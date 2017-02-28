@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
@@ -226,6 +226,11 @@
                <property name="text">
                 <string>Predictions</string>
                </property>
+               <item>
+                <property name="text">
+                 <string>2-point probability</string>
+                </property>
+               </item>
               </item>
              </widget>
             </item>
@@ -851,7 +856,7 @@
                <x>0</x>
                <y>0</y>
                <width>361</width>
-               <height>547</height>
+               <height>525</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1263,22 +1268,6 @@
                </layout>
               </item>
               <item>
-               <spacer name="verticalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <widget class="Line" name="line_14">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -1557,7 +1546,6 @@
              <zorder>line_11</zorder>
              <zorder>line_12</zorder>
              <zorder>line_14</zorder>
-             <zorder>verticalSpacer_6</zorder>
             </widget>
            </widget>
           </item>
