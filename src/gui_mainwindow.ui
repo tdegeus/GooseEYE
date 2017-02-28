@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
@@ -1740,8 +1740,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab4_mouse"/>
   <buttongroup name="buttonGroup_tab2_img1"/>
   <buttongroup name="buttonGroup_tab2_img2"/>
+  <buttongroup name="buttonGroup_tab4_mouse"/>
  </buttongroups>
 </ui>
