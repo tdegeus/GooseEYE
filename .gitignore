@@ -1,6 +1,20 @@
+
+# custom variables
 build*
 *.pro.user
 docs/_build
+src/pybind11
+
+# cmake files
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
