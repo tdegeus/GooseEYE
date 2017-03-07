@@ -8,27 +8,26 @@
 #include <vector>
 
 
-namespace image {
+namespace Image {
 
 template <class T> class Matrix
 {
 
   public:
 
-    std::vector<T>   data;     // data array
-    std::vector<int> shape;    // number of entries in each dimensions
-    int              size;     // total number of entries (==prod(shape))
-    int              nd;       // number of dimensions (1,2,3)
-    bool             periodic; // periodic: true/false
+    std::vector<T>      data;     // data array
+    std::vector<size_t> shape;    // number of entries in each dimensions
+    std::vector<size_t> strides;  // stride length for each index
+    size_t              size;     // total number of entries (==prod(shape))
+    size_t              ndim;     // number of dimensions (1,2,3)
 
     Matrix<T>();
-    Matrix<T>(int nh, int ni=1, int nj=1, bool periodic=false);
+    Matrix<T>(std::vector<size_t>, const T *data=NULL );
+    Matrix<T>(const Matrix<T>& );
 
 }; // class Matrix
 
-
-
-std::vector<double> S2 ( std::vector<double>& pos );
+Matrix<int> S2 ( Matrix<int> &f , Matrix<int> &g );
 
 }; // namespace image
 

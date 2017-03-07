@@ -1,7 +1,7 @@
 
 #include "image.h"
 
-namespace image {
+namespace Image {
 
 // =============================================================================
 // class constructor: default
@@ -17,22 +17,62 @@ Matrix<T>::Matrix()
 // =============================================================================
 
 template <class T>
-Matrix<T>::Matrix(int nh, int ni, int nj, bool periodic_ )
+Matrix<T>::Matrix (std::vector<size_t> shape_, const T *data_ )
 {
-  size     = nh*nj*ni;
-  periodic = periodic_;
 
-  if ( ni==1 && nj==1 )
-    nd = 1;
-  else if ( nj==1 )
-    nd = 2;
+  int i;
 
-  shape.push_back(nh);
-  shape.push_back(ni);
-  shape.push_back(nj);
+  ndim = shape_.size();
 
-  for ( int i=0 ; i<size ; i++ )
+  if ( ndim<1 || ndim>3 )
+    throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
+
+  while ( shape.size()<3 )
+    shape.push_back(1);
+  while ( strides.size()<3 )
+    strides.push_back(1);
+
+  for ( i=0 ; i<shape_.size() ; i++ )
+    shape[i] = shape_[i];
+  for ( i=shape_.size() ; i<3 ; i++ )
+    shape[i] = 1;
+
+  for ( i=2 ; i>0 ; i-- )
+    if ( shape[i]!=1 )
+      break;
+
+  ndim = i+1;
+
+  size = 1;
+  for ( i=0 ; i<3 ; i++ )
+    size *= shape[i];
+
+  strides[0] = shape[2]*shape[1];
+  strides[1] = shape[2];
+  strides[2] = 1;
+
+  while ( data.size()<size )
     data.push_back((T)0);
+
+  if ( data_!=NULL )
+    for ( int i=0 ; i<size ; i++ )
+      data[i] = data_[i];
+
+}
+
+// =============================================================================
+// class constructor: copy
+// =============================================================================
+
+template <class T>
+Matrix<T>::Matrix (const Matrix<T>& src )
+{
+  data    = src.data;
+  shape   = src.shape;
+  strides = src.strides;
+  size    = src.size;
+  ndim    = src.ndim;
+
 }
 
 // =============================================================================
@@ -43,26 +83,19 @@ template class Matrix<int>;
 template class Matrix<bool>;
 template class Matrix<double>;
 
+// =============================================================================
+// 2-point correlation
+// =============================================================================
 
-
-
-std::vector<double> S2 ( std::vector<double>& pos )
+Matrix<int> S2 ( Matrix<int> &f , Matrix<int> &g )
 {
+  Matrix<int> out(f.shape);
 
-  int N = (int)pos.size()/2;
+  for ( int i=0 ; i<f.size ; i++ )
+    out.data[i] = f.data[i]*g.data[i];
 
-  std::vector<double> output(N*3);
-
-  for ( int i=0 ; i<N ; i++ ) {
-    output[i*3+0] = pos[i*2+0];
-    output[i*3+1] = pos[i*2+1];
-    output[i*3+2] = pow(pos[i*2+0]*pos[i*2+1],.5);
-  }
-
-  return output;
+  return out;
 
 }
-
-
 
 }
