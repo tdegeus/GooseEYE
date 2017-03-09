@@ -25,9 +25,13 @@ template <class T> class Matrix
     Matrix<T>(std::vector<size_t>, const T *data=NULL );
     Matrix<T>(const Matrix<T>& );
 
+    T&   operator[] ( size_t i                         );
+    T&   operator() ( size_t h, size_t i=0, size_t j=0 );
+
 }; // class Matrix
 
-Matrix<int> S2 ( Matrix<int> &f , Matrix<int> &g );
+std::tuple<Matrix<int   >,int> S2 ( Matrix<int   > &f , Matrix<int   > &g , std::vector<size_t> roi=std::vector<size_t>() , bool periodic=true );
+std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f , Matrix<double> &g , std::vector<size_t> roi=std::vector<size_t>() , bool periodic=true );
 
 }; // namespace image
 

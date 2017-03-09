@@ -19,7 +19,10 @@ namespace pybind11 { namespace detail {
       PYBIND11_TYPE_CASTER(Image::Matrix<T>, _("Image::Matrix<T>"));
 
       // Conversion part 1 (Python -> C++)
-      bool load(py::handle src, bool) {
+      bool load(py::handle src, bool convert) {
+
+        if (!convert && !py::array_t<T>::check_(src))
+          return false;
 
         auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
         if (!buf)
@@ -66,7 +69,10 @@ PYBIND11_PLUGIN(gooseeye) {
   py::module m("gooseeye", "Geometrical statistics");
   py::module mi = m.def_submodule("image", "Image-based input");
 
-  mi.def("S2", &Image::S2, "2-point correlation" , py::arg("f") , py::arg("g") );
+
+  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>,bool>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi")=std::vector<size_t>() , py::arg("periodic")=false );
+  mi.def("S2", py::overload_cast<Image::Matrix<double>&,Image::Matrix<double>&,std::vector<size_t>,bool>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi")=std::vector<size_t>() , py::arg("periodic")=false );
+
 
   return m.ptr();
 }
