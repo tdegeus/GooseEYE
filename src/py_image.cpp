@@ -45,15 +45,7 @@ namespace pybind11 { namespace detail {
       //Conversion part 2 (C++ -> Python)
       static py::handle cast(const Image::Matrix<T>& src, py::return_value_policy policy, py::handle parent) {
 
-        std::vector<size_t> shape  (src.ndim);
-        std::vector<size_t> strides(src.ndim);
-
-        for ( int i=0 ; i<src.ndim ; i++ ) {
-          shape  [i] = src.shape  [i];
-          strides[i] = src.strides[i]*sizeof(T);
-        }
-
-        py::array a(std::move(shape), std::move(strides), src.data.data() );
+        py::array a(std::move(src.shape()), std::move(src.strides(true)), src.data() );
 
         return a.release();
 
@@ -70,8 +62,10 @@ PYBIND11_PLUGIN(gooseeye) {
   py::module mi = m.def_submodule("image", "Image-based input");
 
 
-  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>,bool>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi")=std::vector<size_t>() , py::arg("periodic")=false );
-  mi.def("S2", py::overload_cast<Image::Matrix<double>&,Image::Matrix<double>&,std::vector<size_t>,bool>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi")=std::vector<size_t>() , py::arg("periodic")=false );
+  mi.def("dummy_circles", &Image::dummy_circles, "Dummy image" , py::arg("shape") , py::arg("x") , py::arg("y") , py::arg("r") , py::arg("periodic")=true );
+
+  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi") );
+  mi.def("S2", py::overload_cast<Image::Matrix<double>&,Image::Matrix<double>&,std::vector<size_t>>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi") );
 
 
   return m.ptr();
