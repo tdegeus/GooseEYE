@@ -110,11 +110,9 @@ size_t Matrix<T>::ndim ( void ) const
 // -----------------------------------------------------------------------------
 
 template <class T>
-std::vector<size_t> Matrix<T>::shape ( int ndim ) const
+std::vector<size_t> Matrix<T>::shape ( void ) const
 {
-  if ( ndim==0 )
-    ndim = this->ndim();
-
+  int ndim = this->ndim();
   std::vector<size_t> out(ndim);
 
   for ( int i=0 ; i<ndim ; i++ )
@@ -165,28 +163,27 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 
 // =============================================================================
 
-Matrix<int> dummy_circles ( std::vector<size_t> shape ,
-  std::vector<int> x , std::vector<int> y , std::vector<int> r , bool periodic )
+Matrix<int> dummy_circles ( std::vector<size_t> &shape ,
+  std::vector<int> &x , std::vector<int> &y , std::vector<int> &r , bool periodic )
 {
-
   if ( shape.size()!=2 )
     throw std::length_error("Only allowed in 2 dimensions");
 
   if ( x.size()!=y.size() || x.size()!=y.size() )
     throw std::length_error("'x', 'y', and 'r' are inconsistent");
 
-  int i,di,dj,N,M;
+  int i,di,dj,I,J;
   Matrix<int> out(shape);
 
-  N = shape[0];
-  M = shape[1];
+  I = shape[0];
+  J = shape[1];
 
   for ( i=0 ; i<x.size() ; i++ )
     for ( di=-r[i] ; di<=r[i] ; di++ )
       for ( dj=-r[i] ; dj<=r[i] ; dj++ )
-        if ( periodic || ( x[i]+di>=0 && x[i]+di<N && y[i]+dj>=0 && y[i]+dj<M ) )
+        if ( periodic || ( x[i]+di>=0 && x[i]+di<I && y[i]+dj>=0 && y[i]+dj<J ) )
           if ( (int)(ceil(pow((double)(pow(di,2)+pow(dj,2)),0.5))) < r[i] )
-            out(PER(x[i]+di,N),PER(y[i]+dj,M)) = 1;
+            out(PER(x[i]+di,I),PER(y[i]+dj,J)) = 1;
 
   return out;
 }
@@ -194,7 +191,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> shape ,
 // =============================================================================
 
 std::tuple<Matrix<int>,int> S2 ( Matrix<int> &f , Matrix<int> &g ,
-  std::vector<size_t> roi )
+  std::vector<size_t> &roi )
 {
   if ( f.shape()!=g.shape() )
     throw std::length_error("'f' and 'g' are inconsistent");
@@ -203,38 +200,35 @@ std::tuple<Matrix<int>,int> S2 ( Matrix<int> &f , Matrix<int> &g ,
     if ( roi[i]%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  int h,i,j,dh,di,dj,N,M,P,dN,dM,dP;
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
   Matrix<int> out(roi);
-
-  while ( roi.size()<3 )
-    roi.push_back(1);
 
   std::vector<size_t> mid = midpoint(roi);
 
-  N  = f.shape(3)[0];
-  M  = f.shape(3)[1];
-  P  = f.shape(3)[2];
-  dN = (int)mid[0];
-  dM = (int)mid[1];
-  dP = (int)mid[2];
+  if ( roi.size()>=1 ) { H  = f.shape()[0]; } else { H  = 1; }
+  if ( roi.size()>=2 ) { I  = f.shape()[1]; } else { I  = 1; }
+  if ( roi.size()>=3 ) { J  = f.shape()[2]; } else { J  = 1; }
+  if ( roi.size()>=1 ) { dH = (int)mid[0];  } else { dH = 0; }
+  if ( roi.size()>=2 ) { dI = (int)mid[1];  } else { dI = 0; }
+  if ( roi.size()>=3 ) { dJ = (int)mid[2];  } else { dJ = 0; }
 
-  for ( h = 0 ; h<N ; h++ )
-    for ( i = 0 ; i<M ; i++ )
-      for ( j = 0 ; j<P ; j++ )
+  for ( h=0 ; h<H ; h++ )
+    for ( i=0 ; i<I ; i++ )
+      for ( j=0 ; j<J ; j++ )
         if ( f(h,i,j) )
-          for ( dh=-dN ; dh<=dN ; dh++ )
-            for ( di=-dM ; di<=dM ; di++ )
-              for ( dj=-dP ; dj<=dP ; dj++ )
-                if ( f(h,i,j)==g(PER(h+dh,N),PER(i+di,M),PER(j+dj,P)) )
-                  out(dh+dN,di+dM,dj+dP)++;
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                if ( f(h,i,j)==g(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  out(dh+dH,di+dI,dj+dJ)++;
 
-  return std::make_tuple(out,N*M*P);
+  return std::make_tuple(out,H*I*J);
 }
 
 // =============================================================================
 
 std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f , Matrix<double> &g ,
-  std::vector<size_t> roi )
+  std::vector<size_t> &roi )
 {
   if ( f.shape()!=g.shape() )
     throw std::length_error("'f' and 'g' are inconsistent");
@@ -243,30 +237,27 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f , Matrix<double> &g ,
     if ( roi[i]%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  int h,i,j,dh,di,dj,N,M,P,dN,dM,dP;
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
   Matrix<double> out(roi);
-
-  while ( roi.size()<3 )
-    roi.push_back(1);
 
   std::vector<size_t> mid = midpoint(roi);
 
-  N  = f.shape(3)[0];
-  M  = f.shape(3)[1];
-  P  = f.shape(3)[2];
-  dN = (int)mid[0];
-  dM = (int)mid[1];
-  dP = (int)mid[2];
+  if ( roi.size()>=1 ) { H  = f.shape()[0]; } else { H  = 1; }
+  if ( roi.size()>=2 ) { I  = f.shape()[1]; } else { I  = 1; }
+  if ( roi.size()>=3 ) { J  = f.shape()[2]; } else { J  = 1; }
+  if ( roi.size()>=1 ) { dH = (int)mid[0];  } else { dH = 0; }
+  if ( roi.size()>=2 ) { dI = (int)mid[1];  } else { dI = 0; }
+  if ( roi.size()>=3 ) { dJ = (int)mid[2];  } else { dJ = 0; }
 
-  for ( h = 0 ; h<N ; h++ )
-    for ( i = 0 ; i<M ; i++ )
-      for ( j = 0 ; j<P ; j++ )
-        for ( dh=-dN ; dh<=dN ; dh++ )
-          for ( di=-dM ; di<=dM ; di++ )
-            for ( dj=-dP ; dj<=dP ; dj++ )
-              out(dh+dN,di+dM,dj+dP) += f(h,i,j)*g(PER(h+dh,N),PER(i+di,M),PER(j+dj,P));
+  for ( h=0 ; h<H ; h++ )
+    for ( i=0 ; i<I ; i++ )
+      for ( j=0 ; j<J ; j++ )
+        for ( dh=-dH ; dh<=dH ; dh++ )
+          for ( di=-dI ; di<=dI ; di++ )
+            for ( dj=-dJ ; dj<=dJ ; dj++ )
+              out(dh+dH,di+dI,dj+dJ) += f(h,i,j)*g(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
 
-  return std::make_tuple(out,N*M*P);
+  return std::make_tuple(out,H*I*J);
 }
 
 }

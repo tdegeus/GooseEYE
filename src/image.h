@@ -27,7 +27,7 @@ template <class T> class Matrix
     Matrix<T>( const Matrix<T>& );
 
     const T*            data    ( void             ) const;
-    std::vector<size_t> shape   ( int  ndim =0     ) const;
+    std::vector<size_t> shape   ( void             ) const;
     std::vector<size_t> strides ( bool bytes=false ) const;
     size_t              size    ( void             ) const;
     size_t              ndim    ( void             ) const;
@@ -39,10 +39,10 @@ template <class T> class Matrix
 
 std::vector<size_t> midpoint ( std::vector<size_t> shape );
 
-Matrix<int> dummy_circles ( std::vector<size_t> shape , std::vector<int> x , std::vector<int> y , std::vector<int> r , bool periodic=true );
+Matrix<int> dummy_circles ( std::vector<size_t> &shape , std::vector<int> &x , std::vector<int> &y , std::vector<int> &r , bool periodic=true );
 
-std::tuple<Matrix<int   >,int> S2 ( Matrix<int   > &f , Matrix<int   > &g , std::vector<size_t> roi );
-std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f , Matrix<double> &g , std::vector<size_t> roi );
+std::tuple<Matrix<int   >,int> S2 ( Matrix<int   > &f , Matrix<int   > &g , std::vector<size_t> &roi );
+std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f , Matrix<double> &g , std::vector<size_t> &roi );
 
 }; // namespace image
 
