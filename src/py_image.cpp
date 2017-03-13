@@ -62,7 +62,8 @@ PYBIND11_PLUGIN(gooseeye) {
   py::module mi = m.def_submodule("image", "Image-based input");
 
 
-  mi.def("dummy_circles", &Image::dummy_circles, "Dummy image", py::arg("shape"), py::arg("x"), py::arg("y"), py::arg("r"), py::arg("periodic")=true );
+  mi.def("dummy_circles", py::overload_cast<std::vector<size_t>&,                                                      bool>(&Image::dummy_circles), "Dummy image", py::arg("shape"),                                           py::arg("periodic")=true );
+  mi.def("dummy_circles", py::overload_cast<std::vector<size_t>&,std::vector<int>&,std::vector<int>&,std::vector<int>&,bool>(&Image::dummy_circles), "Dummy image", py::arg("shape"), py::arg("x"), py::arg("y"), py::arg("r"), py::arg("periodic")=true );
 
   mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&                                                  >(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi")                                                                                         );
   mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,                                        bool,bool>(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi"),                                     py::arg("periodic")=false, py::arg("zeropad")=true );

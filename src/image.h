@@ -43,6 +43,7 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape );
 
 template <typename T> Matrix<T> pad ( Matrix<T> src, std::vector<size_t> pad_shape, T value=(T)0 );
 
+Matrix<int> dummy_circles ( std::vector<size_t> &shape,                                                                bool periodic=true );
 Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &x, std::vector<int> &y, std::vector<int> &r, bool periodic=true );
 
 std::tuple<Matrix<int   >,       int > S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi                                                                                 );

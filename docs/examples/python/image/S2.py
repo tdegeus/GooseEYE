@@ -7,22 +7,8 @@ import numpy          as np
 # binary image + correlation
 # --------------------------
 
-# square grid of circles
-N       = 15
-M       = 500
-x       = np.linspace(0,M,N)
-y       = np.linspace(0,M,N)
-(x,y)   = np.meshgrid(x,y)
-x       = x.reshape(-1)
-y       = y.reshape(-1)
-r       = float(M)/float(N)/4.*np.ones((N*N))
-# random perturbation
-x      += np.random.normal(0.0,float(M)/float(N),N*N)
-y      += np.random.normal(0.0,float(M)/float(N),N*N)
-r      *= np.random.random(N*N)*2.+0.1
-# generate image
-I       = gimage.dummy_circles((M,M),x.astype(np.int),y.astype(np.int),r.astype(np.int),periodic=True)
-# 'volume-fraction' (for bounds)
+# generate image, store 'volume-fraction'
+I       = gimage.dummy_circles((500,500),periodic=True)
 phi     = np.mean(I)
 
 # 2-point probability + apply normalization
@@ -62,8 +48,8 @@ fig.set_tight_layout(True)
 
 ax   = fig.add_subplot(2,3,1)
 im   = ax.imshow(I,clim=(0,1),cmap=mpl.colors.ListedColormap(cm.gray([0,255])))
-ax.xaxis.set_ticks([0,M])
-ax.yaxis.set_ticks([0,M])
+ax.xaxis.set_ticks([0,500])
+ax.yaxis.set_ticks([0,500])
 plt.xlabel(r'$x$')
 plt.ylabel(r'$y$')
 plt.title(r'$\mathcal{I}$')
@@ -99,8 +85,8 @@ plt.ylabel(r'$S_2$')
 
 ax   = fig.add_subplot(2,3,4)
 im   = ax.imshow(Igr,clim=(0,1),cmap='gray')
-ax.xaxis.set_ticks([0,M])
-ax.yaxis.set_ticks([0,M])
+ax.xaxis.set_ticks([0,500])
+ax.yaxis.set_ticks([0,500])
 plt.xlabel(r'$x$')
 plt.ylabel(r'$y$')
 plt.title(r'$\mathcal{I}$')

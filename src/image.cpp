@@ -215,7 +215,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape,
   if ( shape.size()!=2 )
     throw std::length_error("Only allowed in 2 dimensions");
 
-  if ( x.size()!=y.size() || x.size()!=y.size() )
+  if ( x.size()!=y.size() || x.size()!=r.size() )
     throw std::length_error("'x', 'y', and 'r' are inconsistent");
 
   int i,di,dj,I,J;
@@ -232,6 +232,45 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape,
             ret(PER(x[i]+di,I),PER(y[i]+dj,J)) = 1;
 
   return ret;
+}
+
+// =============================================================================
+
+Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
+{
+  if ( shape.size()!=2 )
+    throw std::length_error("Only allowed in 2 dimensions");
+
+  std::srand(std::time(0));
+
+  const double PI = std::atan(1.0)*4;
+
+  int N = (int)(.05*(double)shape[0]);
+  int M = (int)(.05*(double)shape[1]);
+  int R = (int)(pow((.3*(double)(shape[0]*shape[1]))/(PI*(double)(N*M)),.5));
+
+  std::vector<int> x(N*M),y(N*M),r(N*M);
+
+  // define regular grid of circles
+  for ( int i=0 ; i<N ; i++ ) {
+    for ( int j=0 ; j<M ; j++ ) {
+      x[i*M+j] = (int)((double)i*(double)shape[0]/(double)N);
+      y[i*M+j] = (int)((double)j*(double)shape[1]/(double)M);
+      r[i*M+j] = R;
+    }
+  }
+
+  int dN = (int)(.5*(double)shape[0]/(double)N);
+  int dM = (int)(.5*(double)shape[1]/(double)M);
+
+  // randomly perturb circles (move in any direction, enlarge/shrink)
+  for ( int i=0 ; i<N*M ; i++ ) {
+    x[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dN;
+    y[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dM;
+    r[i]  = (int)(((double)(std::rand()%100)/100.*2.+.1)*(double)(r[i]));
+  }
+
+  return dummy_circles(shape,x,y,r,periodic);
 }
 
 // =============================================================================
