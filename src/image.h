@@ -37,7 +37,7 @@ template <class T> class Matrix
 
 }; // class Matrix
 
-std::tuple<int,int,int> shape3d ( std::vector<size_t> shape, int value=1 );
+std::tuple<int,int,int> unpack3d ( std::vector<size_t> src, int value=1 );
 
 std::vector<size_t> midpoint ( std::vector<size_t> shape );
 
@@ -46,13 +46,13 @@ template <typename T> Matrix<T> pad ( Matrix<T> src, std::vector<size_t> pad_sha
 Matrix<int> dummy_circles ( std::vector<size_t> &shape,                                                                bool periodic=true );
 Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &x, std::vector<int> &y, std::vector<int> &r, bool periodic=true );
 
-std::tuple<Matrix<int   >,       int > S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi                                                                                 );
-std::tuple<Matrix<int   >,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi,                                         bool periodic=false, bool zeropad=true );
-std::tuple<Matrix<int   >,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask,                     bool periodic=false, bool zeropad=true );
-std::tuple<Matrix<int   >,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask, bool periodic=false, bool zeropad=true );
+std::tuple<Matrix<double>,       int > S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi                                                                                 );
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi,                                         bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask,                     bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask, bool periodic=true, bool zeropad=false );
 std::tuple<Matrix<double>,       int > S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi                                                                                 );
 
-// void S2_mask ( Matrix<int> &f, Matrix<int> &g, std::vector<size_t> &roi, bool periodic, bool zeropad,  Matrix<int> &fmask );
+std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &I, std::vector<size_t> &roi );
 
 }; // namespace image
 

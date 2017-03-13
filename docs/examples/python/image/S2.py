@@ -8,28 +8,26 @@ import numpy          as np
 # --------------------------
 
 # generate image, store 'volume-fraction'
-I       = gimage.dummy_circles((500,500),periodic=True)
-phi     = np.mean(I)
+I          = gimage.dummy_circles((500,500),periodic=True)
+phi        = np.mean(I)
 
 # 2-point probability + apply normalization
-(S2,N)  = gimage.S2(I,I,(101,101))
-S2      = S2.astype(np.float)/float(N)
+(S2,norm)  = gimage.S2(I,I,(101,101))
 
 # gray image + correlation
 # ------------------------
 
 # convert to gray-scale image by introducing noise
-Igr     = np.array(I,copy=True).astype(np.float)
-Igr    += 0.1*(2.0*np.random.random(Igr.size)-1.0).reshape(Igr.shape)+0.1
-Igr    /= 1.2
+Igr        = np.array(I,copy=True).astype(np.float)
+Igr       += 0.1*(2.0*np.random.random(Igr.size)-1.0).reshape(Igr.shape)+0.1
+Igr       /= 1.2
 
 # 2-point correlation (auto-correlation)
-(cor,N) = gimage.S2(Igr,Igr,(101,101))
-cor     = cor/float(N)
+(cor,norm) = gimage.S2(Igr,Igr,(101,101))
 
 # mean intensity and mean of the intensity squared (for bounds)
-Iav     = np.mean(Igr)
-Isq     = np.mean(Igr**2.)
+Iav        = np.mean(Igr)
+Isq        = np.mean(Igr**2.)
 
 # </snippet>
 
@@ -41,7 +39,8 @@ import matplotlib        as mpl
 import matplotlib.cm     as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-plt.style.use('goose-latex')
+try   : plt.style.use('goose-latex')
+except: pass
 
 fig  = plt.figure(figsize=(18,12))
 fig.set_tight_layout(True)

@@ -8,12 +8,11 @@ import numpy          as np
 # --------------------------
 
 # generate image, store 'volume-fraction'
-I       = gimage.dummy_circles((500,500),periodic=True)
-phi     = np.mean(I)
+I         = gimage.dummy_circles((500,500),periodic=True)
+phi       = np.mean(I)
 
 # 2-point probability + apply normalization
-(S2,N)  = gimage.S2(I,I,(101,101))
-S2      = S2.astype(np.float)/float(N)
+(S2,norm) = gimage.S2(I,I,(101,101))
 
 # artifact + (masked) correlation
 # -------------------------------
@@ -25,12 +24,10 @@ mask[:150,:150] = 1
 Ierr[:150,:150] = 1
 
 # 2-point correlation on image with artifact (no mask)
-(S2err,N)   = gimage.S2(Ierr,Ierr,(101,101))
-S2err       = S2err.astype(np.float)/float(N)
+(S2err,norm)  = gimage.S2(Ierr,Ierr,(101,101))
 
 # 2-point correlation on image with artifact, with artifact masked
-(S2mask,N)  = gimage.S2(Ierr,Ierr,(101,101),fmask=mask,gmask=mask,periodic=True,zeropad=False)
-S2mask      = S2mask.astype(np.float)/N.astype(np.float)
+(S2mask,norm) = gimage.S2(Ierr,Ierr,(101,101),fmask=mask,gmask=mask,periodic=True,zeropad=False)
 
 # </snippet>
 
@@ -42,7 +39,8 @@ import matplotlib        as mpl
 import matplotlib.cm     as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-plt.style.use('goose-latex')
+try   : plt.style.use('goose-latex')
+except: pass
 
 fig  = plt.figure(figsize=(18,12))
 fig.set_tight_layout(True)
