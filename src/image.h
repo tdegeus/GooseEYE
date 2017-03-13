@@ -6,8 +6,10 @@
 #include <cstdlib>
 #include <cmath>
 #include <vector>
+#include <string>
 
 #define PER(i,N) ( (i<0) ? i+N : (i>=N) ? i-N : i )
+#define SIGN(a)  ( (a<0) ?  -1 :  a>0   ?   1 : 0 )
 
 namespace Image {
 
@@ -64,6 +66,8 @@ std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<double>
 std::tuple<Matrix<double>,       double > W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi                                                            );
 std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
 std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
+
+Matrix<int> path ( std::vector<int> &xa , std::vector<int> &xb , std::string mode="Bresenham" );
 
 }; // namespace image
 
