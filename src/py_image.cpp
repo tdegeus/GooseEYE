@@ -61,8 +61,8 @@ PYBIND11_PLUGIN(gooseeye) {
   py::module m("gooseeye", "Geometrical statistics");
   py::module mi = m.def_submodule("image", "Image-based input");
 
-  mi.def("dummy_circles", py::overload_cast<std::vector<size_t>&,                                                      bool>(&Image::dummy_circles), "Dummy image", py::arg("shape"),                                           py::arg("periodic")=true );
-  mi.def("dummy_circles", py::overload_cast<std::vector<size_t>&,std::vector<int>&,std::vector<int>&,std::vector<int>&,bool>(&Image::dummy_circles), "Dummy image", py::arg("shape"), py::arg("x"), py::arg("y"), py::arg("r"), py::arg("periodic")=true );
+  mi.def("dummy_circles", py::overload_cast<std::vector<size_t>&,                                                      bool>(&Image::dummy_circles), "Dummy image", py::arg("shape"),                                               py::arg("periodic")=true );
+  mi.def("dummy_circles", py::overload_cast<std::vector<size_t>&,std::vector<int>&,std::vector<int>&,std::vector<int>&,bool>(&Image::dummy_circles), "Dummy image", py::arg("shape"), py::arg("row"), py::arg("col"), py::arg("r"), py::arg("periodic")=true );
 
   mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&                                                  >(&Image::S2), "2-point probability", py::arg("f"), py::arg("g"), py::arg("roi")                                                                                         );
   mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,                                        bool,bool>(&Image::S2), "2-point probability", py::arg("f"), py::arg("g"), py::arg("roi"),                                     py::arg("periodic")=true, py::arg("zeropad")=false );
@@ -70,7 +70,9 @@ PYBIND11_PLUGIN(gooseeye) {
   mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,Image::Matrix<int>&,Image::Matrix<int>&,bool,bool>(&Image::S2), "2-point probability", py::arg("f"), py::arg("g"), py::arg("roi"), py::arg("fmask"), py::arg("gmask"), py::arg("periodic")=true, py::arg("zeropad")=false );
   mi.def("S2", py::overload_cast<Image::Matrix<double>&,Image::Matrix<double>&,std::vector<size_t>&                                                  >(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi")                                                                                         );
 
-  mi.def("W2", &Image::W2, "Conditional 2-point probability", py::arg("W"), py::arg("I"), py::arg("roi") );
+  mi.def("W2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&                              >(&Image::W2), "Conditional 2-point probability", py::arg("W"), py::arg("I"), py::arg("roi")                                                                      );
+  mi.def("W2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,                    bool,bool>(&Image::W2), "Conditional 2-point probability", py::arg("W"), py::arg("I"), py::arg("roi"),                  py::arg("periodic")=true, py::arg("zeropad")=false );
+  mi.def("W2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,Image::Matrix<int>&,bool,bool>(&Image::W2), "Conditional 2-point probability", py::arg("W"), py::arg("I"), py::arg("roi"), py::arg("mask"), py::arg("periodic")=true, py::arg("zeropad")=false );
 
   return m.ptr();
 }

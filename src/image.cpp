@@ -221,13 +221,13 @@ Matrix<T> pad ( Matrix<T> src, std::vector<size_t> pad_shape, T value )
 // =============================================================================
 
 Matrix<int> dummy_circles ( std::vector<size_t> &shape,
-  std::vector<int> &x, std::vector<int> &y, std::vector<int> &r, bool periodic )
+  std::vector<int> &row, std::vector<int> &col, std::vector<int> &r, bool periodic )
 {
   if ( shape.size()!=2 )
     throw std::length_error("Only allowed in 2 dimensions");
 
-  if ( x.size()!=y.size() || x.size()!=r.size() )
-    throw std::length_error("'x', 'y', and 'r' are inconsistent");
+  if ( row.size()!=col.size() || row.size()!=r.size() )
+    throw std::length_error("'row', 'col', and 'r' are inconsistent");
 
   int i,di,dj,I,J;
   Matrix<int> ret(shape);
@@ -235,12 +235,12 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape,
   I = shape[0];
   J = shape[1];
 
-  for ( i=0 ; i<x.size() ; i++ )
+  for ( i=0 ; i<row.size() ; i++ )
     for ( di=-r[i] ; di<=r[i] ; di++ )
       for ( dj=-r[i] ; dj<=r[i] ; dj++ )
-        if ( periodic || ( x[i]+di>=0 && x[i]+di<I && y[i]+dj>=0 && y[i]+dj<J ) )
+        if ( periodic || ( row[i]+di>=0 && row[i]+di<I && col[i]+dj>=0 && col[i]+dj<J ) )
           if ( (int)(ceil(pow((double)(pow(di,2)+pow(dj,2)),0.5))) < r[i] )
-            ret(PER(x[i]+di,I),PER(y[i]+dj,J)) = 1;
+            ret(PER(row[i]+di,I),PER(col[i]+dj,J)) = 1;
 
   return ret;
 }
@@ -264,13 +264,13 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
   int M = (int)(.05*(double)shape[1]);
   int R = (int)(pow((.3*(double)(shape[0]*shape[1]))/(PI*(double)(N*M)),.5));
 
-  std::vector<int> x(N*M),y(N*M),r(N*M);
+  std::vector<int> row(N*M),col(N*M),r(N*M);
 
   // define regular grid of circles
   for ( int i=0 ; i<N ; i++ ) {
     for ( int j=0 ; j<M ; j++ ) {
-      x[i*M+j] = (int)((double)i*(double)shape[0]/(double)N);
-      y[i*M+j] = (int)((double)j*(double)shape[1]/(double)M);
+      row[i*M+j] = (int)((double)i*(double)shape[0]/(double)N);
+      col[i*M+j] = (int)((double)j*(double)shape[1]/(double)M);
       r[i*M+j] = R;
     }
   }
@@ -281,13 +281,13 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
 
   // randomly perturb circles (move in any direction, enlarge/shrink)
   for ( int i=0 ; i<N*M ; i++ ) {
-    x[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dN;
-    y[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dM;
+    row[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dN;
+    col[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dM;
     r[i]  = (int)(((double)(std::rand()%100)/100.*2.+.1)*(double)(r[i]));
   }
 
   // convert to image
-  return dummy_circles(shape,x,y,r,periodic);
+  return dummy_circles(shape,row,col,r,periodic);
 }
 
 // =============================================================================
@@ -482,7 +482,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
   std::vector<size_t> mid = midpoint(roi);
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(mid       ,0);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
 
   // compute correlation
   for ( h=0 ; h<H ; h++ )
@@ -509,7 +509,79 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
 }
 
 // =============================================================================
+// masked conditional 2-point probability (binary image, binary weight)
+// =============================================================================
 
+std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
+  std::vector<size_t> &roi, Matrix<int> &mask, bool periodic, bool zeropad )
+{
+  if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
+    throw std::length_error("'W', 'I', and 'mask' are inconsistent");
 
+  for ( int i=0 ; i<roi.size() ; i++ )
+    if ( roi[i]%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
+
+  Matrix<double> ret (roi);
+  Matrix<int   > norm(roi);
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  if ( zeropad ) {
+    src  = pad(src ,mid  );
+    mask = pad(mask,mid,1);
+  }
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  // define boundary region to skip
+  if ( !periodic )
+    std::tie(bH,bI,bJ) = unpack3d(mid,0);
+
+  // compute correlation
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
+        if ( W(h,i,j) )
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  if ( src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                    ret(dh+dH,di+dI,dj+dJ) += 1.;
+
+  // compute normalization: sum of weight factors (binary) of unmasked voxels
+  for ( h=0 ; h<H ; h++ )
+    for ( i=0 ; i<I ; i++ )
+      for ( j=0 ; j<J ; j++ )
+        if ( W(h,i,j) )
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  norm(dh+dH,di+dI,dj+dJ)++;
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= (double)norm[i];
+
+  return std::make_tuple(ret,norm);
+}
+
+// =============================================================================
+// conditional 2-point probability (binary image, binary weight)
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
+  std::vector<size_t> &roi, bool periodic, bool zeropad )
+{
+  Matrix<int> mask(src.shape());
+  return W2(W,src,roi,mask,periodic,zeropad);
+}
+
+// =============================================================================
 
 } // namespace Image
