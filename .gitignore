@@ -1,4 +1,6 @@
 
+test.py
+
 # custom variables
 build*
 *.pro.user

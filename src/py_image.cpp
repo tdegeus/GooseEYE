@@ -62,11 +62,15 @@ PYBIND11_PLUGIN(gooseeye) {
   py::module mi = m.def_submodule("image", "Image-based input");
 
 
-  mi.def("dummy_circles", &Image::dummy_circles, "Dummy image" , py::arg("shape") , py::arg("x") , py::arg("y") , py::arg("r") , py::arg("periodic")=true );
+  mi.def("dummy_circles", &Image::dummy_circles, "Dummy image", py::arg("shape"), py::arg("x"), py::arg("y"), py::arg("r"), py::arg("periodic")=true );
 
-  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi") );
-  mi.def("S2", py::overload_cast<Image::Matrix<double>&,Image::Matrix<double>&,std::vector<size_t>&>(&Image::S2), "2-point correlation" , py::arg("f") , py::arg("g") , py::arg("roi") );
+  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&                                                  >(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi")                                                                                         );
+  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,                                        bool,bool>(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi"),                                     py::arg("periodic")=false, py::arg("zeropad")=true );
+  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,Image::Matrix<int>&,                    bool,bool>(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi"), py::arg("fmask"),                   py::arg("periodic")=false, py::arg("zeropad")=true );
+  mi.def("S2", py::overload_cast<Image::Matrix<int   >&,Image::Matrix<int   >&,std::vector<size_t>&,Image::Matrix<int>&,Image::Matrix<int>&,bool,bool>(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi"), py::arg("fmask"), py::arg("gmask"), py::arg("periodic")=false, py::arg("zeropad")=true );
+  mi.def("S2", py::overload_cast<Image::Matrix<double>&,Image::Matrix<double>&,std::vector<size_t>&                                                  >(&Image::S2), "2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi")                                                                                         );
 
+  // mi.def("S2_mask", &Image::S2_mask, "(Masked) 2-point correlation", py::arg("f"), py::arg("g"), py::arg("roi"), py::arg("periodic")=false, py::arg("zeropad")=true, py::arg("fmask")=Image::Matrix<int>({0}) );
 
   return m.ptr();
 }

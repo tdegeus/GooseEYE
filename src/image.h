@@ -37,12 +37,21 @@ template <class T> class Matrix
 
 }; // class Matrix
 
+std::tuple<int,int,int> shape3d ( std::vector<size_t> shape, int value=1 );
+
 std::vector<size_t> midpoint ( std::vector<size_t> shape );
 
-Matrix<int> dummy_circles ( std::vector<size_t> &shape , std::vector<int> &x , std::vector<int> &y , std::vector<int> &r , bool periodic=true );
+template <typename T> Matrix<T> pad ( Matrix<T> src, std::vector<size_t> pad_shape, T value=(T)0 );
 
-std::tuple<Matrix<int   >,int> S2 ( Matrix<int   > &f , Matrix<int   > &g , std::vector<size_t> &roi );
-std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f , Matrix<double> &g , std::vector<size_t> &roi );
+Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &x, std::vector<int> &y, std::vector<int> &r, bool periodic=true );
+
+std::tuple<Matrix<int   >,       int > S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi                                                                                 );
+std::tuple<Matrix<int   >,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi,                                         bool periodic=false, bool zeropad=true );
+std::tuple<Matrix<int   >,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask,                     bool periodic=false, bool zeropad=true );
+std::tuple<Matrix<int   >,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask, bool periodic=false, bool zeropad=true );
+std::tuple<Matrix<double>,       int > S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi                                                                                 );
+
+// void S2_mask ( Matrix<int> &f, Matrix<int> &g, std::vector<size_t> &roi, bool periodic, bool zeropad,  Matrix<int> &fmask );
 
 }; // namespace image
 
