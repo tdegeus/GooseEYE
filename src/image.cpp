@@ -291,7 +291,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
 }
 
 // =============================================================================
-// 2-point correlation (binary) / 2-point cluster function (int)      [periodic]
+// 2-point probability (binary) / 2-point cluster function (int)      [periodic]
 // =============================================================================
 
 std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
@@ -370,8 +370,8 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
   return std::make_tuple(ret,f.size());
 }
 
-// =============================================================================
-// masked 2-point correlation (binary) / 2-point cluster function (int)
+// =======x======================================================================
+// masked 2-point probability (binary) / 2-point cluster function (int)
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
@@ -384,6 +384,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
   for ( auto i : roi )
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<fmask.size() ; i++ )
+    if ( !(fmask[i]==0 || fmask[i]==1) || !(gmask[i]==0 || gmask[i]==1) )
+      throw std::out_of_range("'fmask' and 'gmask' must be binary");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
@@ -437,7 +441,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 }
 
 // =============================================================================
-// masked 2-point correlation (binary) / 2-point cluster function (int)
+// masked 2-point probability (binary) / 2-point cluster function (int)
 // - default "gmask"
 // =============================================================================
 
@@ -449,11 +453,106 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 }
 
 // =============================================================================
-// masked 2-point correlation (binary) / 2-point cluster function (int)
+// masked 2-point probability (binary) / 2-point cluster function (int)
 // - default "fmask" and "gmask"
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
+  std::vector<size_t> &roi, bool periodic, bool zeropad )
+{
+  Matrix<int> fmask(f.shape());
+  Matrix<int> gmask(g.shape());
+  return S2(f,g,roi,fmask,gmask,periodic,zeropad);
+}
+
+// =======x======================================================================
+// masked 2-point correlation (floating-point)
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
+  std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask,
+  bool periodic, bool zeropad )
+{
+  if ( f.shape()!=g.shape() || f.shape()!=fmask.shape() || f.shape()!=gmask.shape() )
+    throw std::length_error("'f', 'g', 'fmask', and 'gmask' are inconsistent");
+
+  for ( auto i : roi )
+    if ( i%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<fmask.size() ; i++ )
+    if ( !(fmask[i]==0 || fmask[i]==1) || !(gmask[i]==0 || gmask[i]==1) )
+      throw std::out_of_range("'fmask' and 'gmask' must be binary");
+
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
+
+  Matrix<double> ret (roi);
+  Matrix<int   > norm(roi);
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  if ( zeropad ) {
+    f     = pad(f    ,mid  );
+    g     = pad(g    ,mid  );
+    fmask = pad(fmask,mid,1);
+    gmask = pad(gmask,mid,1);
+  }
+
+  std::tie( H, I, J) = unpack3d(f.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid      ,0);
+
+  // define boundary region to skip
+  if ( !periodic )
+    std::tie(bH,bI,bJ) = unpack3d(mid,0);
+
+  // compute correlation
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
+        if ( !fmask(h,i,j) )
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                if ( !gmask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  ret(dh+dH,di+dI,dj+dJ) += \
+                    f(h,i,j)*g(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+
+  // compute normalization (account for masked voxels)
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
+        if ( !fmask(h,i,j) )
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                if ( !gmask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  norm(dh+dH,di+dI,dj+dJ)++;
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= (double)norm[i];
+
+  return std::make_tuple(ret,norm);
+}
+
+// =============================================================================
+// masked 2-point correlation (floating-point)
+// - default "gmask"
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
+  std::vector<size_t> &roi, Matrix<int> &fmask, bool periodic, bool zeropad )
+{
+  Matrix<int> gmask(g.shape());
+  return S2(f,g,roi,fmask,gmask,periodic,zeropad);
+}
+
+// =============================================================================
+// masked 2-point correlation (floating-point)
+// - default "fmask" and "gmask"
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
   std::vector<size_t> &roi, bool periodic, bool zeropad )
 {
   Matrix<int> fmask(f.shape());
@@ -474,6 +573,10 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
   for ( auto i : roi )
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<W.size() ; i++ )
+    if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) )
+      throw std::out_of_range("'W' and 'I' must be binary");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
 
@@ -509,6 +612,100 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
 }
 
 // =============================================================================
+// conditional 2-point correlation (float. image, binary weight)      [periodic]
+// =============================================================================
+
+std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<double> &src,
+  std::vector<size_t> &roi )
+{
+  if ( W.shape()!=src.shape() )
+    throw std::length_error("'W' and 'I' are inconsistent");
+
+  for ( auto i : roi )
+    if ( i%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<W.size() ; i++ )
+    if ( !(W[i]==0 || W[i]==1) )
+      throw std::out_of_range("'W' must be binary");
+
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
+
+  Matrix<double> ret(roi);
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  // compute correlation
+  for ( h=0 ; h<H ; h++ )
+    for ( i=0 ; i<I ; i++ )
+      for ( j=0 ; j<J ; j++ )
+        if ( W(h,i,j) )
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                ret(dh+dH,di+dI,dj+dJ) += src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+
+  // compute normalization: sum of weight factors (binary)
+  int norm = 0;
+  for ( i=0 ; i<W.size() ; i++ )
+    if ( W[i] )
+      norm++;
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= (double)norm;
+
+  return std::make_tuple(ret,norm);
+}
+
+// =============================================================================
+// weighted 2-point correlation (float. image, float. weight)         [periodic]
+// =============================================================================
+
+std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
+  std::vector<size_t> &roi )
+{
+  if ( W.shape()!=src.shape() )
+    throw std::length_error("'W' and 'I' are inconsistent");
+
+  for ( auto i : roi )
+    if ( i%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
+
+  Matrix<double> ret(roi);
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  // compute correlation
+  for ( h=0 ; h<H ; h++ )
+    for ( i=0 ; i<I ; i++ )
+      for ( j=0 ; j<J ; j++ )
+        for ( dh=-dH ; dh<=dH ; dh++ )
+          for ( di=-dI ; di<=dI ; di++ )
+            for ( dj=-dJ ; dj<=dJ ; dj++ )
+              ret(dh+dH,di+dI,dj+dJ) += W(h,i,j)*src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+
+  // compute normalization: sum of weight factors (binary)
+  double norm = 0.;
+  for ( i=0 ; i<W.size() ; i++ )
+    norm += W[i];
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= norm;
+
+  return std::make_tuple(ret,norm);
+}
+
+// =============================================================================
 // masked conditional 2-point probability (binary image, binary weight)
 // =============================================================================
 
@@ -521,6 +718,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
   for ( auto i : roi )
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<W.size() ; i++ )
+    if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) || !(mask[i]==0 || mask[i]==1) )
+      throw std::out_of_range("'W', 'I', and 'mask' must be binary");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
@@ -576,6 +777,159 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
+  std::vector<size_t> &roi, bool periodic, bool zeropad )
+{
+  Matrix<int> mask(src.shape());
+  return W2(W,src,roi,mask,periodic,zeropad);
+}
+
+// =============================================================================
+// masked conditional 2-point correlation (float. image, binary weight)
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
+  std::vector<size_t> &roi, Matrix<int> &mask, bool periodic, bool zeropad )
+{
+  if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
+    throw std::length_error("'W', 'I', and 'mask' are inconsistent");
+
+  for ( auto i : roi )
+    if ( i%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<W.size() ; i++ )
+    if ( !(W[i]==0 || W[i]==1) || !(mask[i]==0 || mask[i]==1) )
+      throw std::out_of_range("'W' and 'mask' must be binary");
+
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
+
+  Matrix<double> ret (roi);
+  Matrix<int   > norm(roi);
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  if ( zeropad ) {
+    src  = pad(src ,mid  );
+    mask = pad(mask,mid,1);
+  }
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  // define boundary region to skip
+  if ( !periodic )
+    std::tie(bH,bI,bJ) = unpack3d(mid,0);
+
+  // compute correlation
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
+        if ( W(h,i,j) )
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  ret(dh+dH,di+dI,dj+dJ) += src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+
+  // compute normalization: sum of weight factors (binary) of unmasked voxels
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
+        if ( W(h,i,j) )
+          for ( dh=-dH ; dh<=dH ; dh++ )
+            for ( di=-dI ; di<=dI ; di++ )
+              for ( dj=-dJ ; dj<=dJ ; dj++ )
+                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  norm(dh+dH,di+dI,dj+dJ)++;
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= (double)norm[i];
+
+  return std::make_tuple(ret,norm);
+}
+
+// =============================================================================
+// conditional 2-point correlation (float. image, binary weight)
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
+  std::vector<size_t> &roi, bool periodic, bool zeropad )
+{
+  Matrix<int> mask(src.shape());
+  return W2(W,src,roi,mask,periodic,zeropad);
+}
+
+// =============================================================================
+// weighted conditional 2-point correlation (float. image, float. weight)
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &src,
+  std::vector<size_t> &roi, Matrix<int> &mask, bool periodic, bool zeropad )
+{
+  if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
+    throw std::length_error("'W', 'I', and 'mask' are inconsistent");
+
+  for ( auto i : roi )
+    if ( i%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<W.size() ; i++ )
+    if ( !(mask[i]==0 || mask[i]==1) )
+      throw std::out_of_range("'mask' must be binary");
+
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
+
+  Matrix<double> ret (roi);
+  Matrix<double> norm(roi);
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  if ( zeropad ) {
+    src  = pad(src ,mid  );
+    mask = pad(mask,mid,1);
+  }
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  // define boundary region to skip
+  if ( !periodic )
+    std::tie(bH,bI,bJ) = unpack3d(mid,0);
+
+  // compute correlation
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
+        for ( dh=-dH ; dh<=dH ; dh++ )
+          for ( di=-dI ; di<=dI ; di++ )
+            for ( dj=-dJ ; dj<=dJ ; dj++ )
+              if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                ret(dh+dH,di+dI,dj+dJ) += \
+                  W(h,i,j)*src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+
+  // compute normalization: sum of weight factors (binary) of unmasked voxels
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
+        for ( dh=-dH ; dh<=dH ; dh++ )
+          for ( di=-dI ; di<=dI ; di++ )
+            for ( dj=-dJ ; dj<=dJ ; dj++ )
+              if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                norm(dh+dH,di+dI,dj+dJ) += W(h,i,j);
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= norm[i];
+
+  return std::make_tuple(ret,norm);
+}
+
+// =============================================================================
+// weighted 2-point correlation (float. image, float. weight)
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &src,
   std::vector<size_t> &roi, bool periodic, bool zeropad )
 {
   Matrix<int> mask(src.shape());

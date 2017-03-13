@@ -51,10 +51,19 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask,                     bool periodic=true, bool zeropad=false );
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask, bool periodic=true, bool zeropad=false );
 std::tuple<Matrix<double>,       int > S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi                                                                                 );
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi,                                         bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi, Matrix<int> &fmask,                     bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask, bool periodic=true, bool zeropad=false );
 
-std::tuple<Matrix<double>,       int > W2 ( Matrix<int> &W, Matrix<int> &I, std::vector<size_t> &roi );
-std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,       int    > W2 ( Matrix<int   > &W, Matrix<int   > &I, std::vector<size_t> &roi                                                            );
+std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<int   > &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<int   > &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,       int    > W2 ( Matrix<int   > &W, Matrix<double> &I, std::vector<size_t> &roi                                                            );
+std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<double> &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<double> &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,       double > W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi                                                            );
+std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
+std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
 
 }; // namespace image
 
