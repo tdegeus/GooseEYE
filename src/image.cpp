@@ -186,7 +186,7 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 }
 
 // =============================================================================
-// pad "pad_shape" entries on each side with a certain "value"
+// pad "pad_shape" entries on each side of "src" with a certain "value"
 // =============================================================================
 
 template <typename T>
@@ -217,7 +217,7 @@ Matrix<T> pad ( Matrix<T> src, std::vector<size_t> pad_shape, T value )
 }
 
 // =============================================================================
-// create a dummy image with circles at position "x","y" with radius "r"
+// create a dummy image with circles at position "row","col" with radius "r"
 // =============================================================================
 
 Matrix<int> dummy_circles ( std::vector<size_t> &shape,
@@ -271,7 +271,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
     for ( int j=0 ; j<M ; j++ ) {
       row[i*M+j] = (int)((double)i*(double)shape[0]/(double)N);
       col[i*M+j] = (int)((double)j*(double)shape[1]/(double)M);
-      r[i*M+j] = R;
+      r  [i*M+j] = R;
     }
   }
 
@@ -283,7 +283,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
   for ( int i=0 ; i<N*M ; i++ ) {
     row[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dN;
     col[i] += (int)(((double)(std::rand()%2)-.5)*2.)*std::rand()%dM;
-    r[i]  = (int)(((double)(std::rand()%100)/100.*2.+.1)*(double)(r[i]));
+    r  [i]  = (int)(((double)(std::rand()%100)/100.*2.+.1)*(double)(r[i]));
   }
 
   // convert to image
@@ -291,7 +291,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
 }
 
 // =============================================================================
-// 2-point correlation (binary) / 2-point cluster function (int)
+// 2-point correlation (binary) / 2-point cluster function (int)      [periodic]
 // =============================================================================
 
 std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
@@ -300,8 +300,8 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
   if ( f.shape()!=g.shape() )
     throw std::length_error("'f' and 'g' are inconsistent");
 
-  for ( int i=0 ; i<roi.size() ; i++ )
-    if ( roi[i]%2==0 )
+  for ( auto i : roi )
+    if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
@@ -332,7 +332,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
 }
 
 // =============================================================================
-// 2-point correlation (floating-point)
+// 2-point correlation (floating-point)                               [periodic]
 // =============================================================================
 
 std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
@@ -341,8 +341,8 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
   if ( f.shape()!=g.shape() )
     throw std::length_error("'f' and 'g' are inconsistent");
 
-  for ( int i=0 ; i<roi.size() ; i++ )
-    if ( roi[i]%2==0 )
+  for ( auto i : roi )
+    if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
@@ -379,10 +379,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
   bool periodic, bool zeropad )
 {
   if ( f.shape()!=g.shape() || f.shape()!=fmask.shape() || f.shape()!=gmask.shape() )
-    throw std::length_error("'f,g,fmask,gmask' are inconsistent");
+    throw std::length_error("'f', 'g', 'fmask', and 'gmask' are inconsistent");
 
-  for ( int i=0 ; i<roi.size() ; i++ )
-    if ( roi[i]%2==0 )
+  for ( auto i : roi )
+    if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
@@ -462,7 +462,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 }
 
 // =============================================================================
-// conditional 2-point probability (binary image, binary weight)
+// conditional 2-point probability (binary image, binary weight)      [periodic]
 // =============================================================================
 
 std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
@@ -471,8 +471,8 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
   if ( W.shape()!=src.shape() )
     throw std::length_error("'W' and 'I' are inconsistent");
 
-  for ( int i=0 ; i<roi.size() ; i++ )
-    if ( roi[i]%2==0 )
+  for ( auto i : roi )
+    if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
@@ -518,8 +518,8 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
     throw std::length_error("'W', 'I', and 'mask' are inconsistent");
 
-  for ( int i=0 ; i<roi.size() ; i++ )
-    if ( roi[i]%2==0 )
+  for ( auto i : roi )
+    if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
@@ -554,9 +554,9 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
                     ret(dh+dH,di+dI,dj+dJ) += 1.;
 
   // compute normalization: sum of weight factors (binary) of unmasked voxels
-  for ( h=0 ; h<H ; h++ )
-    for ( i=0 ; i<I ; i++ )
-      for ( j=0 ; j<J ; j++ )
+  for ( h=bH ; h<H-bH ; h++ )
+    for ( i=bI ; i<I-bI ; i++ )
+      for ( j=bJ ; j<J-bJ ; j++ )
         if ( W(h,i,j) )
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
