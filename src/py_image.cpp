@@ -79,6 +79,11 @@ mi.def("kernel",&Image::kernel,py::arg("ndim"),py::arg("mode")="default");
 mi.def("clusters",py::overload_cast<Mi&,    i,b>(&Image::clusters),"Identify clusters",py::arg("im"),                  py::arg("min_size")=0,py::arg("periodic")=true);
 mi.def("clusters",py::overload_cast<Mi&,Mi&,i,b>(&Image::clusters),"Identify clusters",py::arg("im"),py::arg("kernel"),py::arg("min_size")=0,py::arg("periodic")=true);
 
+mi.def("dilate",py::overload_cast<Mi&    ,i  ,b>(&Image::dilate),"Dilate image",py::arg("im"),                  py::arg("iterations")=1,py::arg("periodic")=true );
+mi.def("dilate",py::overload_cast<Mi&    ,Vi&,b>(&Image::dilate),"Dilate image",py::arg("im"),                  py::arg("iterations")  ,py::arg("periodic")=true );
+mi.def("dilate",py::overload_cast<Mi&,Mi&,i  ,b>(&Image::dilate),"Dilate image",py::arg("im"),py::arg("kernel"),py::arg("iterations")=1,py::arg("periodic")=true );
+mi.def("dilate",py::overload_cast<Mi&,Mi&,Vi&,b>(&Image::dilate),"Dilate image",py::arg("im"),py::arg("kernel"),py::arg("iterations")  ,py::arg("periodic")=true );
+
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&            >(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,        b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("zeropad")=false,py::arg("periodic")=true);
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,Mi&,    b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),                 py::arg("zeropad")=false,py::arg("periodic")=true);

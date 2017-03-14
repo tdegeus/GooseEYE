@@ -207,7 +207,7 @@ Matrix<int> stamp_points ( std::vector<size_t> &N )
 
   // allocate
   Matrix<int> ret({(size_t)n,(size_t)nd});
-  std::vector<size_t> mid = midpoint(N);
+  std::vector<int> mid = midpoint_int(N);
 
   // 1-D
   // ---
@@ -278,6 +278,23 @@ std::tuple<int,int,int> unpack3d ( std::vector<size_t> src, int value )
 
 // =============================================================================
 // compute midpoint from "shape"-vector
+// =============================================================================
+
+std::vector<int> midpoint_int ( std::vector<size_t> shape )
+{
+  std::vector<int> ret(shape.size());
+
+  for ( auto i : shape )
+    if ( !(i%2) )
+      throw std::domain_error("Only allowed for odd-shaped matrices");
+
+  for ( int i=0 ; i<shape.size() ; i++ )
+    ret[i] = ((int)shape[i]-1)/2;
+
+  return ret;
+
+}
+
 // =============================================================================
 
 std::vector<size_t> midpoint ( std::vector<size_t> shape )
@@ -356,6 +373,115 @@ Matrix<double> pad ( Matrix<double> &src , std::vector<size_t> &pad_shape ,
 }
 
 // =============================================================================
+// dilate image
+// =============================================================================
+
+Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
+  std::vector<int> &iterations, bool periodic )
+{
+  if ( iterations.size()!=src.max()+1 )
+    throw std::length_error("Iteration must be specified for each label");
+
+  int h,i,j,dh,di,dj,nlab,ilab,iter;
+  int max_iter = 0;
+
+  Matrix<int> l = src;
+  std::vector<int> mid = midpoint_int(kern.shape(3));
+  std::vector<size_t> N = src.shape(3);
+
+  // number of labels
+  nlab = l.max();
+
+  // find maximum number of iterations
+  max_iter = *std::max_element(iterations.begin(),iterations.end());
+
+  // loop over iterations
+  for ( iter=0 ; iter<max_iter ; iter++ ) {
+
+    // loop over all voxel
+    for ( h=0 ; h<N[0] ; h++ ) {
+      for ( i=0 ; i<N[1] ; i++ ) {
+        for ( j=0 ; j<N[2] ; j++ ) {
+          // label over the current voxel
+          ilab = l(h,i,j);
+          // proceed:
+          // - for non-zero label
+          // - if the number of iterations for this label has not been exceeded
+          if ( ilab>0 && iterations[ilab]>iter ) {
+            // loop over the kernel
+            for ( dh=-mid[0] ; dh<=mid[0] ; dh++ ) {
+              for ( di=-mid[1] ; di<=mid[1] ; di++ ) {
+                for ( dj=-mid[2] ; dj<=mid[2] ; dj++ ) {
+                  // dilate for non-zero kernel value
+                  if ( kern(dh+mid[0],di+mid[1],dj+mid[2]) && !(dh==0 && di==0 && dj==0) ) {
+                    // periodic image
+                    if ( periodic ) {
+                      if ( !l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) ) {
+                        l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) = -1*ilab;
+                      }
+                    }
+                    // non-periodic image
+                    else {
+                      // check if the comparison voxel in the image
+                      if ( h+dh<N[0] && h+dh>=0 && i+di<N[1] && i+di>=0 && j+dj<N[2] && j+dj>=0 ) {
+                        // dilate (only for zero comparison voxel)
+                        if ( !l(h+dh,i+di,j+dj) ) {
+                          l(h+dh,i+di,j+dj) = -1*ilab;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // copy new image to input image
+    l.abs();
+
+  }
+
+  return l;
+}
+
+// =============================================================================
+
+Matrix<int> dilate ( Matrix<int> &src, int iterations, bool periodic )
+{
+  Matrix<int> kern = kernel(src.ndim());
+
+  std::vector<int> iter(src.max()+1);
+  for ( auto &i : iter )
+    i = iterations;
+
+  return dilate(src,kern,iter,periodic);
+}
+
+// =============================================================================
+
+Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kernel, int iterations,
+  bool periodic )
+{
+  std::vector<int> iter(src.max()+1);
+  for ( auto &i : iter )
+    i = iterations;
+
+  return dilate(src,kernel,iter,periodic);
+}
+
+// =============================================================================
+
+Matrix<int> dilate ( Matrix<int> &src, std::vector<int> &iterations,
+  bool periodic )
+{
+  Matrix<int> kern = kernel(src.ndim());
+  return dilate(src,kern,iterations,periodic);
+}
+
+// =============================================================================
 // create a dummy image with circles at position "row","col" with radius "r"
 // =============================================================================
 
@@ -430,7 +556,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
 }
 
 // =============================================================================
-// kernels
+// define kernels
 // =============================================================================
 
 Matrix<int> kernel ( int ndim , std::string mode )
@@ -552,8 +678,8 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
   Matrix<int> l(f.shape());
   Matrix<int> c(f.shape());
 
-  std::vector<size_t> mid = midpoint(kern.shape(3));
-  std::vector<size_t> N   = f.shape(3);
+  std::vector<int> mid = midpoint_int(kern.shape(3));
+  std::vector<size_t> N = f.shape(3);
 
   // --------------
   // basic labeling
@@ -886,8 +1012,6 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
   Matrix<int> kern = kernel(f.ndim());
   return clusters(f,kern,min_size,periodic);
 }
-
-
 
 // =============================================================================
 // 2-point probability (binary) / 2-point cluster function (int)      [periodic]

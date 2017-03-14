@@ -161,6 +161,15 @@ template <class T> class Matrix
     T max ( void )
     { return *std::max_element(_data.begin(),_data.end()); };
 
+    // absolute values
+    // ---------------
+
+    void abs ( void )
+    {
+      for ( auto &i : _data )
+        i = std::abs(i);
+    };
+
 }; // class Matrix
 
 // =============================================================================
@@ -178,7 +187,8 @@ using b  = bool;
 
 std::tuple<i,i,i> unpack3d ( Vs src, i value=1 );
 
-Vs midpoint ( Vs shape );
+Vi midpoint_int ( Vs shape );
+Vs midpoint     ( Vs shape );
 
 Mi path ( Vi &xa, Vi &xb, std::string mode="Bresenham" );
 
@@ -195,10 +205,10 @@ Mi kernel ( i ndim , std::string mode="default" );
 std::tuple<Mi,Mi> clusters ( Mi &src,             i min_size=0, b periodic=true);
 std::tuple<Mi,Mi> clusters ( Mi &src, Mi &kernel, i min_size=0, b periodic=true);
 
-Mi dilate ( Mi &src              , i  iterations=1    );
-Mi dilate ( Mi &src              , Vi iterations=Vi() );
-Mi dilate ( Mi &src , Mi &kernel , i  iterations=1    );
-Mi dilate ( Mi &src , Mi &kernel , Vi iterations=Vi() );
+Mi dilate ( Mi &src            , i   iterations=1, b periodic=true );
+Mi dilate ( Mi &src            , Vi& iterations  , b periodic=true );
+Mi dilate ( Mi &src, Mi &kernel, i   iterations=1, b periodic=true );
+Mi dilate ( Mi &src, Mi &kernel, Vi& iterations  , b periodic=true );
 
 std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );
 std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b pad=false, b periodic=true );
