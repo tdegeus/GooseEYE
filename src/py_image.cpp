@@ -65,6 +65,7 @@ using Vi = std::vector<int>;
 using d  = double;
 using i  = int;
 using b  = bool;
+using s  = std::string;
 
 PYBIND11_PLUGIN(gooseeye) {
 
@@ -102,6 +103,11 @@ mi.def("W2",py::overload_cast<Mi&,Md&,Vs&,Mi&,b,b>(&Image::W2),"Conditional 2-po
 mi.def("W2",py::overload_cast<Md&,Md&,Vs&        >(&Image::W2),"Weighted 2-point correlation"   ,py::arg("W"), py::arg("I"), py::arg("roi")                                                                  );
 mi.def("W2",py::overload_cast<Md&,Md&,Vs&,    b,b>(&Image::W2),"Weighted 2-point correlation"   ,py::arg("W"), py::arg("I"), py::arg("roi"),                py::arg("zeropad")=false,py::arg("periodic")=true);
 mi.def("W2",py::overload_cast<Md&,Md&,Vs&,Mi&,b,b>(&Image::W2),"Weighted 2-point correlation"   ,py::arg("W"), py::arg("I"), py::arg("roi"),py::arg("mask"),py::arg("zeropad")=false,py::arg("periodic")=true);
+
+mi.def("W2c",py::overload_cast<Md&,Mi&,Mi&,Vs&,    s,b>(&Image::W2c),"Collapsed weighted 2-point correlation",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),                py::arg("mode")="Bresenham",py::arg("periodic")=true);
+mi.def("W2c",py::overload_cast<Md&,Mi&,Mi&,Vs&,Mi&,s,b>(&Image::W2c),"Collapsed weighted 2-point correlation",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),py::arg("mask"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
+
+mi.def("L",&Image::L,"Lineal path function",py::arg("im"),py::arg("roi"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
 
 mi.def("path",&Image::path,"Voxel path",py::arg("xa"),py::arg("xb"),py::arg("mode")="Bresenham");
 

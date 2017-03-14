@@ -184,13 +184,14 @@ using Vi = std::vector<int>;
 using d  = double;
 using i  = int;
 using b  = bool;
+using s  = std::string;
 
 std::tuple<i,i,i> unpack3d ( Vs src, i value=1 );
 
 Vi midpoint_int ( Vs shape );
 Vs midpoint     ( Vs shape );
 
-Mi path ( Vi &xa, Vi &xb, std::string mode="Bresenham" );
+Mi path ( Vi &xa, Vi &xb, s mode="Bresenham" );
 
 Mi stamp_points ( Vs &shape );
 
@@ -200,7 +201,7 @@ Md pad ( Md &src, Vs &pad_shape, d value=0. );
 Mi dummy_circles ( Vs &shape,                          b periodic=true );
 Mi dummy_circles ( Vs &shape, Vi &row, Vi &col, Vi &r, b periodic=true );
 
-Mi kernel ( i ndim , std::string mode="default" );
+Mi kernel ( i ndim , s mode="default" );
 
 std::tuple<Mi,Mi> clusters ( Mi &src,             i min_size=0, b periodic=true);
 std::tuple<Mi,Mi> clusters ( Mi &src, Mi &kernel, i min_size=0, b periodic=true);
@@ -228,6 +229,11 @@ std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=t
 std::tuple<Md,d > W2 ( Md &W, Md &I, Vs &roi                                        );
 std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b pad=false, b periodic=true );
 std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
+
+std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi, Mi &msk, s mode="Bresenham", b periodic=true );
+std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi,          s mode="Bresenham", b periodic=true );
+
+std::tuple<Md,Mi> L ( Mi &f, Vs &roi, s mode="Bresenham", b periodic=true );
 
 }; // namespace image
 

@@ -1653,11 +1653,195 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double>
 // weighted 2-point correlation (float. image, float. weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &src,
-  std::vector<size_t> &roi, bool zeropad, bool periodic )
+std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
+  Matrix<double> &src, std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
   Matrix<int> mask(src.shape());
   return W2(W,src,roi,mask,zeropad,periodic);
+}
+
+// =============================================================================
+// weighted 2-point correlation -> collapse to center
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
+  Matrix<int> &clusters, Matrix<int> &centers, std::vector<size_t> &roi,
+  Matrix<int> &mask, std::string mode, bool periodic )
+{
+ if ( src.shape()!=clusters.shape() || src.shape()!=centers.shape() || src.shape()!=mask.shape() )
+    throw std::length_error("'I', 'clusters', and 'centers' are inconsistent");
+
+  for ( auto i : roi )
+    if ( i%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  for ( int i=0 ; i<mask.size() ; i++ )
+    if ( !(mask[i]==0 || mask[i]==1) )
+      throw std::out_of_range("'mask' must be binary");
+
+  int ipnt,ipix,jpix,label;
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
+
+  Matrix<double> ret (roi);
+  Matrix<int   > norm(roi);
+
+  std::vector<int> begin(3),end(3);
+  for ( i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  // define boundary region to skip
+  if ( !periodic )
+    std::tie(bH,bI,bJ) = unpack3d(mid,0);
+
+  // define the "end"-point of each voxel path
+  Matrix<int> pnt = stamp_points(roi);
+
+  // loop over ROI
+  for ( ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
+  {
+    // copy end-point
+    for ( i=0 ; i<pnt.shape()[1] ; i++ )
+      end[i] = pnt(ipnt,i);
+    // voxel-path
+    Matrix<int> pix = path(begin,end,mode);
+
+    // loop over image
+    for ( h=bH ; h<(H-bH) ; h++ ) {
+      for ( i=bI ; i<(I-bI) ; i++ ) {
+        for ( j=bJ ; j<(J-bJ) ; j++ ) {
+          if ( centers(h,i,j) )
+          {
+            // store the label
+            label = centers(h,i,j);
+            // only proceed when the center is inside the cluster
+            if ( clusters(h,i,j)==label )
+            {
+              // initialize
+              jpix = -1;
+              // loop over the voxel-path
+              for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
+              {
+                // loop through the voxel-path until the end of a cluster
+                if ( clusters(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J))!=label && jpix<0 )
+                  jpix = 0;
+                // storage: loop from the beginning of the voxel-path and store there
+                // (while continuing to loop starting from the edge of the cluster)
+                if ( jpix>=0 ) {
+                  if ( !mask(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J)) ) {
+                    norm(dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))++;
+                    ret (dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))+=\
+                    src(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J));
+                  }
+                }
+                // update counter
+                jpix++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= (double)std::max(norm[i],1);
+
+  return std::make_tuple(ret,norm);
+
+}
+
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
+  Matrix<int> &clusters, Matrix<int> &centers, std::vector<size_t> &roi,
+  std::string mode, bool periodic )
+{
+  Matrix<int> mask(I.shape());
+  return W2c(I,clusters,centers,roi,mask,mode,periodic);
+}
+
+// =============================================================================
+// lineal path function
+// =============================================================================
+
+std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
+  std::vector<size_t> &roi, std::string mode, bool periodic )
+{
+  for ( auto i : roi )
+    if ( i%2==0 )
+      throw std::length_error("'roi' must be odd shaped");
+
+  int ipnt,ipix;
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
+
+  Matrix<double> ret (roi);
+  Matrix<int   > norm(roi);
+
+  std::vector<int> begin(3),end(3);
+  for ( i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
+
+  std::vector<size_t> mid = midpoint(roi);
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  // define boundary region to skip
+  if ( !periodic )
+    std::tie(bH,bI,bJ) = unpack3d(mid,0);
+
+  // define the "end"-point of each voxel path
+  Matrix<int> pnt = stamp_points(roi);
+
+  // correlation
+  for ( ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
+  {
+    // copy end-point
+    for ( i=0 ; i<pnt.shape()[1] ; i++ )
+      end[i] = pnt(ipnt,i);
+    // voxel-path
+    Matrix<int> pix = path(begin,end,mode);
+
+    // loop over image
+    for ( h=bH ; h<(H-bH) ; h++ ) {
+      for ( i=bI ; i<(I-bI) ; i++ ) {
+        for ( j=bJ ; j<(J-bJ) ; j++ ) {
+
+          for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ ) {
+            // new voxel in path not "true" in f: terminate this path
+            if ( !src(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J)) )
+              break;
+            // positive correlation: add to result
+            ret(pix(ipix,0)+dH,pix(ipix,1)+dI,pix(ipix,2)+dJ) += 1.;
+          }
+        }
+      }
+    }
+  }
+
+  // normalization
+  for ( ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
+  {
+    // copy end-point
+    for ( i=0 ; i<pnt.shape()[1] ; i++ )
+      end[i] = pnt(ipnt,i);
+    // voxel-path
+    Matrix<int> pix = path(begin,end,mode);
+
+    // loop over voxel-path
+    for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
+      norm(pix(ipix,0)+dH,pix(ipix,1)+dI,pix(ipix,2)+dJ) += (H-bH)*(I-bI)*(J-bJ);
+  }
+
+  // apply normalization
+  for ( i=0 ; i<ret.size() ; i++ )
+    ret[i] /= (double)std::max(norm[i],1);
+
+  return std::make_tuple(ret,norm);
 }
 
 // =============================================================================
