@@ -3,147 +3,6 @@
 
 namespace Image {
 
-// =============================================================================
-// Image::Matrix class
-// =============================================================================
-
-// -----------------------------------------------------------------------------
-// default constructor
-// -----------------------------------------------------------------------------
-
-template <class T>
-Matrix<T>::Matrix()
-{
-}
-
-// -----------------------------------------------------------------------------
-// constructor -> allocate full matrix, optionally copy from source "*data"
-// -----------------------------------------------------------------------------
-
-template <class T>
-Matrix<T>::Matrix ( std::vector<size_t> shape, const T *data )
-{
-  if ( shape.size()<1 || shape.size()>3 )
-    throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
-
-  // store '_strides' and '_shape' always in 3-D,
-  // use unit-length for "extra" dimensions (> 'shape.size()')
-  while ( _shape  .size()<3 ) { _shape  .push_back(1); }
-  while ( _strides.size()<3 ) { _strides.push_back(1); }
-
-  for ( int i=0 ; i<shape.size() ; i++ )
-    _shape[i] = shape[i];
-
-  _strides[0] = _shape[2]*_shape[1];
-  _strides[1] = _shape[2];
-  _strides[2] = 1;
-
-  int size = _shape[0]*_shape[1]*_shape[2];
-
-  for ( int i=0 ; i<_data.size() ; i++ )
-    _data[i] = (T)0;
-
-  while ( _data.size()<size )
-    _data.push_back((T)0);
-
-  if ( data!=NULL )
-    for ( int i=0 ; i<size ; i++ )
-      _data[i] = data[i];
-
-}
-
-// -----------------------------------------------------------------------------
-// copy constructor
-// -----------------------------------------------------------------------------
-
-template <class T>
-Matrix<T>::Matrix ( const Matrix<T>& src )
-{
-  _data    = src._data;
-  _shape   = src._shape;
-  _strides = src._strides;
-}
-
-// -----------------------------------------------------------------------------
-
-template <class T>
-T& Matrix<T>::operator[] ( size_t i )
-{
-  return _data[i];
-}
-
-// -----------------------------------------------------------------------------
-
-template <class T>
-T& Matrix<T>::operator() ( size_t h, size_t i, size_t j )
-{
-  return _data[h*_strides[0]+i*_strides[1]+j*_strides[2]];
-}
-
-// -----------------------------------------------------------------------------
-
-template <class T>
-const T* Matrix<T>::data ( void ) const
-{
-  return _data.data();
-}
-
-// -----------------------------------------------------------------------------
-
-template <class T>
-size_t Matrix<T>::size ( void ) const
-{
-  return _data.size();
-}
-
-// -----------------------------------------------------------------------------
-
-template <class T>
-size_t Matrix<T>::ndim ( void ) const
-{
-  size_t i;
-
-  for ( i=2 ; i>0 ; i-- )
-    if ( _shape[i]!=1 )
-      break;
-
-  return i+1;
-}
-
-// -----------------------------------------------------------------------------
-
-template <class T>
-std::vector<size_t> Matrix<T>::shape ( void ) const
-{
-  int ndim = this->ndim();
-  std::vector<size_t> ret(ndim);
-
-  for ( int i=0 ; i<ndim ; i++ )
-    ret[i] = _shape[i];
-
-  return ret;
-}
-
-// -----------------------------------------------------------------------------
-
-template <class T>
-std::vector<size_t> Matrix<T>::strides ( bool bytes ) const
-{
-  int ndim = this->ndim();
-  std::vector<size_t> ret(ndim);
-
-  for ( int i=0 ; i<ndim ; i++ )
-    ret[i] = _strides[i];
-
-  if ( bytes )
-    for ( int i=0 ; i<ndim ; i++ )
-      ret[i] *= sizeof(T);
-
-  return ret;
-}
-
-// -----------------------------------------------------------------------------
-
 template class Matrix<int>;
 template class Matrix<double>;
 
@@ -174,8 +33,8 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 {
   std::vector<size_t> ret(shape.size());
 
-  for ( int i=0 ; i<shape.size() ; i++ )
-    if ( !(shape[i]%2) )
+  for ( auto i : shape )
+    if ( !(i%2) )
       throw std::domain_error("Only allowed for odd-shaped matrices");
 
   for ( int i=0 ; i<shape.size() ; i++ )
@@ -189,24 +48,53 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 // pad "pad_shape" entries on each side of "src" with a certain "value"
 // =============================================================================
 
-template <typename T>
-Matrix<T> pad ( Matrix<T> src, std::vector<size_t> pad_shape, T value )
+Matrix<int> pad ( Matrix<int> &src , std::vector<size_t> &pad_shape ,
+  int value )
 {
   std::vector<size_t> shape = src.shape();
 
   for ( int i=0 ; i<pad_shape.size() ; i++ )
     shape[i] += 2*pad_shape[i];
 
-  Matrix<T> ret(shape);
+  Matrix<int> ret(shape);
 
   int h,i,j,H,I,J,dH,dI,dJ;
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(pad_shape  ,0);
 
-  if ( value!=(T)0 )
-    for ( i=0 ; i<ret.size() ; i++ )
-      ret[i] = value;
+  if ( value!=0 )
+    for ( auto &i : ret )
+      i = value;
+
+  for ( h=0 ; h<H ; h++ )
+    for ( i=0 ; i<I ; i++ )
+      for ( j=0 ; j<J ; j++ )
+        ret(h+dH,i+dI,j+dJ) = src(h,i,j);
+
+  return ret;
+}
+
+// =============================================================================
+
+Matrix<double> pad ( Matrix<double> &src , std::vector<size_t> &pad_shape ,
+  double value )
+{
+  std::vector<size_t> shape = src.shape();
+
+  for ( int i=0 ; i<pad_shape.size() ; i++ )
+    shape[i] += 2*pad_shape[i];
+
+  Matrix<double> ret(shape);
+
+  int h,i,j,H,I,J,dH,dI,dJ;
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(pad_shape  ,0);
+
+  if ( value!=0. )
+    for ( auto &i : ret )
+      i = value;
 
   for ( h=0 ; h<H ; h++ )
     for ( i=0 ; i<I ; i++ )
@@ -691,7 +579,8 @@ std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
         for ( dh=-dH ; dh<=dH ; dh++ )
           for ( di=-dI ; di<=dI ; di++ )
             for ( dj=-dJ ; dj<=dJ ; dj++ )
-              ret(dh+dH,di+dI,dj+dJ) += W(h,i,j)*src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+              ret(dh+dH,di+dI,dj+dJ) += \
+                W(h,i,j)*src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
 
   // compute normalization: sum of weight factors (binary)
   double norm = 0.;

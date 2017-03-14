@@ -13,61 +13,190 @@
 
 namespace Image {
 
+// =============================================================================
+// Image::Matrix class
+// =============================================================================
+
 template <class T> class Matrix
 {
 
   private:
 
-    std::vector<T>      _data;    // data array
-    std::vector<size_t> _shape;   // number of entries in each dimensions
+    std::vector<T>      _data;     // data array
+    std::vector<size_t> _shape;    // number of entries in each dimensions
     std::vector<size_t> _strides;  // stride length for each index
 
   public:
 
-    Matrix<T>();
-    Matrix<T>( std::vector<size_t>, const T *data=NULL );
-    Matrix<T>( const Matrix<T>& );
+    // default constructor
+    // -------------------
 
-    const T*            data    ( void             ) const;
-    std::vector<size_t> shape   ( void             ) const;
-    std::vector<size_t> strides ( bool bytes=false ) const;
-    size_t              size    ( void             ) const;
-    size_t              ndim    ( void             ) const;
+    Matrix<T>(){};
 
-    T&   operator[] ( size_t i                         );
-    T&   operator() ( size_t h, size_t i=0, size_t j=0 );
+    // constructor
+    // -----------
+
+    Matrix<T>( std::vector<size_t> shape, const T *data=NULL )
+    {
+      if ( shape.size()<1 || shape.size()>3 )
+        throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
+
+      // store '_strides' and '_shape' always in 3-D,
+      // use unit-length for "extra" dimensions (> 'shape.size()')
+      while ( _shape  .size()<3 ) { _shape  .push_back(1); }
+      while ( _strides.size()<3 ) { _strides.push_back(1); }
+
+      for ( int i=0 ; i<shape.size() ; i++ )
+        _shape[i] = shape[i];
+
+      _strides[0] = _shape[2]*_shape[1];
+      _strides[1] = _shape[2];
+      _strides[2] = 1;
+
+      int size = _shape[0]*_shape[1]*_shape[2];
+
+      for ( int i=0 ; i<_data.size() ; i++ )
+        _data[i] = (T)0;
+
+      while ( _data.size()<size )
+        _data.push_back((T)0);
+
+      if ( data!=NULL )
+        for ( int i=0 ; i<size ; i++ )
+          _data[i] = data[i];
+    };
+
+    // copy constructor
+    // ----------------
+
+    Matrix<T>( const Matrix<T> &src )
+    {
+      _data    = src._data;
+      _shape   = src._shape;
+      _strides = src._strides;
+    };
+
+    // index operators
+    // ---------------
+
+    T& operator[] ( size_t i )
+    { return _data[i]; };
+
+    T& operator() ( size_t h, size_t i=0, size_t j=0 )
+    { return _data[h*_strides[0]+i*_strides[1]+j*_strides[2]]; };
+
+    // iterators
+    // ---------
+
+    auto begin()
+    { return _data.begin(); }
+
+    auto end ()
+    { return _data.end  (); }
+
+    // return pointer to data
+    // ----------------------
+
+    const T* data ( void ) const
+    { return _data.data(); };
+
+    // return shape array [ndim]
+    // -------------------------
+
+    std::vector<size_t> shape ( void ) const
+    {
+      int ndim = this->ndim();
+      std::vector<size_t> ret(ndim);
+
+      for ( int i=0 ; i<ndim ; i++ )
+        ret[i] = _shape[i];
+
+      return ret;
+    };
+
+    // return strides array [ndim]
+    // ---------------------------
+
+    std::vector<size_t> strides ( bool bytes=false ) const
+    {
+      int ndim = this->ndim();
+      std::vector<size_t> ret(ndim);
+
+      for ( int i=0 ; i<ndim ; i++ )
+        ret[i] = _strides[i];
+
+      if ( bytes )
+        for ( int i=0 ; i<ndim ; i++ )
+          ret[i] *= sizeof(T);
+
+      return ret;
+    };
+
+    // return size
+    // -----------
+
+    size_t size ( void ) const
+    { return _data.size(); };
+
+    // return number of dimensions
+    // ---------------------------
+
+    size_t ndim ( void ) const
+    {
+      size_t i;
+
+      for ( i=2 ; i>0 ; i-- )
+        if ( _shape[i]!=1 )
+          break;
+
+      return i+1;
+    };
 
 }; // class Matrix
 
-std::tuple<int,int,int> unpack3d ( std::vector<size_t> src, int value=1 );
+// =============================================================================
+// function
+// =============================================================================
 
-std::vector<size_t> midpoint ( std::vector<size_t> shape );
+// abbreviate data types to enhance readability -> templates fit on one line
+using Md = Matrix<double>;
+using Mi = Matrix<int>;
+using Vs = std::vector<size_t>;
+using Vi = std::vector<int>;
+using d  = double;
+using i  = int;
+using b  = bool;
 
-template <typename T> Matrix<T> pad ( Matrix<T> src, std::vector<size_t> pad_shape, T value=(T)0 );
+std::tuple<i,i,i> unpack3d ( Vs src, i value=1 );
 
-Matrix<int> dummy_circles ( std::vector<size_t> &shape,                                                                    bool periodic=true );
-Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &row, std::vector<int> &col, std::vector<int> &r, bool periodic=true );
+Vs midpoint ( Vs shape );
 
-std::tuple<Matrix<double>,       int > S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi                                                                                 );
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi,                                         bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask,                     bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int   > &f, Matrix<int   > &g, std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask, bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,       int > S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi                                                                                 );
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi,                                         bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi, Matrix<int> &fmask,                     bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g, std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask, bool periodic=true, bool zeropad=false );
+Mi path ( Vi &xa, Vi &xb, std::string mode="Bresenham" );
 
-std::tuple<Matrix<double>,       int    > W2 ( Matrix<int   > &W, Matrix<int   > &I, std::vector<size_t> &roi                                                            );
-std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<int   > &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<int   > &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,       int    > W2 ( Matrix<int   > &W, Matrix<double> &I, std::vector<size_t> &roi                                                            );
-std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<double> &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<int   >> W2 ( Matrix<int   > &W, Matrix<double> &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,       double > W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi                                                            );
-std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi,                    bool periodic=true, bool zeropad=false );
-std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &I, std::vector<size_t> &roi, Matrix<int> &mask, bool periodic=true, bool zeropad=false );
+Mi pad ( Mi &src, Vs &pad_shape, i value=0  );
+Md pad ( Md &src, Vs &pad_shape, d value=0. );
 
-Matrix<int> path ( std::vector<int> &xa , std::vector<int> &xb , std::string mode="Bresenham" );
+Mi dummy_circles ( Vs &shape,                          b periodic=true );
+Mi dummy_circles ( Vs &shape, Vi &row, Vi &col, Vi &r, b periodic=true );
+
+std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );
+std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b periodic=true, b pad=false );
+std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk,           b periodic=true, b pad=false );
+std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk, Mi &gmsk, b periodic=true, b pad=false );
+std::tuple<Md,i > S2 ( Md &f, Md &g, Vs &roi                                                   );
+std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi,                     b periodic=true, b pad=false );
+std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk,           b periodic=true, b pad=false );
+std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk, Mi &gmsk, b periodic=true, b pad=false );
+
+std::tuple<Md,i > W2 ( Mi &W, Mi &I, Vs &roi                                        );
+std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi,          b periodic=true, b pad=false );
+std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi, Mi &msk, b periodic=true, b pad=false );
+std::tuple<Md,i > W2 ( Mi &W, Md &I, Vs &roi                                        );
+std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi,          b periodic=true, b pad=false );
+std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi, Mi &msk, b periodic=true, b pad=false );
+std::tuple<Md,d > W2 ( Md &W, Md &I, Vs &roi                                        );
+std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b periodic=true, b pad=false );
+std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi, Mi &msk, b periodic=true, b pad=false );
 
 }; // namespace image
 
