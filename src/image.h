@@ -10,6 +10,7 @@
 
 #define PER(i,N) ( (i<0) ? i+N : (i>=N) ? i-N : i )
 #define SIGN(a)  ( (a<0) ?  -1 :  a>0   ?   1 : 0 )
+#define POS(a)   ( (a<0) ?   0                : a )
 
 namespace Image {
 
@@ -103,9 +104,11 @@ template <class T> class Matrix
     // return shape array [ndim]
     // -------------------------
 
-    std::vector<size_t> shape ( void ) const
+    std::vector<size_t> shape ( int ndim=0 ) const
     {
-      int ndim = this->ndim();
+      if ( ndim==0 )
+        ndim = this->ndim();
+
       std::vector<size_t> ret(ndim);
 
       for ( int i=0 ; i<ndim ; i++ )
@@ -152,10 +155,16 @@ template <class T> class Matrix
       return i+1;
     };
 
+    // maximum
+    // -------
+
+    T max ( void )
+    { return *std::max_element(_data.begin(),_data.end()); };
+
 }; // class Matrix
 
 // =============================================================================
-// function
+// Image::... (functions)
 // =============================================================================
 
 // abbreviate data types to enhance readability -> templates fit on one line
@@ -173,11 +182,16 @@ Vs midpoint ( Vs shape );
 
 Mi path ( Vi &xa, Vi &xb, std::string mode="Bresenham" );
 
+Mi stamp_points ( Vs &shape );
+
 Mi pad ( Mi &src, Vs &pad_shape, i value=0  );
 Md pad ( Md &src, Vs &pad_shape, d value=0. );
 
 Mi dummy_circles ( Vs &shape,                          b periodic=true );
 Mi dummy_circles ( Vs &shape, Vi &row, Vi &col, Vi &r, b periodic=true );
+
+std::tuple<Mi,Mi> clusters ( Mi &src,             b periodic=true, i min_size=0);
+std::tuple<Mi,Mi> clusters ( Mi &src, Mi &kernel, b periodic=true, i min_size=0);
 
 std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );
 std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b periodic=true, b pad=false );

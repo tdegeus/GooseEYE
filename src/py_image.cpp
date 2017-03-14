@@ -74,6 +74,9 @@ py::module mi = m.def_submodule("image", "Image-based input");
 mi.def("dummy_circles",py::overload_cast<Vs&,            bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),                                           py::arg("periodic")=true);
 mi.def("dummy_circles",py::overload_cast<Vs&,Vi&,Vi&,Vi&,bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),py::arg("row"),py::arg("col"),py::arg("r"),py::arg("periodic")=true);
 
+mi.def("clusters",py::overload_cast<Mi&,    b,i>(&Image::clusters),"Identify clusters",py::arg("im"),                  py::arg("periodic")=true,py::arg("min_size")=0);
+mi.def("clusters",py::overload_cast<Mi&,Mi&,b,i>(&Image::clusters),"Identify clusters",py::arg("im"),py::arg("kernel"),py::arg("periodic")=true,py::arg("min_size")=0);
+
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&            >(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,        b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("periodic")=true,py::arg("zeropad")=false);
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,Mi&,    b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),                 py::arg("periodic")=true,py::arg("zeropad")=false);
@@ -94,6 +97,8 @@ mi.def("W2",py::overload_cast<Md&,Md&,Vs&,    b,b>(&Image::W2),"Weighted 2-point
 mi.def("W2",py::overload_cast<Md&,Md&,Vs&,Mi&,b,b>(&Image::W2),"Weighted 2-point correlation"   ,py::arg("W"), py::arg("I"), py::arg("roi"),py::arg("mask"),py::arg("periodic")=true,py::arg("zeropad")=false);
 
 mi.def("path",&Image::path,"Voxel path",py::arg("xa"),py::arg("xb"),py::arg("mode")="Bresenham");
+
+mi.def("stamp_points",&Image::stamp_points,"End points of voxel stamp",py::arg("shape"));
 
 mi.def("pad",py::overload_cast<Mi&,Vs&,i>(&Image::pad),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0 );
 mi.def("pad",py::overload_cast<Md&,Vs&,d>(&Image::pad),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0.);
