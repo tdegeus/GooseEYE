@@ -430,6 +430,43 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
 }
 
 // =============================================================================
+// kernels
+// =============================================================================
+
+Matrix<int> kernel ( int ndim , std::string mode )
+{
+  std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
+
+  if ( mode=="default" )
+  {
+    std::vector<size_t> shape(ndim);
+    for ( int i=0 ; i<ndim ; i++ )
+      shape[i] = 3;
+
+    Matrix<int> kern(shape);
+
+    if      ( ndim==1 ) {
+      kern(0) = 1; kern(1) = 1; kern(2) = 1;
+    }
+    else if ( ndim==2 ) {
+      kern(1,0) = 1; kern(1,1) = 1; kern(1,2) = 1;
+      kern(0,1) = 1; kern(2,1) = 1;
+    }
+    else if ( ndim==3 ) {
+      kern(1,1,0) = 1; kern(1,1,1) = 1; kern(1,1,2) = 1;
+      kern(1,0,1) = 1; kern(1,2,1) = 1;
+      kern(0,1,1) = 1; kern(2,1,1) = 1;
+    }
+    else
+      throw std::length_error("'shape' must be 1-, 2-, or 3-D");
+
+    return kern;
+  }
+
+  throw std::length_error("Unknown mode");
+}
+
+// =============================================================================
 // determine clusters from image
 // =============================================================================
 
@@ -504,7 +541,7 @@ void _clusters_link ( std::vector<int> &linked, int a, int b )
 // -----------------------------------------------------------------------------
 
 std::tuple<Matrix<int>,Matrix<int>> clusters (
-  Matrix<int> &f, Matrix<int> &kern, bool periodic, int min_size )
+  Matrix<int> &f, Matrix<int> &kern, int min_size, bool periodic )
 {
   int  h,i,j,di,dj,dh,ii,jj,nlab;
   int  lb[3],ub[3];               // upper/lower bound of kernel ==(shape[i]-1)/2 except for edges
@@ -736,7 +773,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 
     // "l_": labels for the non-periodic version image "f"
     Matrix<int> l_,c_;
-    std::tie(l_,c_) = clusters(f,kern,false,min_size);
+    std::tie(l_,c_) = clusters(f,kern,min_size,false);
 
     // delete clusters that are also not present in "l"
     for ( i=0 ; i<f.size() ; i++ )
@@ -844,30 +881,13 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 // =============================================================================
 
 std::tuple<Matrix<int>,Matrix<int>> clusters (
-  Matrix<int> &f, bool periodic, int min_size )
+  Matrix<int> &f, int min_size, bool periodic )
 {
-  std::vector<size_t> shape(f.ndim());
-  for ( int i=0 ; i<f.ndim() ; i++ )
-    shape[i] = 3;
-
-  Matrix<int> kern(shape);
-
-  if      ( f.ndim()==1 ) {
-    kern(0) = 1; kern(1) = 1; kern(2) = 1;
-  }
-  else if ( f.ndim()==2 ) {
-    kern(1,0) = 1; kern(1,1) = 1; kern(1,2) = 1;
-    kern(0,1) = 1; kern(2,1) = 1;
-  }
-  else if ( f.ndim()==3 ) {
-    kern(1,1,0) = 1; kern(1,1,1) = 1; kern(1,1,2) = 1;
-    kern(1,0,1) = 1; kern(1,2,1) = 1;
-    kern(0,1,1) = 1; kern(2,1,1) = 1;
-  }
-
-  return clusters(f,kern,periodic,min_size);
-
+  Matrix<int> kern = kernel(f.ndim());
+  return clusters(f,kern,min_size,periodic);
 }
+
+
 
 // =============================================================================
 // 2-point probability (binary) / 2-point cluster function (int)      [periodic]
@@ -955,7 +975,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
   std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask,
-  bool periodic, bool zeropad )
+  bool zeropad, bool periodic )
 {
   if ( f.shape()!=g.shape() || f.shape()!=fmask.shape() || f.shape()!=gmask.shape() )
     throw std::length_error("'f', 'g', 'fmask', and 'gmask' are inconsistent");
@@ -1025,10 +1045,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
-  std::vector<size_t> &roi, Matrix<int> &fmask, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, Matrix<int> &fmask, bool zeropad, bool periodic )
 {
   Matrix<int> gmask(g.shape());
-  return S2(f,g,roi,fmask,gmask,periodic,zeropad);
+  return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
 // =============================================================================
@@ -1037,11 +1057,11 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
-  std::vector<size_t> &roi, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
   Matrix<int> fmask(f.shape());
   Matrix<int> gmask(g.shape());
-  return S2(f,g,roi,fmask,gmask,periodic,zeropad);
+  return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
 // =======x======================================================================
@@ -1050,7 +1070,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
   std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask,
-  bool periodic, bool zeropad )
+  bool zeropad, bool periodic )
 {
   if ( f.shape()!=g.shape() || f.shape()!=fmask.shape() || f.shape()!=gmask.shape() )
     throw std::length_error("'f', 'g', 'fmask', and 'gmask' are inconsistent");
@@ -1120,10 +1140,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
-  std::vector<size_t> &roi, Matrix<int> &fmask, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, Matrix<int> &fmask, bool zeropad, bool periodic )
 {
   Matrix<int> gmask(g.shape());
-  return S2(f,g,roi,fmask,gmask,periodic,zeropad);
+  return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
 // =============================================================================
@@ -1132,11 +1152,11 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
-  std::vector<size_t> &roi, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
   Matrix<int> fmask(f.shape());
   Matrix<int> gmask(g.shape());
-  return S2(f,g,roi,fmask,gmask,periodic,zeropad);
+  return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
 // =============================================================================
@@ -1290,7 +1310,7 @@ std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
-  std::vector<size_t> &roi, Matrix<int> &mask, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, Matrix<int> &mask, bool zeropad, bool periodic )
 {
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
     throw std::length_error("'W', 'I', and 'mask' are inconsistent");
@@ -1357,10 +1377,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
-  std::vector<size_t> &roi, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
   Matrix<int> mask(src.shape());
-  return W2(W,src,roi,mask,periodic,zeropad);
+  return W2(W,src,roi,mask,zeropad,periodic);
 }
 
 // =============================================================================
@@ -1368,7 +1388,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
-  std::vector<size_t> &roi, Matrix<int> &mask, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, Matrix<int> &mask, bool zeropad, bool periodic )
 {
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
     throw std::length_error("'W', 'I', and 'mask' are inconsistent");
@@ -1434,10 +1454,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
-  std::vector<size_t> &roi, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
   Matrix<int> mask(src.shape());
-  return W2(W,src,roi,mask,periodic,zeropad);
+  return W2(W,src,roi,mask,zeropad,periodic);
 }
 
 // =============================================================================
@@ -1445,7 +1465,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &src,
-  std::vector<size_t> &roi, Matrix<int> &mask, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, Matrix<int> &mask, bool zeropad, bool periodic )
 {
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
     throw std::length_error("'W', 'I', and 'mask' are inconsistent");
@@ -1510,10 +1530,10 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double>
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &src,
-  std::vector<size_t> &roi, bool periodic, bool zeropad )
+  std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
   Matrix<int> mask(src.shape());
-  return W2(W,src,roi,mask,periodic,zeropad);
+  return W2(W,src,roi,mask,zeropad,periodic);
 }
 
 // =============================================================================

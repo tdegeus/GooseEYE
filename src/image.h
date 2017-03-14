@@ -190,27 +190,34 @@ Md pad ( Md &src, Vs &pad_shape, d value=0. );
 Mi dummy_circles ( Vs &shape,                          b periodic=true );
 Mi dummy_circles ( Vs &shape, Vi &row, Vi &col, Vi &r, b periodic=true );
 
-std::tuple<Mi,Mi> clusters ( Mi &src,             b periodic=true, i min_size=0);
-std::tuple<Mi,Mi> clusters ( Mi &src, Mi &kernel, b periodic=true, i min_size=0);
+Mi kernel ( i ndim , std::string mode="default" );
+
+std::tuple<Mi,Mi> clusters ( Mi &src,             i min_size=0, b periodic=true);
+std::tuple<Mi,Mi> clusters ( Mi &src, Mi &kernel, i min_size=0, b periodic=true);
+
+Mi dilate ( Mi &src              , i  iterations=1    );
+Mi dilate ( Mi &src              , Vi iterations=Vi() );
+Mi dilate ( Mi &src , Mi &kernel , i  iterations=1    );
+Mi dilate ( Mi &src , Mi &kernel , Vi iterations=Vi() );
 
 std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );
-std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b periodic=true, b pad=false );
-std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk,           b periodic=true, b pad=false );
-std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk, Mi &gmsk, b periodic=true, b pad=false );
+std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b pad=false, b periodic=true );
+std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
+std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
 std::tuple<Md,i > S2 ( Md &f, Md &g, Vs &roi                                                   );
-std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi,                     b periodic=true, b pad=false );
-std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk,           b periodic=true, b pad=false );
-std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk, Mi &gmsk, b periodic=true, b pad=false );
+std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi,                     b pad=false, b periodic=true );
+std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
+std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
 
 std::tuple<Md,i > W2 ( Mi &W, Mi &I, Vs &roi                                        );
-std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi,          b periodic=true, b pad=false );
-std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi, Mi &msk, b periodic=true, b pad=false );
+std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi,          b pad=false, b periodic=true );
+std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
 std::tuple<Md,i > W2 ( Mi &W, Md &I, Vs &roi                                        );
-std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi,          b periodic=true, b pad=false );
-std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi, Mi &msk, b periodic=true, b pad=false );
+std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi,          b pad=false, b periodic=true );
+std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
 std::tuple<Md,d > W2 ( Md &W, Md &I, Vs &roi                                        );
-std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b periodic=true, b pad=false );
-std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi, Mi &msk, b periodic=true, b pad=false );
+std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b pad=false, b periodic=true );
+std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
 
 }; // namespace image
 
