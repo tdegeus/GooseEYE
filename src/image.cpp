@@ -10,7 +10,8 @@ template class Matrix<double>;
 // voxel path
 // =============================================================================
 
-Matrix<int> path ( std::vector<int> &xa, std::vector<int> &xb, std::string mode )
+Matrix<int> path (
+  std::vector<int> &xa, std::vector<int> &xb, std::string mode )
 {
   int ndim = xa.size();
 
@@ -401,8 +402,8 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
                   // check to dilate for non-zero kernel value
                   if ( kern(dh+dH,di+dI,dj+dJ) && !(dh==0 && di==0 && dj==0) ) {
                     if ( periodic ) {
-                      if ( !l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
-                        l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) = -1*ilab;
+                      if ( !l(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
+                        l(P(h+dh,H),P(i+di,I),P(j+dj,J)) = -1*ilab;
                     }
                     else {
                       if ( BND(h+dh,H) && BND(i+di,I) && BND(j+dj,J) )
@@ -479,9 +480,9 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &row,
   for ( i=0 ; i<row.size() ; i++ )
     for ( di=-r[i] ; di<=r[i] ; di++ )
       for ( dj=-r[i] ; dj<=r[i] ; dj++ )
-        if ( periodic || ( row[i]+di>=0 && row[i]+di<I && col[i]+dj>=0 && col[i]+dj<J ) )
+        if ( periodic || ( BND(row[i]+di,I) && BND(col[i]+dj,J) ) )
           if ( (int)(ceil(pow((double)(pow(di,2)+pow(dj,2)),0.5))) < r[i] )
-            ret(PER(row[i]+di,I),PER(col[i]+dj,J)) = 1;
+            ret(P(row[i]+di,I),P(col[i]+dj,J)) = 1;
 
   return ret;
 }
@@ -704,8 +705,8 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
               for ( di=lI ; di<=uJ ; di++ ) {
                 for ( dj=lJ ; dj<=uI ; dj++ ) {
                   if ( kern(dh+dH,di+dI,dj+dJ) ) {
-                    if ( l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) ) {
-                      l(h,i,j) = l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+                    if ( l(P(h+dh,H),P(i+di,I),P(j+dj,J)) ) {
+                      l(h,i,j) = l(P(h+dh,H),P(i+di,I),P(j+dj,J));
                       goto end;
                     }
           }}}}}
@@ -725,11 +726,11 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
             for ( di=lI ; di<=uJ ; di++ ) {
               for ( dj=lJ ; dj<=uI ; dj++ ) {
                 if ( kern(dh+dH,di+dI,dj+dJ) ) {
-                  if ( f(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) ) {
-                    if ( l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J))==0 )
-                      l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) = l(h,i,j);
+                  if ( f(P(h+dh,H),P(i+di,I),P(j+dj,J)) ) {
+                    if ( l(P(h+dh,H),P(i+di,I),P(j+dj,J))==0 )
+                     l(P(h+dh,H),P(i+di,I),P(j+dj,J)) = l(h,i,j);
                     else
-                      _link(lnk,l(h,i,j),l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)));
+                     _link(lnk,l(h,i,j),l(P(h+dh,H),P(i+di,I),P(j+dj,J)));
           }}}}}
 
         }
@@ -789,7 +790,8 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
         l[i] = 0;
 
     // new numbering for the included labels
-    // inc[i] will contain the new cluster numbers, j-1 will be the number of clusters
+    // inc[i] will contain the new cluster numbers,
+    // j-1 will be the number of clusters
     j = 0;
     for ( i=0 ; i<nlab ; i++ ) {
       if ( inc[i] ) {
@@ -896,7 +898,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
             for ( dj=0 ; dj<=dJ ; dj++ )
               if ( i+di<I && j+dj<J )
                 if ( l_(H-1,i,j) )
-                  if ( l(H-1,i,j)==l(PER(H-1+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                  if ( l(H-1,i,j)==l(P(H-1+dh,H),P(i+di,I),P(j+dj,J)) )
                     dx(l_(H-1,i,j),0) = 1;
 
     // h-j plane
@@ -907,7 +909,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
             for ( dj=0 ; dj<=dJ ; dj++ )
               if ( h+dh<H && j+dj<J )
                 if ( l_(h,I-1,j) )
-                  if ( l(h,I-1,j)==l(PER(h+dh,H),PER(I-1+di,I),PER(j+dj,J)) )
+                  if ( l(h,I-1,j)==l(P(h+dh,H),P(I-1+di,I),P(j+dj,J)) )
                     dx(l_(h,I-1,j),1) = 1;
 
     // h-i plane
@@ -918,7 +920,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
             for ( dj=1 ; dj<=dJ ; dj++ )
               if ( h+dh<H && i+di<I )
                 if ( l_(h,i,J-1) )
-                  if ( l(h,i,J-1)==l(PER(h+dh,H),PER(i+di,I),PER(J-1+dj,J)) )
+                  if ( l(h,i,J-1)==l(P(h+dh,H),P(i+di,I),P(J-1+dj,J)) )
                     dx(l_(h,i,J-1),2) = 1;
 
     // calculate centers
@@ -1008,7 +1010,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( f(h,i,j)==g(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( f(h,i,j)==g(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                   ret(dh+dH,di+dI,dj+dJ) += 1.;
 
   // apply normalization
@@ -1048,7 +1050,8 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
         for ( dh=-dH ; dh<=dH ; dh++ )
           for ( di=-dI ; di<=dI ; di++ )
             for ( dj=-dJ ; dj<=dJ ; dj++ )
-              ret(dh+dH,di+dI,dj+dJ) += f(h,i,j)*g(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+              ret(dh+dH,di+dI,dj+dJ) += \
+                f(h,i,j)*g(P(h+dh,H),P(i+di,I),P(j+dj,J));
 
   // apply normalization
   for ( i=0 ; i<ret.size() ; i++ )
@@ -1062,18 +1065,20 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
 // =============================================================================
 
 std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
-  std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask,
+  std::vector<size_t> &roi, Matrix<int> &fmsk, Matrix<int> &gmsk,
   bool zeropad, bool periodic )
 {
-  if ( f.shape()!=g.shape() || f.shape()!=fmask.shape() || f.shape()!=gmask.shape() )
-    throw std::length_error("'f', 'g', 'fmask', and 'gmask' are inconsistent");
+  if ( f.shape()!=g.shape() )
+    throw std::length_error("'f' and 'g' are inconsistent");
+  if ( f.shape()!=fmsk.shape() || f.shape()!=gmsk.shape() )
+    throw std::length_error("'f', 'fmask', and 'gmask' are inconsistent");
 
   for ( auto i : roi )
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<fmask.size() ; i++ )
-    if ( !(fmask[i]==0 || fmask[i]==1) || !(gmask[i]==0 || gmask[i]==1) )
+  for ( int i=0 ; i<fmsk.size() ; i++ )
+    if ( !(fmsk[i]==0 || fmsk[i]==1) || !(gmsk[i]==0 || gmsk[i]==1) )
       throw std::out_of_range("'fmask' and 'gmask' must be binary");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
@@ -1084,10 +1089,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
   std::vector<size_t> mid = midpoint(roi);
 
   if ( zeropad ) {
-    f     = pad(f    ,mid  );
-    g     = pad(g    ,mid  );
-    fmask = pad(fmask,mid,1);
-    gmask = pad(gmask,mid,1);
+    f    = pad(f   ,mid  );
+    g    = pad(g   ,mid  );
+    fmsk = pad(fmsk,mid,1);
+    gmsk = pad(gmsk,mid,1);
   }
 
   std::tie( H, I, J) = unpack3d(f.shape(),1);
@@ -1101,23 +1106,23 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
   for ( h=bH ; h<H-bH ; h++ )
     for ( i=bI ; i<I-bI ; i++ )
       for ( j=bJ ; j<J-bJ ; j++ )
-        if ( f(h,i,j) && !fmask(h,i,j) )
+        if ( f(h,i,j) && !fmsk(h,i,j) )
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !gmask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
-                  if ( f(h,i,j)==g(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( !gmsk(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
+                  if ( f(h,i,j)==g(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                     ret(dh+dH,di+dI,dj+dJ) += 1.;
 
   // compute normalization (account for masked voxels)
   for ( h=bH ; h<H-bH ; h++ )
     for ( i=bI ; i<I-bI ; i++ )
       for ( j=bJ ; j<J-bJ ; j++ )
-        if ( !fmask(h,i,j) )
+        if ( !fmsk(h,i,j) )
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !gmask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( !gmsk(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
@@ -1156,19 +1161,21 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 // masked 2-point correlation (floating-point)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
-  std::vector<size_t> &roi, Matrix<int> &fmask, Matrix<int> &gmask,
-  bool zeropad, bool periodic )
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
+  Matrix<double> &g, std::vector<size_t> &roi, Matrix<int> &fmsk,
+  Matrix<int> &gmsk, bool zeropad, bool periodic )
 {
-  if ( f.shape()!=g.shape() || f.shape()!=fmask.shape() || f.shape()!=gmask.shape() )
-    throw std::length_error("'f', 'g', 'fmask', and 'gmask' are inconsistent");
+  if ( f.shape()!=g.shape() )
+    throw std::length_error("'f' and 'g' are inconsistent");
+  if ( f.shape()!=fmsk.shape() || f.shape()!=gmsk.shape() )
+    throw std::length_error("'f', 'fmask', and 'gmask' are inconsistent");
 
   for ( auto i : roi )
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<fmask.size() ; i++ )
-    if ( !(fmask[i]==0 || fmask[i]==1) || !(gmask[i]==0 || gmask[i]==1) )
+  for ( int i=0 ; i<fmsk.size() ; i++ )
+    if ( !(fmsk[i]==0 || fmsk[i]==1) || !(gmsk[i]==0 || gmsk[i]==1) )
       throw std::out_of_range("'fmask' and 'gmask' must be binary");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
@@ -1179,10 +1186,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g
   std::vector<size_t> mid = midpoint(roi);
 
   if ( zeropad ) {
-    f     = pad(f    ,mid  );
-    g     = pad(g    ,mid  );
-    fmask = pad(fmask,mid,1);
-    gmask = pad(gmask,mid,1);
+    f    = pad(f   ,mid  );
+    g    = pad(g   ,mid  );
+    fmsk = pad(fmsk,mid,1);
+    gmsk = pad(gmsk,mid,1);
   }
 
   std::tie( H, I, J) = unpack3d(f.shape(),1);
@@ -1196,23 +1203,23 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g
   for ( h=bH ; h<H-bH ; h++ )
     for ( i=bI ; i<I-bI ; i++ )
       for ( j=bJ ; j<J-bJ ; j++ )
-        if ( !fmask(h,i,j) )
+        if ( !fmsk(h,i,j) )
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !gmask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( !gmsk(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                   ret(dh+dH,di+dI,dj+dJ) += \
-                    f(h,i,j)*g(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+                    f(h,i,j)*g(P(h+dh,H),P(i+di,I),P(j+dj,J));
 
   // compute normalization (account for masked voxels)
   for ( h=bH ; h<H-bH ; h++ )
     for ( i=bI ; i<I-bI ; i++ )
       for ( j=bJ ; j<J-bJ ; j++ )
-        if ( !fmask(h,i,j) )
+        if ( !fmsk(h,i,j) )
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !gmask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( !gmsk(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
@@ -1239,8 +1246,8 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g
 // - default "fmask" and "gmask"
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
-  std::vector<size_t> &roi, bool zeropad, bool periodic )
+std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
+  Matrix<double> &g, std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
   Matrix<int> fmask(f.shape());
   Matrix<int> gmask(g.shape());
@@ -1282,7 +1289,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( src(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                   ret(dh+dH,di+dI,dj+dJ) += 1.;
 
   // compute normalization: sum of weight factors (binary)
@@ -1333,7 +1340,8 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<double> &src,
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                ret(dh+dH,di+dI,dj+dJ) += src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+                ret(dh+dH,di+dI,dj+dJ) += \
+                  src(P(h+dh,H),P(i+di,I),P(j+dj,J));
 
   // compute normalization: sum of weight factors (binary)
   int norm = 0;
@@ -1379,7 +1387,7 @@ std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
           for ( di=-dI ; di<=dI ; di++ )
             for ( dj=-dJ ; dj<=dJ ; dj++ )
               ret(dh+dH,di+dI,dj+dJ) += \
-                W(h,i,j)*src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+                W(h,i,j)*src(P(h+dh,H),P(i+di,I),P(j+dj,J));
 
   // compute normalization: sum of weight factors (binary)
   double norm = 0.;
@@ -1408,8 +1416,11 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
       throw std::length_error("'roi' must be odd shaped");
 
   for ( int i=0 ; i<W.size() ; i++ )
-    if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) || !(mask[i]==0 || mask[i]==1) )
-      throw std::out_of_range("'W', 'I', and 'mask' must be binary");
+    if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) )
+      throw std::out_of_range("'W' and 'I' must be binary");
+  for ( int i=0 ; i<W.size() ; i++ )
+    if ( !(mask[i]==0 || mask[i]==1) )
+      throw std::out_of_range("'mask' must be binary");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
@@ -1438,8 +1449,8 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
-                  if ( src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
+                  if ( src(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                     ret(dh+dH,di+dI,dj+dJ) += 1.;
 
   // compute normalization: sum of weight factors (binary) of unmasked voxels
@@ -1450,7 +1461,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
@@ -1516,8 +1527,9 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
-                  ret(dh+dH,di+dI,dj+dJ) += src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
+                  ret(dh+dH,di+dI,dj+dJ) += \
+                    src(P(h+dh,H),P(i+di,I),P(j+dj,J));
 
   // compute normalization: sum of weight factors (binary) of unmasked voxels
   for ( h=bH ; h<H-bH ; h++ )
@@ -1527,7 +1539,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
@@ -1552,8 +1564,9 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
 // weighted conditional 2-point correlation (float. image, float. weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double> &src,
-  std::vector<size_t> &roi, Matrix<int> &mask, bool zeropad, bool periodic )
+std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
+  Matrix<double> &src, std::vector<size_t> &roi, Matrix<int> &mask,
+  bool zeropad, bool periodic )
 {
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
     throw std::length_error("'W', 'I', and 'mask' are inconsistent");
@@ -1592,9 +1605,9 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double>
         for ( dh=-dH ; dh<=dH ; dh++ )
           for ( di=-dI ; di<=dI ; di++ )
             for ( dj=-dJ ; dj<=dJ ; dj++ )
-              if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+              if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                 ret(dh+dH,di+dI,dj+dJ) += \
-                  W(h,i,j)*src(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
+                  W(h,i,j)*src(P(h+dh,H),P(i+di,I),P(j+dj,J));
 
   // compute normalization: sum of weight factors (binary) of unmasked voxels
   for ( h=bH ; h<H-bH ; h++ )
@@ -1603,7 +1616,7 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W, Matrix<double>
         for ( dh=-dH ; dh<=dH ; dh++ )
           for ( di=-dI ; di<=dI ; di++ )
             for ( dj=-dJ ; dj<=dJ ; dj++ )
-              if ( !mask(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+              if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
                 norm(dh+dH,di+dI,dj+dJ) += W(h,i,j);
 
   // apply normalization
@@ -1632,8 +1645,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
   Matrix<int> &clusters, Matrix<int> &centers, std::vector<size_t> &roi,
   Matrix<int> &mask, std::string mode, bool periodic )
 {
- if ( src.shape()!=clusters.shape() || src.shape()!=centers.shape() || src.shape()!=mask.shape() )
+ if ( src.shape()!=clusters.shape() || src.shape()!=centers.shape() )
     throw std::length_error("'I', 'clusters', and 'centers' are inconsistent");
+  if ( src.shape()!=mask.shape() )
+    throw std::length_error("'I' and 'mask' are inconsistent");
 
   for ( auto i : roi )
     if ( i%2==0 )
@@ -1689,16 +1704,18 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
               // loop over the voxel-path
               for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
               {
+                dh = pix(ipix,0);
+                di = pix(ipix,1);
+                dj = pix(ipix,2);
                 // loop through the voxel-path until the end of a cluster
-                if ( clusters(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J))!=label && jpix<0 )
+                if ( clusters(P(h+dh,H),P(i+di,I),P(j+dj,J))!=label && jpix<0 )
                   jpix = 0;
-                // storage: loop from the beginning of the voxel-path and store there
-                // (while continuing to loop starting from the edge of the cluster)
+                // store: loop from the beginning of the path and store there
                 if ( jpix>=0 ) {
-                  if ( !mask(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J)) ) {
+                  if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) ) {
                     norm(dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))++;
                     ret (dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))+=\
-                    src(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J));
+                      src(P(h+dh,H),P(i+di,I),P(j+dj,J));
                   }
                 }
                 // update counter
@@ -1776,11 +1793,14 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
         for ( j=bJ ; j<(J-bJ) ; j++ ) {
 
           for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ ) {
+            dh = pix(ipix,0);
+            di = pix(ipix,1);
+            dj = pix(ipix,2);
             // new voxel in path not "true" in f: terminate this path
-            if ( !src(PER(h+pix(ipix,0),H),PER(i+pix(ipix,1),I),PER(j+pix(ipix,2),J)) )
+            if ( !src(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
               break;
             // positive correlation: add to result
-            ret(pix(ipix,0)+dH,pix(ipix,1)+dI,pix(ipix,2)+dJ) += 1.;
+            ret(dh+dH,di+dI,dj+dJ) += 1.;
           }
         }
       }
@@ -1798,7 +1818,8 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
 
     // loop over voxel-path
     for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
-      norm(pix(ipix,0)+dH,pix(ipix,1)+dI,pix(ipix,2)+dJ) += (H-bH)*(I-bI)*(J-bJ);
+      norm(pix(ipix,0)+dH,pix(ipix,1)+dI,pix(ipix,2)+dJ) += \
+        (H-bH)*(I-bI)*(J-bJ);
   }
 
   // apply normalization
