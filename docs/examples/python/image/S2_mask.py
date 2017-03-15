@@ -8,11 +8,11 @@ import numpy          as np
 # --------------------------
 
 # generate image, store 'volume-fraction'
-I         = gimage.dummy_circles((500,500),periodic=True)
-phi       = np.mean(I)
+I        = gimage.dummy_circles((500,500))
+phi      = np.mean(I)
 
-# 2-point probability + apply normalization
-(S2,norm) = gimage.S2(I,I,(101,101))
+# 2-point probability
+S2,_     = gimage.S2(I,I,(101,101))
 
 # artifact + (masked) correlation
 # -------------------------------
@@ -24,10 +24,10 @@ mask[:150,:150] = 1
 Ierr[:150,:150] = 1
 
 # 2-point correlation on image with artifact (no mask)
-(S2err,norm)  = gimage.S2(Ierr,Ierr,(101,101))
+S2err,_  = gimage.S2(Ierr,Ierr,(101,101))
 
 # 2-point correlation on image with artifact, with artifact masked
-(S2mask,norm) = gimage.S2(Ierr,Ierr,(101,101),fmask=mask,gmask=mask,periodic=True,zeropad=False)
+S2mask,_ = gimage.S2(Ierr,Ierr,(101,101),fmask=mask,gmask=mask)
 
 # </snippet>
 
@@ -91,7 +91,7 @@ plt.title(r'$S_2$')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
-cbar.set_ticks([0,phi])
+cbar.set_ticks     ([ 0 ,       phi  ])
 cbar.set_ticklabels(['0',r'$\varphi$'])
 
 ax   = fig.add_subplot(2,3,5)
@@ -104,7 +104,7 @@ plt.title(r'$S_2$ (with artifact)')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
-cbar.set_ticks([0,phi])
+cbar.set_ticks     ([ 0 ,       phi  ])
 cbar.set_ticklabels(['0',r'$\varphi$'])
 
 ax   = fig.add_subplot(2,3,6)
@@ -117,7 +117,7 @@ plt.title(r'$S_2$ (masked artifact)')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
-cbar.set_ticks([0,phi])
+cbar.set_ticks     ([ 0 ,       phi  ])
 cbar.set_ticklabels(['0',r'$\varphi$'])
 
 plt.savefig('S2_mask.svg')
