@@ -196,26 +196,28 @@ Matrix<int> stamp_points ( std::vector<size_t> &N )
     if ( i%2==0 )
       throw std::length_error("'shape' must be odd shaped");
 
-  int n,i,j;
+  int n,i,j,H,I,J,dH,dI,dJ;
   int idx = 0;
   int nd  = N.size();
 
+  std::tie( H, I, J) = unpack3d(N,1);
+  std::tie(dH,dI,dJ) = unpack3d(midpoint(N),0);
+
   // number of points
-  if ( nd==1 ) n =              2;
-  if ( nd==2 ) n =              2*N[0]+2*POS(N[1]-2);
-  if ( nd==3 ) n = POS(N[2]-2)*(2*N[0]+2*POS(N[1]-2))+2*N[0]*N[1];
+  if ( nd==1 ) n =           2;
+  if ( nd==2 ) n =           2*H+2*POS(I-2);
+  if ( nd==3 ) n = POS(J-2)*(2*H+2*POS(I-2))+2*H*I;
 
   // allocate
   Matrix<int> ret({(size_t)n,(size_t)nd});
-  std::vector<int> mid = midpoint_int(N);
 
   // 1-D
   // ---
 
   if ( nd==1 )
   {
-    ret(idx,0) = -mid[0]; idx++;
-    ret(idx,0) = +mid[0]; idx++;
+    ret(idx,0) = -dH; idx++;
+    ret(idx,0) = +dH; idx++;
     return ret;
   }
 
@@ -224,13 +226,13 @@ Matrix<int> stamp_points ( std::vector<size_t> &N )
 
   if ( nd==2 )
   {
-    for ( i=0 ; i<N[0]   ; i++ ) {
-      ret(idx,0) = i-mid[0]; ret(idx,1) =  -mid[1]; idx++;
-      ret(idx,0) = i-mid[0]; ret(idx,1) =  +mid[1]; idx++;
+    for ( i=0 ; i<H   ; i++ ) {
+      ret(idx,0) = i-dH; ret(idx,1) =  -dI; idx++;
+      ret(idx,0) = i-dH; ret(idx,1) =  +dI; idx++;
     }
-    for ( i=1 ; i<N[1]-1 ; i++ ) {
-      ret(idx,0) =  -mid[0]; ret(idx,1) = i-mid[1]; idx++;
-      ret(idx,0) =  +mid[0]; ret(idx,1) = i-mid[1]; idx++;
+    for ( i=1 ; i<I-1 ; i++ ) {
+      ret(idx,0) =  -dH; ret(idx,1) = i-dI; idx++;
+      ret(idx,0) =  +dH; ret(idx,1) = i-dI; idx++;
     }
     return ret;
   }
@@ -238,20 +240,20 @@ Matrix<int> stamp_points ( std::vector<size_t> &N )
   // 3-D
   // ---
 
-  for ( j=1 ; j<N[2]-1 ; j++ ) {
-    for ( i=0 ; i<N[0]   ; i++ ) {
-      ret(idx,0) = i-mid[0]; ret(idx,1) =  -mid[1]; ret(idx,2) = j-mid[2]; idx++;
-      ret(idx,0) = i-mid[0]; ret(idx,1) =  +mid[1]; ret(idx,2) = j-mid[2]; idx++;
+  for ( j=1 ; j<J-1 ; j++ ) {
+    for ( i=0 ; i<H   ; i++ ) {
+      ret(idx,0) = i-dH; ret(idx,1) =  -dI; ret(idx,2) = j-dJ; idx++;
+      ret(idx,0) = i-dH; ret(idx,1) =  +dI; ret(idx,2) = j-dJ; idx++;
     }
-    for ( i=1 ; i<N[1]-1 ; i++ ) {
-      ret(idx,0) =  -mid[0]; ret(idx,1) = i-mid[1]; ret(idx,2) = j-mid[2]; idx++;
-      ret(idx,0) =  +mid[0]; ret(idx,1) = i-mid[1]; ret(idx,2) = j-mid[2]; idx++;
+    for ( i=1 ; i<I-1 ; i++ ) {
+      ret(idx,0) =  -dH; ret(idx,1) = i-dI; ret(idx,2) = j-dJ; idx++;
+      ret(idx,0) =  +dH; ret(idx,1) = i-dI; ret(idx,2) = j-dJ; idx++;
     }
   }
-  for ( i=0 ; i<N[0]   ; i++ ) {
-    for ( j=0 ; j<N[1]   ; j++ ) {
-      ret(idx,0) = i-mid[0]; ret(idx,1) = j-mid[1]; ret(idx,2) =  -mid[2]; idx++;
-      ret(idx,0) = i-mid[0]; ret(idx,1) = j-mid[1]; ret(idx,2) =  +mid[2]; idx++;
+  for ( i=0 ; i<H   ; i++ ) {
+    for ( j=0 ; j<I   ; j++ ) {
+      ret(idx,0) = i-dH; ret(idx,1) = j-dI; ret(idx,2) =  -dJ; idx++;
+      ret(idx,0) = i-dH; ret(idx,1) = j-dI; ret(idx,2) =  +dJ; idx++;
     }
   }
   return ret;
@@ -278,23 +280,6 @@ std::tuple<int,int,int> unpack3d ( std::vector<size_t> src, int value )
 
 // =============================================================================
 // compute midpoint from "shape"-vector
-// =============================================================================
-
-std::vector<int> midpoint_int ( std::vector<size_t> shape )
-{
-  std::vector<int> ret(shape.size());
-
-  for ( auto i : shape )
-    if ( !(i%2) )
-      throw std::domain_error("Only allowed for odd-shaped matrices");
-
-  for ( int i=0 ; i<shape.size() ; i++ )
-    ret[i] = ((int)shape[i]-1)/2;
-
-  return ret;
-
-}
-
 // =============================================================================
 
 std::vector<size_t> midpoint ( std::vector<size_t> shape )
@@ -976,7 +961,6 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
         c(h,i,j) = ilab;
       }
     }
-
   }
 
   return std::make_tuple(l,c);
