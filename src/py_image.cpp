@@ -72,10 +72,23 @@ PYBIND11_PLUGIN(gooseeye) {
 py::module m("gooseeye", "Geometrical statistics");
 py::module mi = m.def_submodule("image", "Image-based input");
 
-mi.def("dummy_circles",py::overload_cast<Vs&,            bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),                                           py::arg("periodic")=true);
-mi.def("dummy_circles",py::overload_cast<Vs&,Vi&,Vi&,Vi&,bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),py::arg("row"),py::arg("col"),py::arg("r"),py::arg("periodic")=true);
+// toolbox
+// -------
+
+mi.def("path",&Image::path,"Voxel path",py::arg("xa"),py::arg("xb"),py::arg("mode")="Bresenham");
+
+mi.def("stamp_points",&Image::stamp_points,"End points of voxel stamp",py::arg("shape"));
+
+mi.def("pad",py::overload_cast<Mi&,Vs&,i>(&Image::pad),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0 );
+mi.def("pad",py::overload_cast<Md&,Vs&,d>(&Image::pad),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0.);
 
 mi.def("kernel",&Image::kernel,py::arg("ndim"),py::arg("mode")="default");
+
+// image manipulation
+// ------------------
+
+mi.def("dummy_circles",py::overload_cast<Vs&,            bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),                                           py::arg("periodic")=true);
+mi.def("dummy_circles",py::overload_cast<Vs&,Vi&,Vi&,Vi&,bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),py::arg("row"),py::arg("col"),py::arg("r"),py::arg("periodic")=true);
 
 mi.def("clusters",py::overload_cast<Mi&,    i,b>(&Image::clusters),"Identify clusters",py::arg("im"),                  py::arg("min_size")=0,py::arg("periodic")=true);
 mi.def("clusters",py::overload_cast<Mi&,Mi&,i,b>(&Image::clusters),"Identify clusters",py::arg("im"),py::arg("kernel"),py::arg("min_size")=0,py::arg("periodic")=true);
@@ -84,6 +97,9 @@ mi.def("dilate",py::overload_cast<Mi&    ,i  ,b>(&Image::dilate),"Dilate image",
 mi.def("dilate",py::overload_cast<Mi&    ,Vi&,b>(&Image::dilate),"Dilate image",py::arg("im"),                  py::arg("iterations")  ,py::arg("periodic")=true );
 mi.def("dilate",py::overload_cast<Mi&,Mi&,i  ,b>(&Image::dilate),"Dilate image",py::arg("im"),py::arg("kernel"),py::arg("iterations")=1,py::arg("periodic")=true );
 mi.def("dilate",py::overload_cast<Mi&,Mi&,Vi&,b>(&Image::dilate),"Dilate image",py::arg("im"),py::arg("kernel"),py::arg("iterations")  ,py::arg("periodic")=true );
+
+// statistics
+// ----------
 
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&            >(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,        b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("zeropad")=false,py::arg("periodic")=true);
@@ -108,13 +124,6 @@ mi.def("W2c",py::overload_cast<Md&,Mi&,Mi&,Vs&,    s,b>(&Image::W2c),"Collapsed 
 mi.def("W2c",py::overload_cast<Md&,Mi&,Mi&,Vs&,Mi&,s,b>(&Image::W2c),"Collapsed weighted 2-point correlation",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),py::arg("mask"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
 
 mi.def("L",&Image::L,"Lineal path function",py::arg("im"),py::arg("roi"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
-
-mi.def("path",&Image::path,"Voxel path",py::arg("xa"),py::arg("xb"),py::arg("mode")="Bresenham");
-
-mi.def("stamp_points",&Image::stamp_points,"End points of voxel stamp",py::arg("shape"));
-
-mi.def("pad",py::overload_cast<Mi&,Vs&,i>(&Image::pad),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0 );
-mi.def("pad",py::overload_cast<Md&,Vs&,d>(&Image::pad),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0.);
 
 return m.ptr();
 

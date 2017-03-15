@@ -7,7 +7,7 @@ template class Matrix<int>;
 template class Matrix<double>;
 
 // =============================================================================
-// voxel path
+// pixel/voxel path between two points "xa" and "xb"
 // =============================================================================
 
 Matrix<int> path (
@@ -185,7 +185,7 @@ Matrix<int> path (
 }
 
 // =============================================================================
-// create end-points of ROI-stamp used in path-based correlations
+// list of end-points of ROI-stamp used in path-based correlations
 // =============================================================================
 
 Matrix<int> stamp_points ( std::vector<size_t> &N )
@@ -533,7 +533,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
 }
 
 // =============================================================================
-// define kernels
+// define kernel
 // =============================================================================
 
 Matrix<int> kernel ( int ndim , std::string mode )
@@ -570,7 +570,7 @@ Matrix<int> kernel ( int ndim , std::string mode )
 }
 
 // =============================================================================
-// determine clusters from image
+// determine clusters in image
 // =============================================================================
 
 void _link ( std::vector<int> &linked, int a, int b )
