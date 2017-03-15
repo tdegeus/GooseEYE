@@ -261,7 +261,7 @@ Matrix<int> stamp_points ( std::vector<size_t> &N )
 }
 
 // =============================================================================
-// return vector as (h,i,j) with default value if "src.size()<3"
+// return vector as "(h,i,j)", using a default "value" if "src.size()<3"
 // =============================================================================
 
 std::tuple<int,int,int> unpack3d ( std::vector<size_t> src, int value )

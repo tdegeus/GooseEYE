@@ -187,31 +187,55 @@ using i  = int;
 using b  = bool;
 using s  = std::string;
 
+// implementation support
+// ----------------------
+
+// return vector as "(h,i,j)", using a default "value" if "src.size()<3"
 std::tuple<i,i,i> unpack3d ( Vs src, i value=1 );
 
-Vi midpoint_int ( Vs shape );
-Vs midpoint     ( Vs shape );
+// compute midpoint from "shape"-vector
+Vs midpoint ( Vs shape );
 
+// toolbox
+// -------
+
+// pixel/voxel path between two points "xa" and "xb"
+// mode: "Bresenham", "actual", or "full"
 Mi path ( Vi &xa, Vi &xb, s mode="Bresenham" );
 
+// list of end-points of ROI-stamp used in path-based correlations
 Mi stamp_points ( Vs &shape );
 
+// (zero)pad "pad_shape" entries on each side of "src" (with a certain "value")
 Mi pad ( Mi &src, Vs &pad_shape, i value=0  );
 Md pad ( Md &src, Vs &pad_shape, d value=0. );
 
+// define kernel
+// mode: "default"
+Mi kernel ( i ndim , s mode="default" );
+
+// image manipulation
+// ------------------
+
+// create a dummy image with circles at position "row","col" with radius "r"
 Mi dummy_circles ( Vs &shape,                          b periodic=true );
 Mi dummy_circles ( Vs &shape, Vi &row, Vi &col, Vi &r, b periodic=true );
 
-Mi kernel ( i ndim , s mode="default" );
-
+// determine clusters in image (for "min_size=0" the minimum size is ignored)
 std::tuple<Mi,Mi> clusters ( Mi &src,             i min_size=0, b periodic=true);
 std::tuple<Mi,Mi> clusters ( Mi &src, Mi &kernel, i min_size=0, b periodic=true);
 
+// dilate image (binary or int)
+// for 'int' image the number of iterations can be specified per label
 Mi dilate ( Mi &src            , i   iterations=1, b periodic=true );
 Mi dilate ( Mi &src            , Vi& iterations  , b periodic=true );
 Mi dilate ( Mi &src, Mi &kernel, i   iterations=1, b periodic=true );
 Mi dilate ( Mi &src, Mi &kernel, Vi& iterations  , b periodic=true );
 
+// statistics
+// ----------
+
+// 2-point probability (binary), 2-point cluster function (int), and 2-point correlations (double)
 std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );
 std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b pad=false, b periodic=true );
 std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
@@ -221,6 +245,7 @@ std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi,                     b pad=false, b
 std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
 std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
 
+// weighted 2-point probability (binary) or 2-point correlation (float)
 std::tuple<Md,i > W2 ( Mi &W, Mi &I, Vs &roi                                        );
 std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi,          b pad=false, b periodic=true );
 std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
@@ -231,9 +256,11 @@ std::tuple<Md,d > W2 ( Md &W, Md &I, Vs &roi                                    
 std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b pad=false, b periodic=true );
 std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
 
+// collapsed weighted 2-point correlation
 std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi, Mi &msk, s mode="Bresenham", b periodic=true );
 std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi,          s mode="Bresenham", b periodic=true );
 
+// lineal path function (binary or int)
 std::tuple<Md,Mi> L ( Mi &f, Vs &roi, s mode="Bresenham", b periodic=true );
 
 }; // namespace image
