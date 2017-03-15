@@ -23,9 +23,9 @@ Matrix<int> path ( std::vector<int> &xa, std::vector<int> &xb, std::string mode 
 
   std::vector<int> ret;
 
-  // see http://www.luberth.com/plotter/line3d.c.txt.html
   if ( mode=="bresenham" )
   {
+    // see http://www.luberth.com/plotter/line3d.c.txt.html
     int a[3],s[3],x[3],d[3],in[2],j,i,iin,nnz=0;
 
     // set defaults
@@ -382,12 +382,13 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
   if ( iterations.size()!=src.max()+1 )
     throw std::length_error("Iteration must be specified for each label");
 
-  int h,i,j,dh,di,dj,nlab,ilab,iter;
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,nlab,ilab,iter;
   int max_iter = 0;
 
   Matrix<int> l = src;
-  std::vector<int> mid = midpoint_int(kern.shape(3));
-  std::vector<size_t> N = src.shape(3);
+
+  std::tie( H, I, J) = unpack3d(src.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
 
   // number of labels
   nlab = l.max();
@@ -399,9 +400,9 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
   for ( iter=0 ; iter<max_iter ; iter++ ) {
 
     // loop over all voxel
-    for ( h=0 ; h<N[0] ; h++ ) {
-      for ( i=0 ; i<N[1] ; i++ ) {
-        for ( j=0 ; j<N[2] ; j++ ) {
+    for ( h=0 ; h<H ; h++ ) {
+      for ( i=0 ; i<I ; i++ ) {
+        for ( j=0 ; j<J ; j++ ) {
           // label over the current voxel
           ilab = l(h,i,j);
           // proceed:
@@ -409,26 +410,19 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
           // - if the number of iterations for this label has not been exceeded
           if ( ilab>0 && iterations[ilab]>iter ) {
             // loop over the kernel
-            for ( dh=-mid[0] ; dh<=mid[0] ; dh++ ) {
-              for ( di=-mid[1] ; di<=mid[1] ; di++ ) {
-                for ( dj=-mid[2] ; dj<=mid[2] ; dj++ ) {
-                  // dilate for non-zero kernel value
-                  if ( kern(dh+mid[0],di+mid[1],dj+mid[2]) && !(dh==0 && di==0 && dj==0) ) {
-                    // periodic image
+            for ( dh=-dH ; dh<=dH ; dh++ ) {
+              for ( di=-dI ; di<=dI ; di++ ) {
+                for ( dj=-dJ ; dj<=dJ ; dj++ ) {
+                  // check to dilate for non-zero kernel value
+                  if ( kern(dh+dH,di+dI,dj+dJ) && !(dh==0 && di==0 && dj==0) ) {
                     if ( periodic ) {
-                      if ( !l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) ) {
-                        l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) = -1*ilab;
-                      }
+                      if ( !l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                        l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) = -1*ilab;
                     }
-                    // non-periodic image
                     else {
-                      // check if the comparison voxel in the image
-                      if ( h+dh<N[0] && h+dh>=0 && i+di<N[1] && i+di>=0 && j+dj<N[2] && j+dj>=0 ) {
-                        // dilate (only for zero comparison voxel)
-                        if ( !l(h+dh,i+di,j+dj) ) {
+                      if ( BND(h+dh,H) && BND(i+di,I) && BND(j+dj,J) )
+                        if ( !l(h+dh,i+di,j+dj) )
                           l(h+dh,i+di,j+dj) = -1*ilab;
-                        }
-                      }
                     }
                   }
                 }
@@ -438,10 +432,8 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
         }
       }
     }
-
-    // copy new image to input image
+    // accept all new labels (which were stored as negative)
     l.abs();
-
   }
 
   return l;
@@ -485,14 +477,13 @@ Matrix<int> dilate ( Matrix<int> &src, std::vector<int> &iterations,
 // create a dummy image with circles at position "row","col" with radius "r"
 // =============================================================================
 
-Matrix<int> dummy_circles ( std::vector<size_t> &shape,
-  std::vector<int> &row, std::vector<int> &col, std::vector<int> &r, bool periodic )
+Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &row,
+  std::vector<int> &col, std::vector<int> &r, bool periodic )
 {
-  if ( shape.size()!=2 )
-    throw std::length_error("Only allowed in 2 dimensions");
-
   if ( row.size()!=col.size() || row.size()!=r.size() )
     throw std::length_error("'row', 'col', and 'r' are inconsistent");
+  if ( shape.size()!=2 )
+    throw std::length_error("Only allowed in 2 dimensions");
 
   int i,di,dj,I,J;
   Matrix<int> ret(shape);
@@ -584,7 +575,7 @@ Matrix<int> kernel ( int ndim , std::string mode )
       kern(0,1,1) = 1; kern(2,1,1) = 1;
     }
     else
-      throw std::length_error("'shape' must be 1-, 2-, or 3-D");
+      throw std::length_error("Only defined in 1-, 2-, or 3-D");
 
     return kern;
   }
@@ -596,7 +587,7 @@ Matrix<int> kernel ( int ndim , std::string mode )
 // determine clusters from image
 // =============================================================================
 
-void _clusters_link ( std::vector<int> &linked, int a, int b )
+void _link ( std::vector<int> &linked, int a, int b )
 {
 
   if ( a==b )
@@ -669,21 +660,24 @@ void _clusters_link ( std::vector<int> &linked, int a, int b )
 std::tuple<Matrix<int>,Matrix<int>> clusters (
   Matrix<int> &f, Matrix<int> &kern, int min_size, bool periodic )
 {
-  int  h,i,j,di,dj,dh,ii,jj,nlab;
-  int  lb[3],ub[3];               // upper/lower bound of kernel ==(shape[i]-1)/2 except for edges
-  int  ilab = 0;                  // current label
-  std::vector<int> lnk(f.size()); // cluster links (e.g. 4 coupled to 2: lnk[4]=2)
-  std::vector<int> inc(f.size()); // saved clusters: 1=saved, 0=not-saved
+  int h,i,j,di,dj,dh,H,I,J,lH,lI,lJ,uH,uI,uJ,dI,dJ,dH,ii,jj,ilab,nlab;
+  // cluster links (e.g. 4 coupled to 2: lnk[4]=2)
+  std::vector<int> lnk(f.size());
+  // saved clusters: 1=saved, 0=not-saved
+  std::vector<int> inc(f.size());
 
   Matrix<int> l(f.shape());
   Matrix<int> c(f.shape());
 
-  std::vector<int> mid = midpoint_int(kern.shape(3));
-  std::vector<size_t> N = f.shape(3);
+  std::tie( H, I, J) = unpack3d(f.shape(),1);
+  std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
 
   // --------------
   // basic labeling
   // --------------
+
+  // current label
+  ilab = 0;
 
   // initialize cluster-links (only coupled to self)
   for ( i=0 ; i<f.size() ; i++ )
@@ -695,77 +689,63 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 
   // periodic: lower/upper bound of the kernel always == (shape[i]-1)/2
   if ( periodic ) {
-    for ( i=0 ; i<3 ; i++ ) {
-      lb[i] = -mid[i];
-      ub[i] = +mid[i];
-    }
+    lH = -dH; uH = +dH;
+    lI = -dI; uI = +dI;
+    lJ = -dJ; uJ = +dJ;
   }
 
   // loop over voxels (in all directions)
-  for ( h=0 ; h<N[0] ; h++ ) {
-    for ( i=0 ; i<N[1] ; i++ ) {
-      for ( j=0 ; j<N[2] ; j++ ) {
+  for ( h=0 ; h<H ; h++ ) {
+    for ( i=0 ; i<I ; i++ ) {
+      for ( j=0 ; j<J ; j++ ) {
 
         // only continue for non-zero voxels
-        if ( f(h,i,j) )
-        {
+        if ( f(h,i,j) ) {
 
           // set lower/upper bound of the kernel near edges
           // -> avoids reading out-of-bounds
-          if ( !periodic )
-          {
-            if ( h <       mid[0] ) lb[0]=0; else lb[0]=-mid[0];
-            if ( i <       mid[1] ) lb[1]=0; else lb[1]=-mid[1];
-            if ( j <       mid[2] ) lb[2]=0; else lb[2]=-mid[2];
-            if ( h >= N[0]-mid[0] ) ub[0]=0; else ub[0]=+mid[0];
-            if ( i >= N[1]-mid[1] ) ub[1]=0; else ub[1]=+mid[1];
-            if ( j >= N[2]-mid[2] ) ub[2]=0; else ub[2]=+mid[2];
+          if ( !periodic ) {
+            if ( h <    dH ) lH=0; else lH=-dH;
+            if ( i <    dI ) lI=0; else lI=-dI;
+            if ( j <    dJ ) lJ=0; else lJ=-dJ;
+            if ( h >= H-dH ) uH=0; else uH=+dH;
+            if ( i >= I-dI ) uJ=0; else uJ=+dI;
+            if ( j >= J-dJ ) uI=0; else uI=+dJ;
           }
 
           // cluster not yet labeled: try to couple to labeled neighbors
-          if ( l(h,i,j)==0 )
-          {
-            for ( dh=lb[0] ; dh<=ub[0] ; dh++ ) {
-              for ( di=lb[1] ; di<=ub[1] ; di++ ) {
-                for ( dj=lb[2] ; dj<=ub[2] ; dj++ ) {
-                  if ( kern(dh+mid[0],di+mid[1],dj+mid[2]) ) {
-                    if ( l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) ) {
-                      l(h,i,j) = l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2]));
+          if ( l(h,i,j)==0 ) {
+            for ( dh=lH ; dh<=uH ; dh++ ) {
+              for ( di=lI ; di<=uJ ; di++ ) {
+                for ( dj=lJ ; dj<=uI ; dj++ ) {
+                  if ( kern(dh+dH,di+dI,dj+dJ) ) {
+                    if ( l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) ) {
+                      l(h,i,j) = l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J));
                       goto end;
                     }
-                  }
-                }
-              }
-            }
-          }
+          }}}}}
           end: ;
 
           // cluster not yet labeled: create new label
-          if ( l(h,i,j)==0 )
-          {
+          if ( l(h,i,j)==0 ) {
             ilab++;
-            l(h,i,j) = ilab;
+            l(h,i,j)  = ilab;
             inc[ilab] = 1;
           }
 
           // try to couple neighbors to current label
           // - not yet labeled -> label neighbor
           // - labeled         -> link labels
-          for ( dh=lb[0] ; dh<=ub[0] ; dh++ ) {
-            for ( di=lb[1] ; di<=ub[1] ; di++ ) {
-              for ( dj=lb[2] ; dj<=ub[2] ; dj++ ) {
-                if ( kern(dh+mid[0],di+mid[1],dj+mid[2]) ) {
-                  if ( f(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) )
-                  {
-                    if ( l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2]))==0 )
-                      l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) = l(h,i,j);
+          for ( dh=lH ; dh<=uH ; dh++ ) {
+            for ( di=lI ; di<=uJ ; di++ ) {
+              for ( dj=lJ ; dj<=uI ; dj++ ) {
+                if ( kern(dh+dH,di+dI,dj+dJ) ) {
+                  if ( f(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) ) {
+                    if ( l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J))==0 )
+                      l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)) = l(h,i,j);
                     else
-                      _clusters_link(lnk,l(h,i,j),l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])));
-                  }
-                }
-              }
-            }
-          }
+                      _link(lnk,l(h,i,j),l(PER(h+dh,H),PER(i+di,I),PER(j+dj,J)));
+          }}}}}
 
         }
 
@@ -802,8 +782,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
   // threshold for cluster size
   // --------------------------
 
-  if ( min_size>0 )
-  {
+  if ( min_size>0 ) {
 
     // find the size of all clusters
     for ( i=0 ; i<nlab ; i++ ) {
@@ -846,8 +825,6 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 
   if ( !periodic )
   {
-    int h,i,j,ilab,nlab;
-
     // number of labels
     nlab = l.max()+1;
 
@@ -856,9 +833,9 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
     Matrix<int> x({(size_t)nlab,4});
 
     // loop over the image to update the position and size of each label
-    for ( h=0 ; h<N[0] ; h++ ) {
-      for ( i=0 ; i<N[1] ; i++ ) {
-        for ( j=0 ; j<N[2] ; j++ ) {
+    for ( h=0 ; h<H ; h++ ) {
+      for ( i=0 ; i<I ; i++ ) {
+        for ( j=0 ; j<J ; j++ ) {
           ilab = l(h,i,j);
           if ( ilab>0 ) {
             x(ilab,0) += h;
@@ -878,12 +855,12 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
         i = (int)round( (float)x(ilab,1) / (float)x(ilab,3) );
         j = (int)round( (float)x(ilab,2) / (float)x(ilab,3) );
 
-        if ( h <  0    ) { h = 0;    }
-        if ( i <  0    ) { i = 0;    }
-        if ( j <  0    ) { j = 0;    }
-        if ( h >= N[0] ) { h = N[0]; }
-        if ( i >= N[1] ) { i = N[1]; }
-        if ( j >= N[2] ) { j = N[2]; }
+        if ( h <  0 ) { h = 0; }
+        if ( i <  0 ) { i = 0; }
+        if ( j <  0 ) { j = 0; }
+        if ( h >= H ) { h = H; }
+        if ( i >= I ) { i = I; }
+        if ( j >= J ) { j = J; }
 
         c(h,i,j) = ilab;
       }
@@ -927,47 +904,50 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
     // ------------------------------------------------------------
 
     // i-j plane
-    for ( i=0 ; i<N[1] ; i++ )
-      for ( j=0 ; j<N[2] ; j++ )
-        for ( dh=1 ; dh<=mid[0] ; dh++ )
-          for ( di=0 ; di<=mid[1] ; di++ )
-            for ( dj=0 ; dj<=mid[2] ; dj++ )
-              if ( i+di<N[1] && j+dj<N[2] )
-                if ( l_(N[0]-1,i,j) && l(N[0]-1,i,j)==l(PER(N[0]-1+dh,N[0]),PER(i+di,N[1]),PER(j+dj,N[2])) )
-                  dx(l_(N[0]-1,i,j),0) = 1;
+    for ( i=0 ; i<I ; i++ )
+      for ( j=0 ; j<J ; j++ )
+        for ( dh=1 ; dh<=dH ; dh++ )
+          for ( di=0 ; di<=dI ; di++ )
+            for ( dj=0 ; dj<=dJ ; dj++ )
+              if ( i+di<I && j+dj<J )
+                if ( l_(H-1,i,j) )
+                  if ( l(H-1,i,j)==l(PER(H-1+dh,H),PER(i+di,I),PER(j+dj,J)) )
+                    dx(l_(H-1,i,j),0) = 1;
 
     // h-j plane
-    for ( h=0 ; h<N[0] ; h++ )
-      for ( j=0 ; j<N[2] ; j++ )
-        for ( dh=0 ; dh<=mid[0] ; dh++ )
-          for ( di=1 ; di<=mid[1] ; di++ )
-            for ( dj=0 ; dj<=mid[2] ; dj++ )
-              if ( h+dh<N[0] && j+dj<N[2] )
-                if ( l_(h,N[1]-1,j) && l(h,N[1]-1,j)==l(PER(h+dh,N[0]),PER(N[1]-1+di,N[1]),PER(j+dj,N[2])) )
-                  dx(l_(h,N[1]-1,j),1) = 1;
+    for ( h=0 ; h<H ; h++ )
+      for ( j=0 ; j<J ; j++ )
+        for ( dh=0 ; dh<=dH ; dh++ )
+          for ( di=1 ; di<=dI ; di++ )
+            for ( dj=0 ; dj<=dJ ; dj++ )
+              if ( h+dh<H && j+dj<J )
+                if ( l_(h,I-1,j) )
+                  if ( l(h,I-1,j)==l(PER(h+dh,H),PER(I-1+di,I),PER(j+dj,J)) )
+                    dx(l_(h,I-1,j),1) = 1;
 
     // h-i plane
-    for ( h=0 ; h<N[0] ; h++ )
-      for ( i=0 ; j<N[1] ; j++ )
-        for ( dh=0 ; dh<=mid[0] ; dh++ )
-          for ( di=0 ; di<=mid[1] ; di++ )
-            for ( dj=1 ; dj<=mid[2] ; dj++ )
-              if ( h+dh<N[0] && i+di<N[1] )
-                if ( l_(h,i,N[2]-1) && l(h,i,N[2]-1)==l(PER(h+dh,N[0]),PER(i+di,N[1]),PER(N[2]-1+dj,N[2])) )
-                  dx(l_(h,i,N[2]-1),2) = 1;
+    for ( h=0 ; h<H ; h++ )
+      for ( i=0 ; j<I ; j++ )
+        for ( dh=0 ; dh<=dH ; dh++ )
+          for ( di=0 ; di<=dI ; di++ )
+            for ( dj=1 ; dj<=dJ ; dj++ )
+              if ( h+dh<H && i+di<I )
+                if ( l_(h,i,J-1) )
+                  if ( l(h,i,J-1)==l(PER(h+dh,H),PER(i+di,I),PER(J-1+dj,J)) )
+                    dx(l_(h,i,J-1),2) = 1;
 
     // calculate centers
     // -----------------
 
     // loop over the image to update the position and size of each label
-    for ( h=0 ; h<N[0] ; h++ ) {
-      for ( i=0 ; i<N[1] ; i++ ) {
-        for ( j=0 ; j<N[2] ; j++ ) {
+    for ( h=0 ; h<H ; h++ ) {
+      for ( i=0 ; i<I ; i++ ) {
+        for ( j=0 ; j<J ; j++ ) {
           ilab = l_(h,i,j);
           if ( ilab>0 ) {
-            if ( dx(ilab,0) ) dh = -N[0]; else dh = 0;
-            if ( dx(ilab,1) ) di = -N[1]; else di = 0;
-            if ( dx(ilab,2) ) dj = -N[2]; else dj = 0;
+            if ( dx(ilab,0) ) dh = -H; else dh = 0;
+            if ( dx(ilab,1) ) di = -I; else di = 0;
+            if ( dx(ilab,2) ) dj = -J; else dj = 0;
 
             x(lnk[ilab],0) += h+dh;
             x(lnk[ilab],1) += i+di;
@@ -986,12 +966,12 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
         i = (int)round( (float)x(ilab,1) / (float)x(ilab,3) );
         j = (int)round( (float)x(ilab,2) / (float)x(ilab,3) );
 
-        while ( h <  0    ) { h += N[0]; }
-        while ( i <  0    ) { i += N[1]; }
-        while ( j <  0    ) { j += N[2]; }
-        while ( h >= N[0] ) { h -= N[0]; }
-        while ( i >= N[1] ) { i -= N[1]; }
-        while ( j >= N[2] ) { j -= N[2]; }
+        while ( h <  0 ) { h += H; }
+        while ( i <  0 ) { i += I; }
+        while ( j <  0 ) { j += J; }
+        while ( h >= H ) { h -= H; }
+        while ( i >= I ) { i -= I; }
+        while ( j >= J ) { j -= J; }
 
         c(h,i,j) = ilab;
       }

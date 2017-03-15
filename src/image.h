@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 
+#define BND(i,N) ( (i<0) ?   0 : (i>=N) ?   0 : 1 )
 #define PER(i,N) ( (i<0) ? i+N : (i>=N) ? i-N : i )
 #define SIGN(a)  ( (a<0) ?  -1 :  a>0   ?   1 : 0 )
 #define POS(a)   ( (a<0) ?   0                : a )
