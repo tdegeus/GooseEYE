@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
@@ -221,10 +221,15 @@
                  <string>2-point probability</string>
                 </property>
                </item>
+               <item>
+                <property name="text">
+                 <string>Collapsed 2-point probability</string>
+                </property>
+               </item>
               </item>
               <item>
                <property name="text">
-                <string>Predictions</string>
+                <string>Prediction from conditional statistics</string>
                </property>
                <item>
                 <property name="text">
@@ -274,32 +279,32 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im1Float_radioButton">
+             <widget class="QRadioButton" name="tab2_im1f_radioButton">
               <property name="text">
                <string>float</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_img1</string>
+               <string notr="true">buttonGroup_tab2_im1</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im1Int_radioButton">
+             <widget class="QRadioButton" name="tab2_im1i_radioButton">
               <property name="text">
                <string>int</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_img1</string>
+               <string notr="true">buttonGroup_tab2_im1</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im1Bool_radioButton">
+             <widget class="QRadioButton" name="tab2_im1b_radioButton">
               <property name="text">
-               <string>bool</string>
+               <string>binary</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_img1</string>
+               <string notr="true">buttonGroup_tab2_im1</string>
               </attribute>
              </widget>
             </item>
@@ -356,32 +361,32 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im2Float_radioButton">
+             <widget class="QRadioButton" name="tab2_im2f_radioButton">
               <property name="text">
                <string>float</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_img2</string>
+               <string notr="true">buttonGroup_tab2_im2</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im2Int_radioButton">
+             <widget class="QRadioButton" name="tab2_im2i_radioButton">
               <property name="text">
                <string>int</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_img2</string>
+               <string notr="true">buttonGroup_tab2_im2</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im2Bool_radioButton">
+             <widget class="QRadioButton" name="tab2_im2b_radioButton">
               <property name="text">
-               <string>bool</string>
+               <string>binary</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_img2</string>
+               <string notr="true">buttonGroup_tab2_im2</string>
               </attribute>
              </widget>
             </item>
@@ -856,7 +861,7 @@
                <x>0</x>
                <y>0</y>
                <width>361</width>
-               <height>525</height>
+               <height>553</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1264,6 +1269,55 @@
                    <string notr="true">buttonGroup_tab4_mouse</string>
                   </attribute>
                  </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_29">
+                <item>
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Maximum</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                </item>
+                <item>
+                 <widget class="QSlider" name="horizontalSlider">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_35">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Maximum</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </item>
@@ -1740,8 +1794,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab2_img1"/>
-  <buttongroup name="buttonGroup_tab2_img2"/>
   <buttongroup name="buttonGroup_tab4_mouse"/>
+  <buttongroup name="buttonGroup_tab2_im1"/>
+  <buttongroup name="buttonGroup_tab2_im2"/>
  </buttongroups>
 </ui>
