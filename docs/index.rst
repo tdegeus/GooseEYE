@@ -1,15 +1,30 @@
-.. GooseEYE documentation master file, created by
-   sphinx-quickstart on Tue Feb 28 17:10:58 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-Welcome to GooseEYE's documentation!
-====================================
+GooseEYE Documentation
+======================
+
+Documentation
+-------------
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
 
+   install.rst
+   quickstart.rst
+   cpp.rst
+   python.rst
+   gui.rst
+
+Python examples
+---------------
+
+.. note::
+
+  A little bit of theory is included in each of the examples.
+
+.. toctree::
+   :maxdepth: 1
+
+   examples/python/readme.rst
 
 
 Indices and tables

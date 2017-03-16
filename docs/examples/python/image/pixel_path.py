@@ -42,7 +42,9 @@ for (subplot,mode) in enumerate(['bresenham','actual','full']):
   ax.plot(grid[1],grid[0],linewidth=1.,color='k')
   ax.xaxis.set_ticks([])
   ax.yaxis.set_ticks([])
-  plt.title(r"``%s''"%mode)
+  plt.xlabel(r'$\Delta x$')
+  plt.ylabel(r'$\Delta y$')
+  plt.title (r"``%s''"%mode)
 
 # save figure
 plt.savefig('pixel_path.svg')
