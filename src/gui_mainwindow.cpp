@@ -1,6 +1,10 @@
 #include "gui_mainwindow.h"
 #include "ui_gui_mainwindow.h"
 
+// ============================================================================
+// basic constructor
+// ============================================================================
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
@@ -9,13 +13,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
   QString cur_dir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
   QString func    = "";
-
 }
+
+// ============================================================================
+// destructor
+// ============================================================================
 
 MainWindow::~MainWindow()
 {
   delete ui;
 }
+
+// ============================================================================
+// pop-up to signal work in progress
+// ============================================================================
 
 void MainWindow::WIP()
 {
@@ -24,6 +35,32 @@ void MainWindow::WIP()
     QMessageBox::Ok,QMessageBox::Ok
   );
 }
+
+// ============================================================================
+// tab-select: print message to status-bar
+// ============================================================================
+
+void MainWindow::on_tabWidget_tabBarClicked(int index)
+{
+  QString mes;
+
+  if      ( index==0 )
+    mes = "Overview, load pre-existing state";
+  else if ( index==1 )
+    mes = "Select measure and image type(s)";
+  else if ( index==2 )
+    mes = "Select images";
+  else if ( index==3 )
+    mes = "Check/modify images";
+  else if ( index==4 )
+    mes = "Run computation";
+
+  statusBar()->showMessage(mes);
+}
+
+// ============================================================================
+// load pre-existing state
+// ============================================================================
 
 void MainWindow::on_tab1_load_pushButton_clicked()
 {
@@ -49,25 +86,29 @@ void MainWindow::tab2_selectStat(void)
   bool    ti       = false;
   bool    lnk      = false;
   int     im2      = 0;
+  QString lab1     = "Image 1";
+  QString lab2     = "Image 2";
 
   // settings based on selected statistic
   if      ( category=="Spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      statusBar()->showMessage("Function to use: 'S2'");
       func = "S2";
+      lab1 = "Phase";
+      lab2 = "Phase";
       tb   = true;
       tf   = true;
       lnk  = true;
     }
     else if ( measure=="2-point cluster" ) {
-      statusBar()->showMessage("Function to use: 'S2'");
       func = "S2";
+      lab1 = "Clusters";
+      lab2 = "Clusters";
       ti   = true;
       lnk  = true;
     }
     else if ( measure=="Lineal path" ) {
-      statusBar()->showMessage("Function to use: 'L'");
       func = "L" ;
+      lab1 = "Phase";
       tb   = true;
       ti   = true;
       lnk  = true;
@@ -76,15 +117,17 @@ void MainWindow::tab2_selectStat(void)
   }
   else if ( category=="Conditional spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      statusBar()->showMessage("Function to use: 'W2'");
       func = "W2";
+      lab1 = "Phase";
+      lab2 = "Weights";
       tb   = true;
       tf   = true;
       im2  = 1;
     }
     else if ( measure=="Collapsed 2-point probability" ) {
-      statusBar()->showMessage("Function to use: 'W2c'");
       func = "W2c";
+      lab1 = "Phase";
+      lab2 = "Weights";
       tb   = true;
       tf   = true;
       im2  = 1;
@@ -94,7 +137,19 @@ void MainWindow::tab2_selectStat(void)
     this->WIP();
   }
 
-  // selections of image 2: -1=disable ; 0=user-select ; 1=force-select
+  // show function in status bar
+  QString mes = "Function to use: '%1'";
+  statusBar()->showMessage(mes.arg(func));
+
+  // apply label
+  ui->tab2_im1_checkBox->setText(lab1);
+  ui->tab2_im2_checkBox->setText(lab2);
+
+  // selection of image 1: force-select
+  ui->tab2_im1_checkBox->setEnabled(false);
+  ui->tab2_im1_checkBox->setChecked(true );
+
+  // selection of image 2: -1=disable ; 0=user-select ; 1=force-select
   if      ( im2==-1 ) {
     this->on_tab2_im2_checkBox_toggled(false);
     ui->tab2_im2_checkBox->setChecked (false);
@@ -121,6 +176,14 @@ void MainWindow::tab2_selectStat(void)
     this->on_tab2_im1_checkBox_toggled(false);
   if ( !ti && ui->tab2_im2i_radioButton->isChecked() )
     this->on_tab2_im2_checkBox_toggled(false);
+
+  // auto-fill radio-button if there is only one possibility
+  if ( tb && !(ti || tf) )
+    ui->tab2_im1b_radioButton->setChecked(true);
+  if ( tf && !(tb || ti) )
+    ui->tab2_im1f_radioButton->setChecked(true);
+  if ( ti && !(tb || tf) )
+    ui->tab2_im1i_radioButton->setChecked(true);
 
   // enable/disable type-radioButton based on settings above
   ui->tab2_im1b_radioButton->setEnabled(tb);
@@ -243,4 +306,22 @@ void MainWindow::on_tab2_im2_checkBox_toggled(bool checked)
     ui->buttonGroup_tab2_im2->setExclusive(true );
   }
 }
+
+// =============================================================================
+// add/remove/move files to/in QListWidget
+// =============================================================================
+
+void MainWindow::on_tab3_im1Add_pushButton_clicked()
+{
+  QFileDialog dialog(this);
+  dialog.setFileMode(QFileDialog::ExistingFiles);
+  dialog.setNameFilter(tr("Images (*.png *.jpg *.jpeg *.tif *tiff *.mat *.npz)"));
+  dialog.setViewMode(QFileDialog::List);
+  QStringList fileNames;
+  if (dialog.exec())
+      fileNames = dialog.selectedFiles();
+
+  ui->tab3_im1_listWidget->addItems(fileNames);
+}
+
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>788</width>
-    <height>731</height>
+    <width>786</width>
+    <height>547</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
@@ -78,8 +78,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>714</width>
-               <height>262</height>
+               <width>712</width>
+               <height>170</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -260,18 +260,6 @@
              </spacer>
             </item>
             <item>
-             <widget class="QLabel" name="tab2_im1_label">
-              <property name="font">
-               <font>
-                <italic>true</italic>
-               </font>
-              </property>
-              <property name="text">
-               <string>Type</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QCheckBox" name="tab2_im1_checkBox">
               <property name="text">
                <string>Image 1</string>
@@ -309,6 +297,22 @@
              </widget>
             </item>
             <item>
+             <spacer name="horizontalSpacer_36">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>70</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <spacer name="verticalSpacer">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -340,18 +344,6 @@
                </size>
               </property>
              </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="tab2_im2_label">
-              <property name="font">
-               <font>
-                <italic>true</italic>
-               </font>
-              </property>
-              <property name="text">
-               <string>Type</string>
-              </property>
-             </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="tab2_im2_checkBox">
@@ -389,6 +381,22 @@
                <string notr="true">buttonGroup_tab2_im2</string>
               </attribute>
              </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_37">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>70</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
             <item>
              <spacer name="verticalSpacer_2">
@@ -482,7 +490,14 @@
              <widget class="QComboBox" name="tab3_im1_comboBox"/>
             </item>
             <item>
-             <widget class="QListWidget" name="tab3_im1_listWidget"/>
+             <widget class="QListWidget" name="tab3_im1_listWidget">
+              <property name="acceptDrops">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DropOnly</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -1763,7 +1778,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>788</width>
+     <width>786</width>
      <height>22</height>
     </rect>
    </property>
@@ -1794,8 +1809,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab4_mouse"/>
   <buttongroup name="buttonGroup_tab2_im1"/>
   <buttongroup name="buttonGroup_tab2_im2"/>
+  <buttongroup name="buttonGroup_tab4_mouse"/>
  </buttongroups>
 </ui>

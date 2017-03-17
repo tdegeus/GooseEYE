@@ -19,16 +19,26 @@ class MainWindow : public QMainWindow
 public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
+
   void WIP(void);
 
   void tab2_selectStat(void);
 
 private slots:
 
+  // write to message bar
+  void on_tabWidget_tabBarClicked(int index);
+
   void on_tab1_load_pushButton_clicked();
 
+  // run "tab2_selectStat()"
   void on_tab2_measure_treeWidget_clicked(const QModelIndex &index);
 
+  // check: run "tab2_selectStat()" ; uncheck: clear radioBox
+  void on_tab2_im1_checkBox_toggled(bool checked);
+  void on_tab2_im2_checkBox_toggled(bool checked);
+
+  // toggle "tab2_imX_checkBox"; run "tab2_selectStat()"
   void on_tab2_im1b_radioButton_clicked();
   void on_tab2_im1f_radioButton_clicked();
   void on_tab2_im1i_radioButton_clicked();
@@ -36,8 +46,8 @@ private slots:
   void on_tab2_im2f_radioButton_clicked();
   void on_tab2_im2i_radioButton_clicked();
 
-  void on_tab2_im1_checkBox_toggled(bool checked);
-  void on_tab2_im2_checkBox_toggled(bool checked);
+  // add files to QListWidget
+  void on_tab3_im1Add_pushButton_clicked();
 
 private:
   Ui::MainWindow *ui;
