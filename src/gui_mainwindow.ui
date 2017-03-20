@@ -20,144 +20,189 @@
       <property name="currentIndex">
        <number>2</number>
       </property>
-      <widget class="QWidget" name="tabWidgetPage1">
+      <widget class="QWidget" name="tabWidgetPage0">
        <attribute name="title">
         <string>Load</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_11">
+       <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_8">
+         <layout class="QHBoxLayout" name="horizontalLayout_25">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_25">
-            <item>
-             <widget class="QLabel" name="tab1_load_label">
-              <property name="text">
-               <string>&amp;Open pre-existing state:</string>
-              </property>
-              <property name="buddy">
-               <cstring>tab1_load_pushButton</cstring>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="tab1_load_pushButton">
-              <property name="text">
-               <string>Select</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_20">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+           <widget class="QLabel" name="tab0_load_label">
+            <property name="text">
+             <string>&amp;Open pre-existing state:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tab0_load_pushButton</cstring>
+            </property>
+           </widget>
           </item>
           <item>
-           <widget class="Line" name="line_2">
+           <widget class="QPushButton" name="tab0_load_pushButton">
+            <property name="text">
+             <string>Select</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_20">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QScrollArea" name="scrollArea">
-            <property name="widgetResizable">
-             <bool>true</bool>
-            </property>
-            <widget class="QWidget" name="scrollAreaWidgetContents_2">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>712</width>
-               <height>170</height>
-              </rect>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_9">
-              <item>
-               <widget class="QLabel" name="label_4">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Brief overview:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_7">
-                <property name="font">
-                 <font>
-                  <italic>true</italic>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>1. [optional] Load pre-existing state.</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_8">
-                <property name="text">
-                 <string>2. Select a measure.</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_9">
-                <property name="text">
-                 <string>3. Select set(s) of images to use as input.</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_10">
-                <property name="text">
-                 <string>4. Verify/modify input images.</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_12">
-                <property name="text">
-                 <string>5. Run computation, output result.</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>17</width>
-              <height>37</height>
+              <width>40</width>
+              <height>20</height>
              </size>
             </property>
            </spacer>
           </item>
          </layout>
         </item>
+        <item>
+         <widget class="Line" name="line_15">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="tab0_outdir_lineEdit"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Output directory:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Store result/settings as:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="tab0_result_lineEdit">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="tab0_result_pushButton">
+            <property name="text">
+             <string>Select</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="tab0_outdir_pushButton">
+            <property name="text">
+             <string>Select</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>714</width>
+             <height>160</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Brief overview:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="font">
+               <font>
+                <italic>true</italic>
+               </font>
+              </property>
+              <property name="text">
+               <string>1. Load pre-existing state (optional). Set output directory and result file.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>2. Select a measure.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>3. Select set(s) of images to use as input.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>4. Verify/modify input images.</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_12">
+              <property name="text">
+               <string>5. Run computation, output result.</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>17</width>
+            <height>87</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabWidgetPage2">
+      <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
         <string>Measure</string>
        </attribute>
@@ -180,7 +225,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QTreeWidget" name="tab2_measure_treeWidget">
+             <widget class="QTreeWidget" name="tab1_measure_treeWidget">
               <property name="headerHidden">
                <bool>true</bool>
               </property>
@@ -260,39 +305,54 @@
              </spacer>
             </item>
             <item>
-             <widget class="QCheckBox" name="tab2_im1_checkBox">
+             <widget class="QCheckBox" name="tab1_im1_checkBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Image 1</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im1f_radioButton">
+             <widget class="QRadioButton" name="tab1_im1f_radioButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>float</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_im1</string>
+               <string notr="true">buttonGroup_tab1_im1</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im1i_radioButton">
+             <widget class="QRadioButton" name="tab1_im1i_radioButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>int</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_im1</string>
+               <string notr="true">buttonGroup_tab1_im1</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im1b_radioButton">
+             <widget class="QRadioButton" name="tab1_im1b_radioButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>binary</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_im1</string>
+               <string notr="true">buttonGroup_tab1_im1</string>
               </attribute>
              </widget>
             </item>
@@ -346,39 +406,51 @@
              </spacer>
             </item>
             <item>
-             <widget class="QCheckBox" name="tab2_im2_checkBox">
+             <widget class="QCheckBox" name="tab1_im2_checkBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Image 2</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im2f_radioButton">
+             <widget class="QRadioButton" name="tab1_im2f_radioButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>float</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_im2</string>
+               <string notr="true">buttonGroup_tab1_im2</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im2i_radioButton">
+             <widget class="QRadioButton" name="tab1_im2i_radioButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>int</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_im2</string>
+               <string notr="true">buttonGroup_tab1_im2</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab2_im2b_radioButton">
+             <widget class="QRadioButton" name="tab1_im2b_radioButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>binary</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab2_im2</string>
+               <string notr="true">buttonGroup_tab1_im2</string>
               </attribute>
              </widget>
             </item>
@@ -429,7 +501,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QTextEdit" name="tab2_measure_textEdit">
+             <widget class="QTextEdit" name="tab1_measure_textEdit">
               <property name="readOnly">
                <bool>true</bool>
               </property>
@@ -441,7 +513,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabWidgetPage3">
+      <widget class="QWidget" name="tabWidgetPage2">
        <attribute name="title">
         <string>Files</string>
        </attribute>
@@ -473,24 +545,31 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="tab3_im1_label">
+               <widget class="QLabel" name="tab2_im1_label">
                 <property name="font">
                  <font>
                   <italic>true</italic>
                  </font>
                 </property>
                 <property name="text">
-                 <string>Type</string>
+                 <string>Field</string>
                 </property>
                </widget>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QComboBox" name="tab3_im1_comboBox"/>
+             <widget class="QComboBox" name="tab2_im1_comboBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="tab3_im1_listWidget">
+             <widget class="QListWidget" name="tab2_im1_listWidget">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="acceptDrops">
                <bool>true</bool>
               </property>
@@ -502,14 +581,20 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QPushButton" name="tab3_im1Add_pushButton">
+               <widget class="QPushButton" name="tab2_im1Add_pushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Add</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab3_im1Rm_pushButton">
+               <widget class="QPushButton" name="tab2_im1Rmv_pushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Remove</string>
                 </property>
@@ -520,7 +605,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="tab3_cp_pushButton">
+           <widget class="QPushButton" name="tab2_cp_pushButton">
             <property name="maximumSize">
              <size>
               <width>30</width>
@@ -557,50 +642,70 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="tab3_im2_label">
+               <widget class="QLabel" name="tab2_im2_label">
                 <property name="font">
                  <font>
                   <italic>true</italic>
                  </font>
                 </property>
                 <property name="text">
-                 <string>Type</string>
+                 <string>Field</string>
                 </property>
                </widget>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QComboBox" name="tab3_im2_comboBox"/>
+             <widget class="QComboBox" name="tab2_im2_comboBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="tab3_im2_listWidget"/>
+             <widget class="QListWidget" name="tab2_im2_listWidget">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QPushButton" name="tab3_im2Add_pushButton">
+               <widget class="QPushButton" name="tab2_im2Add_pushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Add</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab3_im2Rm_pushButton">
+               <widget class="QPushButton" name="tab2_im2Rmv_pushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Remove</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab3_im2Up_pushButton">
+               <widget class="QPushButton" name="tab2_im2Up__pushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Up</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab3_im2Dwn_pushButton">
+               <widget class="QPushButton" name="tab2_im2Dwn_pushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Down</string>
                 </property>
@@ -651,7 +756,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabWidgetPage4">
+      <widget class="QWidget" name="tabWidgetPage3">
        <attribute name="title">
         <string>Images</string>
        </attribute>
@@ -663,7 +768,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_8">
               <item>
-               <widget class="QPushButton" name="tab4_setPrev_pushButton">
+               <widget class="QPushButton" name="tab3_setPrev_pushButton">
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
@@ -692,7 +797,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QComboBox" name="tab4_set_comboBox">
+               <widget class="QComboBox" name="tab3_set_comboBox">
                 <property name="minimumSize">
                  <size>
                   <width>300</width>
@@ -718,7 +823,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="tab4_setNext_pushButton">
+               <widget class="QPushButton" name="tab3_setNext_pushButton">
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
@@ -744,10 +849,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QComboBox" name="tab4_setData_comboBox"/>
-              </item>
-              <item>
-               <widget class="QLabel" name="tab4_set_label">
+               <widget class="QLabel" name="tab3_set_label">
                 <property name="minimumSize">
                  <size>
                   <width>60</width>
@@ -759,6 +861,20 @@
                   <italic>true</italic>
                  </font>
                 </property>
+                <property name="text">
+                 <string>Field</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_15">
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="tab3_set_label_type">
                 <property name="text">
                  <string>Type</string>
                 </property>
@@ -783,7 +899,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
-               <widget class="QPushButton" name="tab4_imPrev_pushButton">
+               <widget class="QPushButton" name="tab3_imPrev_pushButton">
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
@@ -812,7 +928,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QComboBox" name="tab4_im_comboBox"/>
+               <widget class="QComboBox" name="tab3_im_comboBox"/>
               </item>
               <item>
                <spacer name="horizontalSpacer_17">
@@ -831,7 +947,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="tab4_imNext_pushButton">
+               <widget class="QPushButton" name="tab3_imNext_pushButton">
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
@@ -848,14 +964,14 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
               <item>
-               <widget class="QPushButton" name="tab4_imApply_pushButton">
+               <widget class="QPushButton" name="tab3_imApply_pushButton">
                 <property name="text">
                  <string>Apply</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab4_imApplyAll_pushButton">
+               <widget class="QPushButton" name="tab3_imApplyAll_pushButton">
                 <property name="text">
                  <string>Apply to &amp;All</string>
                 </property>
@@ -890,7 +1006,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_10">
                 <item>
-                 <widget class="QCheckBox" name="tab4_phaseA_checkBox">
+                 <widget class="QCheckBox" name="tab3_phaseA_checkBox">
                   <property name="text">
                    <string>Phase A</string>
                   </property>
@@ -913,7 +1029,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QGraphicsView" name="tab4_phaseA_graphicsView">
+                 <widget class="QGraphicsView" name="tab3_phaseA_graphicsView">
                   <property name="maximumSize">
                    <size>
                     <width>20</width>
@@ -939,7 +1055,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="tab4_phaseAManual_checkBox">
+                 <widget class="QCheckBox" name="tab3_phaseAManual_checkBox">
                   <property name="layoutDirection">
                    <enum>Qt::RightToLeft</enum>
                   </property>
@@ -972,12 +1088,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="tab4_phaseA_radioButton">
+                 <widget class="QRadioButton" name="tab3_phaseA_radioButton">
                   <property name="text">
                    <string/>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup_tab4_mouse</string>
+                   <string notr="true">buttonGroup_tab3_mouse</string>
                   </attribute>
                  </widget>
                 </item>
@@ -1002,17 +1118,17 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QDoubleSpinBox" name="tab4_phaseALow_doubleSpinBox"/>
+                 <widget class="QDoubleSpinBox" name="tab3_phaseALow_doubleSpinBox"/>
                 </item>
                 <item>
-                 <widget class="QSlider" name="tab4_phaseA_horizontalSlider">
+                 <widget class="QSlider" name="tab3_phaseA_horizontalSlider">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QDoubleSpinBox" name="tab4_phaseAHigh_doubleSpinBox"/>
+                 <widget class="QDoubleSpinBox" name="tab3_phaseAHigh_doubleSpinBox"/>
                 </item>
                 <item>
                  <spacer name="horizontalSpacer_8">
@@ -1042,7 +1158,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_13">
                 <item>
-                 <widget class="QCheckBox" name="tab4_phaseB_checkBox">
+                 <widget class="QCheckBox" name="tab3_phaseB_checkBox">
                   <property name="text">
                    <string>Phase B</string>
                   </property>
@@ -1065,7 +1181,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QGraphicsView" name="tab4_phaseB_graphicsView">
+                 <widget class="QGraphicsView" name="tab3_phaseB_graphicsView">
                   <property name="maximumSize">
                    <size>
                     <width>20</width>
@@ -1091,7 +1207,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="tab4_phaseBManual_checkBox">
+                 <widget class="QCheckBox" name="tab3_phaseBManual_checkBox">
                   <property name="layoutDirection">
                    <enum>Qt::RightToLeft</enum>
                   </property>
@@ -1124,12 +1240,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="tab4_phaseB_radioButton">
+                 <widget class="QRadioButton" name="tab3_phaseB_radioButton">
                   <property name="text">
                    <string/>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup_tab4_mouse</string>
+                   <string notr="true">buttonGroup_tab3_mouse</string>
                   </attribute>
                  </widget>
                 </item>
@@ -1154,17 +1270,17 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QDoubleSpinBox" name="tab4_phaseBLow_doubleSpinBox"/>
+                 <widget class="QDoubleSpinBox" name="tab3_phaseBLow_doubleSpinBox"/>
                 </item>
                 <item>
-                 <widget class="QSlider" name="tab4_phaseB_horizontalSlider">
+                 <widget class="QSlider" name="tab3_phaseB_horizontalSlider">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QDoubleSpinBox" name="tab4_phaseBHigh_doubleSpinBox"/>
+                 <widget class="QDoubleSpinBox" name="tab3_phaseBHigh_doubleSpinBox"/>
                 </item>
                 <item>
                  <spacer name="horizontalSpacer_23">
@@ -1194,7 +1310,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_28">
                 <item>
-                 <widget class="QCheckBox" name="tab4_mask_checkBox">
+                 <widget class="QCheckBox" name="tab3_mask_checkBox">
                   <property name="text">
                    <string>Mask</string>
                   </property>
@@ -1217,7 +1333,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QGraphicsView" name="tab4_mask_graphicsView">
+                 <widget class="QGraphicsView" name="tab3_mask_graphicsView">
                   <property name="maximumSize">
                    <size>
                     <width>20</width>
@@ -1243,7 +1359,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="tab4_maskManual_checkBox">
+                 <widget class="QCheckBox" name="tab3_maskManual_checkBox">
                   <property name="layoutDirection">
                    <enum>Qt::RightToLeft</enum>
                   </property>
@@ -1276,12 +1392,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="tab4_mask_radioButton">
+                 <widget class="QRadioButton" name="tab3_mask_radioButton">
                   <property name="text">
                    <string/>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup_tab4_mouse</string>
+                   <string notr="true">buttonGroup_tab3_mouse</string>
                   </attribute>
                  </widget>
                 </item>
@@ -1346,7 +1462,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_16">
                 <item>
-                 <widget class="QCheckBox" name="tab4_row_checkBox">
+                 <widget class="QCheckBox" name="tab3_row_checkBox">
                   <property name="text">
                    <string>Rows</string>
                   </property>
@@ -1373,12 +1489,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="tab4_row_radioButton">
+                 <widget class="QRadioButton" name="tab3_row_radioButton">
                   <property name="text">
                    <string/>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup_tab4_mouse</string>
+                   <string notr="true">buttonGroup_tab3_mouse</string>
                   </attribute>
                  </widget>
                 </item>
@@ -1403,17 +1519,17 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="tab4_rowLow_spinBox"/>
+                 <widget class="QSpinBox" name="tab3_rowLow_spinBox"/>
                 </item>
                 <item>
-                 <widget class="QSlider" name="tab4_row_horizontalSlider">
+                 <widget class="QSlider" name="tab3_row_horizontalSlider">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="tab4_rowHigh_spinBox"/>
+                 <widget class="QSpinBox" name="tab3_rowHigh_spinBox"/>
                 </item>
                 <item>
                  <spacer name="horizontalSpacer_25">
@@ -1443,7 +1559,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_17">
                 <item>
-                 <widget class="QCheckBox" name="tab4_col_checkBox">
+                 <widget class="QCheckBox" name="tab3_col_checkBox">
                   <property name="text">
                    <string>Columns</string>
                   </property>
@@ -1470,12 +1586,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="tab4_col_radioButton">
+                 <widget class="QRadioButton" name="tab3_col_radioButton">
                   <property name="text">
                    <string/>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup_tab4_mouse</string>
+                   <string notr="true">buttonGroup_tab3_mouse</string>
                   </attribute>
                  </widget>
                 </item>
@@ -1500,17 +1616,17 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="tab4_colLow_spinBox"/>
+                 <widget class="QSpinBox" name="tab3_colLow_spinBox"/>
                 </item>
                 <item>
-                 <widget class="QSlider" name="tab4_col_horizontalSlider">
+                 <widget class="QSlider" name="tab3_col_horizontalSlider">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="tab4_colHigh_spinBox"/>
+                 <widget class="QSpinBox" name="tab3_colHigh_spinBox"/>
                 </item>
                 <item>
                  <spacer name="horizontalSpacer_26">
@@ -1540,7 +1656,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_27">
                 <item>
-                 <widget class="QCheckBox" name="tab4_field_checkBox">
+                 <widget class="QCheckBox" name="tab3_field_checkBox">
                   <property name="text">
                    <string>Field</string>
                   </property>
@@ -1580,7 +1696,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="tab4_field_comboBox"/>
+                 <widget class="QComboBox" name="tab3_field_comboBox"/>
                 </item>
                 <item>
                  <spacer name="horizontalSpacer_7">
@@ -1622,7 +1738,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabWidgetPage6">
+      <widget class="QWidget" name="tabWidgetPage4">
        <attribute name="title">
         <string>Compute</string>
        </attribute>
@@ -1637,10 +1753,10 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="tab5_dir_lineEdit"/>
+           <widget class="QLineEdit" name="tab4_dir_lineEdit"/>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="tab5_dir_pushButton">
+           <widget class="QPushButton" name="tab4_dir_pushButton">
             <property name="text">
              <string>Select</string>
             </property>
@@ -1654,10 +1770,10 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="tab5_state_lineEdit"/>
+           <widget class="QLineEdit" name="tab4_state_lineEdit"/>
           </item>
           <item row="1" column="2">
-           <widget class="QPushButton" name="tab5_state_pushButton">
+           <widget class="QPushButton" name="tab4_state_pushButton">
             <property name="text">
              <string>Select</string>
             </property>
@@ -1671,10 +1787,10 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="tab5_res_lineEdit"/>
+           <widget class="QLineEdit" name="tab4_res_lineEdit"/>
           </item>
           <item row="2" column="2">
-           <widget class="QPushButton" name="tab5_res_pushButton">
+           <widget class="QPushButton" name="tab4_res_pushButton">
             <property name="text">
              <string>Select</string>
             </property>
@@ -1683,14 +1799,14 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="tab5_mask_checkBox">
+         <widget class="QCheckBox" name="tab4_mask_checkBox">
           <property name="text">
            <string>Mask weights</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="tab5_per_checkBox">
+         <widget class="QCheckBox" name="tab4_per_checkBox">
           <property name="text">
            <string>Assume periodic (faster)</string>
           </property>
@@ -1706,7 +1822,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="tab5_path_comboBox"/>
+           <widget class="QComboBox" name="tab4_path_comboBox"/>
           </item>
           <item>
            <spacer name="horizontalSpacer_28">
@@ -1739,7 +1855,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="tab5_compute_pushButton">
+           <widget class="QPushButton" name="tab4_compute_pushButton">
             <property name="text">
              <string>Compute</string>
             </property>
@@ -1748,7 +1864,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QProgressBar" name="tab5_progressBar">
+         <widget class="QProgressBar" name="tab4_progressBar">
           <property name="value">
            <number>24</number>
           </property>
@@ -1809,8 +1925,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab2_im1"/>
-  <buttongroup name="buttonGroup_tab2_im2"/>
-  <buttongroup name="buttonGroup_tab4_mouse"/>
+  <buttongroup name="buttonGroup_tab1_im1"/>
+  <buttongroup name="buttonGroup_tab1_im2"/>
+  <buttongroup name="buttonGroup_tab3_mouse"/>
  </buttongroups>
 </ui>
