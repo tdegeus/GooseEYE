@@ -305,9 +305,14 @@
              </spacer>
             </item>
             <item>
-             <widget class="QCheckBox" name="tab1_im1_checkBox">
+             <widget class="QCheckBox" name="tab1_im0_checkBox">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <italic>true</italic>
+               </font>
               </property>
               <property name="text">
                <string>Image 1</string>
@@ -318,7 +323,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab1_im1f_radioButton">
+             <widget class="QRadioButton" name="tab1_im0f_radioButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -326,12 +331,12 @@
                <string>float</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab1_im1</string>
+               <string notr="true">buttonGroup_tab1_im0</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab1_im1i_radioButton">
+             <widget class="QRadioButton" name="tab1_im0i_radioButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -339,12 +344,12 @@
                <string>int</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab1_im1</string>
+               <string notr="true">buttonGroup_tab1_im0</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab1_im1b_radioButton">
+             <widget class="QRadioButton" name="tab1_im0b_radioButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -352,7 +357,7 @@
                <string>binary</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab1_im1</string>
+               <string notr="true">buttonGroup_tab1_im0</string>
               </attribute>
              </widget>
             </item>
@@ -406,9 +411,14 @@
              </spacer>
             </item>
             <item>
-             <widget class="QCheckBox" name="tab1_im2_checkBox">
+             <widget class="QCheckBox" name="tab1_im1_checkBox">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="font">
+               <font>
+                <italic>true</italic>
+               </font>
               </property>
               <property name="text">
                <string>Image 2</string>
@@ -416,7 +426,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab1_im2f_radioButton">
+             <widget class="QRadioButton" name="tab1_im1f_radioButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -424,12 +434,12 @@
                <string>float</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab1_im2</string>
+               <string notr="true">buttonGroup_tab1_im1</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab1_im2i_radioButton">
+             <widget class="QRadioButton" name="tab1_im1i_radioButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -437,12 +447,12 @@
                <string>int</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab1_im2</string>
+               <string notr="true">buttonGroup_tab1_im1</string>
               </attribute>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="tab1_im2b_radioButton">
+             <widget class="QRadioButton" name="tab1_im1b_radioButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -450,7 +460,7 @@
                <string>binary</string>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab1_im2</string>
+               <string notr="true">buttonGroup_tab1_im1</string>
               </attribute>
              </widget>
             </item>
@@ -545,7 +555,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="tab2_im1_label">
+               <widget class="QLabel" name="tab2_im0Phase_label">
                 <property name="font">
                  <font>
                   <italic>true</italic>
@@ -556,17 +566,24 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="tab2_im0Dtype_label">
+                <property name="text">
+                 <string>Type</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
-             <widget class="QComboBox" name="tab2_im1_comboBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QListWidget" name="tab2_im1_listWidget">
+             <widget class="QListWidget" name="tab2_im0_listWidget">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -576,12 +593,15 @@
               <property name="dragDropMode">
                <enum>QAbstractItemView::DropOnly</enum>
               </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ContiguousSelection</enum>
+              </property>
              </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QPushButton" name="tab2_im1Add_pushButton">
+               <widget class="QPushButton" name="tab2_im0Add_pushButton">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -591,7 +611,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im1Rmv_pushButton">
+               <widget class="QPushButton" name="tab2_im0Rmv_pushButton">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -606,6 +626,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="tab2_cp_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="maximumSize">
              <size>
               <width>30</width>
@@ -642,7 +665,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="tab2_im2_label">
+               <widget class="QLabel" name="tab2_im1Phase_label">
                 <property name="font">
                  <font>
                   <italic>true</italic>
@@ -653,26 +676,36 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="tab2_im1Dtype_label">
+                <property name="text">
+                 <string>Type</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
-             <widget class="QComboBox" name="tab2_im2_comboBox">
+             <widget class="QListWidget" name="tab2_im1_listWidget">
               <property name="enabled">
                <bool>false</bool>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QListWidget" name="tab2_im2_listWidget">
-              <property name="enabled">
-               <bool>false</bool>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ContiguousSelection</enum>
               </property>
              </widget>
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QPushButton" name="tab2_im2Add_pushButton">
+               <widget class="QPushButton" name="tab2_im1Add_pushButton">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -682,7 +715,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im2Rmv_pushButton">
+               <widget class="QPushButton" name="tab2_im1Rmv_pushButton">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -692,7 +725,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im2Up__pushButton">
+               <widget class="QPushButton" name="tab2_im1Up__pushButton">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -702,7 +735,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im2Dwn_pushButton">
+               <widget class="QPushButton" name="tab2_im1Dwn_pushButton">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -1925,8 +1958,8 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="buttonGroup_tab1_im0"/>
   <buttongroup name="buttonGroup_tab1_im1"/>
-  <buttongroup name="buttonGroup_tab1_im2"/>
   <buttongroup name="buttonGroup_tab3_mouse"/>
  </buttongroups>
 </ui>

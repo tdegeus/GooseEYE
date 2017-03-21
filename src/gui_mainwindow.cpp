@@ -11,11 +11,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  QString func     = "";
-  QString im1      = "";
-  QString im2      = "";
-  QString out_dir  = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-  QString out_name = "";
+  phase_ << "" << "";
+  dtype_ << "" << "";
+  func_     = "";
+  outDir_   = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+  outName_  = "";
 }
 
 // ============================================================================
@@ -43,81 +43,48 @@ void MainWindow::WIP()
 }
 
 // ============================================================================
-// tab-select: print message to status-bar
+// tab-select:
+// - print message to status-bar
+// - synchronize data between tabs
 // ============================================================================
 
 void MainWindow::on_tabWidget_tabBarClicked(int index)
 {
+  // print message to status-bar
   QString mes;
-  int i;
-
-  if      ( index==0 ) mes = "Overview, load pre-existing state";
+  if      ( index==0 ) mes = "Overview, load existing state, storage settings";
   else if ( index==1 ) mes = "Select measure and image type(s)";
   else if ( index==2 ) mes = "Select images";
   else if ( index==3 ) mes = "Check/modify images";
   else if ( index==4 ) mes = "Run computation";
-
   statusBar()->showMessage(mes);
 
+  // read storage directory and name
   if ( index>0 ) {
-    out_dir  = ui->tab0_outdir_lineEdit->text();
-    out_name = ui->tab0_result_lineEdit->text();
+    outDir_  = ui->tab0_outdir_lineEdit->text();
+    outName_ = ui->tab0_result_lineEdit->text();
   }
 
   // tab2: selectively enable, and fill
-  // ----------------------------------
-
-  if ( index==2 && func!="" ) {
-
-    QComboBox    *combo;
-    QCheckBox    *check;
-    QLabel       *label;
-    QRadioButton *radio[3];
-    QString       tmp   = "binary,float,int";
-    QStringList   types = tmp.split(",");
-
-    for ( int im=1 ; im<=2 ; im++ )
-    {
-      if      ( im==1 ) {
-        combo    = ui->tab2_im1_comboBox;
-        label    = ui->tab2_im1_label;
-        check    = ui->tab1_im1_checkBox;
-        radio[0] = ui->tab1_im1b_radioButton;
-        radio[1] = ui->tab1_im1f_radioButton;
-        radio[2] = ui->tab1_im1i_radioButton;
-      }
-      else if ( im==2 ) {
-        combo    = ui->tab2_im2_comboBox;
-        label    = ui->tab2_im2_label;
-        check    = ui->tab1_im2_checkBox;
-        radio[0] = ui->tab1_im2b_radioButton;
-        radio[1] = ui->tab1_im2f_radioButton;
-        radio[2] = ui->tab1_im2i_radioButton;
-      }
-
-      if ( check->isChecked() )
-      {
-        combo->clear();
-        combo->setEnabled(true);
-        label->setText(check->text());
-
-        int j=0;
-        for ( int i=0 ; i<types.size() ; i++ ) {
-          if ( radio[i]->isEnabled() ) {
-            combo->addItem(types[i]);
-            if ( radio[i]->isChecked() )
-              combo->setCurrentIndex(j);
-            j++;
-          }
-        }
-      }
-    }
+  if ( index==2 && func_!="" ) {
+    ui->tab2_im0Phase_label   ->setText(phase_[0]);
+    ui->tab2_im0Dtype_label   ->setText(dtype_[0]);
+    ui->tab2_im0_listWidget   ->setEnabled(ui->tab1_im0_checkBox->isChecked());
+    ui->tab2_im0Add_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());
+    ui->tab2_im0Rmv_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());
+    ui->tab2_im1Phase_label   ->setText(phase_[1]);
+    ui->tab2_im1Dtype_label   ->setText(dtype_[1]);
+    ui->tab2_im1_listWidget   ->setEnabled(ui->tab1_im1_checkBox->isChecked());
+    ui->tab2_im1Add_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
+    ui->tab2_im1Rmv_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
+    ui->tab2_im1Up__pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
+    ui->tab2_im1Dwn_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
+    ui->tab2_cp_pushButton    ->setEnabled(ui->tab1_im1_checkBox->isChecked());
   }
-
 }
 
 // ============================================================================
-// tab0: load pre-existing state
+// tab0: load existing state
 // ============================================================================
 
 void MainWindow::on_tab0_load_pushButton_clicked()
@@ -182,145 +149,154 @@ void MainWindow::tab1_selectStat(void)
   if ( ui->tab1_measure_treeWidget->currentItem()->childCount()>0 )
     return;
 
+  // local variables
   QString category = ui->tab1_measure_treeWidget->currentItem()->parent()->text(0);
   QString measure  = ui->tab1_measure_treeWidget->currentItem()->text(0);
-  bool    tb       = false;
-  bool    tf       = false;
-  bool    ti       = false;
   bool    lnk      = false;
-  int     im2      = 0;
-  QString lab1     = "Image 1";
-  QString lab2     = "Image 2";
+  int     im1      = 0;
+  // lists to signal the allowed data-types
+  std::vector<int> dtype { 0      , 0   , 0     };
+  QStringList      label {"binary","int","float"};
+  // allocate lists of pointers
+  typedef void (MainWindow::*ptr)(bool);
+  ptr            clear[2];
+  QCheckBox     *check[2];
+  QRadioButton  *radio[2][3];
+  // pointers to dtype checkBoxes
+  check[0]    = ui->tab1_im0_checkBox;
+  check[1]    = ui->tab1_im1_checkBox;
+  // pointers to dtype radioButtons
+  radio[0][0] = ui->tab1_im0b_radioButton;
+  radio[0][1] = ui->tab1_im0i_radioButton;
+  radio[0][2] = ui->tab1_im0f_radioButton;
+  radio[1][0] = ui->tab1_im1b_radioButton;
+  radio[1][1] = ui->tab1_im1i_radioButton;
+  radio[1][2] = ui->tab1_im1f_radioButton;
+  // pointers to function that clears radioButtons
+  clear[0]    = &MainWindow::on_tab1_im0_checkBox_toggled;
+  clear[1]    = &MainWindow::on_tab1_im1_checkBox_toggled;
+
+  // default: no information on function / phase / data-type
+  func_ = "";
+  for ( int i=0 ; i<2 ; i++ ) {
+    phase_[i] = "";
+    dtype_[i] = "";
+  }
 
   // settings based on selected statistic
   if      ( category=="Spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      func = "S2";
-      lab1 = "Phase";
-      lab2 = "Phase";
-      tb   = true;
-      tf   = true;
-      lnk  = true;
+      func_      = "S2";
+      phase_[0] = "Phase";
+      phase_[1] = "Phase";
+      dtype     = {1,0,1};
+      lnk       = true;
     }
     else if ( measure=="2-point cluster" ) {
-      func = "S2";
-      lab1 = "Clusters";
-      lab2 = "Clusters";
-      ti   = true;
-      lnk  = true;
+      func_      = "S2";
+      phase_[0] = "Clusters";
+      phase_[1] = "Clusters";
+      dtype     = {0,1,0};
+      lnk       = true;
     }
     else if ( measure=="Lineal path" ) {
-      func = "L" ;
-      lab1 = "Phase";
-      tb   = true;
-      ti   = true;
-      lnk  = true;
-      im2  = -1;
+      func_      = "L" ;
+      phase_[0] = "Phase";
+      dtype     = {1,1,0};
+      lnk       = true;
+      im1       = -1;
     }
   }
   else if ( category=="Conditional spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      func = "W2";
-      lab1 = "Phase";
-      lab2 = "Weights";
-      tb   = true;
-      tf   = true;
-      im2  = 1;
+      func_      = "W2";
+      phase_[0] = "Phase";
+      phase_[1] = "Weights";
+      dtype     = {1,0,1};
+      im1       = 1;
     }
     else if ( measure=="Collapsed 2-point probability" ) {
-      func = "W2c";
-      lab1 = "Phase";
-      lab2 = "Weights";
-      tb   = true;
-      tf   = true;
-      im2  = 1;
+      func_      = "W2c";
+      phase_[0] = "Phase";
+      phase_[1] = "Weights";
+      dtype     = {1,0,1};
+      im1       = 1;
     }
   }
-  else if ( category=="Prediction from conditional statistics" ) {
+
+  // function not implemented: show warning
+  if ( func_=="" )
     this->WIP();
-  }
 
   // show function in status bar
   QString mes = "Function to use: '%1'";
-  statusBar()->showMessage(mes.arg(func));
+  statusBar()->showMessage(mes.arg(func_));
 
-  // apply label
-  ui->tab1_im1_checkBox->setText(lab1);
-  ui->tab1_im2_checkBox->setText(lab2);
+  // apply phase label
+  for ( int i=0 ; i<2 ; i++ )
+    check[i]->setText(phase_[i]);
 
   // selection of image 1: force-select
-  ui->tab1_im1_checkBox->setEnabled(false);
-  ui->tab1_im1_checkBox->setChecked(true );
+  check[0]->setEnabled(false);
+  check[0]->setChecked(true );
 
   // selection of image 2: -1=disable ; 0=user-select ; 1=force-select
-  if      ( im2==-1 ) {
-    this->on_tab1_im2_checkBox_toggled(false);
-    ui->tab1_im2_checkBox->setChecked (false);
-    ui->tab1_im2_checkBox->setEnabled (false);
-  }
-  else if ( im2==0 ) {
-    ui->tab1_im2_checkBox->setEnabled (true);
-  }
-  else if ( im2==1 ) {
-    ui->tab1_im2_checkBox->setEnabled (false);
-    ui->tab1_im2_checkBox->setChecked (true );
-  }
-
-  // clear type-radioButton if one was selected that is no longer allowed
-  if ( !tb && ui->tab1_im1b_radioButton->isChecked() )
+  if      ( im1==-1 ) {
     this->on_tab1_im1_checkBox_toggled(false);
-  if ( !tb && ui->tab1_im2b_radioButton->isChecked() )
-    this->on_tab1_im2_checkBox_toggled(false);
-  if ( !tf && ui->tab1_im1f_radioButton->isChecked() )
+    check[1]->setChecked (false);
+    check[1]->setEnabled (false);
+  }
+  else if ( im1==0 ) {
+    check[1]->setEnabled (true );
+  }
+  else if ( im1==1 ) {
+    check[1]->setEnabled (false);
+    check[1]->setChecked (true );
+  }
+
+   // clear dtype radioButton if one was selected that is no longer allowed
+   for ( int i=0 ; i<2 ; i++ )
+     for ( int j=0 ; j<3 ; j++ )
+       if ( !dtype[j] && (radio[i][j])->isChecked() )
+         (this->*clear[i])(false);
+
+  // auto-fill radioButton if there is only one possibility
+  if ( dtype[0]+dtype[1]+dtype[2]==1 )
+    for ( int i=0 ; i<2 ; i++ )
+      for ( int j=0 ; j<3 ; j++ )
+        if ( dtype[j] && check[i] )
+          radio[i][j]->setChecked(true);
+
+  // enable/disable dtype radioButton based on allowed dtype(s)
+  for ( int i=0 ; i<2 ; i++ )
+    for ( int j=0 ; j<3 ; j++ )
+      radio[i][j]->setEnabled((bool)dtype[j]);
+
+  // optionally link image 2 to image 1
+  if ( lnk ) {
+    // - clear radioButtons for image 2
     this->on_tab1_im1_checkBox_toggled(false);
-  if ( !tf && ui->tab1_im2f_radioButton->isChecked() )
-    this->on_tab1_im2_checkBox_toggled(false);
-  if ( !ti && ui->tab1_im1i_radioButton->isChecked() )
-    this->on_tab1_im1_checkBox_toggled(false);
-  if ( !ti && ui->tab1_im2i_radioButton->isChecked() )
-    this->on_tab1_im2_checkBox_toggled(false);
+    // - disable radioButtons for image 2
+    for ( int j=0 ; j<3 ; j++ )
+      radio[1][j]->setEnabled(false);
+    // - if image 2 is activated -> copy selection from image 1
+    if ( ui->tab1_im1_checkBox->isChecked() )
+      for ( int j=0 ; j<3 ; j++ )
+        if ( radio[0][j]->isChecked() )
+          radio[1][j]->setChecked(true);
+  }
 
-  // auto-fill radio-button if there is only one possibility
-  if ( tb && !(ti || tf) )
-    ui->tab1_im1b_radioButton->setChecked(true);
-  if ( tf && !(tb || ti) )
-    ui->tab1_im1f_radioButton->setChecked(true);
-  if ( ti && !(tb || tf) )
-    ui->tab1_im1i_radioButton->setChecked(true);
-
-  // enable/disable type-radioButton based on settings above
-  ui->tab1_im1b_radioButton->setEnabled(tb);
-  ui->tab1_im2b_radioButton->setEnabled(tb);
-  ui->tab1_im1f_radioButton->setEnabled(tf);
-  ui->tab1_im2f_radioButton->setEnabled(tf);
-  ui->tab1_im1i_radioButton->setEnabled(ti);
-  ui->tab1_im2i_radioButton->setEnabled(ti);
-
-  // optionally lnk image 2 to image 1
-  if ( !lnk )
-    return;
-
-  // - clear radioButtons
-  this->on_tab1_im2_checkBox_toggled(false);
-  // - disable radioButtons
-  ui->tab1_im2b_radioButton->setEnabled(false);
-  ui->tab1_im2f_radioButton->setEnabled(false);
-  ui->tab1_im2i_radioButton->setEnabled(false);
-  // - if image 2 is activated -> copy selection from image 1
-  if ( ui->tab1_im2_checkBox->isChecked() ) {
-    if      ( ui->tab1_im1b_radioButton->isChecked() )
-      ui->tab1_im2b_radioButton->setChecked(true);
-    else if ( ui->tab1_im1f_radioButton->isChecked() )
-      ui->tab1_im2f_radioButton->setChecked(true);
-    else if ( ui->tab1_im1i_radioButton->isChecked() )
-      ui->tab1_im2i_radioButton->setChecked(true);
-   }
+  // store dtype
+  for ( int i=0 ; i<2 ; i++ )
+    for ( int j=0 ; j<3 ; j++ )
+      if ( radio[i][j]->isChecked() )
+        dtype_.replace(i,label[j]);
 
 }
 
 // -----------------------------------------------------------------------------
-// tab1: statistics selection list
-//       if the current item is not the deepest: expand the list
+// tab1: statistics selection list: optionally expand list
+//       if deepest -> all further actions are unified in "tab1_selectStat()"
 // -----------------------------------------------------------------------------
 
 void MainWindow::on_tab1_measure_treeWidget_clicked(const QModelIndex &index)
@@ -337,9 +313,27 @@ void MainWindow::on_tab1_measure_treeWidget_clicked(const QModelIndex &index)
 }
 
 // -----------------------------------------------------------------------------
-// tab1: type radioButtons: optionally check image to which it belong,
-//       then to everything in "tab1_selectStat()"
+// tab1: type radioButtons: optionally check checkBox of the relevant image,
+//       all further actions are unified in "tab1_selectStat()"
 // -----------------------------------------------------------------------------
+
+void MainWindow::on_tab1_im0b_radioButton_clicked()
+{
+  ui->tab1_im0_checkBox->setChecked(true);
+  this->tab1_selectStat();
+}
+
+void MainWindow::on_tab1_im0f_radioButton_clicked()
+{
+  ui->tab1_im0_checkBox->setChecked(true);
+  this->tab1_selectStat();
+}
+
+void MainWindow::on_tab1_im0i_radioButton_clicked()
+{
+  ui->tab1_im0_checkBox->setChecked(true);
+  this->tab1_selectStat();
+}
 
 void MainWindow::on_tab1_im1b_radioButton_clicked()
 {
@@ -359,27 +353,25 @@ void MainWindow::on_tab1_im1i_radioButton_clicked()
   this->tab1_selectStat();
 }
 
-void MainWindow::on_tab1_im2b_radioButton_clicked()
-{
-  ui->tab1_im2_checkBox->setChecked(true);
-  this->tab1_selectStat();
-}
-
-void MainWindow::on_tab1_im2f_radioButton_clicked()
-{
-  ui->tab1_im2_checkBox->setChecked(true);
-  this->tab1_selectStat();
-}
-
-void MainWindow::on_tab1_im2i_radioButton_clicked()
-{
-  ui->tab1_im2_checkBox->setChecked(true);
-  this->tab1_selectStat();
-}
-
 // -----------------------------------------------------------------------------
 // tab1: select   image -> read allowed types from "tab1_selectStat()"
 //       deselect image -> clear
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab1_im0_checkBox_toggled(bool checked)
+{
+  if ( checked ) {
+    this->tab1_selectStat();
+  }
+  else {
+    ui->buttonGroup_tab1_im0->setExclusive(false);
+    ui->tab1_im0b_radioButton->setChecked (false);
+    ui->tab1_im0f_radioButton->setChecked (false);
+    ui->tab1_im0i_radioButton->setChecked (false);
+    ui->buttonGroup_tab1_im0->setExclusive(true );
+  }
+}
+
 // -----------------------------------------------------------------------------
 
 void MainWindow::on_tab1_im1_checkBox_toggled(bool checked)
@@ -396,40 +388,140 @@ void MainWindow::on_tab1_im1_checkBox_toggled(bool checked)
   }
 }
 
-void MainWindow::on_tab1_im2_checkBox_toggled(bool checked)
-{
-  if ( checked ) {
-    this->tab1_selectStat();
-  }
-  else {
-    ui->buttonGroup_tab1_im2->setExclusive(false);
-    ui->tab1_im2b_radioButton->setChecked (false);
-    ui->tab1_im2f_radioButton->setChecked (false);
-    ui->tab1_im2i_radioButton->setChecked (false);
-    ui->buttonGroup_tab1_im2->setExclusive(true );
-  }
-}
-
 // =============================================================================
-// tab2: add/remove/move files to/in QListWidget
+// tab2: add/remove/move files to/in QListWidgets
 // =============================================================================
 
-void MainWindow::on_tab2_im1Add_pushButton_clicked()
+void MainWindow::tab2_selectFiles(QListWidget *list)
 {
+  QStringList filters;
+  filters << "Image files (*.png *.xpm *.jpg *.jpeg *.tif *.tiff *.bmp)"
+          << "Archives (*.mat *.npz)"
+          << "Any files (*)";
+
   QFileDialog dialog(this);
-  dialog.setFileMode(QFileDialog::ExistingFiles);
-  dialog.setNameFilter(tr("Images (*.png *.jpg *.jpeg *.tif *tiff *.mat *.npz)"));
-  dialog.setViewMode(QFileDialog::List);
+  dialog.setFileMode   (QFileDialog::ExistingFiles);
+  dialog.setOption     (QFileDialog::HideNameFilterDetails,false);
+  dialog.setDirectory  (outDir_);
+  dialog.setNameFilters(filters);
+  dialog.setViewMode   (QFileDialog::List);
+
   QStringList fileNames;
   if (dialog.exec())
       fileNames = dialog.selectedFiles();
 
-  ui->tab2_im1_listWidget->addItems(fileNames);
+  QDir dir(outDir_);
+  for ( int i=0 ; i<fileNames.size() ; i++ )
+    fileNames[i] = dir.relativeFilePath(fileNames[i]);
+
+  list->addItems(fileNames);
 }
 
+// -----------------------------------------------------------------------------
 
+void MainWindow::on_tab2_im0Add_pushButton_clicked()
+{
+  this->tab2_selectFiles(ui->tab2_im0_listWidget);
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab2_im1Add_pushButton_clicked()
+{
+  this->tab2_selectFiles(ui->tab2_im1_listWidget);
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab2_im0Rmv_pushButton_clicked()
+{
+  QList<QListWidgetItem*> items = ui->tab2_im0_listWidget->selectedItems();
+  foreach (QListWidgetItem *item, items)
+    delete ui->tab2_im0_listWidget->takeItem(ui->tab2_im0_listWidget->row(item));
+}
+
+// -----------------------------------------------------------------------------
 
 void MainWindow::on_tab2_im1Rmv_pushButton_clicked()
 {
-
+  QList<QListWidgetItem*> items = ui->tab2_im1_listWidget->selectedItems();
+  foreach (QListWidgetItem *item, items)
+    delete ui->tab2_im1_listWidget->takeItem(ui->tab2_im1_listWidget->row(item));
 }
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab2_cp_pushButton_clicked()
+{
+  if ( ui->tab2_im1_listWidget->count()>0 ) {
+    QMessageBox::warning(\
+      this,\
+      tr("GooseEYE"),\
+      tr("Only allowed if right list is empty."),\
+      QMessageBox::Ok,\
+      QMessageBox::Ok\
+    );
+  }
+
+  for ( int i=0 ; i<ui->tab2_im0_listWidget->count() ; i++ )
+    ui->tab2_im1_listWidget->addItem(ui->tab2_im0_listWidget->item(i)->text());
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab2_im1Up__pushButton_clicked()
+{
+  QListWidget *list = ui->tab2_im1_listWidget;
+
+  QList<QListWidgetItem*> items = list->selectedItems();
+
+  std::vector<int> row(items.size());
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    row[i] = list->row(items[i]);
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    if ( row[i]==0 )
+      return;
+
+  std::sort(row.begin(),row.end());
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    list->insertItem(row[i]-1,list->takeItem(row[i]));
+
+  for ( int i=0 ; i<list->count() ; i++ )
+    list->item(i)->setSelected(false);
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    list->item(row[i]-1)->setSelected(true);
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab2_im1Dwn_pushButton_clicked()
+{
+  QListWidget *list = ui->tab2_im1_listWidget;
+
+  QList<QListWidgetItem*> items = list->selectedItems();
+
+  std::vector<int> row(items.size());
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    row[i] = list->row(items[i]);
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    if ( row[i]==list->count()-1 )
+      return;
+
+  std::sort(row.begin(),row.end(), [](int a, int b) { return a>b; });
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    list->insertItem(row[i]+1,list->takeItem(row[i]));
+
+  for ( int i=0 ; i<list->count() ; i++ )
+    list->item(i)->setSelected(false);
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    list->item(row[i]+1)->setSelected(true);
+}
+
