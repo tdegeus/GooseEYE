@@ -3,6 +3,7 @@
 
 namespace Image {
 
+template class Matrix<unsigned char>;
 template class Matrix<int>;
 template class Matrix<double>;
 
@@ -419,7 +420,8 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
       }
     }
     // accept all new labels (which were stored as negative)
-    l.abs();
+    for ( size_t i=0 ; i<l.size() ; i++ )
+      l[i] = std::abs(l[i]);
   }
 
   return l;

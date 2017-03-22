@@ -90,11 +90,43 @@ template <class T> class Matrix
     // iterators
     // ---------
 
-    auto begin()
+    T* ptr ( void )
+    { return &_data[0]; };
+
+    auto begin ( void )
     { return _data.begin(); }
 
-    auto end ()
+    auto end ( void )
     { return _data.end  (); }
+
+    // resize
+    // ------
+
+    void reshape ( std::vector<size_t> shape )
+    {
+      if ( shape.size()<1 || shape.size()>3 )
+        throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
+
+      // store '_strides' and '_shape' always in 3-D,
+      // use unit-length for "extra" dimensions (> 'shape.size()')
+      while ( _shape  .size()<3 ) { _shape  .push_back(1); }
+      while ( _strides.size()<3 ) { _strides.push_back(1); }
+
+      for ( size_t i=0 ; i<_shape.size() ; i++ )
+        _shape[i] = 1;
+
+      for ( size_t i=0 ; i<shape.size() ; i++ )
+        _shape[i] = shape[i];
+
+      _strides[0] = _shape[2]*_shape[1];
+      _strides[1] = _shape[2];
+      _strides[2] = 1;
+
+      size_t size = _shape[0]*_shape[1]*_shape[2];
+
+      while ( _data.size()<size )
+        _data.push_back((T)0);
+    };
 
     // return pointer to data
     // ----------------------
@@ -161,15 +193,6 @@ template <class T> class Matrix
 
     T max ( void )
     { return *std::max_element(_data.begin(),_data.end()); };
-
-    // absolute values
-    // ---------------
-
-    void abs ( void )
-    {
-      for ( auto &i : _data )
-        i = std::abs(i);
-    };
 
 }; // class Matrix
 
