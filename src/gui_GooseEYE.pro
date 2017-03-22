@@ -14,3 +14,5 @@ SOURCES  += gui_main.cpp\
 HEADERS  += gui_mainwindow.h
 
 FORMS    += gui_mainwindow.ui
+
+CONFIG   += c++14

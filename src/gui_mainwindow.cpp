@@ -81,6 +81,26 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
     ui->tab2_im1Dwn_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
     ui->tab2_cp_pushButton    ->setEnabled(ui->tab1_im1_checkBox->isChecked());
   }
+
+  QCheckBox *check[2];
+  check[0] = ui->tab1_im0_checkBox;
+  check[1] = ui->tab1_im1_checkBox;
+
+  // tab3: selectively enable and fill
+  if ( index==3 && func_!="" ) {
+    ui->tab3_set_comboBox->clear();
+    ui->tab3_set_comboBox->setEnabled(true);
+
+    QString name = "%1: %2 (%3)";
+    for ( int i=0 ; i<2 ; i++ )
+      if ( check[i]->isChecked() )
+        ui->tab3_set_comboBox->addItem(name.arg(QString::number(i+1),phase_[i],dtype_[i]));
+
+    ui->tab3_setNext_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
+    ui->tab3_setPrev_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
+
+    this->on_tab3_set_comboBox_currentIndexChanged(0);
+  }
 }
 
 // ============================================================================
@@ -113,6 +133,9 @@ void MainWindow::on_tab0_outdir_pushButton_clicked()
     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks\
   );
 
+  if ( dir.size()==0 )
+    return;
+
   ui->tab0_outdir_lineEdit->setText(dir);
 
   if ( ui->tab0_result_lineEdit->text()=="" )
@@ -129,6 +152,9 @@ void MainWindow::on_tab0_result_pushButton_clicked()
     QStandardPaths::writableLocation(QStandardPaths::HomeLocation),\
     tr("State Files (*.json *.JSON)")\
   );
+
+  if ( fname.size()==0 )
+    return;
 
   if ( ui->tab0_outdir_lineEdit->text()!="" )
     return;
@@ -525,3 +551,254 @@ void MainWindow::on_tab2_im1Dwn_pushButton_clicked()
     list->item(row[i]+1)->setSelected(true);
 }
 
+// =============================================================================
+// tab3: define "set" of images, based on statistic; create list of files
+// =============================================================================
+
+void MainWindow::on_tab3_set_comboBox_currentIndexChanged(int index)
+{
+  if ( index<0 )
+    return;
+
+  QListWidget *list[2];
+  list[0] = ui->tab2_im0_listWidget;
+  list[1] = ui->tab2_im1_listWidget;
+
+  ui->tab3_im_comboBox->clear();
+  ui->tab3_im_comboBox->setEnabled(true);
+
+  if ( list[index]->count()==0 )
+    return;
+
+  for ( int i=0 ; i<list[index]->count() ; i++ )
+    ui->tab3_im_comboBox->addItem(list[index]->item(i)->text());
+
+  ui->tab3_imPrev_pushButton ->setEnabled(list[index]->count()>1);
+  ui->tab3_imNext_pushButton ->setEnabled(list[index]->count()>1);
+
+  ui->tab3_image_graphicsView->setEnabled(true);
+  ui->tab3_phase_graphicsView->setEnabled(true);
+  ui->tab3_zoom_slider       ->setEnabled(true);
+  ui->tab3_zoomIn__pushButton->setEnabled(true);
+  ui->tab3_zoomOut_pushButton->setEnabled(true);
+  ui->tab3_colHgh_spinBox    ->setEnabled(true);
+  ui->tab3_colLow_spinBox    ->setEnabled(true);
+  ui->tab3_rowHgh_spinBox    ->setEnabled(true);
+  ui->tab3_rowLow_spinBox    ->setEnabled(true);
+  ui->tab3_phaseLow_spinBox  ->setEnabled(true);
+  ui->tab3_phaseHgh_spinBox  ->setEnabled(true);
+
+  this->on_tab3_im_comboBox_currentIndexChanged(0);
+
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab3_setPrev_pushButton_clicked()
+{
+  int i = ui->tab3_set_comboBox->currentIndex();
+  if ( i>0 )
+    ui->tab3_set_comboBox->setCurrentIndex(i-1);
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab3_setNext_pushButton_clicked()
+{
+  int i = ui->tab3_set_comboBox->currentIndex();
+  if ( i<ui->tab3_set_comboBox->count()-1 )
+    ui->tab3_set_comboBox->setCurrentIndex(i+1);
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab3_imPrev_pushButton_clicked()
+{
+  int i = ui->tab3_im_comboBox->currentIndex();
+  if ( i>0 )
+    ui->tab3_im_comboBox->setCurrentIndex(i-1);
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab3_imNext_pushButton_clicked()
+{
+  int i = ui->tab3_im_comboBox->currentIndex();
+  if ( i<ui->tab3_im_comboBox->count()-1 )
+    ui->tab3_im_comboBox->setCurrentIndex(i+1);
+}
+
+// ============================================================================
+// tab3: view the original image, set the selection fields
+// ============================================================================
+
+double MainWindow::tab3_scaleImage(void)
+{
+  double wdthView  = (double)ui->tab3_image_graphicsView->width ();
+  double hghtView  = (double)ui->tab3_image_graphicsView->height();
+  double wdthImage = (double)ui->tab3_colHgh_spinBox->maximum();
+  double hghtImage = (double)ui->tab3_rowHgh_spinBox->maximum();
+  double zoomScale = pow(1.066,(double)ui->tab3_zoom_slider->sliderPosition());
+  double wdth      = zoomScale*wdthView/wdthImage;
+  double hght      = zoomScale*hghtView/hghtImage;
+
+  return 0.95*std::min(wdth,hght);
+}
+
+void MainWindow::tab3_readImage(void)
+{
+  // load the image
+  QString fname = QDir(outDir_).filePath(ui->tab3_im_comboBox->currentText());
+  imageQt_.load(fname);
+
+  // read the size
+  size_t nrow = imageQt_.height();
+  size_t ncol = imageQt_.width ();
+  size_t size = nrow*ncol;
+
+  // allocate data
+  while ( image_.size()<size )
+    image_.push_back(0);
+  while ( imageChar_.size()<size )
+    imageChar_.push_back(0);
+
+  // set row/column selection wizard
+  ui->tab3_rowHgh_spinBox->setValue  (nrow);
+  ui->tab3_rowHgh_spinBox->setMaximum(nrow);
+  ui->tab3_colHgh_spinBox->setValue  (ncol);
+  ui->tab3_colHgh_spinBox->setMaximum(ncol);
+
+
+}
+
+void MainWindow::tab3_readPhase(void)
+{
+
+}
+
+void MainWindow::tab3_viewImage(void)
+{
+  // load the image
+  QString fname = QDir(outDir_).filePath(ui->tab3_im_comboBox->currentText());
+  QImage  image(fname);
+
+  // set row/column selection wizard
+  ui->tab3_rowHgh_spinBox->setValue  (image.height());
+  ui->tab3_rowHgh_spinBox->setMaximum(image.height());
+  ui->tab3_colHgh_spinBox->setValue  (image.width ());
+  ui->tab3_colHgh_spinBox->setMaximum(image.width ());
+
+  // create a "scene" with containing the image
+  QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+  QGraphicsScene      *scene = new QGraphicsScene;
+  scene->addItem(item);
+  ui->tab3_image_graphicsView->setScene(scene);
+
+  // show the image with the correct scaling applied
+  double scale = this->tab3_scaleImage();
+  ui->tab3_image_graphicsView->setTransform(QTransform::fromScale(scale,scale));
+  ui->tab3_image_graphicsView->show();
+}
+
+// ============================================================================
+// tab3: view the interpreted image, gray-scale + red mask
+// ============================================================================
+
+void MainWindow::tab3_viewPhase(void)
+{
+  // load the image
+  QString fname = QDir(outDir_).filePath(ui->tab3_im_comboBox->currentText());
+  QImage  rawImage(fname);
+
+  // read cropped-image dimensions
+  int irow = ui->tab3_rowLow_spinBox->value();
+  int jrow = ui->tab3_rowHgh_spinBox->value();
+  int icol = ui->tab3_colLow_spinBox->value();
+  int jcol = ui->tab3_colHgh_spinBox->value();
+
+  // convert raw image -> Image::Matrix
+  Image::Matrix<int> im({(size_t)(jrow-irow),(size_t)(jcol-icol)});
+  for ( int i=irow ; i<jrow ; i++ )
+    for ( int j=icol ; j<jcol ; j++ )
+      im(i,j) = qGray(rawImage.pixel(j,i));
+
+  // convert "im" to "unsigned char" data-type, for QImage
+  std::vector<unsigned char> data;
+  data.reserve(im.size());
+  for ( auto i : im )
+    data.push_back(i);
+//  std::vector<unsigned char> data(im.size());
+//  // - apply conversion for each entry
+//  for ( int i=0 ; i<(int)im.size() ; i++ )
+//    data[i] = (unsigned char)(im[i]);
+
+  // colorbar
+  QVector<QRgb> grayscale;
+  // - gray values
+  for (int i = 0; i < 255; ++i)
+    grayscale.append(qRgb(i, i, i));
+  // - add red to the final value
+  grayscale.append(qRgb(255,0,0));
+
+  // convert Image::Matrix -> image to view
+  QImage image(&data[0],(jcol-icol),(jrow-irow),QImage::QImage::Format_Indexed8);
+  image.setColorTable(grayscale);
+
+  // create a "scene" with containing the image
+  QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+  QGraphicsScene      *scene = new QGraphicsScene;
+  scene->addItem(item);
+  ui->tab3_phase_graphicsView->setScene(scene);
+
+  // show the image with the correct scaling applied
+  double scale = this->tab3_scaleImage();
+  ui->tab3_phase_graphicsView->setTransform(QTransform::fromScale(scale,scale));
+  ui->tab3_phase_graphicsView->show();
+}
+
+// ============================================================================
+// tab3: act on changes
+// ============================================================================
+
+void MainWindow::on_tab3_im_comboBox_currentIndexChanged(int index)
+{
+  if ( index<0 )
+    return;
+
+  this->tab3_readImage();
+  this->tab3_viewImage();
+}
+
+void MainWindow::on_tab3_zoom_slider_valueChanged(int value)
+{
+  this->tab3_viewImage();
+}
+
+void MainWindow::on_tab3_zoomOut_pushButton_clicked()
+{
+  ui->tab3_zoom_slider->setSliderPosition(ui->tab3_zoom_slider->sliderPosition()-1);
+}
+
+void MainWindow::on_tab3_zoomIn__pushButton_clicked()
+{
+  ui->tab3_zoom_slider->setSliderPosition(ui->tab3_zoom_slider->sliderPosition()+1);
+}
+
+
+void MainWindow::on_tab4_cp2out_checkBox_toggled(bool checked)
+{
+  if ( checked )
+    return;
+
+  QString mes;
+  mes.append("It is advised to store the images (a.k.a. the raw-data) ");
+  mes.append("in the output directory, to facilitate reproducibility.");
+
+  QMessageBox::warning(\
+    this,\
+    tr("GooseEYE"),\
+    mes,\
+    QMessageBox::Ok,\
+    QMessageBox::Ok\
+  );
+}

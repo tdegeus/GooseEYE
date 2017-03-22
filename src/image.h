@@ -48,23 +48,23 @@ template <class T> class Matrix
       while ( _shape  .size()<3 ) { _shape  .push_back(1); }
       while ( _strides.size()<3 ) { _strides.push_back(1); }
 
-      for ( int i=0 ; i<shape.size() ; i++ )
+      for ( size_t i=0 ; i<shape.size() ; i++ )
         _shape[i] = shape[i];
 
       _strides[0] = _shape[2]*_shape[1];
       _strides[1] = _shape[2];
       _strides[2] = 1;
 
-      int size = _shape[0]*_shape[1]*_shape[2];
+      size_t size = _shape[0]*_shape[1]*_shape[2];
 
-      for ( int i=0 ; i<_data.size() ; i++ )
+      for ( size_t i=0 ; i<_data.size() ; i++ )
         _data[i] = (T)0;
 
       while ( _data.size()<size )
         _data.push_back((T)0);
 
       if ( data!=NULL )
-        for ( int i=0 ; i<size ; i++ )
+        for ( size_t i=0 ; i<size ; i++ )
           _data[i] = data[i];
     };
 

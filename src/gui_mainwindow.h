@@ -7,10 +7,18 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QListWidget>
+#include <QImage>
+
+#include <QGraphicsPixmapItem>
+#include <QGraphicsScene>
+#include <QByteArray>
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
+
+#include "image.h"
 
 namespace Ui {
 class MainWindow;
@@ -58,18 +66,42 @@ private slots:
   void on_tab2_im1Dwn_pushButton_clicked();
   void on_tab2_cp_pushButton_clicked();
 
+  // define "set" of images, create list of files
+  void on_tab3_set_comboBox_currentIndexChanged(int index);
+  void on_tab3_setPrev_pushButton_clicked();
+  void on_tab3_setNext_pushButton_clicked();
+  void on_tab3_imPrev_pushButton_clicked();
+  void on_tab3_imNext_pushButton_clicked();
+
+
+  void on_tab3_im_comboBox_currentIndexChanged(int index);
+
+  void on_tab3_zoom_slider_valueChanged(int value);
+  void on_tab3_zoomOut_pushButton_clicked();
+  void on_tab3_zoomIn__pushButton_clicked();
+
+  void on_tab4_cp2out_checkBox_toggled(bool checked);
+
 private:
   Ui::MainWindow *ui;
 
   QStringList phase_;
   QStringList dtype_;
-  QString func_;
-  QString outDir_;
-  QString outName_;
+  QString     func_;
+  QString     outDir_;
+  QString     outName_;
+  QImage      imageQt_;
+  std::vector<int> image_;
+  std::vector<unsigned char> imageChar_;
 
-  void WIP(void);
-  void tab1_selectStat(void);
-  void tab2_selectFiles(QListWidget *list);
+  void   WIP(void);
+  void   tab1_selectStat(void);
+  void   tab2_selectFiles(QListWidget *list);
+  double tab3_scaleImage(void);
+  void   tab3_readImage(void);
+  void   tab3_readPhase(void);
+  void   tab3_viewImage(void);
+  void   tab3_viewPhase(void);
 };
 
 #endif // MAINWINDOW_H
