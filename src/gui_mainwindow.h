@@ -13,6 +13,10 @@
 #include <QGraphicsScene>
 #include <QByteArray>
 
+#include <QObject>
+#include <QScrollBar>
+
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -34,6 +38,15 @@ public:
 
 private slots:
 
+  void   tab1_selectStat(void);
+
+  void   tab3_readImage(void);
+  void   tab3_readPhase(void);
+  void   tab3_viewImage(void);
+  void   tab3_viewPhase(void);
+  void   tab3_syncImage(void);
+  void   tab3_syncPhase(void);
+
   // write to message bar
   void on_tabWidget_tabBarClicked(int index);
 
@@ -48,14 +61,6 @@ private slots:
   // check: run "tab1_selectStat()" ; uncheck: clear radioBox
   void on_tab1_im0_checkBox_toggled(bool checked);
   void on_tab1_im1_checkBox_toggled(bool checked);
-
-  // toggle "tab1_imX_checkBox"; run "tab1_selectStat()"
-  void on_tab1_im0b_radioButton_clicked();
-  void on_tab1_im0f_radioButton_clicked();
-  void on_tab1_im0i_radioButton_clicked();
-  void on_tab1_im1b_radioButton_clicked();
-  void on_tab1_im1f_radioButton_clicked();
-  void on_tab1_im1i_radioButton_clicked();
 
   // add files to QListWidget
   void on_tab2_im0Add_pushButton_clicked();
@@ -74,13 +79,12 @@ private slots:
   void on_tab3_imNext_pushButton_clicked();
 
 
-  void on_tab3_im_comboBox_currentIndexChanged(int index);
-
   void on_tab3_zoom_slider_valueChanged(int value);
   void on_tab3_zoomOut_pushButton_clicked();
   void on_tab3_zoomIn__pushButton_clicked();
 
   void on_tab4_cp2out_checkBox_toggled(bool checked);
+
 
 private:
   Ui::MainWindow *ui;
@@ -90,18 +94,18 @@ private:
   QString     func_;
   QString     outDir_;
   QString     outName_;
-  QImage      imageQt_;
-  std::vector<int> image_;
-  std::vector<unsigned char> imageChar_;
+  QImage      imageRawQt_;
+  Image::Matrix<int>           imageRaw_;
+  Image::Matrix<int>           image_;
+  Image::Matrix<int>           mask_;
+  Image::Matrix<unsigned char> imageView_;
 
   void   WIP(void);
-  void   tab1_selectStat(void);
+
   void   tab2_selectFiles(QListWidget *list);
   double tab3_scaleImage(void);
-  void   tab3_readImage(void);
-  void   tab3_readPhase(void);
-  void   tab3_viewImage(void);
-  void   tab3_viewPhase(void);
+
+
 };
 
 #endif // MAINWINDOW_H
