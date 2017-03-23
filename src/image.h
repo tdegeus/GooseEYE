@@ -30,13 +30,17 @@ template <class T> class Matrix
 
   public:
 
-    // default constructor
-    // -------------------
+    // (copy) constructor
+    // ------------------
+
+    Matrix(const Matrix<T> &) = default;
+
+    Matrix<T> & operator=(const Matrix<T> &) = default;
 
     Matrix<T>(){};
 
-    // constructor
-    // -----------
+    // explicit constructor
+    // --------------------
 
     Matrix<T>( std::vector<size_t> shape, const T *data=NULL )
     {
@@ -66,16 +70,6 @@ template <class T> class Matrix
       if ( data!=NULL )
         for ( size_t i=0 ; i<size ; i++ )
           _data[i] = data[i];
-    };
-
-    // copy constructor
-    // ----------------
-
-    Matrix<T>( const Matrix<T> &src )
-    {
-      _data    = src._data;
-      _shape   = src._shape;
-      _strides = src._strides;
     };
 
     // index operators
@@ -137,14 +131,14 @@ template <class T> class Matrix
     // return shape array [ndim]
     // -------------------------
 
-    std::vector<size_t> shape ( int ndim=0 ) const
+    std::vector<size_t> shape ( size_t ndim=0 ) const
     {
       if ( ndim==0 )
         ndim = this->ndim();
 
       std::vector<size_t> ret(ndim);
 
-      for ( int i=0 ; i<ndim ; i++ )
+      for ( size_t i=0 ; i<ndim ; i++ )
         ret[i] = _shape[i];
 
       return ret;
@@ -155,14 +149,14 @@ template <class T> class Matrix
 
     std::vector<size_t> strides ( bool bytes=false ) const
     {
-      int ndim = this->ndim();
+      size_t ndim = this->ndim();
       std::vector<size_t> ret(ndim);
 
-      for ( int i=0 ; i<ndim ; i++ )
+      for ( size_t i=0 ; i<ndim ; i++ )
         ret[i] = _strides[i];
 
       if ( bytes )
-        for ( int i=0 ; i<ndim ; i++ )
+        for ( size_t i=0 ; i<ndim ; i++ )
           ret[i] *= sizeof(T);
 
       return ret;

@@ -14,9 +14,9 @@ template class Matrix<double>;
 Matrix<int> path (
   std::vector<int> &xa, std::vector<int> &xb, std::string mode )
 {
-  int ndim = xa.size();
+  int ndim = (int)xa.size();
 
-  if ( xb.size()!=ndim )
+  if ( (int)xb.size()!=ndim )
     throw std::length_error("'xa' and 'xb' must have the same dimension");
   if ( ndim<1 || ndim>3 )
     throw std::length_error("Only allowed in 1, 2, or 3 dimensions");
@@ -292,7 +292,7 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
     if ( !(i%2) )
       throw std::domain_error("Only allowed for odd-shaped matrices");
 
-  for ( int i=0 ; i<shape.size() ; i++ )
+  for ( size_t i=0 ; i<shape.size() ; i++ )
     ret[i] = (shape[i]-1)/2;
 
   return ret;
@@ -308,7 +308,7 @@ Matrix<int> pad ( Matrix<int> &src , std::vector<size_t> &pad_shape ,
 {
   std::vector<size_t> shape = src.shape();
 
-  for ( int i=0 ; i<pad_shape.size() ; i++ )
+  for ( size_t i=0 ; i<pad_shape.size() ; i++ )
     shape[i] += 2*pad_shape[i];
 
   Matrix<int> ret(shape);
@@ -337,7 +337,7 @@ Matrix<double> pad ( Matrix<double> &src , std::vector<size_t> &pad_shape ,
 {
   std::vector<size_t> shape = src.shape();
 
-  for ( int i=0 ; i<pad_shape.size() ; i++ )
+  for ( size_t i=0 ; i<pad_shape.size() ; i++ )
     shape[i] += 2*pad_shape[i];
 
   Matrix<double> ret(shape);
@@ -366,7 +366,7 @@ Matrix<double> pad ( Matrix<double> &src , std::vector<size_t> &pad_shape ,
 Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
   std::vector<int> &iterations, bool periodic )
 {
-  if ( iterations.size()!=src.max()+1 )
+  if ( (int)iterations.size()!=src.max()+1 )
     throw std::length_error("Iteration must be specified for each label");
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,nlab,ilab,iter;
@@ -473,7 +473,8 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &row,
   if ( shape.size()!=2 )
     throw std::length_error("Only allowed in 2 dimensions");
 
-  int i,di,dj,I,J;
+  int    di,dj,I,J;
+  size_t i;
   Matrix<int> ret(shape);
 
   I = shape[0];
@@ -668,11 +669,11 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
   ilab = 0;
 
   // initialize cluster-links (only coupled to self)
-  for ( i=0 ; i<f.size() ; i++ )
+  for ( i=0 ; i<(int)f.size() ; i++ )
     lnk[i] = i;
   // initialize: no saved clusters, except background (inc[0]=1)
   inc[0] = 1;
-  for ( i=1 ; i<f.size() ; i++ )
+  for ( size_t i=1 ; i<f.size() ; i++ )
     inc[i] = 0;
 
   // periodic: lower/upper bound of the kernel always == (shape[i]-1)/2
@@ -763,7 +764,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
     }
   }
   // apply renumbering
-  for ( i=0 ; i<f.size() ; i++ )
+  for ( size_t i=0 ; i<f.size() ; i++ )
     l[i] = lnk[l[i]];
 
   // --------------------------
@@ -777,7 +778,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
       lnk[i] = 0;    // now: size of the cluster with the label
       inc[i] = 0;    // now: included label (true/false)
     }
-    for ( i=0 ; i<l.size() ; i++ ) {
+    for ( size_t i=0 ; i<l.size() ; i++ ) {
       lnk[l[i]]++;
       inc[l[i]] = 1;
     }
@@ -787,7 +788,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
         inc[i] = 0;
 
     // remove clusters with too small size
-    for ( i=0 ; i<l.size() ; i++ )
+    for ( size_t i=0 ; i<l.size() ; i++ )
       if ( !inc[l[i]] )
         l[i] = 0;
 
@@ -804,7 +805,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
     nlab = j;
 
     // renumber the labels
-    for ( i=0 ; i<l.size() ; i++ )
+    for ( size_t i=0 ; i<l.size() ; i++ )
       l[i] = inc[l[i]];
 
   }
@@ -868,7 +869,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
     std::tie(l_,c_) = clusters(f,kern,min_size,false);
 
     // delete clusters that are also not present in "l"
-    for ( i=0 ; i<f.size() ; i++ )
+    for ( size_t i=0 ; i<f.size() ; i++ )
       if ( f[i] )
         if ( !l[i] )
           l_[i] = 0;
@@ -886,7 +887,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
     // label dependency: which labels in "l_" correspond to which labels in "l"
     std::vector<int> lnk(nlab_);
 
-    for ( i=0 ; i<l.size() ; i++ )
+    for ( size_t i=0 ; i<l.size() ; i++ )
       lnk[l_[i]] = l[i];
 
     // check periodicity: to which sides the clusters are connected
@@ -1016,7 +1017,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
                   ret(dh+dH,di+dI,dj+dJ) += 1.;
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)f.size();
 
   return std::make_tuple(ret,f.size());
@@ -1056,7 +1057,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
                 f(h,i,j)*g(P(h+dh,H),P(i+di,I),P(j+dj,J));
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)f.size();
 
   return std::make_tuple(ret,f.size());
@@ -1079,7 +1080,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<fmsk.size() ; i++ )
+  for ( size_t i=0 ; i<fmsk.size() ; i++ )
     if ( !(fmsk[i]==0 || fmsk[i]==1) || !(gmsk[i]==0 || gmsk[i]==1) )
       throw std::out_of_range("'fmask' and 'gmask' must be binary");
 
@@ -1128,7 +1129,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)norm[i];
 
   return std::make_tuple(ret,norm);
@@ -1176,7 +1177,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<fmsk.size() ; i++ )
+  for ( size_t i=0 ; i<fmsk.size() ; i++ )
     if ( !(fmsk[i]==0 || fmsk[i]==1) || !(gmsk[i]==0 || gmsk[i]==1) )
       throw std::out_of_range("'fmask' and 'gmask' must be binary");
 
@@ -1225,7 +1226,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)norm[i];
 
   return std::make_tuple(ret,norm);
@@ -1270,7 +1271,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) )
       throw std::out_of_range("'W' and 'I' must be binary");
 
@@ -1296,12 +1297,12 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
 
   // compute normalization: sum of weight factors (binary)
   int norm = 0;
-  for ( i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( W[i] )
       norm++;
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)norm;
 
   return std::make_tuple(ret,norm);
@@ -1321,7 +1322,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<double> &src,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( !(W[i]==0 || W[i]==1) )
       throw std::out_of_range("'W' must be binary");
 
@@ -1347,12 +1348,12 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<double> &src,
 
   // compute normalization: sum of weight factors (binary)
   int norm = 0;
-  for ( i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( W[i] )
       norm++;
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)norm;
 
   return std::make_tuple(ret,norm);
@@ -1393,11 +1394,11 @@ std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
 
   // compute normalization: sum of weight factors (binary)
   double norm = 0.;
-  for ( i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     norm += W[i];
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= norm;
 
   return std::make_tuple(ret,norm);
@@ -1417,10 +1418,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) )
       throw std::out_of_range("'W' and 'I' must be binary");
-  for ( int i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( !(mask[i]==0 || mask[i]==1) )
       throw std::out_of_range("'mask' must be binary");
 
@@ -1467,7 +1468,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)norm[i];
 
   return std::make_tuple(ret,norm);
@@ -1498,7 +1499,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( !(W[i]==0 || W[i]==1) || !(mask[i]==0 || mask[i]==1) )
       throw std::out_of_range("'W' and 'mask' must be binary");
 
@@ -1545,7 +1546,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
                   norm(dh+dH,di+dI,dj+dJ)++;
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)norm[i];
 
   return std::make_tuple(ret,norm);
@@ -1577,7 +1578,7 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<W.size() ; i++ )
+  for ( size_t i=0 ; i<W.size() ; i++ )
     if ( !(mask[i]==0 || mask[i]==1) )
       throw std::out_of_range("'mask' must be binary");
 
@@ -1622,7 +1623,7 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
                 norm(dh+dH,di+dI,dj+dJ) += W(h,i,j);
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= norm[i];
 
   return std::make_tuple(ret,norm);
@@ -1656,18 +1657,18 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( int i=0 ; i<mask.size() ; i++ )
+  for ( size_t i=0 ; i<mask.size() ; i++ )
     if ( !(mask[i]==0 || mask[i]==1) )
       throw std::out_of_range("'mask' must be binary");
 
-  int ipnt,ipix,jpix,label;
+  int jpix,label;
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
   Matrix<double> ret (roi);
   Matrix<int   > norm(roi);
 
   std::vector<int> begin(3),end(3);
-  for ( i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
+  for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1682,10 +1683,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
   Matrix<int> pnt = stamp_points(roi);
 
   // loop over ROI
-  for ( ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
+  for ( size_t ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
   {
     // copy end-point
-    for ( i=0 ; i<pnt.shape()[1] ; i++ )
+    for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
     Matrix<int> pix = path(begin,end,mode);
@@ -1704,7 +1705,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
               // initialize
               jpix = -1;
               // loop over the voxel-path
-              for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
+              for ( size_t ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
               {
                 dh = pix(ipix,0);
                 di = pix(ipix,1);
@@ -1731,7 +1732,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
   }
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)std::max(norm[i],1);
 
   return std::make_tuple(ret,norm);
@@ -1759,14 +1760,13 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  int ipnt,ipix;
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
   Matrix<double> ret (roi);
   Matrix<int   > norm(roi);
 
   std::vector<int> begin(3),end(3);
-  for ( i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
+  for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1781,10 +1781,10 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
   Matrix<int> pnt = stamp_points(roi);
 
   // correlation
-  for ( ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
+  for ( size_t ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
   {
     // copy end-point
-    for ( i=0 ; i<pnt.shape()[1] ; i++ )
+    for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
     Matrix<int> pix = path(begin,end,mode);
@@ -1794,7 +1794,7 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
       for ( i=bI ; i<(I-bI) ; i++ ) {
         for ( j=bJ ; j<(J-bJ) ; j++ ) {
 
-          for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ ) {
+          for ( size_t ipix=0 ; ipix<pix.shape()[0] ; ipix++ ) {
             dh = pix(ipix,0);
             di = pix(ipix,1);
             dj = pix(ipix,2);
@@ -1810,22 +1810,22 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
   }
 
   // normalization
-  for ( ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
+  for ( size_t ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
   {
     // copy end-point
-    for ( i=0 ; i<pnt.shape()[1] ; i++ )
+    for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
     Matrix<int> pix = path(begin,end,mode);
 
     // loop over voxel-path
-    for ( ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
+    for ( size_t ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
       norm(pix(ipix,0)+dH,pix(ipix,1)+dI,pix(ipix,2)+dJ) += \
         (H-bH)*(I-bI)*(J-bJ);
   }
 
   // apply normalization
-  for ( i=0 ; i<ret.size() ; i++ )
+  for ( size_t i=0 ; i<ret.size() ; i++ )
     ret[i] /= (double)std::max(norm[i],1);
 
   return std::make_tuple(ret,norm);

@@ -609,8 +609,6 @@ void MainWindow::tab3_readImage(void)
 
   // allocate data
   imageRaw_ .reshape({nrow,ncol});
-  image_    .reshape({nrow,ncol});
-  mask_     .reshape({nrow,ncol});
   imageView_.reshape({nrow,ncol});
 
   // read image
@@ -640,18 +638,32 @@ void MainWindow::tab3_readPhase(void)
   min = ui->tab3_phaseLow_spinBox->value();
   max = ui->tab3_phaseHgh_spinBox->value();
 
-  if ( dtype_[ui->tab3_set_comboBox->currentIndex()]=="float" ) {
+  if ( dtype=="float" ) {
     for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
-      if ( imageRaw_[i]>=min && imageRaw_[i]<=max ) {
-        image_    [i] = imageRaw_[i];
-        mask_     [i] = 0;
+      if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
         imageView_[i] = std::min(imageRaw_[i],254);
-      }
-      else {
-        mask_     [i] = 1;
+      else
         imageView_[i] = 255;
-      }
     }
+  }
+  else if ( dtype=="binary" ) {
+    for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
+      if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
+        imageView_[i] = 254;
+      else
+        imageView_[i] = 0;
+    }
+  }
+  else if ( dtype=="int" ) {
+    Image::Matrix<int> im(imageRaw_.shape());
+    Image::Matrix<int> clusters,centers;
+    for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
+      if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
+        im[i] = 1;
+      else
+        im[i] = 0;
+    }
+    std::tie(clusters,centers) = Image::clusters(im);
   }
 
   // apply mask

@@ -76,8 +76,6 @@ private:
   QString     outName_;
   QImage      imageRawQt_;
   Image::Matrix<int>           imageRaw_;
-  Image::Matrix<int>           image_;
-  Image::Matrix<int>           mask_;
   Image::Matrix<unsigned char> imageView_;
 
   void   WIP(void);
