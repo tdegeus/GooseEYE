@@ -28,6 +28,14 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab1_im1i_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
   connect(ui->tab1_im1f_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
 
+  // tab2: pushButtons -> add/remove files
+  connect(ui->tab2_im0Add_pushButton,&QPushButton::clicked,[=](){this->tab2_addFiles(ui->tab2_im0_listWidget);});
+  connect(ui->tab2_im1Add_pushButton,&QPushButton::clicked,[=](){this->tab2_addFiles(ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im0Rmv_pushButton,&QPushButton::clicked,[=](){this->tab2_rmvFiles(ui->tab2_im0_listWidget);});
+  connect(ui->tab2_im1Rmv_pushButton,&QPushButton::clicked,[=](){this->tab2_rmvFiles(ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im1Up__pushButton,&QPushButton::clicked,[=](){this->tab2_uprFiles(ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im1Dwn_pushButton,&QPushButton::clicked,[=](){this->tab2_dwnFiles(ui->tab2_im1_listWidget);});
+
   // tab3: link scroll position of graphicsViews
   QScrollBar *I1h = ui->tab3_image_graphicsView->horizontalScrollBar();
   QScrollBar *I2h = ui->tab3_phase_graphicsView->horizontalScrollBar();
@@ -409,7 +417,7 @@ void MainWindow::tab1_selectStat(void)
 // tab2: add/remove/move files to/in QListWidgets
 // =============================================================================
 
-void MainWindow::tab2_selectFiles(QListWidget *list)
+void MainWindow::tab2_addFiles(QListWidget *list)
 {
   QStringList filters;
   filters << "Image files (*.png *.xpm *.jpg *.jpeg *.tif *.tiff *.bmp)"
@@ -436,60 +444,17 @@ void MainWindow::tab2_selectFiles(QListWidget *list)
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::on_tab2_im0Add_pushButton_clicked()
+void MainWindow::tab2_rmvFiles(QListWidget *list)
 {
-  this->tab2_selectFiles(ui->tab2_im0_listWidget);
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab2_im1Add_pushButton_clicked()
-{
-  this->tab2_selectFiles(ui->tab2_im1_listWidget);
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab2_im0Rmv_pushButton_clicked()
-{
-  QList<QListWidgetItem*> items = ui->tab2_im0_listWidget->selectedItems();
+  QList<QListWidgetItem*> items = list->selectedItems();
   foreach (QListWidgetItem *item, items)
-    delete ui->tab2_im0_listWidget->takeItem(ui->tab2_im0_listWidget->row(item));
+    delete list->takeItem(list->row(item));
 }
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::on_tab2_im1Rmv_pushButton_clicked()
+void MainWindow::tab2_uprFiles(QListWidget *list)
 {
-  QList<QListWidgetItem*> items = ui->tab2_im1_listWidget->selectedItems();
-  foreach (QListWidgetItem *item, items)
-    delete ui->tab2_im1_listWidget->takeItem(ui->tab2_im1_listWidget->row(item));
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab2_cp_pushButton_clicked()
-{
-  if ( ui->tab2_im1_listWidget->count()>0 ) {
-    QMessageBox::warning(\
-      this,\
-      tr("GooseEYE"),\
-      tr("Only allowed if right list is empty."),\
-      QMessageBox::Ok,\
-      QMessageBox::Ok\
-    );
-  }
-
-  for ( int i=0 ; i<ui->tab2_im0_listWidget->count() ; i++ )
-    ui->tab2_im1_listWidget->addItem(ui->tab2_im0_listWidget->item(i)->text());
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab2_im1Up__pushButton_clicked()
-{
-  QListWidget *list = ui->tab2_im1_listWidget;
-
   QList<QListWidgetItem*> items = list->selectedItems();
 
   std::vector<int> row(items.size());
@@ -515,10 +480,8 @@ void MainWindow::on_tab2_im1Up__pushButton_clicked()
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::on_tab2_im1Dwn_pushButton_clicked()
+void MainWindow::tab2_dwnFiles(QListWidget *list)
 {
-  QListWidget *list = ui->tab2_im1_listWidget;
-
   QList<QListWidgetItem*> items = list->selectedItems();
 
   std::vector<int> row(items.size());
@@ -540,6 +503,24 @@ void MainWindow::on_tab2_im1Dwn_pushButton_clicked()
 
   for ( int i=0 ; i<items.size() ; i++ )
     list->item(row[i]+1)->setSelected(true);
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab2_cp_pushButton_clicked()
+{
+  if ( ui->tab2_im1_listWidget->count()>0 ) {
+    QMessageBox::warning(\
+      this,\
+      tr("GooseEYE"),\
+      tr("Only allowed if right list is empty."),\
+      QMessageBox::Ok,\
+      QMessageBox::Ok\
+    );
+  }
+
+  for ( int i=0 ; i<ui->tab2_im0_listWidget->count() ; i++ )
+    ui->tab2_im1_listWidget->addItem(ui->tab2_im0_listWidget->item(i)->text());
 }
 
 // =============================================================================
