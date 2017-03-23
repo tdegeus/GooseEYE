@@ -629,6 +629,9 @@ void MainWindow::tab3_readImage(void)
 
 void MainWindow::tab3_readPhase(void)
 {
+  if ( imageRawQt_.isNull() )
+    return;
+
   int min,max;
   QString dtype = dtype_[ui->tab3_set_comboBox->currentIndex()];
 
@@ -664,6 +667,10 @@ void MainWindow::tab3_readPhase(void)
         im[i] = 0;
     }
     std::tie(clusters,centers) = Image::clusters(im);
+    double fac = 255./(double)clusters.max();
+    for ( size_t i=0 ; i<imageRaw_.size() ; i++ )
+      imageView_[i] = std::min((int)((double)clusters[i]*fac),254);
+//    std::cout << clusters.max() << std::endl;
   }
 
   // apply mask
@@ -745,6 +752,9 @@ void MainWindow::tab3_viewImage(void)
 
 void MainWindow::tab3_viewPhase(void)
 {
+  if ( imageRawQt_.isNull() )
+    return;
+
   // colorbar
   QVector<QRgb> grayscale;
   // - gray values
