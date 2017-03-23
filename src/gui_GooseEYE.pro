@@ -1,7 +1,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET    = GooseEYE
 TEMPLATE  = app
@@ -9,9 +9,11 @@ TEMPLATE  = app
 DEFINES  += QT_DEPRECATED_WARNINGS
 
 SOURCES  += gui_main.cpp\
-            gui_mainwindow.cpp
+            gui_mainwindow.cpp \
+            qcustomplot.cpp
 
-HEADERS  += gui_mainwindow.h
+HEADERS  += gui_mainwindow.h \
+            qcustomplot.h
 
 FORMS    += gui_mainwindow.ui
 
