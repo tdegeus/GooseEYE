@@ -17,6 +17,10 @@ MainWindow::MainWindow(QWidget *parent) :
   outDir_   = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
   outName_  = "";
 
+  // tab1: treeWidget/radioButton/checkBox -> interpret selection, set allowed values
+  connect(ui->tab1_measure_treeWidget,SIGNAL(clicked(QModelIndex)),this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im0_checkBox    ,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im1_checkBox    ,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
   connect(ui->tab1_im0b_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
   connect(ui->tab1_im0i_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
   connect(ui->tab1_im0f_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
@@ -24,17 +28,41 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab1_im1i_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
   connect(ui->tab1_im1f_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
 
-  connect(ui->tab3_im_comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncImage()));
-  connect(ui->tab3_im_comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
+  // tab3: link scroll position of graphicsViews
+  QScrollBar *I1h = ui->tab3_image_graphicsView->horizontalScrollBar();
+  QScrollBar *I2h = ui->tab3_phase_graphicsView->horizontalScrollBar();
+  QScrollBar *I1v = ui->tab3_image_graphicsView->verticalScrollBar  ();
+  QScrollBar *I2v = ui->tab3_phase_graphicsView->verticalScrollBar  ();
+  connect(I1h,SIGNAL(valueChanged(int)),I2h,SLOT(setValue(int)));
+  connect(I2h,SIGNAL(valueChanged(int)),I1h,SLOT(setValue(int)));
+  connect(I1v,SIGNAL(valueChanged(int)),I2v,SLOT(setValue(int)));
+  connect(I2v,SIGNAL(valueChanged(int)),I1v,SLOT(setValue(int)));
 
-  QGraphicsView *view1 = ui->tab3_image_graphicsView;
-  QGraphicsView *view2 = ui->tab3_phase_graphicsView;
+  // tab3: switch set/image
+  QComboBox *im  = ui->tab3_im_comboBox;
+  QComboBox *set = ui->tab3_set_comboBox;
+  connect(ui->tab3_imPrev_pushButton ,&QPushButton::clicked,[=](){if (im ->currentIndex()>0             ) im ->setCurrentIndex(im ->currentIndex()-1);});
+  connect(ui->tab3_imNext_pushButton ,&QPushButton::clicked,[=](){if (im ->currentIndex()<im ->count()-1) im ->setCurrentIndex(im ->currentIndex()+1);});
+  connect(ui->tab3_setPrev_pushButton,&QPushButton::clicked,[=](){if (set->currentIndex()>0             ) set->setCurrentIndex(set->currentIndex()-1);});
+  connect(ui->tab3_setNext_pushButton,&QPushButton::clicked,[=](){if (set->currentIndex()<set->count()-1) set->setCurrentIndex(set->currentIndex()+1);});
 
-  connect(view1->horizontalScrollBar(), SIGNAL(valueChanged(int)), view2->horizontalScrollBar(), SLOT(setValue(int)));
-  connect(view2->horizontalScrollBar(), SIGNAL(valueChanged(int)), view1->horizontalScrollBar(), SLOT(setValue(int)));
-  connect(view1->verticalScrollBar  (), SIGNAL(valueChanged(int)), view2->verticalScrollBar  (), SLOT(setValue(int)));
-  connect(view2->verticalScrollBar  (), SIGNAL(valueChanged(int)), view1->verticalScrollBar  (), SLOT(setValue(int)));
+  // tab3: load / current image changed -> reintialize both images
+  connect(ui->tab3_load_pushButton   ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncImage()));
+  connect(ui->tab3_load_pushButton   ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_imPrev_pushButton ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncImage()));
+  connect(ui->tab3_imPrev_pushButton ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_imNext_pushButton ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncImage()));
+  connect(ui->tab3_imNext_pushButton ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_setPrev_pushButton,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncImage()));
+  connect(ui->tab3_setPrev_pushButton,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_setNext_pushButton,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncImage()));
+  connect(ui->tab3_setNext_pushButton,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_im_comboBox       ,SIGNAL(activated(int)),this,SLOT(tab3_syncImage()));
+  connect(ui->tab3_im_comboBox       ,SIGNAL(activated(int)),this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_set_comboBox      ,SIGNAL(activated(int)),this,SLOT(tab3_syncImage()));
+  connect(ui->tab3_set_comboBox      ,SIGNAL(activated(int)),this,SLOT(tab3_syncPhase()));
 
+  // tab3: image manipulated -> reintialize interpreted image
   connect(ui->tab3_phaseLow_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_phaseHgh_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_mask1Low_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
@@ -47,6 +75,13 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_rowHgh_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_colLow_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_colHgh_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
+
+  // tab3: zoom
+  QSlider *zoom = ui->tab3_zoom_slider;
+  connect(ui->tab3_zoomOut_pushButton,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()-1);});
+  connect(ui->tab3_zoomIn__pushButton,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()+1);});
+  connect(ui->tab3_zoom_slider,SIGNAL(valueChanged(int)),this,SLOT(tab3_viewImage()));
+  connect(ui->tab3_zoom_slider,SIGNAL(valueChanged(int)),this,SLOT(tab3_viewPhase()));
 
 }
 
@@ -205,8 +240,13 @@ void MainWindow::on_tab0_result_pushButton_clicked()
 
 void MainWindow::tab1_selectStat(void)
 {
-  if ( ui->tab1_measure_treeWidget->currentItem()->childCount()>0 )
+  if ( ui->tab1_measure_treeWidget->currentItem()->childCount()>0 ) {
+    if ( !ui->tab1_measure_treeWidget->currentItem()->isExpanded() ) {
+      ui->tab1_measure_treeWidget->collapseAll();
+      ui->tab1_measure_treeWidget->currentItem()->setExpanded(true);
+    }
     return;
+  }
 
   // local variables
   QString category = ui->tab1_measure_treeWidget->currentItem()->parent()->text(0);
@@ -217,23 +257,22 @@ void MainWindow::tab1_selectStat(void)
   std::vector<int> dtype { 0      , 0   , 0     };
   QStringList      label {"binary","int","float"};
   // allocate lists of pointers
-  typedef void (MainWindow::*ptr)(bool);
-  ptr            clear[2];
-  QCheckBox     *check[2];
-  QRadioButton  *radio[2][3];
+  QButtonGroup *group[2];
+  QCheckBox    *check[2];
+  QRadioButton *radio[2][3];
   // pointers to dtype checkBoxes
-  check[0]    = ui->tab1_im0_checkBox;
-  check[1]    = ui->tab1_im1_checkBox;
+  check[0]     = ui->tab1_im0_checkBox;
+  check[1]     = ui->tab1_im1_checkBox;
   // pointers to dtype radioButtons
-  radio[0][0] = ui->tab1_im0b_radioButton;
-  radio[0][1] = ui->tab1_im0i_radioButton;
-  radio[0][2] = ui->tab1_im0f_radioButton;
-  radio[1][0] = ui->tab1_im1b_radioButton;
-  radio[1][1] = ui->tab1_im1i_radioButton;
-  radio[1][2] = ui->tab1_im1f_radioButton;
-  // pointers to function that clears radioButtons
-  clear[0]    = &MainWindow::on_tab1_im0_checkBox_toggled;
-  clear[1]    = &MainWindow::on_tab1_im1_checkBox_toggled;
+  radio[0][0]  = ui->tab1_im0b_radioButton;
+  radio[0][1]  = ui->tab1_im0i_radioButton;
+  radio[0][2]  = ui->tab1_im0f_radioButton;
+  radio[1][0]  = ui->tab1_im1b_radioButton;
+  radio[1][1]  = ui->tab1_im1i_radioButton;
+  radio[1][2]  = ui->tab1_im1f_radioButton;
+  // pointer to dtype buttonGroups
+  group[0]     = ui->buttonGroup_tab1_im0;
+  group[1]     = ui->buttonGroup_tab1_im1;
 
   // default: no information on function / phase / data-type
   func_ = "";
@@ -301,7 +340,10 @@ void MainWindow::tab1_selectStat(void)
 
   // selection of image 2: -1=disable ; 0=user-select ; 1=force-select
   if      ( im1==-1 ) {
-    this->on_tab1_im1_checkBox_toggled(false);
+    group[1]->setExclusive(false);
+    for ( int j=0 ; j<3 ; j++ )
+      radio[1][j]->setChecked(false);
+    group[1]->setExclusive(true);
     check[1]->setChecked (false);
     check[1]->setEnabled (false);
   }
@@ -314,10 +356,17 @@ void MainWindow::tab1_selectStat(void)
   }
 
   // clear dtype radioButton if one was selected that is no longer allowed
+  // - set non-exclusive (otherwise setChecked(false) will have no effect)
+  for ( int i=0 ; i<2 ; i++ )
+    group[i]->setExclusive(false);
+  // - optionally uncheck
   for ( int i=0 ; i<2 ; i++ )
     for ( int j=0 ; j<3 ; j++ )
       if ( !dtype[j] && radio[i][j]->isChecked() )
-        (this->*clear[i])(false);
+        radio[i][j]->setChecked(false);
+  // - reset exclusive to get back the normal behavior
+  for ( int i=0 ; i<2 ; i++ )
+    group[i]->setExclusive(true);
 
   // auto-fill radioButton if there is only one possibility
   if ( dtype[0]+dtype[1]+dtype[2]==1 )
@@ -334,7 +383,10 @@ void MainWindow::tab1_selectStat(void)
   // optionally link image 2 to image 1
   if ( lnk ) {
     // - clear radioButtons for image 2
-    this->on_tab1_im1_checkBox_toggled(false);
+    group[1]->setExclusive(false);
+    for ( int j=0 ; j<3 ; j++ )
+      radio[1][j]->setChecked(false);
+    group[1]->setExclusive(true);
     // - disable radioButtons for image 2
     for ( int j=0 ; j<3 ; j++ )
       radio[1][j]->setEnabled(false);
@@ -351,59 +403,6 @@ void MainWindow::tab1_selectStat(void)
       if ( radio[i][j]->isChecked() )
         dtype_.replace(i,label[j]);
 
-}
-
-// -----------------------------------------------------------------------------
-// tab1: statistics selection list: optionally expand list
-//       if deepest -> all further actions are unified in "tab1_selectStat()"
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab1_measure_treeWidget_clicked(const QModelIndex &index)
-{
-
-  if ( ui->tab1_measure_treeWidget->currentItem()->childCount()>0 ) {
-    if ( !ui->tab1_measure_treeWidget->currentItem()->isExpanded() ) {
-      ui->tab1_measure_treeWidget->collapseAll();
-      ui->tab1_measure_treeWidget->currentItem()->setExpanded(true);
-    }
-    return;
-  }
-  this->tab1_selectStat();
-}
-
-// -----------------------------------------------------------------------------
-// tab1: select   image -> read allowed types from "tab1_selectStat()"
-//       deselect image -> clear
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab1_im0_checkBox_toggled(bool checked)
-{
-  if ( checked ) {
-    this->tab1_selectStat();
-  }
-  else {
-    ui->buttonGroup_tab1_im0->setExclusive(false);
-    ui->tab1_im0b_radioButton->setChecked (false);
-    ui->tab1_im0f_radioButton->setChecked (false);
-    ui->tab1_im0i_radioButton->setChecked (false);
-    ui->buttonGroup_tab1_im0->setExclusive(true );
-  }
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab1_im1_checkBox_toggled(bool checked)
-{
-  if ( checked ) {
-    this->tab1_selectStat();
-  }
-  else {
-    ui->buttonGroup_tab1_im1->setExclusive(false);
-    ui->tab1_im1b_radioButton->setChecked (false);
-    ui->tab1_im1f_radioButton->setChecked (false);
-    ui->tab1_im1i_radioButton->setChecked (false);
-    ui->buttonGroup_tab1_im1->setExclusive(true );
-  }
 }
 
 // =============================================================================
@@ -568,6 +567,7 @@ void MainWindow::on_tab3_set_comboBox_currentIndexChanged(int index)
   ui->tab3_imPrev_pushButton ->setEnabled(list[index]->count()>1);
   ui->tab3_imNext_pushButton ->setEnabled(list[index]->count()>1);
 
+  ui->tab3_load_pushButton   ->setEnabled(true);
   ui->tab3_image_graphicsView->setEnabled(true);
   ui->tab3_phase_graphicsView->setEnabled(true);
   ui->tab3_zoom_slider       ->setEnabled(true);
@@ -588,58 +588,9 @@ void MainWindow::on_tab3_set_comboBox_currentIndexChanged(int index)
 
 }
 
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab3_setPrev_pushButton_clicked()
-{
-  int i = ui->tab3_set_comboBox->currentIndex();
-  if ( i>0 )
-    ui->tab3_set_comboBox->setCurrentIndex(i-1);
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab3_setNext_pushButton_clicked()
-{
-  int i = ui->tab3_set_comboBox->currentIndex();
-  if ( i<ui->tab3_set_comboBox->count()-1 )
-    ui->tab3_set_comboBox->setCurrentIndex(i+1);
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab3_imPrev_pushButton_clicked()
-{
-  int i = ui->tab3_im_comboBox->currentIndex();
-  if ( i>0 )
-    ui->tab3_im_comboBox->setCurrentIndex(i-1);
-}
-
-// -----------------------------------------------------------------------------
-
-void MainWindow::on_tab3_imNext_pushButton_clicked()
-{
-  int i = ui->tab3_im_comboBox->currentIndex();
-  if ( i<ui->tab3_im_comboBox->count()-1 )
-    ui->tab3_im_comboBox->setCurrentIndex(i+1);
-}
-
-// ============================================================================
-// tab3: view the original image, set the selection fields
-// ============================================================================
-
-double MainWindow::tab3_scaleImage(void)
-{
-  double wdthView  = (double)ui->tab3_image_graphicsView->width ();
-  double hghtView  = (double)ui->tab3_image_graphicsView->height();
-  double wdthImage = (double)ui->tab3_colHgh_spinBox->maximum();
-  double hghtImage = (double)ui->tab3_rowHgh_spinBox->maximum();
-  double zoomScale = pow(1.066,(double)ui->tab3_zoom_slider->sliderPosition());
-  double wdth      = zoomScale*wdthView/wdthImage;
-  double hght      = zoomScale*hghtView/hghtImage;
-
-  return 0.95*std::min(wdth,hght);
-}
+// =============================================================================
+// tab3: read raw image (view using "tab3_viewImage")
+// =============================================================================
 
 void MainWindow::tab3_readImage(void)
 {
@@ -668,6 +619,10 @@ void MainWindow::tab3_readImage(void)
   ui->tab3_colHgh_spinBox->setValue  (ncol);
   ui->tab3_colHgh_spinBox->setMaximum(ncol);
 }
+
+// =============================================================================
+// tab3: interpret image (view using "tab3_viewPhase")
+// =============================================================================
 
 void MainWindow::tab3_readPhase(void)
 {
@@ -709,9 +664,6 @@ void MainWindow::tab3_readPhase(void)
           imageView_[i] = 255;
   }
 
-
-
-
   size_t nrow = imageRaw_.shape()[0];
   size_t ncol = imageRaw_.shape()[1];
   size_t irow = ui->tab3_rowLow_spinBox->value();
@@ -724,23 +676,31 @@ void MainWindow::tab3_readPhase(void)
     for ( size_t j=0 ; j<ncol ; j++ )
       if ( i<irow || i>jrow || j<icol || j>jcol )
         imageView_(i,j) = 254;
-
-
-
 }
+
+// =============================================================================
+// tab3: compute image scaling
+// =============================================================================
+
+double MainWindow::tab3_scaleImage(void)
+{
+  double wdthView  = (double)ui->tab3_image_graphicsView->width ();
+  double hghtView  = (double)ui->tab3_image_graphicsView->height();
+  double wdthImage = (double)ui->tab3_colHgh_spinBox->maximum();
+  double hghtImage = (double)ui->tab3_rowHgh_spinBox->maximum();
+  double zoomScale = pow(1.066,(double)ui->tab3_zoom_slider->sliderPosition());
+  double wdth      = zoomScale*wdthView/wdthImage;
+  double hght      = zoomScale*hghtView/hghtImage;
+
+  return 0.95*std::min(wdth,hght);
+}
+
+// =============================================================================
+// tab3: view raw image
+// =============================================================================
 
 void MainWindow::tab3_viewImage(void)
 {
-  // // load the image
-  // QString fname = QDir(outDir_).filePath(ui->tab3_im_comboBox->currentText());
-  // QImage  image(fname);
-
-  // // set row/column selection wizard
-  // ui->tab3_rowHgh_spinBox->setValue  (image.height());
-  // ui->tab3_rowHgh_spinBox->setMaximum(image.height());
-  // ui->tab3_colHgh_spinBox->setValue  (image.width ());
-  // ui->tab3_colHgh_spinBox->setMaximum(image.width ());
-
   // create a "scene" with containing the image
   QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(imageRawQt_));
   QGraphicsScene      *scene = new QGraphicsScene;
@@ -753,38 +713,12 @@ void MainWindow::tab3_viewImage(void)
   ui->tab3_image_graphicsView->show();
 }
 
-// ============================================================================
+// =============================================================================
 // tab3: view the interpreted image, gray-scale + red mask
-// ============================================================================
+// =============================================================================
 
 void MainWindow::tab3_viewPhase(void)
 {
-//   // load the image
-//   QString fname = QDir(outDir_).filePath(ui->tab3_im_comboBox->currentText());
-//   QImage  rawImage(fname);
-
-//   // read cropped-image dimensions
-//   int irow = ui->tab3_rowLow_spinBox->value();
-//   int jrow = ui->tab3_rowHgh_spinBox->value();
-//   int icol = ui->tab3_colLow_spinBox->value();
-//   int jcol = ui->tab3_colHgh_spinBox->value();
-
-//   // convert raw image -> Image::Matrix
-//   Image::Matrix<int> im({(size_t)(jrow-irow),(size_t)(jcol-icol)});
-//   for ( int i=irow ; i<jrow ; i++ )
-//     for ( int j=icol ; j<jcol ; j++ )
-//       im(i,j) = qGray(rawImage.pixel(j,i));
-
-//   // convert "im" to "unsigned char" data-type, for QImage
-//   std::vector<unsigned char> data;
-//   data.reserve(im.size());
-//   for ( auto i : im )
-//     data.push_back(i);
-// //  std::vector<unsigned char> data(im.size());
-// //  // - apply conversion for each entry
-// //  for ( int i=0 ; i<(int)im.size() ; i++ )
-// //    data[i] = (unsigned char)(im[i]);
-
   // colorbar
   QVector<QRgb> grayscale;
   // - gray values
@@ -794,7 +728,12 @@ void MainWindow::tab3_viewPhase(void)
   grayscale.append(qRgb(255,0,0));
 
   // convert Image::Matrix -> image to view
-  QImage image(imageView_.ptr(),imageView_.shape()[1],imageView_.shape()[0],QImage::QImage::Format_Indexed8);
+  QImage image(\
+    imageView_.ptr(),\
+    imageView_.shape()[1],\
+    imageView_.shape()[0],\
+    QImage::QImage::Format_Indexed8\
+  );
   image.setColorTable(grayscale);
 
   // create a "scene" with containing the image
@@ -809,6 +748,9 @@ void MainWindow::tab3_viewPhase(void)
   ui->tab3_phase_graphicsView->show();
 }
 
+// =============================================================================
+// tab3: fully refresh images
+// =============================================================================
 
 void MainWindow::tab3_syncImage(void)
 {
@@ -816,51 +758,13 @@ void MainWindow::tab3_syncImage(void)
   this->tab3_viewImage();
 }
 
+// -----------------------------------------------------------------------------
+
 void MainWindow::tab3_syncPhase(void)
 {
   this->tab3_readPhase();
   this->tab3_viewPhase();
 }
 
-// ============================================================================
-// tab3: act on changes
-// ============================================================================
 
-
-
-void MainWindow::on_tab3_zoom_slider_valueChanged(int value)
-{
-  this->tab3_viewImage();
-  this->tab3_viewPhase();
-}
-
-void MainWindow::on_tab3_zoomOut_pushButton_clicked()
-{
-  ui->tab3_zoom_slider->setSliderPosition(ui->tab3_zoom_slider->sliderPosition()-1);
-}
-
-void MainWindow::on_tab3_zoomIn__pushButton_clicked()
-{
-  ui->tab3_zoom_slider->setSliderPosition(ui->tab3_zoom_slider->sliderPosition()+1);
-}
-
-
-
-void MainWindow::on_tab4_cp2out_checkBox_toggled(bool checked)
-{
-  if ( checked )
-    return;
-
-  QString mes;
-  mes.append("It is advised to store the images (a.k.a. the raw-data) ");
-  mes.append("in the output directory, to facilitate reproducibility.");
-
-  QMessageBox::warning(\
-    this,\
-    tr("GooseEYE"),\
-    mes,\
-    QMessageBox::Ok,\
-    QMessageBox::Ok\
-  );
-}
 

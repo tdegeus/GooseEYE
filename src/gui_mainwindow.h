@@ -38,14 +38,14 @@ public:
 
 private slots:
 
-  void   tab1_selectStat(void);
-
-  void   tab3_readImage(void);
-  void   tab3_readPhase(void);
-  void   tab3_viewImage(void);
-  void   tab3_viewPhase(void);
-  void   tab3_syncImage(void);
-  void   tab3_syncPhase(void);
+  // custom functions to connect buttons
+  void tab1_selectStat(void);
+  void tab3_readImage (void);
+  void tab3_readPhase (void);
+  void tab3_viewImage (void);
+  void tab3_viewPhase (void);
+  void tab3_syncImage (void);
+  void tab3_syncPhase (void);
 
   // write to message bar
   void on_tabWidget_tabBarClicked(int index);
@@ -54,13 +54,6 @@ private slots:
   void on_tab0_load_pushButton_clicked();
   void on_tab0_outdir_pushButton_clicked();
   void on_tab0_result_pushButton_clicked();
-
-  // run "tab1_selectStat()"
-  void on_tab1_measure_treeWidget_clicked(const QModelIndex &index);
-
-  // check: run "tab1_selectStat()" ; uncheck: clear radioBox
-  void on_tab1_im0_checkBox_toggled(bool checked);
-  void on_tab1_im1_checkBox_toggled(bool checked);
 
   // add files to QListWidget
   void on_tab2_im0Add_pushButton_clicked();
@@ -73,18 +66,6 @@ private slots:
 
   // define "set" of images, create list of files
   void on_tab3_set_comboBox_currentIndexChanged(int index);
-  void on_tab3_setPrev_pushButton_clicked();
-  void on_tab3_setNext_pushButton_clicked();
-  void on_tab3_imPrev_pushButton_clicked();
-  void on_tab3_imNext_pushButton_clicked();
-
-
-  void on_tab3_zoom_slider_valueChanged(int value);
-  void on_tab3_zoomOut_pushButton_clicked();
-  void on_tab3_zoomIn__pushButton_clicked();
-
-  void on_tab4_cp2out_checkBox_toggled(bool checked);
-
 
 private:
   Ui::MainWindow *ui;
