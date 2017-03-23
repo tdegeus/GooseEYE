@@ -70,14 +70,14 @@ private slots:
 private:
   Ui::MainWindow *ui;
 
-  QStringList phase_;
-  QStringList dtype_;
-  QString     func_;
-  QString     outDir_;
-  QString     outName_;
-  QImage      imageRawQt_;
-  Image::Matrix<int>           imageRaw_;
-  Image::Matrix<unsigned char> imageView_;
+  QStringList                  phase_;
+  QStringList                  dtype_;
+  QString                      func_;
+  QString                      outDir_;
+  QString                      outName_;
+  QImage                       imgRawQt_;
+  Image::Matrix<int>           imgRaw_;
+  Image::Matrix<unsigned char> imgView_;
 
   void   WIP(void);
 

@@ -263,7 +263,7 @@ void MainWindow::tab1_selectStat(void)
   bool    lnk      = false;
   int     im1      = 0;
   // lists to signal the allowed data-types
-  std::vector<int> dtype { 0      , 0   , 0     };
+  int dtype[2][3];
   QStringList      label {"binary","int","float"};
   // allocate lists of pointers
   QButtonGroup *group[2];
@@ -293,41 +293,47 @@ void MainWindow::tab1_selectStat(void)
   // settings based on selected statistic
   if      ( category=="Spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      func_      = "S2";
-      phase_[0] = "Phase";
-      phase_[1] = "Phase";
-      dtype     = {1,0,1};
-      lnk       = true;
+      func_       = "S2";
+      phase_[0]   = "Phase";
+      phase_[1]   = "Phase";
+      lnk         = true;
+      dtype[0][0] = 1; dtype[0][1] = 0; dtype[0][2] = 1;
+      dtype[1][0] = 1; dtype[1][1] = 0; dtype[1][2] = 1;
     }
     else if ( measure=="2-point cluster" ) {
-      func_      = "S2";
-      phase_[0] = "Clusters";
-      phase_[1] = "Clusters";
-      dtype     = {0,1,0};
-      lnk       = true;
+      func_       = "S2";
+      phase_[0]   = "Clusters";
+      phase_[1]   = "Clusters";
+      lnk         = true;
+      dtype[0][0] = 0; dtype[0][1] = 1; dtype[0][2] = 0;
+      dtype[1][0] = 0; dtype[1][1] = 1; dtype[1][2] = 0;
+
     }
     else if ( measure=="Lineal path" ) {
-      func_      = "L" ;
-      phase_[0] = "Phase";
-      dtype     = {1,1,0};
-      lnk       = true;
-      im1       = -1;
+      func_       = "L" ;
+      phase_[0]   = "Phase";
+      lnk         = true;
+      im1         = -1;
+      dtype[0][0] = 1; dtype[0][1] = 1; dtype[0][2] = 0;
+      dtype[1][0] = 1; dtype[1][1] = 1; dtype[1][2] = 0;
     }
   }
   else if ( category=="Conditional spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      func_      = "W2";
-      phase_[0] = "Phase";
-      phase_[1] = "Weights";
-      dtype     = {1,0,1};
-      im1       = 1;
+      func_       = "W2";
+      phase_[0]   = "Weights";
+      phase_[1]   = "Phase";
+      im1         = 1;
+      dtype[0][0] = 1; dtype[0][1] = 0; dtype[0][2] = 1;
+      dtype[1][0] = 1; dtype[1][1] = 0; dtype[1][2] = 1;
     }
     else if ( measure=="Collapsed 2-point probability" ) {
-      func_      = "W2c";
-      phase_[0] = "Phase";
-      phase_[1] = "Weights";
-      dtype     = {1,0,1};
-      im1       = 1;
+      func_       = "W2c";
+      phase_[0]   = "Weights";
+      phase_[1]   = "Phase";
+      im1         = 1;
+      dtype[0][0] = 0; dtype[0][1] = 1; dtype[0][2] = 0;
+      dtype[1][0] = 1; dtype[1][1] = 0; dtype[1][2] = 1;
     }
   }
 
@@ -373,23 +379,24 @@ void MainWindow::tab1_selectStat(void)
   // - optionally uncheck
   for ( int i=0 ; i<2 ; i++ )
     for ( int j=0 ; j<3 ; j++ )
-      if ( !dtype[j] && radio[i][j]->isChecked() )
+      if ( !dtype[i][j] && radio[i][j]->isChecked() )
         radio[i][j]->setChecked(false);
   // - reset exclusive to get back the normal behavior
   for ( int i=0 ; i<2 ; i++ )
     group[i]->setExclusive(true);
 
   // auto-fill radioButton if there is only one possibility
-  if ( dtype[0]+dtype[1]+dtype[2]==1 )
-    for ( int i=0 ; i<2 ; i++ )
+  for ( int i=0 ; i<2 ; i++ ) {
+    if ( dtype[i][0]+dtype[i][1]+dtype[i][2]==1 )
       for ( int j=0 ; j<3 ; j++ )
-        if ( dtype[j] && check[i]->isChecked() )
+        if ( dtype[i][j] && check[i]->isChecked() )
           radio[i][j]->setChecked(true);
+  }
 
   // enable/disable dtype radioButton based on allowed dtype(s)
   for ( int i=0 ; i<2 ; i++ )
     for ( int j=0 ; j<3 ; j++ )
-      radio[i][j]->setEnabled((bool)dtype[j]);
+      radio[i][j]->setEnabled((bool)dtype[i][j]);
 
   // optionally link image 2 to image 1
   if ( lnk ) {
@@ -601,20 +608,20 @@ void MainWindow::tab3_readImage(void)
 {
   // load the image
   QString fname = QDir(outDir_).filePath(ui->tab3_im_comboBox->currentText());
-  imageRawQt_.load(fname);
+  imgRawQt_.load(fname);
 
   // read the size
-  size_t nrow = imageRawQt_.height();
-  size_t ncol = imageRawQt_.width ();
+  size_t nrow = imgRawQt_.height();
+  size_t ncol = imgRawQt_.width ();
 
   // allocate data
-  imageRaw_ .reshape({nrow,ncol});
-  imageView_.reshape({nrow,ncol});
+  imgRaw_ .reshape({nrow,ncol});
+  imgView_.reshape({nrow,ncol});
 
   // read image
   for ( size_t i=0 ; i<nrow ; i++ )
     for ( size_t j=0 ; j<ncol ; j++ )
-      imageRaw_(i,j) = qGray(imageRawQt_.pixel(j,i));
+      imgRaw_(i,j) = qGray(imgRawQt_.pixel(j,i));
 
   // set row/column selection wizard
   ui->tab3_rowHgh_spinBox->setValue  (nrow);
@@ -629,7 +636,7 @@ void MainWindow::tab3_readImage(void)
 
 void MainWindow::tab3_readPhase(void)
 {
-  if ( imageRawQt_.isNull() )
+  if ( imgRawQt_.isNull() )
     return;
 
   int min,max;
@@ -643,27 +650,27 @@ void MainWindow::tab3_readPhase(void)
 
   if ( dtype=="float" ) {
     // threshold image, set excluded pixels masked
-    for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
-      if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
-        imageView_[i] = std::min(imageRaw_[i],254);
+    for ( size_t i=0 ; i<imgRaw_.size() ; i++ ) {
+      if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
+        imgView_[i] = std::min(imgRaw_[i],254);
       else
-        imageView_[i] = 255;
+        imgView_[i] = 255;
     }
   }
   else if ( dtype=="binary" ) {
     // threshold image, within range -> white, otherwise -> black
-    for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
-      if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
-        imageView_[i] = 254;
+    for ( size_t i=0 ; i<imgRaw_.size() ; i++ ) {
+      if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
+        imgView_[i] = 254;
       else
-        imageView_[i] = 0;
+        imgView_[i] = 0;
     }
   }
   else if ( dtype=="int" ) {
     // threshold image, within range -> 1, otherwise -> 0
-    Image::Matrix<int> im(imageRaw_.shape());
-    for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
-      if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
+    Image::Matrix<int> im(imgRaw_.shape());
+    for ( size_t i=0 ; i<imgRaw_.size() ; i++ ) {
+      if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
         im[i] = 1;
       else
         im[i] = 0;
@@ -673,8 +680,8 @@ void MainWindow::tab3_readPhase(void)
     std::tie(clusters,centers) = Image::clusters(im);
     // scale image for optimizal color contrast
     double fac = 255./(double)clusters.max();
-    for ( size_t i=0 ; i<imageRaw_.size() ; i++ )
-      imageView_[i] = std::min((int)((double)clusters[i]*fac),254);
+    for ( size_t i=0 ; i<imgRaw_.size() ; i++ )
+      imgView_[i] = std::min((int)((double)clusters[i]*fac),254);
   }
 
   // apply mask
@@ -696,13 +703,23 @@ void MainWindow::tab3_readPhase(void)
     max = maskHgh[0]->value();
 
     if ( min!=max )
-      for ( size_t i=0 ; i<imageRaw_.size() ; i++ )
-        if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
-          imageView_[i] = 255;
+      for ( size_t i=0 ; i<imgRaw_.size() ; i++ )
+        if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
+          imgView_[i] = 255;
   }
 
-  size_t nrow = imageRaw_.shape()[0];
-  size_t ncol = imageRaw_.shape()[1];
+  // mask weights
+  // ------------
+
+  if ( ui->tab1_maskW_checkBox->isChecked() && ui->tab3_set_comboBox->currentIndex()>0 ) {
+
+  }
+
+  // crop the image
+  // --------------
+
+  size_t nrow = imgRaw_.shape()[0];
+  size_t ncol = imgRaw_.shape()[1];
   size_t irow = ui->tab3_rowLow_spinBox->value();
   size_t jrow = ui->tab3_rowHgh_spinBox->value();
   size_t icol = ui->tab3_colLow_spinBox->value();
@@ -712,7 +729,7 @@ void MainWindow::tab3_readPhase(void)
   for ( size_t i=0 ; i<nrow ; i++ )
     for ( size_t j=0 ; j<ncol ; j++ )
       if ( i<irow || i>jrow || j<icol || j>jcol )
-        imageView_(i,j) = 254;
+        imgView_(i,j) = 254;
 }
 
 // =============================================================================
@@ -739,7 +756,7 @@ double MainWindow::tab3_scaleImage(void)
 void MainWindow::tab3_viewImage(void)
 {
   // create a "scene" with containing the image
-  QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(imageRawQt_));
+  QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(imgRawQt_));
   QGraphicsScene      *scene = new QGraphicsScene;
   scene->addItem(item);
   ui->tab3_image_graphicsView->setScene(scene);
@@ -756,7 +773,7 @@ void MainWindow::tab3_viewImage(void)
 
 void MainWindow::tab3_viewPhase(void)
 {
-  if ( imageRawQt_.isNull() )
+  if ( imgRawQt_.isNull() )
     return;
 
   // define colormap based on data-type
@@ -778,9 +795,9 @@ void MainWindow::tab3_viewPhase(void)
 
   // convert Image::Matrix -> image to view
   QImage image(\
-    imageView_.ptr(),\
-    imageView_.shape()[1],\
-    imageView_.shape()[0],\
+    imgView_.ptr(),\
+    imgView_.shape()[1],\
+    imgView_.shape()[0],\
     QImage::QImage::Format_Indexed8\
   );
   image.setColorTable(cmap);
