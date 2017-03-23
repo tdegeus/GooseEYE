@@ -1,3 +1,6 @@
 [submodule "src/pybind11"]
 	path = src/pybind11
 	url = https://github.com/pybind/pybind11.git
+[submodule "src/cppcolormap"]
+	path = src/cppcolormap
+	url = https://github.com/tdegeus/cppcolormap.git

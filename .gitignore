@@ -1,11 +1,13 @@
 
-test*
+# submodules
+src/pybind11
+src/cppcolormap
 
 # custom variables
+test*
 build*
 *.pro.user
 docs/_build
-src/pybind11
 
 # cmake files
 CMakeCache.txt
