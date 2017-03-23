@@ -23,6 +23,7 @@
 #include <math.h>
 
 #include "image.h"
+#include "cppcolormap/cppcolormap.h"
 
 namespace Ui {
 class MainWindow;

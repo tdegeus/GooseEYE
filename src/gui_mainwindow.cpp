@@ -642,6 +642,7 @@ void MainWindow::tab3_readPhase(void)
   max = ui->tab3_phaseHgh_spinBox->value();
 
   if ( dtype=="float" ) {
+    // threshold image, set excluded pixels masked
     for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
       if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
         imageView_[i] = std::min(imageRaw_[i],254);
@@ -650,6 +651,7 @@ void MainWindow::tab3_readPhase(void)
     }
   }
   else if ( dtype=="binary" ) {
+    // threshold image, within range -> white, otherwise -> black
     for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
       if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
         imageView_[i] = 254;
@@ -658,19 +660,21 @@ void MainWindow::tab3_readPhase(void)
     }
   }
   else if ( dtype=="int" ) {
+    // threshold image, within range -> 1, otherwise -> 0
     Image::Matrix<int> im(imageRaw_.shape());
-    Image::Matrix<int> clusters,centers;
     for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
       if ( imageRaw_[i]>=min && imageRaw_[i]<=max )
         im[i] = 1;
       else
         im[i] = 0;
     }
+    // compute clusters
+    Image::Matrix<int> clusters,centers;
     std::tie(clusters,centers) = Image::clusters(im);
+    // scale image for optimizal color contrast
     double fac = 255./(double)clusters.max();
     for ( size_t i=0 ; i<imageRaw_.size() ; i++ )
       imageView_[i] = std::min((int)((double)clusters[i]*fac),254);
-//    std::cout << clusters.max() << std::endl;
   }
 
   // apply mask
@@ -755,13 +759,22 @@ void MainWindow::tab3_viewPhase(void)
   if ( imageRawQt_.isNull() )
     return;
 
-  // colorbar
-  QVector<QRgb> grayscale;
-  // - gray values
-  for (int i = 0; i < 255; ++i)
-    grayscale.append(qRgb(i, i, i));
-  // - add red to the final value
-  grayscale.append(qRgb(255,0,0));
+  // define colormap based on data-type
+  std::vector<int> cols;
+  if (  dtype_[ui->tab3_set_comboBox->currentIndex()]=="int" ) {
+    cols = cppcolormap::RdOrYl_r(256);
+    cols[  0*3+0] = 255; cols[  0*3+1] = 255; cols[  0*3+2] = 255; // white background
+    cols[254*3+0] = 255; cols[254*3+1] = 255; cols[254*3+2] = 255; // white excluded pixels
+    cols[255*3+0] =   0; cols[255*3+1] =   0; cols[255*3+2] =   0; // black mask
+  }
+  else {
+    cols = cppcolormap::Greys(256);
+    cols[255*3+0] = 255; cols[255*3+1] =   0; cols[255*3+2] =   0; // red mask
+  }
+  // convert to Qt format
+  QVector<QRgb> cmap;
+  for ( size_t i = 0; i < 256; ++i)
+    cmap.append(qRgb(cols[i*3+0],cols[i*3+1],cols[i*3+2]));
 
   // convert Image::Matrix -> image to view
   QImage image(\
@@ -770,7 +783,7 @@ void MainWindow::tab3_viewPhase(void)
     imageView_.shape()[0],\
     QImage::QImage::Format_Indexed8\
   );
-  image.setColorTable(grayscale);
+  image.setColorTable(cmap);
 
   // create a "scene" with containing the image
   QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(image));
