@@ -29,12 +29,13 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab1_im1f_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
 
   // tab2: pushButtons -> add/remove files
-  connect(ui->tab2_im0Add_pushButton,&QPushButton::clicked,[=](){this->tab2_addFiles(ui->tab2_im0_listWidget);});
-  connect(ui->tab2_im1Add_pushButton,&QPushButton::clicked,[=](){this->tab2_addFiles(ui->tab2_im1_listWidget);});
-  connect(ui->tab2_im0Rmv_pushButton,&QPushButton::clicked,[=](){this->tab2_rmvFiles(ui->tab2_im0_listWidget);});
-  connect(ui->tab2_im1Rmv_pushButton,&QPushButton::clicked,[=](){this->tab2_rmvFiles(ui->tab2_im1_listWidget);});
-  connect(ui->tab2_im1Up__pushButton,&QPushButton::clicked,[=](){this->tab2_uprFiles(ui->tab2_im1_listWidget);});
-  connect(ui->tab2_im1Dwn_pushButton,&QPushButton::clicked,[=](){this->tab2_dwnFiles(ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im0Add_pushButton,&QPushButton::clicked,[=](){this->filesAdd(ui->tab2_im0_listWidget);});
+  connect(ui->tab2_im1Add_pushButton,&QPushButton::clicked,[=](){this->filesAdd(ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im0Rmv_pushButton,&QPushButton::clicked,[=](){this->filesRm (ui->tab2_im0_listWidget);});
+  connect(ui->tab2_im1Rmv_pushButton,&QPushButton::clicked,[=](){this->filesRm (ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im1Up__pushButton,&QPushButton::clicked,[=](){this->filesUp (ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im1Dwn_pushButton,&QPushButton::clicked,[=](){this->filesDwn(ui->tab2_im1_listWidget);});
+  connect(ui->tab2_cp_pushButton    ,&QPushButton::clicked,[=](){this->filesCp (ui->tab2_im0_listWidget,ui->tab2_im1_listWidget);});
 
   // tab3: link scroll position of graphicsViews
   QScrollBar *I1h = ui->tab3_image_graphicsView->horizontalScrollBar();
@@ -331,8 +332,10 @@ void MainWindow::tab1_selectStat(void)
   }
 
   // function not implemented: show warning
-  if ( func_=="" )
+  if ( func_=="" ) {
     this->WIP();
+    return;
+  }
 
   // show function in status bar
   QString mes = "Function to use: '%1'";
@@ -411,13 +414,34 @@ void MainWindow::tab1_selectStat(void)
       if ( radio[i][j]->isChecked() )
         dtype_.replace(i,label[j]);
 
+  // image interpretation settings
+  ui->tab1_periodic_checkBox ->setEnabled(true );
+  ui->tab1_zeropad_checkBox  ->setEnabled(true );
+  ui->tab1_maskW_checkBox    ->setEnabled(false);
+  ui->tab1_maskW_checkBox    ->setChecked(false);
+  ui->tab1_pixelpath_label   ->setEnabled(false);
+  ui->tab1_pixelpath_comboBox->setEnabled(false);
+
+  if ( func_=="W2" || func_=="W2c" ) {
+    ui->tab1_maskW_checkBox->setEnabled(true);
+    ui->tab1_maskW_checkBox->setChecked(true);
+  }
+
+  if ( func_=="L" || func_=="W2c" ) {
+    ui->tab1_pixelpath_label   ->setEnabled(true);
+    ui->tab1_pixelpath_comboBox->setEnabled(true);
+  }
+
+  if ( !ui->tab1_periodic_checkBox->isChecked() && !ui->tab1_zeropad_checkBox->isChecked() )
+    ui->tab1_periodic_checkBox->setChecked(true);
+
 }
 
 // =============================================================================
 // tab2: add/remove/move files to/in QListWidgets
 // =============================================================================
 
-void MainWindow::tab2_addFiles(QListWidget *list)
+void MainWindow::filesAdd(QListWidget *list)
 {
   QStringList filters;
   filters << "Image files (*.png *.xpm *.jpg *.jpeg *.tif *.tiff *.bmp)"
@@ -444,7 +468,7 @@ void MainWindow::tab2_addFiles(QListWidget *list)
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::tab2_rmvFiles(QListWidget *list)
+void MainWindow::filesRm(QListWidget *list)
 {
   QList<QListWidgetItem*> items = list->selectedItems();
   foreach (QListWidgetItem *item, items)
@@ -453,7 +477,7 @@ void MainWindow::tab2_rmvFiles(QListWidget *list)
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::tab2_uprFiles(QListWidget *list)
+void MainWindow::filesUp(QListWidget *list)
 {
   QList<QListWidgetItem*> items = list->selectedItems();
 
@@ -480,7 +504,7 @@ void MainWindow::tab2_uprFiles(QListWidget *list)
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::tab2_dwnFiles(QListWidget *list)
+void MainWindow::filesDwn(QListWidget *list)
 {
   QList<QListWidgetItem*> items = list->selectedItems();
 
@@ -507,20 +531,20 @@ void MainWindow::tab2_dwnFiles(QListWidget *list)
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::on_tab2_cp_pushButton_clicked()
+void MainWindow::filesCp(QListWidget *src,QListWidget *dest)
 {
-  if ( ui->tab2_im1_listWidget->count()>0 ) {
+  if ( dest->count()>0 ) {
     QMessageBox::warning(\
       this,\
       tr("GooseEYE"),\
-      tr("Only allowed if right list is empty."),\
+      tr("Only allowed if destination is empty."),\
       QMessageBox::Ok,\
       QMessageBox::Ok\
     );
   }
 
-  for ( int i=0 ; i<ui->tab2_im0_listWidget->count() ; i++ )
-    ui->tab2_im1_listWidget->addItem(ui->tab2_im0_listWidget->item(i)->text());
+  for ( int i=0 ; i<src->count() ; i++ )
+    dest->addItem(src->item(i)->text());
 }
 
 // =============================================================================
@@ -607,8 +631,14 @@ void MainWindow::tab3_readImage(void)
 
 void MainWindow::tab3_readPhase(void)
 {
-  int min = ui->tab3_phaseLow_spinBox->value();
-  int max = ui->tab3_phaseHgh_spinBox->value();
+  int min,max;
+  QString dtype = dtype_[ui->tab3_set_comboBox->currentIndex()];
+
+  // apply segmentation
+  // ------------------
+
+  min = ui->tab3_phaseLow_spinBox->value();
+  max = ui->tab3_phaseHgh_spinBox->value();
 
   if ( dtype_[ui->tab3_set_comboBox->currentIndex()]=="float" ) {
     for ( size_t i=0 ; i<imageRaw_.size() ; i++ ) {
@@ -623,6 +653,9 @@ void MainWindow::tab3_readPhase(void)
       }
     }
   }
+
+  // apply mask
+  // ----------
 
   QSpinBox *maskLow[3];
   QSpinBox *maskHgh[3];

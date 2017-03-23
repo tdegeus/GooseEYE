@@ -39,19 +39,21 @@ public:
 private slots:
 
   // custom functions to connect buttons
+  // - manipulation of QlistWidget with files
+  void filesAdd(QListWidget *list);
+  void filesRm (QListWidget *list);
+  void filesUp (QListWidget *list);
+  void filesDwn(QListWidget *list);
+  void filesCp (QListWidget *src,QListWidget *dest);
+  // - select statistics, set allowed data-types, etc.
   void tab1_selectStat(void);
-
+  // - read/view images, or do both
   void tab3_readImage(void);
   void tab3_readPhase(void);
   void tab3_viewImage(void);
   void tab3_viewPhase(void);
   void tab3_syncImage(void);
   void tab3_syncPhase(void);
-
-  void tab2_addFiles(QListWidget *list);
-  void tab2_rmvFiles(QListWidget *list);
-  void tab2_uprFiles(QListWidget *list);
-  void tab2_dwnFiles(QListWidget *list);
 
   // write to message bar
   void on_tabWidget_tabBarClicked(int index);
@@ -60,9 +62,6 @@ private slots:
   void on_tab0_load_pushButton_clicked();
   void on_tab0_outdir_pushButton_clicked();
   void on_tab0_result_pushButton_clicked();
-
-  // tab1: copy files between list widgets
-  void on_tab2_cp_pushButton_clicked();
 
   // define "set" of images, create list of files
   void on_tab3_set_comboBox_currentIndexChanged(int index);
