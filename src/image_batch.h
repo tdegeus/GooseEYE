@@ -157,7 +157,8 @@ size_t      maskMax  ( size_t set, size_t i, size_t imsk ) { return _maskMax [i*
 std::tuple<Image::Matrix<int>,Image::Matrix<int>> image ( \
   size_t set, size_t idx, Image::Matrix<int> im, bool crop=true )
 {
-  size_t irow,jrow,icol,jcol,min,max;
+  size_t irow,jrow,icol,jcol;
+  int    min,max;
 
   // set start/end rows/columns -> automatic crop below
   if ( crop ) {
@@ -178,8 +179,8 @@ std::tuple<Image::Matrix<int>,Image::Matrix<int>> image ( \
   Image::Matrix<int> msk({jrow-irow,jcol-icol});
 
   // phase threshold: read bounds from settings
-  min = _phaseMin[idx*_nset+set];
-  max = _phaseMax[idx*_nset+set];
+  min = (int)_phaseMin[idx*_nset+set];
+  max = (int)_phaseMax[idx*_nset+set];
 
   // phase threshold float: retain values; everything outside bounds is masked
   if ( _dtype[set]=="float" ) {
@@ -210,8 +211,8 @@ std::tuple<Image::Matrix<int>,Image::Matrix<int>> image ( \
 
   // mask threshold
   for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
-    min = _maskMin[idx*_nset*_nmsk+set*_nmsk+imsk];
-    max = _maskMax[idx*_nset*_nmsk+set*_nmsk+imsk];
+    min = (int)_maskMin[idx*_nset*_nmsk+set*_nmsk+imsk];
+    max = (int)_maskMax[idx*_nset*_nmsk+set*_nmsk+imsk];
     if ( min!=max )
       for ( size_t i=0 ; i<(jrow-irow) ; i++ )
         for ( size_t j=0 ; j<(jcol-icol) ; j++ )

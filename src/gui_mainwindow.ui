@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage0">
        <attribute name="title">
@@ -68,13 +68,23 @@
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="2">
+           <widget class="QPushButton" name="tab0_result_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Select</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="tab0_outdir_lineEdit"/>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_2">
+          <item row="0" column="2">
+           <widget class="QPushButton" name="tab0_outdir_pushButton">
             <property name="text">
-             <string>Work directory:</string>
+             <string>Select</string>
             </property>
            </widget>
           </item>
@@ -85,24 +95,68 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Working directory:</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="tab0_result_lineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="tab0_result_pushButton">
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="tab0_pdfRaw_lineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="tab0_pdfInterp_lineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="tab0_pdfInterp_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Select</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="tab0_outdir_pushButton">
+          <item row="3" column="2">
+           <widget class="QPushButton" name="tab0_pdfRaw_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Select</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Store PDF of raw result:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>Store PDF of interpreted result:</string>
             </property>
            </widget>
           </item>
@@ -126,7 +180,7 @@
              <x>0</x>
              <y>0</y>
              <width>734</width>
-             <height>179</height>
+             <height>160</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -151,7 +205,7 @@
                </font>
               </property>
               <property name="text">
-               <string>1. Load pre-existing state (optional). Set output directory and result file.</string>
+               <string>1. Load pre-existing state (optional). Set output directory and result files.</string>
               </property>
              </widget>
             </item>
@@ -1382,6 +1436,63 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
+           <widget class="QLabel" name="label_18">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Shape of region-of-interest (ROI) [rows x cols]:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="spinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <number>9999</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_20">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>x</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="spinBox_2">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <number>9999</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <item>
            <widget class="QPushButton" name="tab4_compute_pushButton">
             <property name="enabled">
              <bool>false</bool>
@@ -1395,6 +1506,30 @@
            <widget class="QProgressBar" name="tab4_progressBar">
             <property name="value">
              <number>0</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <item>
+           <widget class="QCustomPlot" name="raw_customPlot" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>100</horstretch>
+              <verstretch>100</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCustomPlot" name="interp_customPlot" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>100</horstretch>
+              <verstretch>100</verstretch>
+             </sizepolicy>
             </property>
            </widget>
           </item>
@@ -1439,6 +1574,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>tab0_load_pushButton</tabstop>
   <tabstop>tab0_outdir_pushButton</tabstop>
@@ -1446,7 +1589,6 @@
   <tabstop>tab0_result_pushButton</tabstop>
   <tabstop>tab0_result_lineEdit</tabstop>
   <tabstop>tab0_scrollArea</tabstop>
-  <tabstop>tabWidget</tabstop>
   <tabstop>tab1_measure_treeWidget</tabstop>
   <tabstop>tab1_im1_checkBox</tabstop>
   <tabstop>tab1_im1b_radioButton</tabstop>
@@ -1509,8 +1651,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab3_mouse"/>
   <buttongroup name="buttonGroup_tab1_im0"/>
   <buttongroup name="buttonGroup_tab1_im1"/>
+  <buttongroup name="buttonGroup_tab3_mouse"/>
  </buttongroups>
 </ui>

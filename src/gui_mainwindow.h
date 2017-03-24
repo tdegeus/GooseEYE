@@ -23,6 +23,7 @@
 #include <math.h>
 
 #include "image.h"
+#include "image_batch.h"
 #include "cppcolormap/cppcolormap.h"
 
 namespace Ui {
@@ -56,6 +57,8 @@ private slots:
   void tab3_syncImage(void);
   void tab3_syncPhase(void);
 
+  void tab4_plotResult(void);
+
   // write to message bar
   void on_tabWidget_tabBarClicked(int index);
 
@@ -66,6 +69,8 @@ private slots:
 
   // define "set" of images, create list of files
   void on_tab3_set_comboBox_currentIndexChanged(int index);
+
+
 
 private:
   Ui::MainWindow *ui;
