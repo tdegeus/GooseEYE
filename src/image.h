@@ -280,6 +280,6 @@ std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi,          s mode="Bre
 // lineal path function (binary or int)
 std::tuple<Md,Mi> L ( Mi &f, Vs &roi, s mode="Bresenham", b periodic=true );
 
-}; // namespace image
+}; // namespace Image
 
 #endif
