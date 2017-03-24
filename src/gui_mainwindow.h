@@ -8,14 +8,12 @@
 #include <QMessageBox>
 #include <QListWidget>
 #include <QImage>
-
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QByteArray>
-
 #include <QObject>
 #include <QScrollBar>
-
+#include <QComboBox>
 
 #include <iostream>
 #include <string>

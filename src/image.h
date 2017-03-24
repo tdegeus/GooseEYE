@@ -33,9 +33,8 @@ template <class T> class Matrix
     // (copy) constructor
     // ------------------
 
-    Matrix(const Matrix<T> &) = default;
-
-    Matrix<T> & operator=(const Matrix<T> &) = default;
+    Matrix               (const Matrix<T> &) = default;
+    Matrix<T>& operator= (const Matrix<T> &) = default;
 
     Matrix<T>(){};
 

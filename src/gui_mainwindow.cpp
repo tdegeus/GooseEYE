@@ -17,16 +17,39 @@ MainWindow::MainWindow(QWidget *parent) :
   outDir_   = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
   outName_  = "";
 
+  // tab0: enable buttons
+  connect(ui->tab0_result_lineEdit   ,&QLineEdit::textChanged,[=](){ui->tab0_result_lineEdit     ->setEnabled(true);});
+  connect(ui->tab0_result_lineEdit   ,&QLineEdit::textChanged,[=](){ui->tab0_result_pushButton   ->setEnabled(true);});
+  connect(ui->tab0_pdfRaw_lineEdit   ,&QLineEdit::textChanged,[=](){ui->tab0_pdfRaw_lineEdit     ->setEnabled(true);});
+  connect(ui->tab0_pdfRaw_lineEdit   ,&QLineEdit::textChanged,[=](){ui->tab0_pdfRaw_pushButton   ->setEnabled(true);});
+  connect(ui->tab0_pdfInterp_lineEdit,&QLineEdit::textChanged,[=](){ui->tab0_pdfInterp_lineEdit  ->setEnabled(true);});
+  connect(ui->tab0_pdfInterp_lineEdit,&QLineEdit::textChanged,[=](){ui->tab0_pdfInterp_pushButton->setEnabled(true);});
+
   // tab1: treeWidget/radioButton/checkBox -> interpret selection, set allowed values
   connect(ui->tab1_measure_treeWidget,SIGNAL(clicked(QModelIndex)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im0_checkBox    ,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im1_checkBox    ,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im0b_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im0i_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im0f_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im1b_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im1i_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
-  connect(ui->tab1_im1f_radioButton,SIGNAL(clicked(bool)),this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im0_checkBox      ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im1_checkBox      ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im0b_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im0i_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im0f_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im1b_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im1i_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  connect(ui->tab1_im1f_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+
+  // tab2: enable pushButtons / set labels
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Phase_label   ->setText   (phase_[0]                         );});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Phase_label   ->setText   (phase_[1]                         );});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Dtype_label   ->setText   (dtype_[0]                         );});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Dtype_label   ->setText   (dtype_[1]                         );});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0_listWidget   ->setEnabled(ui->tab1_im0_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Add_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Rmv_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1_listWidget   ->setEnabled(ui->tab1_im1_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Add_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Rmv_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Up__pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Dwn_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_cp_pushButton    ->setEnabled(ui->tab1_im1_checkBox->isChecked());});
 
   // tab2: pushButtons -> add/remove files
   connect(ui->tab2_im0Add_pushButton,&QPushButton::clicked,[=](){this->filesAdd(ui->tab2_im0_listWidget);});
@@ -84,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_rowHgh_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_colLow_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_colHgh_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_cmap_comboBox   ,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
 
   // tab3: zoom
   QSlider *zoom = ui->tab3_zoom_slider;
@@ -144,23 +168,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
     outName_ = ui->tab0_result_lineEdit->text();
   }
 
-  // tab2: selectively enable, and fill
-  if ( index==2 && func_!="" ) {
-    ui->tab2_im0Phase_label   ->setText(phase_[0]);
-    ui->tab2_im0Dtype_label   ->setText(dtype_[0]);
-    ui->tab2_im0_listWidget   ->setEnabled(ui->tab1_im0_checkBox->isChecked());
-    ui->tab2_im0Add_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());
-    ui->tab2_im0Rmv_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());
-    ui->tab2_im1Phase_label   ->setText(phase_[1]);
-    ui->tab2_im1Dtype_label   ->setText(dtype_[1]);
-    ui->tab2_im1_listWidget   ->setEnabled(ui->tab1_im1_checkBox->isChecked());
-    ui->tab2_im1Add_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
-    ui->tab2_im1Rmv_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
-    ui->tab2_im1Up__pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
-    ui->tab2_im1Dwn_pushButton->setEnabled(ui->tab1_im1_checkBox->isChecked());
-    ui->tab2_cp_pushButton    ->setEnabled(ui->tab1_im1_checkBox->isChecked());
-  }
-
+  // alias
   QCheckBox *check[2];
   check[0] = ui->tab1_im0_checkBox;
   check[1] = ui->tab1_im1_checkBox;
@@ -175,8 +183,34 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
       if ( check[i]->isChecked() )
         ui->tab3_set_comboBox->addItem(name.arg(QString::number(i+1),phase_[i],dtype_[i]));
 
-    ui->tab3_setNext_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
-    ui->tab3_setPrev_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
+    ui->tab3_setNext_pushButton   ->setEnabled(check[0]->isChecked() && check[1]->isChecked());
+    ui->tab3_setPrev_pushButton   ->setEnabled(check[0]->isChecked() && check[1]->isChecked());
+    ui->tab3_load_pushButton      ->setEnabled(true);
+    ui->tab3_image_graphicsView   ->setEnabled(true);
+    ui->tab3_phase_graphicsView   ->setEnabled(true);
+    ui->tab3_zoom_slider          ->setEnabled(true);
+    ui->tab3_zoomIn__pushButton   ->setEnabled(true);
+    ui->tab3_zoomOut_pushButton   ->setEnabled(true);
+    ui->tab3_imApply_pushButton   ->setEnabled(true);
+    ui->tab3_imApplyAll_pushButton->setEnabled(true);
+    ui->tab3_phaseLow_spinBox     ->setEnabled(true);
+    ui->tab3_phaseHgh_spinBox     ->setEnabled(true);
+    ui->tab3_mask1Low_spinBox     ->setEnabled(true);
+    ui->tab3_mask1Hgh_spinBox     ->setEnabled(true);
+    ui->tab3_mask2Low_spinBox     ->setEnabled(true);
+    ui->tab3_mask2Hgh_spinBox     ->setEnabled(true);
+    ui->tab3_mask3Low_spinBox     ->setEnabled(true);
+    ui->tab3_mask3Hgh_spinBox     ->setEnabled(true);
+    ui->tab3_rowHgh_spinBox       ->setEnabled(true);
+    ui->tab3_rowLow_spinBox       ->setEnabled(true);
+    ui->tab3_colHgh_spinBox       ->setEnabled(true);
+    ui->tab3_colLow_spinBox       ->setEnabled(true);
+    ui->tab3_cmap_comboBox        ->setEnabled(true);
+    ui->tab3_phase_label          ->setEnabled(true);
+    ui->tab3_mask_label           ->setEnabled(true);
+    ui->tab3_row_label            ->setEnabled(true);
+    ui->tab3_col_label            ->setEnabled(true);
+    ui->tab3_cmap_label           ->setEnabled(true);
 
     this->on_tab3_set_comboBox_currentIndexChanged(0);
 
@@ -210,7 +244,7 @@ void MainWindow::on_tab0_outdir_pushButton_clicked()
     this,\
     tr("Open Directory"),\
     QStandardPaths::writableLocation(QStandardPaths::HomeLocation),\
-    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks\
+    QFileDialog::ShowDirsOnly\
   );
 
   if ( dir.size()==0 )
@@ -220,6 +254,13 @@ void MainWindow::on_tab0_outdir_pushButton_clicked()
 
   if ( ui->tab0_result_lineEdit->text()=="" )
     ui->tab0_result_lineEdit->setText("GooseEYE.json");
+
+  if ( ui->tab0_pdfRaw_lineEdit->text()=="" )
+    ui->tab0_pdfRaw_lineEdit->setText("GooseEYE_result.pdf");
+
+  if ( ui->tab0_pdfInterp_lineEdit->text()=="" )
+    ui->tab0_pdfInterp_lineEdit->setText("GooseEYE_result_interpretation.pdf");
+
 }
 
 // -----------------------------------------------------------------------------
@@ -455,7 +496,6 @@ void MainWindow::filesAdd(QListWidget *list)
 {
   QStringList filters;
   filters << "Image files (*.png *.xpm *.jpg *.jpeg *.tif *.tiff *.bmp)"
-          << "Archives (*.mat *.npz)"
           << "Any files (*)";
 
   QFileDialog dialog(this);
@@ -558,7 +598,7 @@ void MainWindow::filesCp(QListWidget *src,QListWidget *dest)
 }
 
 // =============================================================================
-// store data
+// tab3: fill
 // =============================================================================
 
 // =============================================================================
@@ -585,26 +625,6 @@ void MainWindow::on_tab3_set_comboBox_currentIndexChanged(int index)
 
   ui->tab3_imPrev_pushButton ->setEnabled(list[index]->count()>1);
   ui->tab3_imNext_pushButton ->setEnabled(list[index]->count()>1);
-
-  ui->tab3_load_pushButton   ->setEnabled(true);
-  ui->tab3_image_graphicsView->setEnabled(true);
-  ui->tab3_phase_graphicsView->setEnabled(true);
-  ui->tab3_zoom_slider       ->setEnabled(true);
-  ui->tab3_zoomIn__pushButton->setEnabled(true);
-  ui->tab3_zoomOut_pushButton->setEnabled(true);
-  ui->tab3_phaseLow_spinBox  ->setEnabled(true);
-  ui->tab3_phaseHgh_spinBox  ->setEnabled(true);
-  ui->tab3_mask1Low_spinBox  ->setEnabled(true);
-  ui->tab3_mask1Hgh_spinBox  ->setEnabled(true);
-  ui->tab3_mask2Low_spinBox  ->setEnabled(true);
-  ui->tab3_mask2Hgh_spinBox  ->setEnabled(true);
-  ui->tab3_mask3Low_spinBox  ->setEnabled(true);
-  ui->tab3_mask3Hgh_spinBox  ->setEnabled(true);
-  ui->tab3_rowHgh_spinBox    ->setEnabled(true);
-  ui->tab3_rowLow_spinBox    ->setEnabled(true);
-  ui->tab3_colHgh_spinBox    ->setEnabled(true);
-  ui->tab3_colLow_spinBox    ->setEnabled(true);
-
 }
 
 // =============================================================================

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>806</width>
+    <width>836</width>
     <height>657</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage0">
        <attribute name="title">
@@ -93,12 +93,18 @@
             <property name="text">
              <string>Store result/settings as:</string>
             </property>
+            <property name="buddy">
+             <cstring>tab0_result_pushButton</cstring>
+            </property>
            </widget>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>Working directory:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tab0_outdir_pushButton</cstring>
             </property>
            </widget>
           </item>
@@ -151,12 +157,18 @@
             <property name="text">
              <string>Store PDF of raw result:</string>
             </property>
+            <property name="buddy">
+             <cstring>tab0_pdfInterp_pushButton</cstring>
+            </property>
            </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
              <string>Store PDF of interpreted result:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tab0_pdfRaw_pushButton</cstring>
             </property>
            </widget>
           </item>
@@ -179,7 +191,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>734</width>
+             <width>764</width>
              <height>160</height>
             </rect>
            </property>
@@ -609,6 +621,9 @@
               <property name="text">
                <string>Pixel path algorithm</string>
               </property>
+              <property name="buddy">
+               <cstring>tab1_pixelpath_comboBox</cstring>
+              </property>
              </widget>
             </item>
             <item>
@@ -909,7 +924,7 @@
        <attribute name="title">
         <string>Images</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_11">
+       <layout class="QHBoxLayout" name="horizontalLayout_15">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_11">
           <item>
@@ -1157,9 +1172,15 @@
           <item>
            <layout class="QGridLayout" name="gridLayout">
             <item row="1" column="0">
-             <widget class="QLabel" name="label_28">
+             <widget class="QLabel" name="tab3_mask_label">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Mask:</string>
+              </property>
+              <property name="buddy">
+               <cstring>tab3_mask1Low_spinBox</cstring>
               </property>
              </widget>
             </item>
@@ -1294,12 +1315,15 @@
              </widget>
             </item>
             <item row="0" column="0">
-             <widget class="QLabel" name="label_15">
+             <widget class="QLabel" name="tab3_phase_label">
               <property name="enabled">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="text">
                <string>Phase:</string>
+              </property>
+              <property name="buddy">
+               <cstring>tab3_phaseLow_spinBox</cstring>
               </property>
              </widget>
             </item>
@@ -1331,9 +1355,15 @@
              </widget>
             </item>
             <item row="4" column="0">
-             <widget class="QLabel" name="label_16">
+             <widget class="QLabel" name="tab3_row_label">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Rows:</string>
+              </property>
+              <property name="buddy">
+               <cstring>tab3_rowLow_spinBox</cstring>
               </property>
              </widget>
             </item>
@@ -1385,9 +1415,15 @@
              </widget>
             </item>
             <item row="5" column="0">
-             <widget class="QLabel" name="label_23">
+             <widget class="QLabel" name="tab3_col_label">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Columns:</string>
+              </property>
+              <property name="buddy">
+               <cstring>tab3_colLow_spinBox</cstring>
               </property>
              </widget>
             </item>
@@ -1407,19 +1443,368 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
             <item>
-             <widget class="QLabel" name="label_31">
+             <widget class="QLabel" name="tab3_cmap_label">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
-               <string>Field:</string>
+               <string>Colormap:</string>
+              </property>
+              <property name="buddy">
+               <cstring>tab3_cmap_comboBox</cstring>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="tab3_field_comboBox">
+             <widget class="QComboBox" name="tab3_cmap_comboBox">
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Accent</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Dark2</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Paired</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Spectral</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Pastel1</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Pastel2</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Set1</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Set2</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Set3</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Blues</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Greens</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Greys</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Oranges</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Purples</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Reds</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>BuPu</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>GnBu</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuBu</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuBuGn</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuRd</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdPu</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>OrRd</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdOrYl</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YlGn</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YlGnBu</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YlOrRd</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>BrBG</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuOr</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdBu</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdGy</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdYlBu</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdYlGn</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PiYG</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PRGn</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Accent_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Dark2_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Paired_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Spectral_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Pastel1_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Pastel2_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Set1_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Set2_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Set3_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Blues_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Greens_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Greys_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Oranges_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Purples_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Reds_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>BuPu_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>GnBu_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuBu_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuBuGn_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuRd_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdPu_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>OrRd_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdOrYl_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YlGn_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YlGnBu_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>YlOrRd_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>BrBG_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PuOr_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdBu_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdGy_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdYlBu_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>RdYlGn_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PiYG_r</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>PRGn_r</string>
+               </property>
+              </item>
              </widget>
             </item>
            </layout>
@@ -1436,17 +1821,20 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
-           <widget class="QLabel" name="label_18">
+           <widget class="QLabel" name="tab4_roi_label">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
              <string>Shape of region-of-interest (ROI) [rows x cols]:</string>
             </property>
+            <property name="buddy">
+             <cstring>tab4_roiRow_spinBox</cstring>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox">
+           <widget class="QSpinBox" name="tab4_roiRow_spinBox">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -1466,7 +1854,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox_2">
+           <widget class="QSpinBox" name="tab4_roiCol_spinBox">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -1535,6 +1923,821 @@
           </item>
          </layout>
         </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <item>
+           <widget class="QLabel" name="tab4_cmap_raw_label">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Colormap:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tab4_cmap_raw_comboBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="tab4_cmap_raw_comboBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="currentIndex">
+             <number>49</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>Accent</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Dark2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Paired</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Spectral</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set3</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Blues</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greens</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greys</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Oranges</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Purples</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Reds</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BuPu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>GnBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBuGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuRd</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdPu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OrRd</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdOrYl</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGnBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlOrRd</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BrBG</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuOr</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdGy</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PiYG</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PRGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Accent_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Dark2_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Paired_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Spectral_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel1_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel2_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set1_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set2_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set3_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Blues_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greens_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greys_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Oranges_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Purples_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Reds_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BuPu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>GnBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBuGn_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuRd_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdPu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OrRd_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdOrYl_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGn_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGnBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlOrRd_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BrBG_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuOr_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdGy_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlGn_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PiYG_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PRGn_r</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="tab4_clim_raw_label">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Range:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tab4_climLow_raw_doubleSpinBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="tab4_climLow_raw_doubleSpinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="tab4_climHgh_raw_doubleSpinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="tab4_cmap_interp_label">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Colormap:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tab4_cmap_interp_comboBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="tab4_cmap_interp_comboBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="currentIndex">
+             <number>62</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>Accent</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Dark2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Paired</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Spectral</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set3</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Blues</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greens</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greys</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Oranges</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Purples</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Reds</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BuPu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>GnBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBuGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuRd</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdPu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OrRd</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdOrYl</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGnBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlOrRd</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BrBG</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuOr</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdGy</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlBu</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PiYG</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PRGn</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Accent_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Dark2_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Paired_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Spectral_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel1_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pastel2_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set1_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set2_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Set3_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Blues_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greens_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Greys_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Oranges_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Purples_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Reds_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BuPu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>GnBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuBuGn_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuRd_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdPu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OrRd_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdOrYl_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGn_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlGnBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>YlOrRd_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>BrBG_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PuOr_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdGy_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlBu_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>RdYlGn_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PiYG_r</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>PRGn_r</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="tab4_clim_interp_label">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Range:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tab4_climLow_interp_doubleSpinBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="tab4_climLow_interp_doubleSpinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="tab4_climHgh_interp_doubleSpinBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -1546,7 +2749,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>806</width>
+     <width>836</width>
      <height>22</height>
     </rect>
    </property>
@@ -1638,15 +2841,23 @@
   <tabstop>tab3_rowHgh_spinBox</tabstop>
   <tabstop>tab3_colLow_spinBox</tabstop>
   <tabstop>tab3_colHgh_spinBox</tabstop>
-  <tabstop>tab3_field_comboBox</tabstop>
   <tabstop>tab3_phase_radioButton</tabstop>
   <tabstop>tab3_mask_radioButton</tabstop>
   <tabstop>tab3_row_radioButton</tabstop>
   <tabstop>tab3_col_radioButton</tabstop>
   <tabstop>tab3_phase_graphicsView</tabstop>
   <tabstop>tab3_image_graphicsView</tabstop>
+  <tabstop>tab3_cmap_comboBox</tabstop>
   <tabstop>tabWidget</tabstop>
+  <tabstop>tab4_roiRow_spinBox</tabstop>
+  <tabstop>tab4_roiCol_spinBox</tabstop>
   <tabstop>tab4_compute_pushButton</tabstop>
+  <tabstop>tab4_cmap_raw_comboBox</tabstop>
+  <tabstop>tab4_climLow_raw_doubleSpinBox</tabstop>
+  <tabstop>tab4_climHgh_raw_doubleSpinBox</tabstop>
+  <tabstop>tab4_cmap_interp_comboBox</tabstop>
+  <tabstop>tab4_climLow_interp_doubleSpinBox</tabstop>
+  <tabstop>tab4_climHgh_interp_doubleSpinBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
