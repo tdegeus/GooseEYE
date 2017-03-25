@@ -12,9 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->setupUi(this);
   ui->tabWidget->setCurrentIndex(0);
 
-  phase_ << "" << "";
-  // dtype_ << "" << "";
-  func_     = "";
   data_.reserve(0);
 
   // tab0: enable buttons
@@ -37,10 +34,10 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab1_im1f_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
 
   // tab2: enable pushButtons / set labels
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Phase_label   ->setText   (phase_[0]                         );});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Phase_label   ->setText   (phase_[1]                         );});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Dtype_label   ->setText   (QString::fromStdString(data_.dtype(0))                    );});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Dtype_label   ->setText   (QString::fromStdString(data_.dtype(1))                    );});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Phase_label   ->setText(QString::fromStdString(data_.phase(0)));});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Phase_label   ->setText(QString::fromStdString(data_.phase(1)));});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Dtype_label   ->setText(QString::fromStdString(data_.dtype(0)));});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Dtype_label   ->setText(QString::fromStdString(data_.dtype(1)));});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0_listWidget   ->setEnabled(ui->tab1_im0_checkBox->isChecked());});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Add_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Rmv_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());});
@@ -217,7 +214,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
   }
   // leaving tab1: check selected statistic
   if ( prevTab_==1 && index>1 ) {
-    if ( func_.size()==0 ) {
+    if ( data_.stat().size()==0 ) {
       this->promptWarning("Please select a statistical measure first\n(left dialog)");
       return;
     }
@@ -288,7 +285,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
   // }
 
   // tab3: selectively enable and fill
-  if ( index==3 && func_!="" ) {
+  if ( index==3 && data_.stat()!="" ) {
 
 
     ui->tab3_set_comboBox->clear();
@@ -297,7 +294,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
     QString name = "%1: %2 (%3)";
     for ( int i=0 ; i<2 ; i++ )
       if ( check[i]->isChecked() )
-        ui->tab3_set_comboBox->addItem(name.arg(QString::number(i+1),phase_[i],QString::fromStdString(data_.dtype(i))));
+        ui->tab3_set_comboBox->addItem(name.arg(QString::number(i+1),QString::fromStdString(data_.phase(i)),QString::fromStdString(data_.dtype(i))));
 
     ui->tab3_setNext_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
     ui->tab3_setPrev_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
@@ -512,34 +509,34 @@ void MainWindow::tab1_selectStat(void)
   group[1]     = ui->buttonGroup_tab1_im1;
 
   // default: no information on function / phase / data-type
-  func_ = "";
+  data_.set_stat("");
   for ( int i=0 ; i<2 ; i++ ) {
-    phase_[i] = "";
+    data_.set_phase(i,"");
     data_.set_dtype(i,"");
   }
 
   // settings based on selected statistic
   if      ( category=="Spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      func_       = "S2";
-      phase_[0]   = "Phase";
-      phase_[1]   = "Phase";
+      data_.set_stat (  "S2"   );
+      data_.set_phase(0,"Phase");
+      data_.set_phase(1,"Phase");
       lnk         = true;
       dtype[0][0] = 1; dtype[0][1] = 0; dtype[0][2] = 1;
       dtype[1][0] = 1; dtype[1][1] = 0; dtype[1][2] = 1;
     }
     else if ( measure=="2-point cluster" ) {
-      func_       = "S2";
-      phase_[0]   = "Clusters";
-      phase_[1]   = "Clusters";
+      data_.set_stat (  "S2"      );
+      data_.set_phase(0,"Clusters");
+      data_.set_phase(1,"Clusters");
       lnk         = true;
       dtype[0][0] = 0; dtype[0][1] = 1; dtype[0][2] = 0;
       dtype[1][0] = 0; dtype[1][1] = 1; dtype[1][2] = 0;
 
     }
     else if ( measure=="Lineal path" ) {
-      func_       = "L" ;
-      phase_[0]   = "Phase";
+      data_.set_stat (  "L"    );
+      data_.set_phase(0,"Phase");
       lnk         = true;
       im1         = -1;
       dtype[0][0] = 1; dtype[0][1] = 1; dtype[0][2] = 0;
@@ -548,17 +545,17 @@ void MainWindow::tab1_selectStat(void)
   }
   else if ( category=="Conditional spatial correlations" ) {
     if      ( measure=="2-point probability" ) {
-      func_       = "W2";
-      phase_[0]   = "Weights";
-      phase_[1]   = "Phase";
+      data_.set_stat (  "W2"     );
+      data_.set_phase(0,"Weights");
+      data_.set_phase(1,"Phase"  );
       im1         = 1;
       dtype[0][0] = 1; dtype[0][1] = 0; dtype[0][2] = 1;
       dtype[1][0] = 1; dtype[1][1] = 0; dtype[1][2] = 1;
     }
     else if ( measure=="Collapsed 2-point probability" ) {
-      func_       = "W2c";
-      phase_[0]   = "Weights";
-      phase_[1]   = "Phase";
+      data_.set_stat (  "W2c"    );
+      data_.set_phase(0,"Weights");
+      data_.set_phase(1,"Phase"  );
       im1         = 1;
       dtype[0][0] = 0; dtype[0][1] = 1; dtype[0][2] = 0;
       dtype[1][0] = 1; dtype[1][1] = 0; dtype[1][2] = 1;
@@ -566,18 +563,18 @@ void MainWindow::tab1_selectStat(void)
   }
 
   // function not implemented: show warning
-  if ( func_=="" ) {
+  if ( data_.stat()=="" ) {
     this->promptWorkInProgress("Function under construction");
     return;
   }
 
   // show function in status bar
   QString mes = "Function to use: '%1'";
-  statusBar()->showMessage(mes.arg(func_));
+  statusBar()->showMessage(mes.arg(QString::fromStdString(data_.stat())));
 
   // apply phase label
   for ( int i=0 ; i<2 ; i++ )
-    check[i]->setText(phase_[i]);
+    check[i]->setText(QString::fromStdString(data_.phase(i)));
 
   // selection of image 2: -1=disable ; 0=user-select ; 1=force-select
   if      ( im1==-1 ) {
@@ -653,12 +650,12 @@ void MainWindow::tab1_selectStat(void)
   ui->tab1_pixelpath_label   ->setEnabled(false);
   ui->tab1_pixelpath_comboBox->setEnabled(false);
 
-  if ( func_=="W2" || func_=="W2c" ) {
+  if ( data_.stat()=="W2" || data_.stat()=="W2c" ) {
     ui->tab1_maskW_checkBox->setEnabled(true);
     ui->tab1_maskW_checkBox->setChecked(true);
   }
 
-  if ( func_=="L" || func_=="W2c" ) {
+  if ( data_.stat()=="L" || data_.stat()=="W2c" ) {
     ui->tab1_pixelpath_label   ->setEnabled(true);
     ui->tab1_pixelpath_comboBox->setEnabled(true);
   }

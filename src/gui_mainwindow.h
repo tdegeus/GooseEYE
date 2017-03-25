@@ -77,9 +77,9 @@ private slots:
 private:
   Ui::MainWindow *ui;
 
-  QStringList                  phase_;
-  QStringList                  dtype_;
-  QString                      func_;
+  // QStringList                  phase_;
+  // QStringList                  dtype_;
+  // QString                      func_;
 
   int                          prevTab_ = 0;
   QImage                       imgRawQt_;
