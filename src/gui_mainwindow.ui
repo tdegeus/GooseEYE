@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage0">
        <attribute name="title">
@@ -927,7 +927,7 @@
        <attribute name="title">
         <string>4. Images</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_15">
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_11">
           <item>
@@ -1446,8 +1446,8 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11">
-            <item>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
              <widget class="QLabel" name="tab3_cmap_label">
               <property name="enabled">
                <bool>true</bool>
@@ -1460,7 +1460,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="1">
              <widget class="QComboBox" name="tab3_cmap_comboBox">
               <property name="enabled">
                <bool>true</bool>
@@ -1806,6 +1806,42 @@
               <item>
                <property name="text">
                 <string>PRGn_r</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Mask color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="tab3_maskCol_comboBox">
+              <item>
+               <property name="text">
+                <string>Red</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Black</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Grey</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>White</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Blue</string>
                </property>
               </item>
              </widget>
@@ -2822,7 +2858,6 @@
   <tabstop>tab1_zeropad_checkBox</tabstop>
   <tabstop>tab1_maskW_checkBox</tabstop>
   <tabstop>tab1_pixelpath_comboBox</tabstop>
-  <tabstop>tabWidget</tabstop>
   <tabstop>tab2_im0Add_pushButton</tabstop>
   <tabstop>tab2_im0Rmv_pushButton</tabstop>
   <tabstop>tab2_im0_listWidget</tabstop>
@@ -2878,8 +2913,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab3_mouse"/>
   <buttongroup name="buttonGroup_tab1_im0"/>
   <buttongroup name="buttonGroup_tab1_im1"/>
+  <buttongroup name="buttonGroup_tab3_mouse"/>
  </buttongroups>
 </ui>
