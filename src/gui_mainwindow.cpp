@@ -201,7 +201,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
 
   // check linear increase
   if ( index>prevTab_+1 ) {
-    this->promptWarning(tr("Please complete tab %1 first").arg(QString::number(prevTab_+1)));
+    this->promptWarning(tr("Please complete/review tab %1 first").arg(QString::number(prevTab_+1)));
     return;
   }
 
@@ -237,21 +237,9 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
       return;
     }
   }
-  // leaving tab3: check settings
-  // if ( prevTab_==3 && index>3 ) {
-  //   if ( files_.count()!=ui->tab2_im0_listWidget->count() ) {
-  //     this->promptWarning("Please apply settings for all files");
-  //     return;
-  //   }
-  //   for ( size_t j=0 ; j<files_.nset() ; j++ ) {
-  //     for ( size_t i=0 ; i<files_.count() ;  ) {
-  //       if ( files_.fname(i,j).size()==0 ) {
-  //         this->promptWarning("Please confirm settings for all files");
-  //         return;
-  //       }
-  //     }
-  //   }
-  // }
+  // leaving tab3:
+  // TODO
+
   // leaving tab4: check to save
   if ( prevTab_==4 && index!=4 ) {
     if ( ui->tab4_save_pushButton->isEnabled() ) {
@@ -259,34 +247,8 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
     }
   }
 
-
-//  std::cout << "<files set 1>" << std::endl;
-//  for ( size_t i=0 ; i<data_.count(0) ; i++ )
-//    std::cout << data_.fname(0,i) << std::endl;
-//  std::cout << "</files set 1>" << std::endl;
-
-//  std::cout << "<files set 2>" << std::endl;
-//  for ( size_t i=0 ; i<data_.count(1) ; i++ )
-//    std::cout << data_.fname(1,i) << std::endl;
-//  std::cout << "</files set 2>" << std::endl;
-
-  // sync data
-  // ---------
-
-
-  // // new on tab2: c
-  // if ( prevTab_<3 && index==3 ) {
-  //   size_t nset;
-  //   if ( ui->tab1_im1_checkBox->isChecked() ) { nset = 2; }
-  //   else                                      { nset = 1; }
-
-  //   files_.reserve(nset,ui->tab2_im0_listWidget->count());
-  //   files_.clear();
-  // }
-
-  // tab3: selectively enable and fill
+  // tab3: selectively enable and fill QComboBox for set and images
   if ( index==3 && data_.stat()!="" ) {
-
 
     ui->tab3_set_comboBox->clear();
     ui->tab3_set_comboBox->setEnabled(true);
@@ -656,8 +618,9 @@ void MainWindow::tab1_selectStat(void)
   }
 
   if ( data_.stat()=="L" || data_.stat()=="W2c" ) {
-    ui->tab1_pixelpath_label   ->setEnabled(true);
-    ui->tab1_pixelpath_comboBox->setEnabled(true);
+    ui->tab1_zeropad_checkBox  ->setEnabled(false);
+    ui->tab1_pixelpath_label   ->setEnabled(true );
+    ui->tab1_pixelpath_comboBox->setEnabled(true );
   }
 
   if ( !ui->tab1_periodic_checkBox->isChecked() && !ui->tab1_zeropad_checkBox->isChecked() )
@@ -789,21 +752,6 @@ void MainWindow::filesCp(QListWidget *src,QListWidget *dest, size_t src_set, siz
 }
 
 // =============================================================================
-// tab2: store data
-// =============================================================================
-
-// void MainWindow::tab2_clearFiles ( void )
-// {
-//   size_t nset;
-//   if ( ui->tab1_im1_checkBox->isChecked() ) { nset = 2; }
-//   else                                      { nset = 1; }
-
-//   files_.clear();
-//   files_.reserve(nset,ui->tab2_im0_listWidget->count());
-// }
-
-
-// =============================================================================
 // tab3: define "set" of images, based on statistic; create list of files
 // =============================================================================
 
@@ -869,7 +817,7 @@ void MainWindow::tab3_readPhase(void)
     return;
 
   int min,max;
-  QString dtype = QString::fromStdString(data_.dtype(ui->tab3_set_comboBox->currentIndex()));
+  std::string dtype = data_.dtype(ui->tab3_set_comboBox->currentIndex());
 
   // apply segmentation
   // ------------------
@@ -941,7 +889,13 @@ void MainWindow::tab3_readPhase(void)
   // ------------
 
   if ( ui->tab1_maskW_checkBox->isChecked() && ui->tab3_set_comboBox->currentIndex()>0 ) {
-
+    if ( data_.saved(0,ui->tab3_im_comboBox->currentIndex()) ) {
+      Image::Matrix<int> W,M;
+      std::tie(W,M) = data_.image(0,ui->tab3_im_comboBox->currentIndex(),imgRaw_,false);
+      for ( size_t i=0 ; i<imgRaw_.size() ; i++ )
+        if ( W[i] )
+          imgView_[i] = 255;
+    }
   }
 
   // crop the image
