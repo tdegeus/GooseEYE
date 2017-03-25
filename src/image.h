@@ -181,8 +181,11 @@ template <class T> class Matrix
       return i+1;
     };
 
-    // maximum
-    // -------
+    // minimum / maximum
+    // -----------------
+
+    T min ( void )
+    { return *std::min_element(_data.begin(),_data.end()); };
 
     T max ( void )
     { return *std::max_element(_data.begin(),_data.end()); };

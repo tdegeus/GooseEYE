@@ -56,6 +56,9 @@ private slots:
   void tab3_viewPhase(void);
   void tab3_syncImage(void);
   void tab3_syncPhase(void);
+  void tab3_setDefault(void);
+  void tab3_applySelection(int idx=-1);
+  void tab3_applyAll(void);
 
   void tab4_plotResult(void);
 

@@ -1151,17 +1151,17 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <widget class="QPushButton" name="tab3_imApply_pushButton">
+             <widget class="QPushButton" name="tab3_imDefault_pushButton">
               <property name="enabled">
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Apply</string>
+               <string>Default</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="tab3_imApplyAll_pushButton">
+             <widget class="QPushButton" name="tab3_imApply_pushButton">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1466,7 +1466,7 @@
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>1</number>
+               <number>11</number>
               </property>
               <item>
                <property name="text">
@@ -2875,8 +2875,8 @@
   <tabstop>tab3_imPrev_pushButton</tabstop>
   <tabstop>tab3_imNext_pushButton</tabstop>
   <tabstop>tab3_load_pushButton</tabstop>
+  <tabstop>tab3_imDefault_pushButton</tabstop>
   <tabstop>tab3_imApply_pushButton</tabstop>
-  <tabstop>tab3_imApplyAll_pushButton</tabstop>
   <tabstop>tab3_zoom_slider</tabstop>
   <tabstop>tab3_zoomOut_pushButton</tabstop>
   <tabstop>tab3_zoomIn__pushButton</tabstop>

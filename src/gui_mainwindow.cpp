@@ -91,27 +91,31 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_set_comboBox      ,SIGNAL(activated(int)),this,SLOT(tab3_syncImage()));
   connect(ui->tab3_set_comboBox      ,SIGNAL(activated(int)),this,SLOT(tab3_syncPhase()));
 
-  // tab3: image manipulated -> reinitialize interpreted image
-  connect(ui->tab3_phaseLow_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_phaseHgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask1Low_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask1Hgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask2Low_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask2Hgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask3Low_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask3Hgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_rowLow_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_rowHgh_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_colLow_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_colHgh_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_cmap_comboBox   ,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
-
   // tab3: zoom
   QSlider *zoom = ui->tab3_zoom_slider;
   connect(ui->tab3_zoomOut_pushButton,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()-1);});
   connect(ui->tab3_zoomIn__pushButton,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()+1);});
   connect(ui->tab3_zoom_slider,SIGNAL(valueChanged(int)),this,SLOT(tab3_viewImage()));
   connect(ui->tab3_zoom_slider,SIGNAL(valueChanged(int)),this,SLOT(tab3_viewPhase()));
+
+  // tab3: settings
+  connect(ui->tab3_imDefault_pushButton,SIGNAL(clicked(bool)),this,SLOT(tab3_setDefault()));
+  connect(ui->tab3_imDefault_pushButton,SIGNAL(clicked(bool)),this,SLOT(tab3_syncPhase ()));
+  connect(ui->tab3_imApply_pushButton  ,SIGNAL(clicked(bool)),this,SLOT(tab3_applyAll  ()));
+  connect(ui->tab3_phaseLow_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_phaseHgh_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_mask1Low_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_mask1Hgh_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_mask2Low_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_mask2Hgh_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_mask3Low_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_mask3Hgh_spinBox,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_rowLow_spinBox  ,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_rowHgh_spinBox  ,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_colLow_spinBox  ,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_colHgh_spinBox  ,&QSpinBox::editingFinished,[=](){ this->tab3_applySelection(); this->tab3_syncPhase(); });
+  connect(ui->tab3_cmap_comboBox   ,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_maskCol_comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
 
 }
 
@@ -237,8 +241,27 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
       return;
     }
   }
-  // leaving tab3:
-  // TODO
+  // leaving tab3: check image consistency
+  if ( prevTab_==3 && index>3 ) {
+    for ( size_t i=0 ; i<data_.count(0) ; i++ ) {
+      for ( size_t j=0 ; j<data_.nset() ; j++ ) {
+        if ( !data_.saved(j,i) ) {
+          this->promptWarning(tr("Set %1: '%2' has not been saved").arg(QString::number(j+1),QString::fromStdString(data_.fname(j,i))));
+          return;
+        }
+      }
+      for ( size_t j=1 ; j<data_.nset() ; j++ ) {
+        if ( (data_.rowMax(j,i)-data_.rowMin(j,i))!=(data_.rowMax(0,i)-data_.rowMin(0,i)) ) {
+          this->promptWarning(tr("Number rows of '%1' and '%2' are inconsistent").arg(QString::fromStdString(data_.fname(j,i)),QString::fromStdString(data_.fname(0,i))));
+          return;
+        }
+        if ( (data_.colMax(j,i)-data_.colMin(j,i))!=(data_.colMax(0,i)-data_.colMin(0,i)) ) {
+          this->promptWarning(tr("Number columns of '%1' and '%2' are inconsistent").arg(QString::fromStdString(data_.fname(j,i)),QString::fromStdString(data_.fname(0,i))));
+          return;
+        }
+      }
+    }
+  }
 
   // leaving tab4: check to save
   if ( prevTab_==4 && index!=4 ) {
@@ -342,7 +365,7 @@ void MainWindow::on_tab0_outdir_pushButton_clicked()
         line[i]->setText(Dir.relativeFilePath(QDir(dirPrev).filePath(line[i]->text())));
     // - filenames in QListWidget
     for ( size_t i=0 ; i<2 ; i++ )
-      for ( size_t j=0 ; j<list[i]->count() ; j++ )
+      for ( int j=0 ; j<list[i]->count() ; j++ )
         list[i]->item(j)->setText(Dir.relativeFilePath(QDir(dirPrev).filePath(list[i]->item(j)->text())));
   }
 
@@ -655,7 +678,7 @@ void MainWindow::filesAdd(QListWidget *list, size_t set)
 
   list->addItems(fileNames);
 
-   for ( size_t i=0 ; i<fileNames.size() ; i++ )
+   for ( int i=0 ; i<fileNames.size() ; i++ )
      data_.itemAdd(set,fileNames[i].toStdString());
 }
 
@@ -749,6 +772,9 @@ void MainWindow::filesCp(QListWidget *src,QListWidget *dest, size_t src_set, siz
 
   for ( int i=0 ; i<src->count() ; i++ )
     dest->addItem(src->item(i)->text());
+
+  for ( int i=0 ; i<src->count() ; i++ )
+    data_.itemAdd(dest_set,data_.fname(src_set,i));
 }
 
 // =============================================================================
@@ -775,6 +801,13 @@ void MainWindow::on_tab3_set_comboBox_currentIndexChanged(int index)
 
   ui->tab3_imPrev_pushButton ->setEnabled(list[index]->count()>1);
   ui->tab3_imNext_pushButton ->setEnabled(list[index]->count()>1);
+
+  size_t set = ui->tab3_set_comboBox->currentIndex();
+
+  if ( data_.phase(set)=="Phase" || data_.phase(set)=="Weights" )
+    ui->tab3_cmap_comboBox->setCurrentIndex(11);
+  else
+    ui->tab3_cmap_comboBox->setCurrentIndex(1);
 }
 
 // =============================================================================
@@ -800,11 +833,137 @@ void MainWindow::tab3_readImage(void)
     for ( size_t j=0 ; j<ncol ; j++ )
       imgRaw_(i,j) = qGray(imgRawQt_.pixel(j,i));
 
-  // set row/column selection wizard
-  ui->tab3_rowHgh_spinBox->setValue  (nrow);
-  ui->tab3_rowHgh_spinBox->setMaximum(nrow);
-  ui->tab3_colHgh_spinBox->setValue  (ncol);
-  ui->tab3_colHgh_spinBox->setMaximum(ncol);
+  // set defaults/limits in selection wizard
+  this->tab3_setDefault();
+}
+
+// =============================================================================
+// tab3: set defaults/limits in selection wizard
+// =============================================================================
+
+void MainWindow::tab3_setDefault(void)
+{
+  size_t set      = ui->tab3_set_comboBox->currentIndex();
+  size_t idx      = ui->tab3_im_comboBox ->currentIndex();
+  size_t phaseMin = imgRaw_.min();
+  size_t phaseMax = imgRaw_.max();
+  size_t mask1Min = 0                 ;
+  size_t mask1Max = 0                 ;
+  size_t mask2Min = 0                 ;
+  size_t mask2Max = 0                 ;
+  size_t mask3Min = 0                 ;
+  size_t mask3Max = 0                 ;
+  size_t rowMin   = 0                 ;
+  size_t rowMax   = imgRaw_.shape()[0];
+  size_t colMin   = 0                 ;
+  size_t colMax   = imgRaw_.shape()[1];
+  size_t cmp;
+
+  ui->tab3_phaseLow_spinBox->setMinimum(phaseMin);
+  ui->tab3_phaseHgh_spinBox->setMinimum(phaseMin);
+  ui->tab3_mask1Low_spinBox->setMinimum(phaseMin);
+  ui->tab3_mask1Hgh_spinBox->setMinimum(phaseMin);
+  ui->tab3_mask2Low_spinBox->setMinimum(phaseMin);
+  ui->tab3_mask2Hgh_spinBox->setMinimum(phaseMin);
+  ui->tab3_mask3Low_spinBox->setMinimum(phaseMin);
+  ui->tab3_mask3Hgh_spinBox->setMinimum(phaseMin);
+  ui->tab3_phaseLow_spinBox->setMaximum(phaseMax);
+  ui->tab3_phaseHgh_spinBox->setMaximum(phaseMax);
+  ui->tab3_mask1Low_spinBox->setMaximum(phaseMax);
+  ui->tab3_mask1Hgh_spinBox->setMaximum(phaseMax);
+  ui->tab3_mask2Low_spinBox->setMaximum(phaseMax);
+  ui->tab3_mask2Hgh_spinBox->setMaximum(phaseMax);
+  ui->tab3_mask3Low_spinBox->setMaximum(phaseMax);
+  ui->tab3_mask3Hgh_spinBox->setMaximum(phaseMax);
+  ui->tab3_rowLow_spinBox  ->setMaximum(rowMax  );
+  ui->tab3_colLow_spinBox  ->setMaximum(colMax  );
+  ui->tab3_rowHgh_spinBox  ->setMaximum(rowMax  );
+  ui->tab3_colHgh_spinBox  ->setMaximum(colMax  );
+
+  if ( set==0 ) { cmp = 1; }
+  else          { cmp = 0; }
+
+  if ( data_.saved(set,idx) && data_.dtype(set).size()>0 ) {
+    phaseMin = data_.phaseMin(set,idx  );
+    phaseMax = data_.phaseMax(set,idx  );
+    mask1Min = data_.maskMin (set,idx,0);
+    mask1Max = data_.maskMax (set,idx,0);
+    mask2Min = data_.maskMin (set,idx,1);
+    mask2Max = data_.maskMax (set,idx,1);
+    mask3Min = data_.maskMin (set,idx,2);
+    mask3Max = data_.maskMax (set,idx,2);
+    rowMin   = data_.rowMin  (set,idx  );
+    rowMax   = data_.rowMax  (set,idx  );
+    colMin   = data_.colMin  (set,idx  );
+    colMax   = data_.colMax  (set,idx  );
+  }
+  else if ( data_.saved(cmp,idx) && data_.dtype(cmp).size()>0 ) {
+    rowMin   = data_.rowMin  (cmp,idx  );
+    rowMax   = data_.rowMax  (cmp,idx  );
+    colMin   = data_.colMin  (cmp,idx  );
+    colMax   = data_.colMax  (cmp,idx  );
+  }
+
+  ui->tab3_phaseLow_spinBox->setValue(phaseMin);
+  ui->tab3_phaseHgh_spinBox->setValue(phaseMax);
+  ui->tab3_rowLow_spinBox  ->setValue(rowMin  );
+  ui->tab3_rowHgh_spinBox  ->setValue(rowMax  );
+  ui->tab3_colLow_spinBox  ->setValue(colMin  );
+  ui->tab3_colHgh_spinBox  ->setValue(colMax  );
+  ui->tab3_mask1Low_spinBox->setValue(0       );
+  ui->tab3_mask1Hgh_spinBox->setValue(0       );
+  ui->tab3_mask2Low_spinBox->setValue(0       );
+  ui->tab3_mask2Hgh_spinBox->setValue(0       );
+  ui->tab3_mask3Low_spinBox->setValue(0       );
+  ui->tab3_mask3Hgh_spinBox->setValue(0       );
+
+  this->tab3_applySelection();
+
+}
+
+// =============================================================================
+// tab3: apply selection wizard to image
+// =============================================================================
+
+void MainWindow::tab3_applySelection(int idx)
+{
+  if ( idx<0 )
+    idx = ui->tab3_im_comboBox ->currentIndex();
+
+  size_t set = ui->tab3_set_comboBox->currentIndex();
+
+  data_.set_saved   (set,idx  ,1                                 );
+  data_.set_phaseMin(set,idx  ,ui->tab3_phaseLow_spinBox->value());
+  data_.set_phaseMax(set,idx  ,ui->tab3_phaseHgh_spinBox->value());
+  data_.set_maskMin (set,idx,0,ui->tab3_mask1Low_spinBox->value());
+  data_.set_maskMax (set,idx,0,ui->tab3_mask1Hgh_spinBox->value());
+  data_.set_maskMin (set,idx,1,ui->tab3_mask2Low_spinBox->value());
+  data_.set_maskMax (set,idx,1,ui->tab3_mask2Hgh_spinBox->value());
+  data_.set_maskMin (set,idx,2,ui->tab3_mask3Low_spinBox->value());
+  data_.set_maskMax (set,idx,2,ui->tab3_mask3Hgh_spinBox->value());
+  data_.set_rowMin  (set,idx  ,ui->tab3_rowLow_spinBox  ->value());
+  data_.set_rowMax  (set,idx  ,ui->tab3_rowHgh_spinBox  ->value());
+  data_.set_colMin  (set,idx  ,ui->tab3_colLow_spinBox  ->value());
+  data_.set_colMax  (set,idx  ,ui->tab3_colHgh_spinBox  ->value());
+
+}
+
+// =============================================================================
+// tab3: apply selection wizard to all images
+// =============================================================================
+
+void MainWindow::tab3_applyAll(void)
+{
+  size_t set = ui->tab3_set_comboBox->currentIndex();
+  for ( size_t i=0 ; i<(size_t)ui->tab3_im_comboBox->count() ; i++ ) {
+    if ( data_.saved(set,i) && i!=ui->tab3_im_comboBox->currentIndex() ) {
+      if ( this->promptQuestion(tr("Overwrite settings of '%1'?").arg(QString::fromStdString(data_.fname(set,i)))) )
+        this->tab3_applySelection(i);
+    }
+    else {
+      this->tab3_applySelection(i);
+    }
+  }
 }
 
 // =============================================================================
@@ -816,84 +975,43 @@ void MainWindow::tab3_readPhase(void)
   if ( imgRawQt_.isNull() )
     return;
 
-  int min,max;
-  std::string dtype = data_.dtype(ui->tab3_set_comboBox->currentIndex());
+  size_t      idx   = ui->tab3_im_comboBox ->currentIndex();
+  size_t      set   = ui->tab3_set_comboBox->currentIndex();
+  std::string dtype = data_.dtype(set);
 
-  // apply segmentation
-  // ------------------
+  Image::Matrix<int> im,mask;
 
-  min = ui->tab3_phaseLow_spinBox->value();
-  max = ui->tab3_phaseHgh_spinBox->value();
+  // convert image
+  // -------------
 
-  if ( dtype=="float" ) {
-    // threshold image, set excluded pixels masked
-    for ( size_t i=0 ; i<imgRaw_.size() ; i++ ) {
-      if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
-        imgView_[i] = std::min(imgRaw_[i],254);
-      else
-        imgView_[i] = 255;
-    }
-  }
-  else if ( dtype=="binary" ) {
-    // threshold image, within range -> white, otherwise -> black
-    for ( size_t i=0 ; i<imgRaw_.size() ; i++ ) {
-      if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
-        imgView_[i] = 254;
-      else
-        imgView_[i] = 0;
-    }
-  }
-  else if ( dtype=="int" ) {
-    // threshold image, within range -> 1, otherwise -> 0
-    Image::Matrix<int> im(imgRaw_.shape());
-    for ( size_t i=0 ; i<imgRaw_.size() ; i++ ) {
-      if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
-        im[i] = 1;
-      else
-        im[i] = 0;
-    }
-    // compute clusters
-    Image::Matrix<int> clusters,centers;
-    std::tie(clusters,centers) = Image::clusters(im);
-    // scale image for optimizal color contrast
-    double fac = 255./(double)clusters.max();
-    for ( size_t i=0 ; i<imgRaw_.size() ; i++ )
-      imgView_[i] = std::min((int)((double)clusters[i]*fac),254);
-  }
+  std::tie(im,mask) = data_.image(set,idx,imgRaw_,false);
+  double fac        = 255./(double)im.max();
 
-  // apply mask
-  // ----------
-
-  QSpinBox *maskLow[3];
-  QSpinBox *maskHgh[3];
-
-  maskLow[0] = ui->tab3_mask1Low_spinBox;
-  maskLow[1] = ui->tab3_mask2Low_spinBox;
-  maskLow[2] = ui->tab3_mask3Low_spinBox;
-  maskHgh[0] = ui->tab3_mask1Hgh_spinBox;
-  maskHgh[1] = ui->tab3_mask2Hgh_spinBox;
-  maskHgh[2] = ui->tab3_mask3Hgh_spinBox;
-
-  for ( int idx=0 ; idx<3 ; idx++ ) {
-
-    min = maskLow[0]->value();
-    max = maskHgh[0]->value();
-
-    if ( min!=max )
-      for ( size_t i=0 ; i<imgRaw_.size() ; i++ )
-        if ( imgRaw_[i]>=min && imgRaw_[i]<=max )
-          imgView_[i] = 255;
-  }
+  // float: max -> 254 (to make room for mask)
+  if ( dtype=="float" )
+    for ( size_t i=0 ; i<im.size() ; i++ )
+      imgView_[i] = std::min(im[i],253);
+  // binary: 1 -> 254
+  if ( dtype=="binary" )
+    for ( size_t i=0 ; i<im.size() ; i++ )
+      imgView_[i] = im[i]*253;
+  // int: stretch scale
+  if ( dtype=="int" )
+    for ( size_t i=0 ; i<im.size() ; i++ )
+      imgView_[i] = std::min((int)((double)im[i]*fac),253);
+  // mask -> 255
+  for ( size_t i=0 ; i<im.size() ; i++ )
+    if ( mask[i] )
+      imgView_[i] = 255;
 
   // mask weights
   // ------------
 
   if ( ui->tab1_maskW_checkBox->isChecked() && ui->tab3_set_comboBox->currentIndex()>0 ) {
     if ( data_.saved(0,ui->tab3_im_comboBox->currentIndex()) ) {
-      Image::Matrix<int> W,M;
-      std::tie(W,M) = data_.image(0,ui->tab3_im_comboBox->currentIndex(),imgRaw_,false);
-      for ( size_t i=0 ; i<imgRaw_.size() ; i++ )
-        if ( W[i] )
+      std::tie(im,mask) = data_.image(0,idx,imgRaw_,false);
+      for ( size_t i=0 ; i<im.size() ; i++ )
+        if ( im[i] )
           imgView_[i] = 255;
     }
   }
@@ -903,10 +1021,10 @@ void MainWindow::tab3_readPhase(void)
 
   size_t nrow = imgRaw_.shape()[0];
   size_t ncol = imgRaw_.shape()[1];
-  size_t irow = ui->tab3_rowLow_spinBox->value();
-  size_t jrow = ui->tab3_rowHgh_spinBox->value();
-  size_t icol = ui->tab3_colLow_spinBox->value();
-  size_t jcol = ui->tab3_colHgh_spinBox->value();
+  size_t irow = data_.rowMin(set,idx);
+  size_t jrow = data_.rowMax(set,idx);
+  size_t icol = data_.colMin(set,idx);
+  size_t jcol = data_.colMax(set,idx);
 
   if ( irow>0 || jrow<nrow || icol>0 || jcol<ncol )
   for ( size_t i=0 ; i<nrow ; i++ )
@@ -959,19 +1077,23 @@ void MainWindow::tab3_viewPhase(void)
   if ( imgRawQt_.isNull() )
     return;
 
-  // define colormap based on data-type
   std::vector<int> cols;
-  if (  data_.dtype(ui->tab3_set_comboBox->currentIndex())=="int" ) {
-    cols = cppcolormap::RdOrYl_r(256);
-    cols[  0*3+0] = 255; cols[  0*3+1] = 255; cols[  0*3+2] = 255; // white background
-    cols[254*3+0] = 255; cols[254*3+1] = 255; cols[254*3+2] = 255; // white excluded pixels
-    cols[255*3+0] =   0; cols[255*3+1] =   0; cols[255*3+2] =   0; // black mask
-  }
-  else {
-    cols = cppcolormap::colormap(ui->tab3_cmap_comboBox->currentText().toStdString(),256);
-//    cols = cppcolormap::Greys(256);
-    cols[255*3+0] = 255; cols[255*3+1] =   0; cols[255*3+2] =   0; // red mask
-  }
+  std::vector<int> tmp;
+
+  // read colormap
+  cols = cppcolormap::colormap(ui->tab3_cmap_comboBox->currentText().toStdString(),256);
+  // excluded pixes -> white
+  for ( size_t i=0 ; i<3 ; i++ )
+    cols[254*3+i] = 255;
+  // optionally set white background
+  if ( data_.dtype(ui->tab3_set_comboBox->currentIndex())=="int" )
+    for ( size_t i=0 ; i<3 ; i++ )
+      cols[0*3+i] = 255;
+  // set mask color
+  tmp = cppcolormap::colormap(ui->tab3_maskCol_comboBox->currentText().toStdString(),1);
+  for ( size_t i=0 ; i<3 ; i++ )
+    cols[255*3+i] = tmp[i];
+
   // convert to Qt format
   QVector<QRgb> cmap;
   for ( size_t i = 0; i < 256; ++i)
