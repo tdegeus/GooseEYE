@@ -408,24 +408,38 @@ void compute_S2 ( Image::Matrix<int> (*func)(std::string) )
 {
   _result.reshape(_roi);
 
-  int n;
-  int N = 0;
-  Image::Matrix<double> tmp(_roi);
-  Image::Matrix<int> f,g,mask;
+  std::vector<size_t> shape;
+  shape.push_back(10);
+  shape.push_back(10);
 
-  for ( size_t i=0 ; i<this->count(0) ; i++ ) {
-    if ( true            ) std::tie(f,mask) = this->image(0,i,func);
-    if ( this->nset()==1 ) std::tie(g,mask) = this->image(1,i,func);
-    else                   std::tie(g,mask) = this->image(0,i,func);
-    std::tie(tmp,n) = Image::S2(f,g,_roi);
-    for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
-      tmp[idx] *= static_cast<double>(n);
-    for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
-      _result[idx] += tmp[idx];
-    N += n;
-  }
-  for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
-    _result[idx] /= static_cast<double>(N);
+  int n;
+  Image::Matrix<double> tmp;
+  Image::Matrix<int> f({100,100});
+  Image::Matrix<int> g({100,100});
+
+  std::tie(tmp,n) = Image::S2(f,g,shape);
+
+
+
+
+  // int n;
+  // int N = 0;
+  // Image::Matrix<double> tmp(_roi);
+  // Image::Matrix<int> f,g,mask;
+
+  // for ( size_t i=0 ; i<this->count(0) ; i++ ) {
+  //   if ( true            ) std::tie(f,mask) = this->image(0,i,func);
+  //   if ( this->nset()==1 ) std::tie(g,mask) = this->image(1,i,func);
+  //   else                   std::tie(g,mask) = this->image(0,i,func);
+  //   std::tie(tmp,n) = Image::S2(f,g,_roi);
+  //   for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
+  //     tmp[idx] *= static_cast<double>(n);
+  //   for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
+  //     _result[idx] += tmp[idx];
+  //   N += n;
+  // }
+  // for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
+  //   _result[idx] /= static_cast<double>(N);
 
 }
 

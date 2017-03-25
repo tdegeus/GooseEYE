@@ -256,23 +256,23 @@ Mi dilate ( Mi &src, Mi &kernel, Vi& iterations  , b periodic=true );
 
 // 2-point probability (binary), 2-point cluster function (int), and 2-point correlations (double)
 std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );
-std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b pad=false, b periodic=true );
+std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b pad      , b periodic      );
 std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
 std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
 std::tuple<Md,i > S2 ( Md &f, Md &g, Vs &roi                                                   );
-std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi,                     b pad=false, b periodic=true );
+std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi,                     b pad      , b periodic      );
 std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
 std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
 
 // weighted 2-point probability (binary) or 2-point correlation (float)
 std::tuple<Md,i > W2 ( Mi &W, Mi &I, Vs &roi                                        );
-std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi,          b pad=false, b periodic=true );
+std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi,          b pad      , b periodic      );
 std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
 std::tuple<Md,i > W2 ( Mi &W, Md &I, Vs &roi                                        );
-std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi,          b pad=false, b periodic=true );
+std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi,          b pad      , b periodic      );
 std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
 std::tuple<Md,d > W2 ( Md &W, Md &I, Vs &roi                                        );
-std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b pad=false, b periodic=true );
+std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b pad      , b periodic      );
 std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
 
 // collapsed weighted 2-point correlation
