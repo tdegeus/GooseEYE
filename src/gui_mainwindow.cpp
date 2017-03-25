@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->tabWidget->setCurrentIndex(0);
 
   phase_ << "" << "";
-  dtype_ << "" << "";
+  // dtype_ << "" << "";
   func_     = "";
   data_.reserve(0);
 
@@ -39,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
   // tab2: enable pushButtons / set labels
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Phase_label   ->setText   (phase_[0]                         );});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Phase_label   ->setText   (phase_[1]                         );});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Dtype_label   ->setText   (dtype_[0]                         );});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Dtype_label   ->setText   (dtype_[1]                         );});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Dtype_label   ->setText   (QString::fromStdString(data_.dtype(0))                    );});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im1Dtype_label   ->setText   (QString::fromStdString(data_.dtype(1))                    );});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0_listWidget   ->setEnabled(ui->tab1_im0_checkBox->isChecked());});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Add_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Rmv_pushButton->setEnabled(ui->tab1_im0_checkBox->isChecked());});
@@ -222,7 +222,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
       return;
     }
     for ( size_t i=0 ; i<2 ; i++ ) {
-      if (check[i]->isChecked() && dtype_[i].size()==0 ) {
+      if (check[i]->isChecked() && data_.dtype(i).size()==0 ) {
         this->promptWarning(tr("Please select data-type for image %1").arg(QString::number(i+1)));
         return;
       }
@@ -297,7 +297,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
     QString name = "%1: %2 (%3)";
     for ( int i=0 ; i<2 ; i++ )
       if ( check[i]->isChecked() )
-        ui->tab3_set_comboBox->addItem(name.arg(QString::number(i+1),phase_[i],dtype_[i]));
+        ui->tab3_set_comboBox->addItem(name.arg(QString::number(i+1),phase_[i],QString::fromStdString(data_.dtype(i))));
 
     ui->tab3_setNext_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
     ui->tab3_setPrev_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
@@ -515,7 +515,7 @@ void MainWindow::tab1_selectStat(void)
   func_ = "";
   for ( int i=0 ; i<2 ; i++ ) {
     phase_[i] = "";
-    dtype_[i] = "";
+    data_.set_dtype(i,"");
   }
 
   // settings based on selected statistic
@@ -643,7 +643,7 @@ void MainWindow::tab1_selectStat(void)
   for ( int i=0 ; i<2 ; i++ )
     for ( int j=0 ; j<3 ; j++ )
       if ( radio[i][j]->isChecked() )
-        dtype_.replace(i,label[j]);
+        data_.set_dtype(i,label[j].toStdString());
 
   // image interpretation settings
   ui->tab1_periodic_checkBox ->setEnabled(true );
@@ -872,7 +872,7 @@ void MainWindow::tab3_readPhase(void)
     return;
 
   int min,max;
-  QString dtype = dtype_[ui->tab3_set_comboBox->currentIndex()];
+  QString dtype = QString::fromStdString(data_.dtype(ui->tab3_set_comboBox->currentIndex()));
 
   // apply segmentation
   // ------------------
@@ -1010,7 +1010,7 @@ void MainWindow::tab3_viewPhase(void)
 
   // define colormap based on data-type
   std::vector<int> cols;
-  if (  dtype_[ui->tab3_set_comboBox->currentIndex()]=="int" ) {
+  if (  data_.dtype(ui->tab3_set_comboBox->currentIndex())=="int" ) {
     cols = cppcolormap::RdOrYl_r(256);
     cols[  0*3+0] = 255; cols[  0*3+1] = 255; cols[  0*3+2] = 255; // white background
     cols[254*3+0] = 255; cols[254*3+1] = 255; cols[254*3+2] = 255; // white excluded pixels
