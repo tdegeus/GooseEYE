@@ -18,11 +18,11 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage0">
        <attribute name="title">
-        <string>Load</string>
+        <string>1. Load</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
@@ -91,7 +91,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Store result/settings as:</string>
+             <string>Store result/settings as (relative path):</string>
             </property>
             <property name="buddy">
              <cstring>tab0_result_pushButton</cstring>
@@ -155,7 +155,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_21">
             <property name="text">
-             <string>Store PDF of raw result:</string>
+             <string>Store PDF of raw result (relative path):</string>
             </property>
             <property name="buddy">
              <cstring>tab0_pdfInterp_pushButton</cstring>
@@ -165,7 +165,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
-             <string>Store PDF of interpreted result:</string>
+             <string>Store PDF of interpreted result (relative path):</string>
             </property>
             <property name="buddy">
              <cstring>tab0_pdfRaw_pushButton</cstring>
@@ -270,7 +270,7 @@
       </widget>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
-        <string>Measure</string>
+        <string>2. Measure</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
@@ -380,6 +380,9 @@
             </property>
             <property name="text">
              <string>Image 1</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -656,7 +659,7 @@
       </widget>
       <widget class="QWidget" name="tabWidgetPage2">
        <attribute name="title">
-        <string>Files</string>
+        <string>3. Files</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_24">
         <item>
@@ -716,7 +719,7 @@
             <item>
              <widget class="QListWidget" name="tab2_im0_listWidget">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="acceptDrops">
                <bool>true</bool>
@@ -734,7 +737,7 @@
               <item>
                <widget class="QPushButton" name="tab2_im0Add_pushButton">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Add</string>
@@ -744,7 +747,7 @@
               <item>
                <widget class="QPushButton" name="tab2_im0Rmv_pushButton">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Remove</string>
@@ -922,7 +925,7 @@
       </widget>
       <widget class="QWidget" name="tabWidgetPage3">
        <attribute name="title">
-        <string>Images</string>
+        <string>4. Images</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_15">
         <item>
@@ -930,14 +933,14 @@
           <item>
            <widget class="QGraphicsView" name="tab3_image_graphicsView">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QGraphicsView" name="tab3_phase_graphicsView">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -946,7 +949,7 @@
             <item>
              <widget class="QPushButton" name="tab3_zoomOut_pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Zoom Out</string>
@@ -956,7 +959,7 @@
             <item>
              <widget class="QSlider" name="tab3_zoom_slider">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -966,7 +969,7 @@
             <item>
              <widget class="QPushButton" name="tab3_zoomIn__pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Zoom In</string>
@@ -984,7 +987,7 @@
             <item>
              <widget class="QPushButton" name="tab3_setPrev_pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximumSize">
                <size>
@@ -1016,7 +1019,7 @@
             <item>
              <widget class="QComboBox" name="tab3_set_comboBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="minimumSize">
                <size>
@@ -1045,7 +1048,7 @@
             <item>
              <widget class="QPushButton" name="tab3_setNext_pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximumSize">
                <size>
@@ -1065,7 +1068,7 @@
             <item>
              <widget class="QPushButton" name="tab3_imPrev_pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximumSize">
                <size>
@@ -1097,7 +1100,7 @@
             <item>
              <widget class="QComboBox" name="tab3_im_comboBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1120,7 +1123,7 @@
             <item>
              <widget class="QPushButton" name="tab3_imNext_pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximumSize">
                <size>
@@ -1138,7 +1141,7 @@
           <item>
            <widget class="QPushButton" name="tab3_load_pushButton">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>(Re)Load</string>
@@ -1150,7 +1153,7 @@
             <item>
              <widget class="QPushButton" name="tab3_imApply_pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Apply</string>
@@ -1160,7 +1163,7 @@
             <item>
              <widget class="QPushButton" name="tab3_imApplyAll_pushButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Apply to &amp;All</string>
@@ -1174,7 +1177,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="tab3_mask_label">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Mask:</string>
@@ -1187,7 +1190,7 @@
             <item row="0" column="4">
              <widget class="QRadioButton" name="tab3_phase_radioButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string/>
@@ -1200,7 +1203,7 @@
             <item row="1" column="1">
              <widget class="QSpinBox" name="tab3_mask1Low_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1217,7 +1220,7 @@
             <item row="3" column="1">
              <widget class="QSpinBox" name="tab3_mask3Low_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1240,7 +1243,7 @@
             <item row="0" column="1">
              <widget class="QSpinBox" name="tab3_phaseLow_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1264,7 +1267,7 @@
             <item row="2" column="1">
              <widget class="QSpinBox" name="tab3_mask2Low_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1281,7 +1284,7 @@
             <item row="3" column="3">
              <widget class="QSpinBox" name="tab3_mask3Hgh_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1291,7 +1294,7 @@
             <item row="5" column="4">
              <widget class="QRadioButton" name="tab3_col_radioButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string/>
@@ -1304,7 +1307,7 @@
             <item row="0" column="3">
              <widget class="QSpinBox" name="tab3_phaseHgh_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1317,7 +1320,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="tab3_phase_label">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Phase:</string>
@@ -1330,7 +1333,7 @@
             <item row="1" column="3">
              <widget class="QSpinBox" name="tab3_mask1Hgh_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1347,7 +1350,7 @@
             <item row="5" column="1">
              <widget class="QSpinBox" name="tab3_colLow_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>9999</number>
@@ -1357,7 +1360,7 @@
             <item row="4" column="0">
              <widget class="QLabel" name="tab3_row_label">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Rows:</string>
@@ -1370,7 +1373,7 @@
             <item row="2" column="3">
              <widget class="QSpinBox" name="tab3_mask2Hgh_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>255</number>
@@ -1380,7 +1383,7 @@
             <item row="5" column="3">
              <widget class="QSpinBox" name="tab3_colHgh_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>9999</number>
@@ -1390,7 +1393,7 @@
             <item row="4" column="3">
              <widget class="QSpinBox" name="tab3_rowHgh_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>9999</number>
@@ -1407,7 +1410,7 @@
             <item row="4" column="1">
              <widget class="QSpinBox" name="tab3_rowLow_spinBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="maximum">
                <number>9999</number>
@@ -1417,7 +1420,7 @@
             <item row="5" column="0">
              <widget class="QLabel" name="tab3_col_label">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Columns:</string>
@@ -1430,7 +1433,7 @@
             <item row="4" column="4">
              <widget class="QRadioButton" name="tab3_row_radioButton">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string/>
@@ -1447,7 +1450,7 @@
             <item>
              <widget class="QLabel" name="tab3_cmap_label">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Colormap:</string>
@@ -1460,7 +1463,7 @@
             <item>
              <widget class="QComboBox" name="tab3_cmap_comboBox">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="currentIndex">
                <number>1</number>
@@ -1815,7 +1818,7 @@
       </widget>
       <widget class="QWidget" name="tabWidgetPage4">
        <attribute name="title">
-        <string>Compute</string>
+        <string>5. Compute</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
@@ -1823,7 +1826,7 @@
           <item>
            <widget class="QLabel" name="tab4_roi_label">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Shape of region-of-interest (ROI) [rows x cols]:</string>
@@ -1836,7 +1839,7 @@
           <item>
            <widget class="QSpinBox" name="tab4_roiRow_spinBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <number>9999</number>
@@ -1846,7 +1849,7 @@
           <item>
            <widget class="QLabel" name="label_20">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>x</string>
@@ -1856,7 +1859,7 @@
           <item>
            <widget class="QSpinBox" name="tab4_roiCol_spinBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <number>9999</number>
@@ -1883,7 +1886,7 @@
           <item>
            <widget class="QPushButton" name="tab4_compute_pushButton">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Compute</string>
@@ -1892,8 +1895,21 @@
           </item>
           <item>
            <widget class="QProgressBar" name="tab4_progressBar">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="value">
              <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="tab4_save_pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Save</string>
             </property>
            </widget>
           </item>
@@ -1928,7 +1944,7 @@
           <item>
            <widget class="QLabel" name="tab4_cmap_raw_label">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Colormap:</string>
@@ -1941,7 +1957,7 @@
           <item>
            <widget class="QComboBox" name="tab4_cmap_raw_comboBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="currentIndex">
              <number>49</number>
@@ -2291,7 +2307,7 @@
           <item>
            <widget class="QLabel" name="tab4_clim_raw_label">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Range:</string>
@@ -2304,7 +2320,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="tab4_climLow_raw_doubleSpinBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -2314,7 +2330,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="tab4_climHgh_raw_doubleSpinBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -2340,7 +2356,7 @@
           <item>
            <widget class="QLabel" name="tab4_cmap_interp_label">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Colormap:</string>
@@ -2353,7 +2369,7 @@
           <item>
            <widget class="QComboBox" name="tab4_cmap_interp_comboBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="currentIndex">
              <number>62</number>
@@ -2703,7 +2719,7 @@
           <item>
            <widget class="QLabel" name="tab4_clim_interp_label">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Range:</string>
@@ -2716,7 +2732,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="tab4_climLow_interp_doubleSpinBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -2726,7 +2742,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="tab4_climHgh_interp_doubleSpinBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -2862,8 +2878,8 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="buttonGroup_tab3_mouse"/>
   <buttongroup name="buttonGroup_tab1_im0"/>
   <buttongroup name="buttonGroup_tab1_im1"/>
-  <buttongroup name="buttonGroup_tab3_mouse"/>
  </buttongroups>
 </ui>

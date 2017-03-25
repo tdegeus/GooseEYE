@@ -10,12 +10,12 @@ MainWindow::MainWindow(QWidget *parent) :
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
+  ui->tabWidget->setCurrentIndex(0);
 
   phase_ << "" << "";
   dtype_ << "" << "";
   func_     = "";
-  outDir_   = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-  outName_  = "";
+  data_.reserve(0);
 
   // tab0: enable buttons
   connect(ui->tab0_result_lineEdit   ,&QLineEdit::textChanged,[=](){ui->tab0_result_lineEdit     ->setEnabled(true);});
@@ -52,13 +52,13 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_cp_pushButton    ->setEnabled(ui->tab1_im1_checkBox->isChecked());});
 
   // tab2: pushButtons -> add/remove files
-  connect(ui->tab2_im0Add_pushButton,&QPushButton::clicked,[=](){this->filesAdd(ui->tab2_im0_listWidget);});
-  connect(ui->tab2_im1Add_pushButton,&QPushButton::clicked,[=](){this->filesAdd(ui->tab2_im1_listWidget);});
-  connect(ui->tab2_im0Rmv_pushButton,&QPushButton::clicked,[=](){this->filesRm (ui->tab2_im0_listWidget);});
-  connect(ui->tab2_im1Rmv_pushButton,&QPushButton::clicked,[=](){this->filesRm (ui->tab2_im1_listWidget);});
-  connect(ui->tab2_im1Up__pushButton,&QPushButton::clicked,[=](){this->filesUp (ui->tab2_im1_listWidget);});
-  connect(ui->tab2_im1Dwn_pushButton,&QPushButton::clicked,[=](){this->filesDwn(ui->tab2_im1_listWidget);});
-  connect(ui->tab2_cp_pushButton    ,&QPushButton::clicked,[=](){this->filesCp (ui->tab2_im0_listWidget,ui->tab2_im1_listWidget);});
+  connect(ui->tab2_im0Add_pushButton,&QPushButton::clicked,[=](){this->filesAdd(ui->tab2_im0_listWidget,0);});
+  connect(ui->tab2_im1Add_pushButton,&QPushButton::clicked,[=](){this->filesAdd(ui->tab2_im1_listWidget,1);});
+  connect(ui->tab2_im0Rmv_pushButton,&QPushButton::clicked,[=](){this->filesRm (ui->tab2_im0_listWidget,0);});
+  connect(ui->tab2_im1Rmv_pushButton,&QPushButton::clicked,[=](){this->filesRm (ui->tab2_im1_listWidget,1);});
+  connect(ui->tab2_im1Up__pushButton,&QPushButton::clicked,[=](){this->filesUp (ui->tab2_im1_listWidget,1);});
+  connect(ui->tab2_im1Dwn_pushButton,&QPushButton::clicked,[=](){this->filesDwn(ui->tab2_im1_listWidget,1);});
+  connect(ui->tab2_cp_pushButton    ,&QPushButton::clicked,[=](){this->filesCp (ui->tab2_im0_listWidget,ui->tab2_im1_listWidget,0,1);});
 
   // tab3: link scroll position of graphicsViews
   QScrollBar *I1h = ui->tab3_image_graphicsView->horizontalScrollBar();
@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_setPrev_pushButton,&QPushButton::clicked,[=](){if (set->currentIndex()>0             ) set->setCurrentIndex(set->currentIndex()-1);});
   connect(ui->tab3_setNext_pushButton,&QPushButton::clicked,[=](){if (set->currentIndex()<set->count()-1) set->setCurrentIndex(set->currentIndex()+1);});
 
-  // tab3: load / current image changed -> reintialize both images
+  // tab3: load / current image changed -> reinitialize both images
   connect(ui->tab3_load_pushButton   ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncImage()));
   connect(ui->tab3_load_pushButton   ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_imPrev_pushButton ,SIGNAL(clicked(bool)) ,this,SLOT(tab3_syncImage()));
@@ -94,19 +94,19 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_set_comboBox      ,SIGNAL(activated(int)),this,SLOT(tab3_syncImage()));
   connect(ui->tab3_set_comboBox      ,SIGNAL(activated(int)),this,SLOT(tab3_syncPhase()));
 
-  // tab3: image manipulated -> reintialize interpreted image
-  connect(ui->tab3_phaseLow_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_phaseHgh_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask1Low_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask1Hgh_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask2Low_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask2Hgh_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask3Low_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_mask3Hgh_spinBox,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_rowLow_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_rowHgh_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_colLow_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
-  connect(ui->tab3_colHgh_spinBox  ,SIGNAL(editingFinished()),this,SLOT(tab3_syncPhase()));
+  // tab3: image manipulated -> reinitialize interpreted image
+  connect(ui->tab3_phaseLow_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_phaseHgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_mask1Low_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_mask1Hgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_mask2Low_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_mask2Hgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_mask3Low_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_mask3Hgh_spinBox,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_rowLow_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_rowHgh_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_colLow_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
+  connect(ui->tab3_colHgh_spinBox  ,SIGNAL(editingFinished())       ,this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_cmap_comboBox   ,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
 
   // tab3: zoom
@@ -115,9 +115,6 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_zoomIn__pushButton,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()+1);});
   connect(ui->tab3_zoom_slider,SIGNAL(valueChanged(int)),this,SLOT(tab3_viewImage()));
   connect(ui->tab3_zoom_slider,SIGNAL(valueChanged(int)),this,SLOT(tab3_viewPhase()));
-
-
-  this->tab4_plotResult();
 
 }
 
@@ -131,50 +128,169 @@ MainWindow::~MainWindow()
 }
 
 // ============================================================================
-// pop-up to signal work in progress
+// check if a file exists
 // ============================================================================
 
-void MainWindow::WIP()
+bool MainWindow::fileExists ( QString fname , QString dirname )
+{
+  if ( dirname!="" )
+    fname = QDir(dirname).filePath(fname);
+
+  QFileInfo check_file(fname);
+
+  // check if file exists and if yes: Is it really a file and no directory?
+  if (check_file.exists() && check_file.isFile())
+    return true;
+  else
+    return false;
+}
+
+// ============================================================================
+// prompt the user with a warning or a question
+// ============================================================================
+
+void MainWindow::promptWarning ( QString msg )
 {
   QMessageBox::warning(\
     this,\
     tr("GooseEYE"),\
-    tr("Work in progress.\nThis function has not been completed."),\
+    msg,\
     QMessageBox::Ok,\
     QMessageBox::Ok\
   );
 }
 
+// -----------------------------------------------------------------------------
+
+void MainWindow::promptWorkInProgress( QString msg )
+{
+  return this->promptWarning(tr("Work-in-progress:\n\n")+msg);
+}
+
+// -----------------------------------------------------------------------------
+
+bool MainWindow::promptQuestion ( QString msg )
+{
+  QMessageBox::StandardButton reply;
+
+  reply = QMessageBox::question(\
+    this,\
+    tr("GooseEYE"),\
+    msg,\
+    QMessageBox::Yes|QMessageBox::No
+  );
+
+  if (reply == QMessageBox::Yes)
+    return true;
+
+  return false;
+}
+
 // ============================================================================
 // tab-select:
+// - check selection
 // - print message to status-bar
-// - synchronize data between tabs
+// - synchronize data
 // ============================================================================
 
 void MainWindow::on_tabWidget_tabBarClicked(int index)
 {
-  // print message to status-bar
-  QString mes;
-  if      ( index==0 ) mes = "Overview, load existing state, storage settings";
-  else if ( index==1 ) mes = "Select measure and image type(s)";
-  else if ( index==2 ) mes = "Select images";
-  else if ( index==3 ) mes = "Check/modify images";
-  else if ( index==4 ) mes = "Run computation";
-  statusBar()->showMessage(mes);
-
-  // read storage directory and name
-  if ( index>0 ) {
-    outDir_  = ui->tab0_outdir_lineEdit->text();
-    outName_ = ui->tab0_result_lineEdit->text();
-  }
-
-  // alias
   QCheckBox *check[2];
   check[0] = ui->tab1_im0_checkBox;
   check[1] = ui->tab1_im1_checkBox;
 
+  // switching between tabs: check selection
+  // ---------------------------------------
+
+  // check linear increase
+  if ( index>prevTab_+1 ) {
+    this->promptWarning(tr("Please complete tab %1 first").arg(QString::number(prevTab_+1)));
+    return;
+  }
+
+  // leaving tab0: check storage directory
+  if ( prevTab_==0 && index>0 ) {
+    if ( ui->tab0_outdir_lineEdit->text().size()==0 ) {
+      this->promptWarning("Please select a working directory first");
+      return;
+    }
+  }
+  // leaving tab1: check selected statistic
+  if ( prevTab_==1 && index>1 ) {
+    if ( func_.size()==0 ) {
+      this->promptWarning("Please select a statistical measure first\n(left dialog)");
+      return;
+    }
+    for ( size_t i=0 ; i<2 ; i++ ) {
+      if (check[i]->isChecked() && dtype_[i].size()==0 ) {
+        this->promptWarning(tr("Please select data-type for image %1").arg(QString::number(i+1)));
+        return;
+      }
+    }
+  }
+  // leaving tab2: check number of selected files
+  if ( prevTab_==2 && index>2 ) {
+    if ( ui->tab2_im1_listWidget->isEnabled() )
+      if ( ui->tab2_im0_listWidget->count()!=ui->tab2_im1_listWidget->count() ) {
+        this->promptWarning("Number of files must be equal");
+        return;
+      }
+    if ( ui->tab2_im0_listWidget->count()<=0 ) {
+      this->promptWarning("Please select files before continuing");
+      return;
+    }
+  }
+  // leaving tab3: check settings
+  // if ( prevTab_==3 && index>3 ) {
+  //   if ( files_.count()!=ui->tab2_im0_listWidget->count() ) {
+  //     this->promptWarning("Please apply settings for all files");
+  //     return;
+  //   }
+  //   for ( size_t j=0 ; j<files_.nset() ; j++ ) {
+  //     for ( size_t i=0 ; i<files_.count() ;  ) {
+  //       if ( files_.fname(i,j).size()==0 ) {
+  //         this->promptWarning("Please confirm settings for all files");
+  //         return;
+  //       }
+  //     }
+  //   }
+  // }
+  // leaving tab4: check to save
+  if ( prevTab_==4 && index!=4 ) {
+    if ( ui->tab4_save_pushButton->isEnabled() ) {
+      this->promptWarning("The modifications in the results have not been saved");
+    }
+  }
+
+
+//  std::cout << "<files set 1>" << std::endl;
+//  for ( size_t i=0 ; i<data_.count(0) ; i++ )
+//    std::cout << data_.fname(0,i) << std::endl;
+//  std::cout << "</files set 1>" << std::endl;
+
+//  std::cout << "<files set 2>" << std::endl;
+//  for ( size_t i=0 ; i<data_.count(1) ; i++ )
+//    std::cout << data_.fname(1,i) << std::endl;
+//  std::cout << "</files set 2>" << std::endl;
+
+  // sync data
+  // ---------
+
+
+  // // new on tab2: c
+  // if ( prevTab_<3 && index==3 ) {
+  //   size_t nset;
+  //   if ( ui->tab1_im1_checkBox->isChecked() ) { nset = 2; }
+  //   else                                      { nset = 1; }
+
+  //   files_.reserve(nset,ui->tab2_im0_listWidget->count());
+  //   files_.clear();
+  // }
+
   // tab3: selectively enable and fill
   if ( index==3 && func_!="" ) {
+
+
     ui->tab3_set_comboBox->clear();
     ui->tab3_set_comboBox->setEnabled(true);
 
@@ -183,38 +299,22 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
       if ( check[i]->isChecked() )
         ui->tab3_set_comboBox->addItem(name.arg(QString::number(i+1),phase_[i],dtype_[i]));
 
-    ui->tab3_setNext_pushButton   ->setEnabled(check[0]->isChecked() && check[1]->isChecked());
-    ui->tab3_setPrev_pushButton   ->setEnabled(check[0]->isChecked() && check[1]->isChecked());
-    ui->tab3_load_pushButton      ->setEnabled(true);
-    ui->tab3_image_graphicsView   ->setEnabled(true);
-    ui->tab3_phase_graphicsView   ->setEnabled(true);
-    ui->tab3_zoom_slider          ->setEnabled(true);
-    ui->tab3_zoomIn__pushButton   ->setEnabled(true);
-    ui->tab3_zoomOut_pushButton   ->setEnabled(true);
-    ui->tab3_imApply_pushButton   ->setEnabled(true);
-    ui->tab3_imApplyAll_pushButton->setEnabled(true);
-    ui->tab3_phaseLow_spinBox     ->setEnabled(true);
-    ui->tab3_phaseHgh_spinBox     ->setEnabled(true);
-    ui->tab3_mask1Low_spinBox     ->setEnabled(true);
-    ui->tab3_mask1Hgh_spinBox     ->setEnabled(true);
-    ui->tab3_mask2Low_spinBox     ->setEnabled(true);
-    ui->tab3_mask2Hgh_spinBox     ->setEnabled(true);
-    ui->tab3_mask3Low_spinBox     ->setEnabled(true);
-    ui->tab3_mask3Hgh_spinBox     ->setEnabled(true);
-    ui->tab3_rowHgh_spinBox       ->setEnabled(true);
-    ui->tab3_rowLow_spinBox       ->setEnabled(true);
-    ui->tab3_colHgh_spinBox       ->setEnabled(true);
-    ui->tab3_colLow_spinBox       ->setEnabled(true);
-    ui->tab3_cmap_comboBox        ->setEnabled(true);
-    ui->tab3_phase_label          ->setEnabled(true);
-    ui->tab3_mask_label           ->setEnabled(true);
-    ui->tab3_row_label            ->setEnabled(true);
-    ui->tab3_col_label            ->setEnabled(true);
-    ui->tab3_cmap_label           ->setEnabled(true);
+    ui->tab3_setNext_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
+    ui->tab3_setPrev_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
 
     this->on_tab3_set_comboBox_currentIndexChanged(0);
-
   }
+
+  // print message to status-bar
+  QString msg;
+  if      ( index==0 ) msg = "Overview, load existing state, storage settings";
+  else if ( index==1 ) msg = "Select measure and image type(s)";
+  else if ( index==2 ) msg = "Select images";
+  else if ( index==3 ) msg = "Check/modify images";
+  else if ( index==4 ) msg = "Run computation";
+  statusBar()->showMessage(msg);
+
+  prevTab_ = index;
 }
 
 // ============================================================================
@@ -223,7 +323,8 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
 
 void MainWindow::on_tab0_load_pushButton_clicked()
 {
-  this->WIP(); return;
+  this->promptWorkInProgress("JSON file functionality will become available soon");
+  return;
 
   QString fname = QFileDialog::getOpenFileName(\
     this,\
@@ -240,27 +341,79 @@ void MainWindow::on_tab0_load_pushButton_clicked()
 
 void MainWindow::on_tab0_outdir_pushButton_clicked()
 {
+  QString dirPrev = ui->tab0_outdir_lineEdit->text();
+  QString dirOpen = dirPrev;
+
+  // set default directory to open the file-dialog
+  if ( dirOpen.size()==0 )
+    dirOpen = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+
+  // alias widgets
+  QLineEdit   *line[3];
+  QListWidget *list[2];
+  line[0] = ui->tab0_result_lineEdit;
+  line[1] = ui->tab0_pdfRaw_lineEdit;
+  line[2] = ui->tab0_pdfInterp_lineEdit;
+  list[0] = ui->tab2_im0_listWidget;
+  list[1] = ui->tab2_im1_listWidget;
+
+  // open file-dialog
   QString dir = QFileDialog::getExistingDirectory(\
     this,\
     tr("Open Directory"),\
-    QStandardPaths::writableLocation(QStandardPaths::HomeLocation),\
+    dirOpen,\
     QFileDialog::ShowDirsOnly\
   );
 
+  // no directory selected -> quit function
   if ( dir.size()==0 )
     return;
 
+  // store directory
   ui->tab0_outdir_lineEdit->setText(dir);
 
-  if ( ui->tab0_result_lineEdit->text()=="" )
-    ui->tab0_result_lineEdit->setText("GooseEYE.json");
+  // working directory changes -> convert relative paths to absolute ones
+  // then convert it to new relative paths
+  if ( dirPrev.size()>0 ) {
+    // - convert type
+    QDir Dir(dir);
+    // - filenames in QListEdit
+    for ( size_t i=0 ; i<3 ; i++ )
+      if ( line[i]->text().size()>0 )
+        line[i]->setText(Dir.relativeFilePath(QDir(dirPrev).filePath(line[i]->text())));
+    // - filenames in QListWidget
+    for ( size_t i=0 ; i<2 ; i++ )
+      for ( size_t j=0 ; j<list[i]->count() ; j++ )
+        list[i]->item(j)->setText(Dir.relativeFilePath(QDir(dirPrev).filePath(list[i]->item(j)->text())));
+  }
 
-  if ( ui->tab0_pdfRaw_lineEdit->text()=="" )
-    ui->tab0_pdfRaw_lineEdit->setText("GooseEYE_result.pdf");
+  // check to set default
+  if ( ui->tab0_result_lineEdit->text()!="" && ui->tab0_pdfRaw_lineEdit->text()!="" && ui->tab0_pdfInterp_lineEdit->text()!="" )
+    return;
 
-  if ( ui->tab0_pdfInterp_lineEdit->text()=="" )
-    ui->tab0_pdfInterp_lineEdit->setText("GooseEYE_result_interpretation.pdf");
+  // default file-names
+  QString result    = "GooseEYE.json";
+  QString pdfRaw    = "GooseEYE_result.pdf";
+  QString pdfInterp = "GooseEYE_result_interpretation.pdf";
 
+  // if one of default files exists, find a number to append the files
+  // (the same number if used for all files)
+  if ( this->fileExists(result,dir) || this->fileExists(pdfRaw,dir) || this->fileExists(pdfInterp,dir)  ) {
+    result    = "GooseEYE-%1.json";
+    pdfRaw    = "GooseEYE-%1_result.pdf";
+    pdfInterp = "GooseEYE-%1_result_interpretation.pdf";
+    int i = 1;
+    while ( this->fileExists(result.arg(QString::number(i)),dir) || this->fileExists(pdfRaw.arg(QString::number(i)),dir) || this->fileExists(pdfInterp.arg(QString::number(i)),dir)  )
+      i++;
+    result    = result   .arg(QString::number(i));
+    pdfRaw    = pdfRaw   .arg(QString::number(i));
+    pdfInterp = pdfInterp.arg(QString::number(i));
+  }
+
+  // store the default filenames
+  if ( ui->tab0_result_lineEdit   ->text()=="" ) ui->tab0_result_lineEdit   ->setText(result);
+  if ( ui->tab0_pdfRaw_lineEdit   ->text()=="" ) ui->tab0_pdfRaw_lineEdit   ->setText(pdfRaw);
+  if ( ui->tab0_pdfInterp_lineEdit->text()=="" ) ui->tab0_pdfInterp_lineEdit->setText(pdfInterp);
 }
 
 // -----------------------------------------------------------------------------
@@ -277,13 +430,44 @@ void MainWindow::on_tab0_result_pushButton_clicked()
   if ( fname.size()==0 )
     return;
 
-  if ( ui->tab0_outdir_lineEdit->text()!="" )
+  QDir dir(ui->tab0_outdir_lineEdit->text());
+  ui->tab0_result_lineEdit->setText(dir.relativeFilePath(fname));
+}
+
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab0_pdfRaw_pushButton_clicked()
+{
+  QString fname = QFileDialog::getOpenFileName(\
+    this,\
+    tr("Open File"),\
+    QStandardPaths::writableLocation(QStandardPaths::HomeLocation),\
+    tr("State Files (*.pdf *.PDF)")\
+  );
+
+  if ( fname.size()==0 )
     return;
 
-  QFileInfo finfo(fname);
-  QDir      fdir = finfo.dir();
+  QDir dir(ui->tab0_outdir_lineEdit->text());
+  ui->tab0_pdfRaw_lineEdit->setText(dir.relativeFilePath(fname));
+}
 
-  ui->tab0_outdir_lineEdit->setText(fdir.dirName());
+// -----------------------------------------------------------------------------
+
+void MainWindow::on_tab0_pdfInterp_pushButton_clicked()
+{
+  QString fname = QFileDialog::getOpenFileName(\
+    this,\
+    tr("Open File"),\
+    QStandardPaths::writableLocation(QStandardPaths::HomeLocation),\
+    tr("State Files (*.pdf *.PDF)")\
+  );
+
+  if ( fname.size()==0 )
+    return;
+
+  QDir dir(ui->tab0_outdir_lineEdit->text());
+  ui->tab0_pdfInterp_lineEdit->setText(dir.relativeFilePath(fname));
 }
 
 // ============================================================================
@@ -383,7 +567,7 @@ void MainWindow::tab1_selectStat(void)
 
   // function not implemented: show warning
   if ( func_=="" ) {
-    this->WIP();
+    this->promptWorkInProgress("Function under construction");
     return;
   }
 
@@ -394,10 +578,6 @@ void MainWindow::tab1_selectStat(void)
   // apply phase label
   for ( int i=0 ; i<2 ; i++ )
     check[i]->setText(phase_[i]);
-
-  // selection of image 1: force-select
-  check[0]->setEnabled(false);
-  check[0]->setChecked(true );
 
   // selection of image 2: -1=disable ; 0=user-select ; 1=force-select
   if      ( im1==-1 ) {
@@ -492,7 +672,7 @@ void MainWindow::tab1_selectStat(void)
 // tab2: add/remove/move files to/in QListWidgets
 // =============================================================================
 
-void MainWindow::filesAdd(QListWidget *list)
+void MainWindow::filesAdd(QListWidget *list, size_t set)
 {
   QStringList filters;
   filters << "Image files (*.png *.xpm *.jpg *.jpeg *.tif *.tiff *.bmp)"
@@ -501,33 +681,40 @@ void MainWindow::filesAdd(QListWidget *list)
   QFileDialog dialog(this);
   dialog.setFileMode   (QFileDialog::ExistingFiles);
   dialog.setOption     (QFileDialog::HideNameFilterDetails,false);
-  dialog.setDirectory  (outDir_);
+  dialog.setDirectory  (ui->tab0_outdir_lineEdit->text());
   dialog.setNameFilters(filters);
   dialog.setViewMode   (QFileDialog::List);
 
   QStringList fileNames;
   if (dialog.exec())
-      fileNames = dialog.selectedFiles();
+    fileNames = dialog.selectedFiles();
 
-  QDir dir(outDir_);
+  QDir dir(ui->tab0_outdir_lineEdit->text());
   for ( int i=0 ; i<fileNames.size() ; i++ )
     fileNames[i] = dir.relativeFilePath(fileNames[i]);
 
   list->addItems(fileNames);
+
+   for ( size_t i=0 ; i<fileNames.size() ; i++ )
+     data_.itemAdd(set,fileNames[i].toStdString());
 }
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::filesRm(QListWidget *list)
+void MainWindow::filesRm(QListWidget *list, size_t set)
 {
   QList<QListWidgetItem*> items = list->selectedItems();
-  foreach (QListWidgetItem *item, items)
+
+  foreach (QListWidgetItem *item, items) {
+    size_t row = list->row(item);
     delete list->takeItem(list->row(item));
+    data_.itemRm(set,row);
+  }
 }
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::filesUp(QListWidget *list)
+void MainWindow::filesUp(QListWidget *list, size_t set)
 {
   QList<QListWidgetItem*> items = list->selectedItems();
 
@@ -550,11 +737,14 @@ void MainWindow::filesUp(QListWidget *list)
 
   for ( int i=0 ; i<items.size() ; i++ )
     list->item(row[i]-1)->setSelected(true);
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    data_.itemUp(set,row[i]);
 }
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::filesDwn(QListWidget *list)
+void MainWindow::filesDwn(QListWidget *list, size_t set)
 {
   QList<QListWidgetItem*> items = list->selectedItems();
 
@@ -577,11 +767,14 @@ void MainWindow::filesDwn(QListWidget *list)
 
   for ( int i=0 ; i<items.size() ; i++ )
     list->item(row[i]+1)->setSelected(true);
+
+  for ( int i=0 ; i<items.size() ; i++ )
+    data_.itemDown(set,row[i]);
 }
 
 // -----------------------------------------------------------------------------
 
-void MainWindow::filesCp(QListWidget *src,QListWidget *dest)
+void MainWindow::filesCp(QListWidget *src,QListWidget *dest, size_t src_set, size_t dest_set)
 {
   if ( dest->count()>0 ) {
     QMessageBox::warning(\
@@ -591,6 +784,7 @@ void MainWindow::filesCp(QListWidget *src,QListWidget *dest)
       QMessageBox::Ok,\
       QMessageBox::Ok\
     );
+    return;
   }
 
   for ( int i=0 ; i<src->count() ; i++ )
@@ -598,8 +792,19 @@ void MainWindow::filesCp(QListWidget *src,QListWidget *dest)
 }
 
 // =============================================================================
-// tab3: fill
+// tab2: store data
 // =============================================================================
+
+// void MainWindow::tab2_clearFiles ( void )
+// {
+//   size_t nset;
+//   if ( ui->tab1_im1_checkBox->isChecked() ) { nset = 2; }
+//   else                                      { nset = 1; }
+
+//   files_.clear();
+//   files_.reserve(nset,ui->tab2_im0_listWidget->count());
+// }
+
 
 // =============================================================================
 // tab3: define "set" of images, based on statistic; create list of files
@@ -634,7 +839,7 @@ void MainWindow::on_tab3_set_comboBox_currentIndexChanged(int index)
 void MainWindow::tab3_readImage(void)
 {
   // load the image
-  QString fname = QDir(outDir_).filePath(ui->tab3_im_comboBox->currentText());
+  QString fname = QDir(ui->tab0_outdir_lineEdit->text()).filePath(ui->tab3_im_comboBox->currentText());
   imgRawQt_.load(fname);
 
   // read the size
@@ -812,7 +1017,8 @@ void MainWindow::tab3_viewPhase(void)
     cols[255*3+0] =   0; cols[255*3+1] =   0; cols[255*3+2] =   0; // black mask
   }
   else {
-    cols = cppcolormap::Greys(256);
+    cols = cppcolormap::colormap(ui->tab3_cmap_comboBox->currentText().toStdString(),256);
+//    cols = cppcolormap::Greys(256);
     cols[255*3+0] = 255; cols[255*3+1] =   0; cols[255*3+2] =   0; // red mask
   }
   // convert to Qt format
@@ -910,6 +1116,7 @@ colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
 // rescale the key (x) and value (y) axes so the whole color map is visible:
 ui->raw_customPlot->rescaleAxes();
 }
+
 
 
 

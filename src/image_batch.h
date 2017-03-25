@@ -18,6 +18,7 @@ class Files8_2D
 private:
 
 std::vector<std::string> _fname           ;
+std::vector<size_t>      _saved           ;
 std::vector<size_t>      _rowMin          ;
 std::vector<size_t>      _rowMax          ;
 std::vector<size_t>      _colMin          ;
@@ -26,7 +27,6 @@ std::vector<size_t>      _phaseMin        ;
 std::vector<size_t>      _phaseMax        ;
 std::vector<size_t>      _maskMin         ;
 std::vector<size_t>      _maskMax         ;
-size_t                   _N        = 0    ;
 size_t                   _nset     = 2    ;
 size_t                   _ndim     = 2    ;
 size_t                   _nmsk     = 3    ;
@@ -35,7 +35,9 @@ bool                     _zeropad  = false;
 std::string              _stat     = ""   ;
 std::string              _mode     = ""   ;
 std::vector<size_t>      _roi             ;
+std::vector<size_t>      _N               ;
 std::vector<std::string> _dtype           ;
+std::vector<std::string> _phase           ;
 
 public:
 
@@ -48,35 +50,19 @@ Files8_2D& operator=(const Files8_2D &) = default;
 
 Files8_2D(){};
 
-// explicit constructor
-// --------------------
-
-Files8_2D( size_t N, std::string stat="",\
-  std::vector<size_t> roi=std::vector<size_t>(),\
-  std::vector<std::string> dtype=std::vector<std::string>(),\
-  bool zeropad=false, bool periodic=true,\
-  std::string mode="Bresenham" )
-{
-  this->reserve(N);
-
-  _periodic = periodic;
-  _zeropad  = zeropad;
-  _stat     = stat;
-  _mode     = mode;
-
-  for ( size_t i=0 ; i<roi  .size() ; i++ ) { _roi  [i] = roi  [i]; }
-  for ( size_t i=0 ; i<dtype.size() ; i++ ) { _dtype[i] = dtype[i]; }
-};
+Files8_2D( size_t N ) { this->reserve(N); };
 
 // reserve a given size
 // --------------------
 
 void reserve ( size_t N )
 {
-  _N = N;
   while ( _roi     .size()<_ndim         ) { _roi     .push_back(0);  }
+  while ( _N       .size()<_nset         ) { _N       .push_back(0);  }
   while ( _dtype   .size()<_nset         ) { _dtype   .push_back(""); }
+  while ( _phase   .size()<_nset         ) { _phase   .push_back(""); }
   while ( _fname   .size()<_nset*N       ) { _fname   .push_back(""); }
+  while ( _saved   .size()<_nset*N       ) { _saved   .push_back(0);  }
   while ( _rowMin  .size()<_nset*N       ) { _rowMin  .push_back(0);  }
   while ( _rowMax  .size()<_nset*N       ) { _rowMax  .push_back(0);  }
   while ( _colMin  .size()<_nset*N       ) { _colMin  .push_back(0);  }
@@ -92,14 +78,16 @@ void reserve ( size_t N )
 
 void clear ( void )
 {
-  _N        = 0;
   _periodic = true;
   _zeropad  = false;
   _stat     = "";
   _mode     = "";
   for ( size_t i=0 ; i<_roi     .size() ; i++ ) { _roi     [i] = 0;  }
+  for ( size_t i=0 ; i<_N       .size() ; i++ ) { _N       [i] = 0;  }
   for ( size_t i=0 ; i<_dtype   .size() ; i++ ) { _dtype   [i] = ""; }
+  for ( size_t i=0 ; i<_phase   .size() ; i++ ) { _phase   [i] = ""; }
   for ( size_t i=0 ; i<_fname   .size() ; i++ ) { _fname   [i] = ""; }
+  for ( size_t i=0 ; i<_saved   .size() ; i++ ) { _saved   [i] = 0;  }
   for ( size_t i=0 ; i<_rowMin  .size() ; i++ ) { _rowMin  [i] = 0;  }
   for ( size_t i=0 ; i<_rowMax  .size() ; i++ ) { _rowMax  [i] = 0;  }
   for ( size_t i=0 ; i<_colMin  .size() ; i++ ) { _colMin  [i] = 0;  }
@@ -108,6 +96,173 @@ void clear ( void )
   for ( size_t i=0 ; i<_phaseMax.size() ; i++ ) { _phaseMax[i] = 0;  }
   for ( size_t i=0 ; i<_maskMin .size() ; i++ ) { _maskMin [i] = 0;  }
   for ( size_t i=0 ; i<_maskMax .size() ; i++ ) { _maskMax [i] = 0;  }
+}
+
+// add empty item
+// --------------
+
+void itemAdd( size_t set , std::string fname="" )
+{
+  this->reserve(0);
+  _N[set]++;
+  this->reserve(_N[set]);
+  _fname[(_N[set]-1)*_nset+set] = fname;
+}
+
+// remove item
+// -----------
+
+void itemRm ( size_t set, size_t idx )
+{
+  for ( size_t i=idx+1 ; i<_N[set] ; i++ ) {
+
+    _fname   [(i-1)*_nset+set] = _fname   [i*_nset+set];
+    _saved   [(i-1)*_nset+set] = _saved   [i*_nset+set];
+    _rowMin  [(i-1)*_nset+set] = _rowMin  [i*_nset+set];
+    _rowMax  [(i-1)*_nset+set] = _rowMax  [i*_nset+set];
+    _colMin  [(i-1)*_nset+set] = _colMin  [i*_nset+set];
+    _colMax  [(i-1)*_nset+set] = _colMax  [i*_nset+set];
+    _phaseMin[(i-1)*_nset+set] = _phaseMin[i*_nset+set];
+    _phaseMax[(i-1)*_nset+set] = _phaseMax[i*_nset+set];
+
+    for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
+      _maskMin[(i-1)*_nset*_nmsk+set*_nmsk+imsk] = _maskMin[i*_nset*_nmsk+set*_nmsk+imsk];
+      _maskMax[(i-1)*_nset*_nmsk+set*_nmsk+imsk] = _maskMax[i*_nset*_nmsk+set*_nmsk+imsk];
+    }
+
+  }
+
+  _N[set]--;
+}
+
+// move item up
+// ------------
+
+void itemUp ( size_t set, size_t i )
+{
+  if ( i<=0 )
+    return;
+
+  std::string fname   ;
+  size_t      saved   ;
+  size_t      rowMin  ;
+  size_t      rowMax  ;
+  size_t      colMin  ;
+  size_t      colMax  ;
+  size_t      phaseMin;
+  size_t      phaseMax;
+  std::vector<size_t> maskMin (_nmsk);
+  std::vector<size_t> maskMax (_nmsk);
+
+  fname    = _fname   [i*_nset+set];
+  saved    = _saved   [i*_nset+set];
+  rowMin   = _rowMin  [i*_nset+set];
+  rowMax   = _rowMax  [i*_nset+set];
+  colMin   = _colMin  [i*_nset+set];
+  colMax   = _colMax  [i*_nset+set];
+  phaseMin = _phaseMin[i*_nset+set];
+  phaseMax = _phaseMax[i*_nset+set];
+
+  for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
+    maskMin[set*_nmsk+imsk] = _maskMin[i*_nset*_nmsk+set*_nmsk+imsk];
+    maskMax[set*_nmsk+imsk] = _maskMax[i*_nset*_nmsk+set*_nmsk+imsk];
+  }
+
+  _fname   [i*_nset+set] = _fname   [(i-1)*_nset+set];
+  _saved   [i*_nset+set] = _saved   [(i-1)*_nset+set];
+  _rowMin  [i*_nset+set] = _rowMin  [(i-1)*_nset+set];
+  _rowMax  [i*_nset+set] = _rowMax  [(i-1)*_nset+set];
+  _colMin  [i*_nset+set] = _colMin  [(i-1)*_nset+set];
+  _colMax  [i*_nset+set] = _colMax  [(i-1)*_nset+set];
+  _phaseMin[i*_nset+set] = _phaseMin[(i-1)*_nset+set];
+  _phaseMax[i*_nset+set] = _phaseMax[(i-1)*_nset+set];
+
+  for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
+    _maskMin[i*_nset*_nmsk+set*_nmsk+imsk] = _maskMin[(i-1)*_nset*_nmsk+set*_nmsk+imsk];
+    _maskMax[i*_nset*_nmsk+set*_nmsk+imsk] = _maskMax[(i-1)*_nset*_nmsk+set*_nmsk+imsk];
+  }
+
+  _fname   [(i-1)*_nset+set] = fname   ;
+  _saved   [(i-1)*_nset+set] = saved   ;
+  _rowMin  [(i-1)*_nset+set] = rowMin  ;
+  _rowMax  [(i-1)*_nset+set] = rowMax  ;
+  _colMin  [(i-1)*_nset+set] = colMin  ;
+  _colMax  [(i-1)*_nset+set] = colMax  ;
+  _phaseMin[(i-1)*_nset+set] = phaseMin;
+  _phaseMax[(i-1)*_nset+set] = phaseMax;
+
+  for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
+    _maskMin[(i-1)*_nset*_nmsk+set*_nmsk+imsk] = maskMin[set*_nmsk+imsk];
+    _maskMax[(i-1)*_nset*_nmsk+set*_nmsk+imsk] = maskMax[set*_nmsk+imsk];
+  }
+
+}
+
+// move item down
+// --------------
+
+void itemDown ( size_t set, size_t i )
+{
+  if ( i>=_N[set]-1 )
+    return;
+
+  std::string fname   ;
+  size_t      saved   ;
+  size_t      rowMin  ;
+  size_t      rowMax  ;
+  size_t      colMin  ;
+  size_t      colMax  ;
+  size_t      phaseMin;
+  size_t      phaseMax;
+  std::vector<size_t> maskMin (_nmsk);
+  std::vector<size_t> maskMax (_nmsk);
+
+  for ( size_t set=0 ; set<_nset ; set++ ) {
+
+    fname    = _fname   [i*_nset+set];
+    saved    = _saved   [i*_nset+set];
+    rowMin   = _rowMin  [i*_nset+set];
+    rowMax   = _rowMax  [i*_nset+set];
+    colMin   = _colMin  [i*_nset+set];
+    colMax   = _colMax  [i*_nset+set];
+    phaseMin = _phaseMin[i*_nset+set];
+    phaseMax = _phaseMax[i*_nset+set];
+
+    for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
+      maskMin[set*_nmsk+imsk] = _maskMin[i*_nset*_nmsk+set*_nmsk+imsk];
+      maskMax[set*_nmsk+imsk] = _maskMax[i*_nset*_nmsk+set*_nmsk+imsk];
+    }
+
+    _fname   [i*_nset+set] = _fname   [(i+1)*_nset+set];
+    _saved   [i*_nset+set] = _saved   [(i+1)*_nset+set];
+    _rowMin  [i*_nset+set] = _rowMin  [(i+1)*_nset+set];
+    _rowMax  [i*_nset+set] = _rowMax  [(i+1)*_nset+set];
+    _colMin  [i*_nset+set] = _colMin  [(i+1)*_nset+set];
+    _colMax  [i*_nset+set] = _colMax  [(i+1)*_nset+set];
+    _phaseMin[i*_nset+set] = _phaseMin[(i+1)*_nset+set];
+    _phaseMax[i*_nset+set] = _phaseMax[(i+1)*_nset+set];
+
+    for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
+      _maskMin[i*_nset*_nmsk+set*_nmsk+imsk] = _maskMin[(i+1)*_nset*_nmsk+set*_nmsk+imsk];
+      _maskMax[i*_nset*_nmsk+set*_nmsk+imsk] = _maskMax[(i+1)*_nset*_nmsk+set*_nmsk+imsk];
+    }
+
+    _fname   [(i+1)*_nset+set] = fname   ;
+    _saved   [(i+1)*_nset+set] = saved   ;
+    _rowMin  [(i+1)*_nset+set] = rowMin  ;
+    _rowMax  [(i+1)*_nset+set] = rowMax  ;
+    _colMin  [(i+1)*_nset+set] = colMin  ;
+    _colMax  [(i+1)*_nset+set] = colMax  ;
+    _phaseMin[(i+1)*_nset+set] = phaseMin;
+    _phaseMax[(i+1)*_nset+set] = phaseMax;
+
+    for ( size_t imsk=0 ; imsk<_nmsk ; imsk++ ) {
+      _maskMin[(i+1)*_nset*_nmsk+set*_nmsk+imsk] = maskMin[set*_nmsk+imsk];
+      _maskMax[(i+1)*_nset*_nmsk+set*_nmsk+imsk] = maskMax[set*_nmsk+imsk];
+    }
+
+  }
+
 }
 
 // insert information (no bounds-check is performed)
@@ -120,7 +275,9 @@ void set_zeropad  (                                    bool   in ) { _zeropad   
 void set_stat     (                               std::string in ) { _stat                                   = in; };
 void set_mode     (                               std::string in ) { _mode                                   = in; };
 void set_dtype    ( size_t set,                   std::string in ) { _dtype   [               set          ] = in; };
+void set_phase    ( size_t set,                   std::string in ) { _phase   [               set          ] = in; };
 void set_fname    ( size_t set, size_t i,         std::string in ) { _fname   [i*_nset       +set          ] = in; };
+void set_saved    ( size_t set, size_t i,              size_t in ) { _saved   [i*_nset       +set          ] = in; };
 void set_rowMin   ( size_t set, size_t i,              size_t in ) { _rowMin  [i*_nset       +set          ] = in; };
 void set_rowMax   ( size_t set, size_t i,              size_t in ) { _rowMax  [i*_nset       +set          ] = in; };
 void set_colMin   ( size_t set, size_t i,              size_t in ) { _colMin  [i*_nset       +set          ] = in; };
@@ -133,6 +290,10 @@ void set_maskMax  ( size_t set, size_t i, size_t imsk, size_t in ) { _maskMax [i
 // return information (no bounds-check is performed)
 // -------------------------------------------------
 
+size_t count ( size_t set ) { return _N[set]; }
+
+size_t nset  ( void ) { size_t i=0; while ( i+1<_nset && _dtype[i].size()!=0 ) i++; return i; }
+
 std::vector<size_t> roi ( void ) { return _roi; };
 
 bool        periodic ( void                              ) { return _periodic;                               };
@@ -140,7 +301,9 @@ bool        zeropad  ( void                              ) { return _zeropad ;  
 std::string stat     ( void                              ) { return _stat    ;                               };
 std::string mode     ( void                              ) { return _mode    ;                               };
 std::string dtype    ( size_t set                        ) { return _dtype   [               set          ]; };
+std::string phase    ( size_t set                        ) { return _phase   [               set          ]; };
 std::string fname    ( size_t set, size_t i              ) { return _fname   [i*_nset       +set          ]; };
+size_t      saved    ( size_t set, size_t i              ) { return _saved   [i*_nset       +set          ]; };
 size_t      rowMin   ( size_t set, size_t i              ) { return _rowMin  [i*_nset       +set          ]; };
 size_t      rowMax   ( size_t set, size_t i              ) { return _rowMax  [i*_nset       +set          ]; };
 size_t      colMin   ( size_t set, size_t i              ) { return _colMin  [i*_nset       +set          ]; };
