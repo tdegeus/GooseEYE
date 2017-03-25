@@ -117,6 +117,20 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_cmap_comboBox   ,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
   connect(ui->tab3_maskCol_comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
 
+  // tab4: read roi
+  connect(ui->tab4_roiRow_spinBox,&QSpinBox::editingFinished,[=](){data_.set_roi(0,ui->tab4_roiRow_spinBox->value());});
+  connect(ui->tab4_roiCol_spinBox,&QSpinBox::editingFinished,[=](){data_.set_roi(1,ui->tab4_roiCol_spinBox->value());});
+  connect(ui->tab4_compute_pushButton,&QPushButton::clicked,[=](){data_.compute(); this->tab4_plotResult(); this->tab4_plotInterp(); this->tab4_saveResult(); this->tab4_saveInterp();});
+  connect(ui->tab4_save_pushButton   ,&QPushButton::clicked,[=](){this->tab4_saveResult(); this->tab4_saveInterp();});
+
+  connect(ui->tab4_climLow_raw_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotResult();});
+  connect(ui->tab4_climHgh_raw_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotResult();});
+  connect(ui->tab4_climLow_interp_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotInterp();});
+  connect(ui->tab4_climHgh_interp_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotInterp();});
+
+  connect(ui->tab4_cmap_raw_comboBox,SIGNAL(activated(int)),this,SLOT(tab4_plotResult()));
+  connect(ui->tab4_cmap_interp_comboBox,SIGNAL(activated(int)),this,SLOT(tab4_plotInterp()));
+
 }
 
 // ============================================================================
@@ -285,6 +299,32 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
     ui->tab3_setPrev_pushButton->setEnabled(check[0]->isChecked() && check[1]->isChecked());
 
     this->on_tab3_set_comboBox_currentIndexChanged(0);
+  }
+
+  // tab4: select region-of-interest
+  if ( index==4 ) {
+
+    size_t row = 0;
+    size_t col = 0;
+
+    for ( size_t set=0 ; set<data_.nset() ; set++ ) {
+      for ( size_t i=0 ; i<data_.count(set) ; i++ ) {
+        if ( row==0 )
+          row = data_.rowMax(set,i)-data_.rowMin(set,i);
+        else
+          row = std::min(row,data_.rowMax(set,i)-data_.rowMin(set,i));
+        if ( col==0 )
+          col = data_.colMax(set,i)-data_.colMin(set,i);
+        else
+          col = std::min(col,data_.colMax(set,i)-data_.colMin(set,i));
+      }
+    }
+
+    ui->tab4_roiRow_spinBox->setMaximum(row   );
+    ui->tab4_roiRow_spinBox->setValue  (row/10);
+    ui->tab4_roiCol_spinBox->setMaximum(col   );
+    ui->tab4_roiCol_spinBox->setValue  (col/10);
+
   }
 
   // print message to status-bar
@@ -1188,6 +1228,21 @@ colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
 
 // rescale the key (x) and value (y) axes so the whole color map is visible:
 ui->raw_customPlot->rescaleAxes();
+}
+
+void MainWindow::tab4_plotInterp(void)
+{
+
+}
+
+void MainWindow::tab4_saveResult(void)
+{
+
+}
+
+void MainWindow::tab4_saveInterp(void)
+{
+
 }
 
 

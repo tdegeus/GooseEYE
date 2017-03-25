@@ -38,6 +38,8 @@ std::vector<size_t>      _roi             ;
 std::vector<size_t>      _N               ;
 std::vector<std::string> _dtype           ;
 std::vector<std::string> _phase           ;
+Image::Matrix<double>    _result          ;
+double                   _norm            ;
 
 public:
 
@@ -269,6 +271,7 @@ void itemDown ( size_t set, size_t i )
 // -------------------------------------------------
 
 void set_roi ( std::vector<size_t> in ) { for ( size_t i=0 ; i<_ndim ; i++ ) { _roi[i] = in[i]; } };
+void set_roi ( size_t i , size_t in ) { _roi[i] = in; };
 
 void set_periodic (                                    bool   in ) { _periodic                               = in; };
 void set_zeropad  (                                    bool   in ) { _zeropad                                = in; };
@@ -289,6 +292,9 @@ void set_maskMax  ( size_t set, size_t i, size_t imsk, size_t in ) { _maskMax [i
 
 // return information (no bounds-check is performed)
 // -------------------------------------------------
+
+Image::Matrix<double> result ( void ) { return _result; }
+double                norm   ( void ) { return _norm;   }
 
 size_t count ( size_t set ) { return _N[set]; }
 
@@ -393,6 +399,39 @@ std::tuple<Image::Matrix<int>,Image::Matrix<int>> image ( \
 {
   Image::Matrix<int> im = func(_fname[idx*_nset+set]);
   return this->image(set,idx,im,crop);
+}
+
+// perform computation: front end
+// ------------------------------
+
+void compute_S2 ( Image::Matrix<int> (*func)(std::string) )
+{
+  _result.reshape(_roi);
+
+  int n;
+  int N = 0;
+  Image::Matrix<double> tmp(_roi);
+  Image::Matrix<int> f,g,mask;
+
+  for ( size_t i=0 ; i<this->count(0) ; i++ ) {
+    if ( true            ) std::tie(f,mask) = this->image(0,i,func);
+    if ( this->nset()==1 ) std::tie(g,mask) = this->image(1,i,func);
+    else                   std::tie(g,mask) = this->image(0,i,func);
+    std::tie(tmp,n) = Image::S2(f,g,_roi);
+    for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
+      tmp[idx] *= static_cast<double>(n);
+    for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
+      _result[idx] += tmp[idx];
+    N += n;
+  }
+  for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
+    _result[idx] /= static_cast<double>(N);
+
+}
+
+void compute ( Image::Matrix<int> (*func)(std::string) )
+{
+  if     ( _stat=="S2" ) { this->compute_S2(func); }
 }
 
 }; // class Files8_2D

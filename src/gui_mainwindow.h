@@ -61,6 +61,9 @@ private slots:
   void tab3_applyAll(void);
 
   void tab4_plotResult(void);
+  void tab4_plotInterp(void);
+  void tab4_saveResult(void);
+  void tab4_saveInterp(void);
 
   // write to message bar
   void on_tabWidget_tabBarClicked(int index);
