@@ -865,8 +865,8 @@ void MainWindow::tab3_readImage(void)
   size_t ncol = imgRawQt_.width ();
 
   // allocate data
-  imgRaw_ .reshape({nrow,ncol});
-  imgView_.reshape({nrow,ncol});
+  imgRaw_ .resize({nrow,ncol});
+  imgView_.resize({nrow,ncol});
 
   // read image
   for ( size_t i=0 ; i<nrow ; i++ )

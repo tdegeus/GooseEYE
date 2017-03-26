@@ -406,40 +406,27 @@ std::tuple<Image::Matrix<int>,Image::Matrix<int>> image ( \
 
 void compute_S2 ( Image::Matrix<int> (*func)(std::string) )
 {
-  _result.reshape(_roi);
-
-  std::vector<size_t> shape;
-  shape.push_back(10);
-  shape.push_back(10);
-
+  _result.resize(_roi);
   int n;
+  int N = 0;
   Image::Matrix<double> tmp;
-  Image::Matrix<int> f({100,100});
-  Image::Matrix<int> g({100,100});
+  Image::Matrix<int>    f,g,fmask,gmask;
 
-  std::tie(tmp,n) = Image::S2(f,g,shape);
-
-
-
-
-  // int n;
-  // int N = 0;
-  // Image::Matrix<double> tmp(_roi);
-  // Image::Matrix<int> f,g,mask;
-
-  // for ( size_t i=0 ; i<this->count(0) ; i++ ) {
-  //   if ( true            ) std::tie(f,mask) = this->image(0,i,func);
-  //   if ( this->nset()==1 ) std::tie(g,mask) = this->image(1,i,func);
-  //   else                   std::tie(g,mask) = this->image(0,i,func);
-  //   std::tie(tmp,n) = Image::S2(f,g,_roi);
-  //   for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
-  //     tmp[idx] *= static_cast<double>(n);
-  //   for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
-  //     _result[idx] += tmp[idx];
-  //   N += n;
-  // }
-  // for ( size_t idx=0 ; idx<tmp.size() ; idx++ )
-  //   _result[idx] /= static_cast<double>(N);
+  // loop over ensemble
+  for ( size_t i=0 ; i<this->count(0) ; i++ ) {
+    // load images
+    if ( true            ) std::tie(f,fmask) = this->image(0,i,func);
+    if ( this->nset()==2 ) std::tie(g,gmask) = this->image(1,i,func);
+    else                   std::tie(g,gmask) = this->image(0,i,func);
+    // compute correlation
+    std::tie(tmp,n) = Image::S2(f,g,_roi);
+    // add to ensemble average
+    tmp     *= static_cast<double>(n);
+    _result += tmp;
+    N       += n;
+  }
+  // scale ensemble average result
+  _result /= static_cast<double>(N);
 
 }
 

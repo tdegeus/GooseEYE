@@ -80,6 +80,65 @@ template <class T> class Matrix
     T& operator() ( size_t h, size_t i=0, size_t j=0 )
     { return _data[h*_strides[0]+i*_strides[1]+j*_strides[2]]; };
 
+    // arithmetic operators
+    // --------------------
+
+    Matrix<T>& operator*= (const Matrix<T> &rhs)
+    {
+      if ( this->shape()!=rhs.shape() )
+        throw std::runtime_error("Matrices must have the same shape");
+
+      for ( size_t i=0 ; i<this->size() ; i++ )
+        _data[i] *= rhs._data[i];
+
+      return *this;
+    }
+
+    Matrix<T>& operator/= (const Matrix<T> &rhs)
+    {
+      if ( this->shape()!=rhs.shape() )
+        throw std::runtime_error("Matrices must have the same shape");
+
+      for ( size_t i=0 ; i<this->size() ; i++ )
+        _data[i] /= rhs._data[i];
+
+      return *this;
+    }
+
+    Matrix<T>& operator+= (const Matrix<T> &rhs)
+    {
+      if ( this->shape()!=rhs.shape() )
+        throw std::runtime_error("Matrices must have the same shape");
+
+      for ( size_t i=0 ; i<this->size() ; i++ )
+        _data[i] += rhs._data[i];
+
+      return *this;
+    }
+
+    Matrix<T>& operator-= (const Matrix<T> &rhs)
+    {
+      if ( this->shape()!=rhs.shape() )
+        throw std::runtime_error("Matrices must have the same shape");
+
+      for ( size_t i=0 ; i<this->size() ; i++ )
+        _data[i] -= rhs._data[i];
+
+      return *this;
+    }
+
+    Matrix<T>& operator*= (T rhs)
+    { for ( size_t i=0 ; i<this->size() ; i++ ) _data[i] *= rhs; return *this; }
+
+    Matrix<T>& operator/= (T rhs)
+    { for ( size_t i=0 ; i<this->size() ; i++ ) _data[i] /= rhs; return *this; }
+
+    Matrix<T>& operator+= (T rhs)
+    { for ( size_t i=0 ; i<this->size() ; i++ ) _data[i] += rhs; return *this; }
+
+    Matrix<T>& operator-= (T rhs)
+    { for ( size_t i=0 ; i<this->size() ; i++ ) _data[i] -= rhs; return *this; }
+
     // iterators
     // ---------
 
@@ -95,7 +154,7 @@ template <class T> class Matrix
     // resize
     // ------
 
-    void reshape ( std::vector<size_t> shape )
+    void resize ( std::vector<size_t> shape )
     {
       if ( shape.size()<1 || shape.size()>3 )
         throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
@@ -181,8 +240,8 @@ template <class T> class Matrix
       return i+1;
     };
 
-    // minimum / maximum
-    // -----------------
+    // minimum / maximum / mean
+    // ------------------------
 
     T min ( void )
     { return *std::min_element(_data.begin(),_data.end()); };
@@ -190,7 +249,67 @@ template <class T> class Matrix
     T max ( void )
     { return *std::max_element(_data.begin(),_data.end()); };
 
+    double mean ( void )
+    {
+      T out = static_cast<T>(0);
+      for ( auto i : _data )
+        out += i;
+
+      return static_cast<double>(out)/static_cast<double>(this->size());
+    }
+
 }; // class Matrix
+
+// arithmetic operators
+// --------------------
+
+template <class T>
+Matrix<T> operator* (const Matrix<T> &A, const Matrix<T> &B)
+{ Matrix<T> C = A; return C *= B; }
+
+template <class T>
+Matrix<T> operator* (const Matrix<T> &A, T B)
+{ Matrix<T> C = A; return C *= B; }
+
+template <class T>
+Matrix<T> operator* (T A, const Matrix<T> &B)
+{ Matrix<T> C = B; return C *= A; }
+
+template <class T>
+Matrix<T> operator/ (const Matrix<T> &A, const Matrix<T> &B)
+{ Matrix<T> C = A; return C /= B; }
+
+template <class T>
+Matrix<T> operator/ (const Matrix<T> &A, T B)
+{ Matrix<T> C = A; return C /= B; }
+
+template <class T>
+Matrix<T> operator/ (T A, const Matrix<T> &B)
+{ Matrix<T> C = B; return C /= A; }
+
+template <class T>
+Matrix<T> operator+ (const Matrix<T> &A, const Matrix<T> &B)
+{ Matrix<T> C = A; return C += B; }
+
+template <class T>
+Matrix<T> operator+ (const Matrix<T> &A, T B)
+{ Matrix<T> C = A; return C += B; }
+
+template <class T>
+Matrix<T> operator+ (T A, const Matrix<T> &B)
+{ Matrix<T> C = B; return C += A; }
+
+template <class T>
+Matrix<T> operator- (const Matrix<T> &A, const Matrix<T> &B)
+{ Matrix<T> C = A; return C -= B; }
+
+template <class T>
+Matrix<T> operator- (const Matrix<T> &A, T B)
+{ Matrix<T> C = A; return C -= B; }
+
+template <class T>
+Matrix<T> operator- (T A, const Matrix<T> &B)
+{ Matrix<T> C = B; return C -= A; }
 
 // =============================================================================
 // Image::... (functions)
@@ -253,6 +372,10 @@ Mi dilate ( Mi &src, Mi &kernel, Vi& iterations  , b periodic=true );
 
 // statistics
 // ----------
+
+// spatial average
+template <class T> double mean ( Matrix<T> &src                     );
+template <class T> double mean ( Matrix<T> &src , Matrix<int> &mask );
 
 // 2-point probability (binary), 2-point cluster function (int), and 2-point correlations (double)
 std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );

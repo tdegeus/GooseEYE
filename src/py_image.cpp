@@ -101,6 +101,11 @@ mi.def("dilate",py::overload_cast<Mi&,Mi&,Vi&,b>(&Image::dilate),"Dilate image",
 // statistics
 // ----------
 
+mi.def("mean",py::overload_cast<Mi&    >(&Image::mean<int>   ),"Spatial average",py::arg("im")                );
+mi.def("mean",py::overload_cast<Md&    >(&Image::mean<double>),"Spatial average",py::arg("im")                );
+mi.def("mean",py::overload_cast<Mi&,Mi&>(&Image::mean<int>   ),"Spatial average",py::arg("im"),py::arg("mask"));
+mi.def("mean",py::overload_cast<Md&,Mi&>(&Image::mean<double>),"Spatial average",py::arg("im"),py::arg("mask"));
+
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&            >(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,        b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("zeropad")=false,py::arg("periodic")=true);
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,Mi&,    b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),                 py::arg("zeropad")=false,py::arg("periodic")=true);

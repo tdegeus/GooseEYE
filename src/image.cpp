@@ -983,6 +983,39 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 }
 
 // =============================================================================
+// mean
+// =============================================================================
+
+template <class T>
+double mean ( Matrix<T> &src , Matrix<int> &mask )
+{
+  T      out = static_cast<T>(0);
+  size_t n   = 0;
+
+  for ( size_t i=0 ; i<src.size() ; i++ ) {
+    if ( !mask[i] ) {
+      out += src[i];
+      n++;
+    }
+  }
+
+  return static_cast<double>(out)/static_cast<double>(n);
+}
+
+// -----------------------------------------------------------------------------
+
+template <class T>
+double mean ( Matrix<T> &src )
+{
+  return src.mean();
+}
+
+template double mean<int   >(Matrix<int   > &               );
+template double mean<double>(Matrix<double> &               );
+template double mean<int   >(Matrix<int   > &, Matrix<int> &);
+template double mean<double>(Matrix<double> &, Matrix<int> &);
+
+// =============================================================================
 // 2-point probability (binary) / 2-point cluster function (int)      [periodic]
 // =============================================================================
 
