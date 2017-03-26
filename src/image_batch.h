@@ -17,29 +17,30 @@ class Files8_2D
 
 private:
 
-std::vector<std::string> _fname           ;
-std::vector<size_t>      _saved           ;
-std::vector<size_t>      _rowMin          ;
-std::vector<size_t>      _rowMax          ;
-std::vector<size_t>      _colMin          ;
-std::vector<size_t>      _colMax          ;
-std::vector<size_t>      _phaseMin        ;
-std::vector<size_t>      _phaseMax        ;
-std::vector<size_t>      _maskMin         ;
-std::vector<size_t>      _maskMax         ;
-size_t                   _nset     = 2    ;
-size_t                   _ndim     = 2    ;
-size_t                   _nmsk     = 3    ;
-bool                     _periodic = true ;
-bool                     _zeropad  = false;
-std::string              _stat     = ""   ;
-std::string              _mode     = ""   ;
-std::vector<size_t>      _roi             ;
-std::vector<size_t>      _N               ;
-std::vector<std::string> _dtype           ;
-std::vector<std::string> _phase           ;
-Image::Matrix<double>    _result          ;
-double                   _norm            ;
+std::vector<std::string> _fname              ;
+std::vector<size_t>      _saved              ;
+std::vector<size_t>      _rowMin             ;
+std::vector<size_t>      _rowMax             ;
+std::vector<size_t>      _colMin             ;
+std::vector<size_t>      _colMax             ;
+std::vector<size_t>      _phaseMin           ;
+std::vector<size_t>      _phaseMax           ;
+std::vector<size_t>      _maskMin            ;
+std::vector<size_t>      _maskMax            ;
+size_t                   _nset        = 2    ;
+size_t                   _ndim        = 2    ;
+size_t                   _nmsk        = 3    ;
+bool                     _periodic    = true ;
+bool                     _zeropad     = false;
+bool                     _mask_weight = true ;
+std::string              _stat        = ""   ;
+std::string              _mode        = ""   ;
+std::vector<size_t>      _roi                ;
+std::vector<size_t>      _N                  ;
+std::vector<std::string> _dtype              ;
+std::vector<std::string> _phase              ;
+Image::Matrix<double>    _result             ;
+double                   _norm               ;
 
 public:
 
@@ -80,10 +81,11 @@ void reserve ( size_t N )
 
 void clear ( void )
 {
-  _periodic = true;
-  _zeropad  = false;
-  _stat     = "";
-  _mode     = "";
+  _mask_weight = true;
+  _periodic    = true;
+  _zeropad     = false;
+  _stat        = "";
+  _mode        = "";
   for ( size_t i=0 ; i<_roi     .size() ; i++ ) { _roi     [i] = 0;  }
   for ( size_t i=0 ; i<_N       .size() ; i++ ) { _N       [i] = 0;  }
   for ( size_t i=0 ; i<_dtype   .size() ; i++ ) { _dtype   [i] = ""; }
@@ -273,22 +275,23 @@ void itemDown ( size_t set, size_t i )
 void set_roi ( std::vector<size_t> in ) { for ( size_t i=0 ; i<_ndim ; i++ ) { _roi[i] = in[i]; } };
 void set_roi ( size_t i , size_t in ) { _roi[i] = in; };
 
-void set_periodic (                                    bool   in ) { _periodic                               = in; };
-void set_zeropad  (                                    bool   in ) { _zeropad                                = in; };
-void set_stat     (                               std::string in ) { _stat                                   = in; };
-void set_mode     (                               std::string in ) { _mode                                   = in; };
-void set_dtype    ( size_t set,                   std::string in ) { _dtype   [               set          ] = in; };
-void set_phase    ( size_t set,                   std::string in ) { _phase   [               set          ] = in; };
-void set_fname    ( size_t set, size_t i,         std::string in ) { _fname   [i*_nset       +set          ] = in; };
-void set_saved    ( size_t set, size_t i,              size_t in ) { _saved   [i*_nset       +set          ] = in; };
-void set_rowMin   ( size_t set, size_t i,              size_t in ) { _rowMin  [i*_nset       +set          ] = in; };
-void set_rowMax   ( size_t set, size_t i,              size_t in ) { _rowMax  [i*_nset       +set          ] = in; };
-void set_colMin   ( size_t set, size_t i,              size_t in ) { _colMin  [i*_nset       +set          ] = in; };
-void set_colMax   ( size_t set, size_t i,              size_t in ) { _colMax  [i*_nset       +set          ] = in; };
-void set_phaseMin ( size_t set, size_t i,              size_t in ) { _phaseMin[i*_nset       +set          ] = in; };
-void set_phaseMax ( size_t set, size_t i,              size_t in ) { _phaseMax[i*_nset       +set          ] = in; };
-void set_maskMin  ( size_t set, size_t i, size_t imsk, size_t in ) { _maskMin [i*_nset*_nmsk+set*_nmsk+imsk] = in; };
-void set_maskMax  ( size_t set, size_t i, size_t imsk, size_t in ) { _maskMax [i*_nset*_nmsk+set*_nmsk+imsk] = in; };
+void set_mask_weight (                                    bool   in ) { _mask_weight                            = in; };
+void set_periodic    (                                    bool   in ) { _periodic                               = in; };
+void set_zeropad     (                                    bool   in ) { _zeropad                                = in; };
+void set_stat        (                               std::string in ) { _stat                                   = in; };
+void set_mode        (                               std::string in ) { _mode                                   = in; };
+void set_dtype       ( size_t set,                   std::string in ) { _dtype   [               set          ] = in; };
+void set_phase       ( size_t set,                   std::string in ) { _phase   [               set          ] = in; };
+void set_fname       ( size_t set, size_t i,         std::string in ) { _fname   [i*_nset       +set          ] = in; };
+void set_saved       ( size_t set, size_t i,              size_t in ) { _saved   [i*_nset       +set          ] = in; };
+void set_rowMin      ( size_t set, size_t i,              size_t in ) { _rowMin  [i*_nset       +set          ] = in; };
+void set_rowMax      ( size_t set, size_t i,              size_t in ) { _rowMax  [i*_nset       +set          ] = in; };
+void set_colMin      ( size_t set, size_t i,              size_t in ) { _colMin  [i*_nset       +set          ] = in; };
+void set_colMax      ( size_t set, size_t i,              size_t in ) { _colMax  [i*_nset       +set          ] = in; };
+void set_phaseMin    ( size_t set, size_t i,              size_t in ) { _phaseMin[i*_nset       +set          ] = in; };
+void set_phaseMax    ( size_t set, size_t i,              size_t in ) { _phaseMax[i*_nset       +set          ] = in; };
+void set_maskMin     ( size_t set, size_t i, size_t imsk, size_t in ) { _maskMin [i*_nset*_nmsk+set*_nmsk+imsk] = in; };
+void set_maskMax     ( size_t set, size_t i, size_t imsk, size_t in ) { _maskMax [i*_nset*_nmsk+set*_nmsk+imsk] = in; };
 
 // return information (no bounds-check is performed)
 // -------------------------------------------------
@@ -302,22 +305,23 @@ size_t nset  ( void ) { size_t i=0; while ( i+1<_nset && _dtype[i].size()!=0 ) i
 
 std::vector<size_t> roi ( void ) { return _roi; };
 
-bool        periodic ( void                              ) { return _periodic;                               };
-bool        zeropad  ( void                              ) { return _zeropad ;                               };
-std::string stat     ( void                              ) { return _stat    ;                               };
-std::string mode     ( void                              ) { return _mode    ;                               };
-std::string dtype    ( size_t set                        ) { return _dtype   [               set          ]; };
-std::string phase    ( size_t set                        ) { return _phase   [               set          ]; };
-std::string fname    ( size_t set, size_t i              ) { return _fname   [i*_nset       +set          ]; };
-size_t      saved    ( size_t set, size_t i              ) { return _saved   [i*_nset       +set          ]; };
-size_t      rowMin   ( size_t set, size_t i              ) { return _rowMin  [i*_nset       +set          ]; };
-size_t      rowMax   ( size_t set, size_t i              ) { return _rowMax  [i*_nset       +set          ]; };
-size_t      colMin   ( size_t set, size_t i              ) { return _colMin  [i*_nset       +set          ]; };
-size_t      colMax   ( size_t set, size_t i              ) { return _colMax  [i*_nset       +set          ]; };
-size_t      phaseMin ( size_t set, size_t i              ) { return _phaseMin[i*_nset       +set          ]; };
-size_t      phaseMax ( size_t set, size_t i              ) { return _phaseMax[i*_nset       +set          ]; };
-size_t      maskMin  ( size_t set, size_t i, size_t imsk ) { return _maskMin [i*_nset*_nmsk+set*_nmsk+imsk]; };
-size_t      maskMax  ( size_t set, size_t i, size_t imsk ) { return _maskMax [i*_nset*_nmsk+set*_nmsk+imsk]; };
+bool        mask_weight ( void                              ) { return _mask_weight;                            };
+bool        periodic    ( void                              ) { return _periodic;                               };
+bool        zeropad     ( void                              ) { return _zeropad ;                               };
+std::string stat        ( void                              ) { return _stat    ;                               };
+std::string mode        ( void                              ) { return _mode    ;                               };
+std::string dtype       ( size_t set                        ) { return _dtype   [               set          ]; };
+std::string phase       ( size_t set                        ) { return _phase   [               set          ]; };
+std::string fname       ( size_t set, size_t i              ) { return _fname   [i*_nset       +set          ]; };
+size_t      saved       ( size_t set, size_t i              ) { return _saved   [i*_nset       +set          ]; };
+size_t      rowMin      ( size_t set, size_t i              ) { return _rowMin  [i*_nset       +set          ]; };
+size_t      rowMax      ( size_t set, size_t i              ) { return _rowMax  [i*_nset       +set          ]; };
+size_t      colMin      ( size_t set, size_t i              ) { return _colMin  [i*_nset       +set          ]; };
+size_t      colMax      ( size_t set, size_t i              ) { return _colMax  [i*_nset       +set          ]; };
+size_t      phaseMin    ( size_t set, size_t i              ) { return _phaseMin[i*_nset       +set          ]; };
+size_t      phaseMax    ( size_t set, size_t i              ) { return _phaseMax[i*_nset       +set          ]; };
+size_t      maskMin     ( size_t set, size_t i, size_t imsk ) { return _maskMin [i*_nset*_nmsk+set*_nmsk+imsk]; };
+size_t      maskMax     ( size_t set, size_t i, size_t imsk ) { return _maskMax [i*_nset*_nmsk+set*_nmsk+imsk]; };
 
 // return image and mask, based on settings (no bounds-check is performed)
 // -----------------------------------------------------------------------
@@ -401,39 +405,258 @@ std::tuple<Image::Matrix<int>,Image::Matrix<int>> image ( \
   return this->image(set,idx,im,crop);
 }
 
-// perform computation: front end
-// ------------------------------
+// check if masked
+// ---------------
 
-void compute_S2 ( Image::Matrix<int> (*func)(std::string) )
+bool masked ( Image::Matrix<int> (*func)(std::string) )
 {
+  Image::Matrix<int> im,mask;
+
+  for ( size_t set=0 ; set<this->nset() ; set++ ) {
+    for ( size_t idx=0 ; idx<this->count(set) ; idx++ ) {
+      std::tie(im,mask) = this->image(set,idx,func);
+      if ( mask.sum()> 0 )
+        return true;
+    }
+  }
+
+  return false;
+}
+
+// compute statistics: scalar
+// --------------------------
+
+void compute_scalar ( Image::Matrix<int> (*func)(std::string) )
+{
+  std::string D0 = _dtype[0];
+  std::string D1 = _dtype[1];
+
+  Image::Matrix<int>    fi,gi,fmask,gmask;
+  Image::Matrix<double> fd,gd,result;
+
+  // allocate / initialize
   _result.resize(_roi);
-  int n;
-  int N = 0;
-  Image::Matrix<double> tmp;
-  Image::Matrix<int>    f,g,fmask,gmask;
+  _result.zeros();
+  _norm = 0.0;
+
+  // load variables
+  double norm;
+  int    nnorm   , Nnorm    = 0;
+  int    nresult , Nresult  = 0;
+  double nresultd, Nresultd = 0.0;
 
   // loop over ensemble
   for ( size_t i=0 ; i<this->count(0) ; i++ ) {
-    // load images
-    if ( true            ) std::tie(f,fmask) = this->image(0,i,func);
-    if ( this->nset()==2 ) std::tie(g,gmask) = this->image(1,i,func);
-    else                   std::tie(g,gmask) = this->image(0,i,func);
-    // compute correlation
-    std::tie(tmp,n) = Image::S2(f,g,_roi);
-    // add to ensemble average
-    tmp     *= static_cast<double>(n);
-    _result += tmp;
-    N       += n;
-  }
-  // scale ensemble average result
-  _result /= static_cast<double>(N);
 
-}
+    // load images
+    std::tie(fi,fmask) = this->image(0,i,func);
+
+    if ( this->nset()==2 ) {
+      std::tie(gi,gmask) = this->image(1,i,func);
+    }
+    else {
+      D1    = D0;
+      gi    = fi;
+      gmask = fmask;
+    }
+
+    // convert to double
+    if ( D0=="float" ) fd = fi.as_double(255.);
+    if ( D1=="float" ) gd = gi.as_double(255.);
+
+    // compute correlation
+    if ( _stat=="S2" ) {
+      if (  D0=="float" && D1=="float" ) {
+        std::tie(result,nresult) = Image::S2(fd,gd,_roi);
+        nresultd = static_cast<double>(nresult);
+      }
+      else if ( ( D0=="integer" && D1=="integer" ) || ( D0=="binary"  && D1=="binary" ) ) {
+        std::tie(result,nresult) = Image::S2(fi,gi,_roi);
+        nresultd = static_cast<double>(nresult);
+      }
+    }
+    else if ( _stat=="W2" ) {
+      if ( D0=="float" && D1=="float" ) {
+        std::tie(result,nresultd) = Image::W2(fd,gd,_roi);
+      }
+      else if ( D0=="binary" && D1=="float" ) {
+        std::tie(result,nresult) = Image::W2(fi,gd,_roi);
+        nresultd = static_cast<double>(nresult);
+      }
+      else if ( D0=="binary" && D1=="binary" ) {
+        std::tie(result,nresult) = Image::W2(fi,gi,_roi);
+        nresultd = static_cast<double>(nresult);
+      }
+    }
+    if ( nresultd<=0.0 )
+      throw std::runtime_error("Unknown settings");
+
+    // add to ensemble average
+    result   *= nresultd;
+    _result  += result;
+    Nresultd += nresultd;
+
+    // update the normalization
+    // - image 1
+    if ( _stat=="S2" ) {
+      if ( D0=="float" ) norm = Image::mean(fd);
+      else               norm = Image::mean(fi);
+      nnorm    = fi.size();
+      norm    *= static_cast<double>(nnorm);
+      _norm   += norm;
+      Nnorm   += nnorm;
+    }
+    // - image 2
+    if ( D0=="float" ) norm = Image::mean(gd);
+    else               norm = Image::mean(gi);
+    nnorm    = gi.size();
+    norm    *= static_cast<double>(nnorm);
+    _norm   += norm;
+    Nnorm   += nnorm;
+
+  } // for ensemble
+
+  // scale ensemble average result/normalization factor
+  _result /= Nresultd;
+  _norm   /= static_cast<double>(Nnorm);
+};
+
+// compute statistics: matrix
+// --------------------------
+
+void compute_matrix ( Image::Matrix<int> (*func)(std::string) )
+{
+  std::string D0 = _dtype[0];
+  std::string D1 = _dtype[1];
+
+  Image::Matrix<int>    fi,gi,fmask,gmask,clusters,centers;
+  Image::Matrix<double> fd,gd,result;
+
+  // allocate / initialize
+  _result.resize(_roi);
+  _result.zeros();
+  _norm = 0.0;
+
+  // local variables
+  double norm;
+  int    nnorm   , Nnorm    = 0;
+  Image::Matrix<int>    nresult;
+  Image::Matrix<double> nresultd,Nresultd;
+
+  // loop over ensemble
+  for ( size_t i=0 ; i<this->count(0) ; i++ ) {
+
+    // load images
+    std::tie(fi,fmask) = this->image(0,i,func);
+
+    if ( this->nset()==2 ) {
+      std::tie(gi,gmask) = this->image(1,i,func);
+    }
+    else {
+      D1    = D0;
+      gi    = fi;
+      gmask = fmask;
+    }
+
+    // apply mask
+    if ( _stat=="W2" || _stat=="W2c" ) {
+      for ( size_t j=0 ; j<fi.size() ; j++ )
+        if ( fmask[j] )
+          fi[j] = 0;
+      if ( _mask_weight ) {
+        for ( size_t j=0 ; j<fi.size() ; j++ )
+          if ( fi[j] )
+            gmask[j] = 1;
+      }
+    }
+
+    // convert to double
+    if ( D0=="float" ) fd = fi.as_double(255.);
+    if ( D1=="float" ) gd = gi.as_double(255.);
+
+    // compute correlation
+    if ( _stat=="S2" ) {
+      if ( D0=="float"   && D1=="float" ) {
+        std::tie(result,nresult) = Image::S2(fd,gd,_roi,fmask,gmask,_zeropad,_periodic);
+        nresultd = nresult.as_double();
+      }
+      else if ( ( D0=="integer" && D1=="integer" ) || ( D0=="binary" && D1=="binary" ) ) {
+        std::tie(result,nresult) = Image::S2(fi,gi,_roi,fmask,gmask,_zeropad,_periodic);
+        nresultd = nresult.as_double();
+      }
+    }
+    else if ( _stat=="W2" ) {
+      if ( D0=="float" && D1=="float" ) {
+        std::tie(result,nresultd) = Image::W2(fd,gd,_roi,gmask,_zeropad,_periodic);
+      }
+      else if ( D0=="binary" && D1=="float" ) {
+        std::tie(result,nresult ) = Image::W2(fi,gd,_roi,gmask,_zeropad,_periodic);
+        nresultd = nresult.as_double();
+      }
+      else if ( D0=="binary" && D1=="binary" ) {
+        std::tie(result,nresult ) = Image::W2(fi,gi,_roi,gmask,_zeropad,_periodic);
+        nresultd = nresult.as_double();
+      }
+    }
+    else if ( _stat=="W2c" && D0=="int" && D1=="float" ) {
+      std::tie(clusters,centers) = Image::clusters(fi,0,_periodic);
+      std::tie(result  ,nresult) = Image::W2c(gd,clusters,centers,_roi,gmask,_mode,_periodic);
+      nresultd = nresult.as_double();
+    }
+    else if ( _stat=="L" && D0=="int" ) {
+      std::tie(result,nresult) = Image::L(fi,_roi,_mode,_periodic);
+      nresultd = nresult.as_double();
+    }
+    if ( nresultd.sum()<=0.0 )
+      throw std::runtime_error("Unknown settings");
+
+    // add to ensemble average
+    result   *= nresultd;
+    _result  += result;
+    Nresultd += nresultd;
+
+    // update the normalization
+    // - image 1
+    if ( _stat=="S2" || _stat=="L" ) {
+      if ( D0=="float" ) norm = Image::mean(fd,fmask);
+      else               norm = Image::mean(fi,fmask);
+      nnorm    = fi.size()-fmask.sum();
+      norm    *= static_cast<double>(nnorm);
+      _norm   += norm;
+      Nnorm   += nnorm;
+    }
+    // - image 2
+    if ( D0=="float" ) norm = Image::mean(gd,gmask);
+    else               norm = Image::mean(gi,gmask);
+    nnorm    = gi.size()-gmask.sum();
+    norm    *= static_cast<double>(nnorm);
+    _norm   += norm;
+    Nnorm   += nnorm;
+
+  } // for ensemble
+
+  // scale ensemble average result/normalization factor
+  _result /= Nresultd;
+  _norm   /= static_cast<double>(Nnorm);
+};
+
+// compute: front end for "compute_matrix" and "compute_scalar"
+// ------------------------------------------------------------
 
 void compute ( Image::Matrix<int> (*func)(std::string) )
 {
-  if     ( _stat=="S2" ) { this->compute_S2(func); }
-}
+  bool matrix = false;
+
+  if      ( _stat=="L"                                      ) matrix = true;
+  else if ( _stat=="W2c"                                    ) matrix = true;
+  else if ( !_periodic                                      ) matrix = true;
+  else if (  _zeropad                                       ) matrix = true;
+  else if ( ( _stat=="W2" || _stat=="W2c" ) && _mask_weight ) matrix = true;
+  else if ( this->masked(func)                              ) matrix = true;
+
+  if ( matrix ) return this->compute_matrix(func);
+  else          return this->compute_scalar(func);
+};
 
 }; // class Files8_2D
 

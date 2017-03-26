@@ -240,8 +240,8 @@ template <class T> class Matrix
       return i+1;
     };
 
-    // minimum / maximum / mean
-    // ------------------------
+    // minimum / maximum / mean / sum
+    // ------------------------------
 
     T min ( void )
     { return *std::min_element(_data.begin(),_data.end()); };
@@ -256,6 +256,37 @@ template <class T> class Matrix
         out += i;
 
       return static_cast<double>(out)/static_cast<double>(this->size());
+    }
+
+    T sum ( void )
+    {
+      T out = static_cast<T>(0);
+      for ( auto i : _data )
+        out += i;
+
+      return out;
+    }
+
+    // zero initialize
+    // ---------------
+
+    void zeros ( void )
+    {
+      for ( size_t i=0 ; i<this->size() ; i++ )
+        _data[i] *= static_cast<T>(0);
+    }
+
+    // convert type
+    // ------------
+
+    Matrix<double> as_double ( double norm=1. )
+    {
+      Matrix<double> out(this->shape());
+
+      for ( size_t i=0 ; i<this->size() ; i++ )
+        out[i] = static_cast<double>(_data[i])/norm;
+
+      return out;
     }
 
 }; // class Matrix

@@ -1,6 +1,27 @@
 #include "gui_mainwindow.h"
 #include "ui_gui_mainwindow.h"
 
+// // load the image
+// Image::Matrix<int> readImage ( std::string fname )
+// {
+//   QImage imgQt;
+//   imgQt.load(QString::fromStdString(fname));
+
+//   // read the size
+//   size_t nrow = imgQt.height();
+//   size_t ncol = imgQt.width ();
+
+//   // allocate data
+//   Image::Matrix<int> img({nrow,ncol});
+
+//   // read image
+//   for ( size_t i=0 ; i<nrow ; i++ )
+//     for ( size_t j=0 ; j<ncol ; j++ )
+//       img(i,j) = qGray(imgQt.pixel(j,i));
+
+//   return img;
+// }
+
 // ============================================================================
 // basic constructor
 // ============================================================================
@@ -120,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent) :
   // tab4: read roi
   connect(ui->tab4_roiRow_spinBox,&QSpinBox::editingFinished,[=](){data_.set_roi(0,ui->tab4_roiRow_spinBox->value());});
   connect(ui->tab4_roiCol_spinBox,&QSpinBox::editingFinished,[=](){data_.set_roi(1,ui->tab4_roiCol_spinBox->value());});
-  connect(ui->tab4_compute_pushButton,&QPushButton::clicked,[=](){data_.compute(); this->tab4_plotResult(); this->tab4_plotInterp(); this->tab4_saveResult(); this->tab4_saveInterp();});
+  // connect(ui->tab4_compute_pushButton,&QPushButton::clicked,[=](){data_.compute(); this->tab4_plotResult(); this->tab4_plotInterp(); this->tab4_saveResult(); this->tab4_saveInterp();});
   connect(ui->tab4_save_pushButton   ,&QPushButton::clicked,[=](){this->tab4_saveResult(); this->tab4_saveInterp();});
 
   connect(ui->tab4_climLow_raw_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotResult();});
