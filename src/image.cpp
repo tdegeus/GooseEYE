@@ -1002,6 +1002,10 @@ double mean ( Matrix<T> &src , Matrix<int> &mask )
   return static_cast<double>(out)/static_cast<double>(n);
 }
 
+template double mean<int   >(Matrix<int   > &, Matrix<int> &);
+template double mean<double>(Matrix<double> &, Matrix<int> &);
+
+
 // -----------------------------------------------------------------------------
 
 template <class T>
@@ -1010,10 +1014,8 @@ double mean ( Matrix<T> &src )
   return src.mean();
 }
 
-template double mean<int   >(Matrix<int   > &               );
-template double mean<double>(Matrix<double> &               );
-template double mean<int   >(Matrix<int   > &, Matrix<int> &);
-template double mean<double>(Matrix<double> &, Matrix<int> &);
+template double mean<int   >(Matrix<int   > &);
+template double mean<double>(Matrix<double> &);
 
 // =============================================================================
 // 2-point probability (binary) / 2-point cluster function (int)      [periodic]
