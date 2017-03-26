@@ -1,26 +1,26 @@
 #include "gui_mainwindow.h"
 #include "ui_gui_mainwindow.h"
 
-// // load the image
-// Image::Matrix<int> readImage ( std::string fname )
-// {
-//   QImage imgQt;
-//   imgQt.load(QString::fromStdString(fname));
+// load the image
+Image::Matrix<int> readImage ( std::string fname )
+{
+  QImage imgQt;
+  imgQt.load(QString::fromStdString(fname));
 
-//   // read the size
-//   size_t nrow = imgQt.height();
-//   size_t ncol = imgQt.width ();
+  // read the size
+  size_t nrow = imgQt.height();
+  size_t ncol = imgQt.width ();
 
-//   // allocate data
-//   Image::Matrix<int> img({nrow,ncol});
+  // allocate data
+  Image::Matrix<int> img({nrow,ncol});
 
-//   // read image
-//   for ( size_t i=0 ; i<nrow ; i++ )
-//     for ( size_t j=0 ; j<ncol ; j++ )
-//       img(i,j) = qGray(imgQt.pixel(j,i));
+  // read image
+  for ( size_t i=0 ; i<nrow ; i++ )
+    for ( size_t j=0 ; j<ncol ; j++ )
+      img(i,j) = qGray(imgQt.pixel(j,i));
 
-//   return img;
-// }
+  return img;
+}
 
 // ============================================================================
 // basic constructor
@@ -34,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->tabWidget->setCurrentIndex(0);
 
   data_.reserve(0);
+  data_.set_periodic   (ui->tab1_periodic_checkBox->isChecked());
+  data_.set_zeropad    (ui->tab1_zeropad_checkBox ->isChecked());
+  data_.set_mask_weight(ui->tab1_maskW_checkBox   ->isChecked());
+  data_.set_mode       (ui->tab1_pixelpath_comboBox->currentText().toStdString());
 
   // tab0: enable buttons
   connect(ui->tab0_result_lineEdit   ,&QLineEdit::textChanged,[=](){ui->tab0_result_lineEdit     ->setEnabled(true);});
@@ -53,6 +57,11 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab1_im1b_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
   connect(ui->tab1_im1i_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
   connect(ui->tab1_im1f_radioButton  ,SIGNAL(clicked(bool))       ,this,SLOT(tab1_selectStat()));
+  // tab1: settings
+  connect(ui->tab1_periodic_checkBox ,&QCheckBox::clicked            ,[=](){data_.set_periodic   (ui->tab1_periodic_checkBox ->isChecked  ());});
+  connect(ui->tab1_zeropad_checkBox  ,&QCheckBox::clicked            ,[=](){data_.set_zeropad    (ui->tab1_zeropad_checkBox  ->isChecked  ());});
+  connect(ui->tab1_maskW_checkBox    ,&QCheckBox::clicked            ,[=](){data_.set_mask_weight(ui->tab1_maskW_checkBox    ->isChecked  ());});
+  connect(ui->tab1_pixelpath_comboBox,static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged),[=](){data_.set_mode       (ui->tab1_pixelpath_comboBox->currentText().toStdString());});
 
   // tab2: enable pushButtons / set labels
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){ui->tab2_im0Phase_label   ->setText(QString::fromStdString(data_.phase(0)));});
@@ -139,18 +148,30 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tab3_maskCol_comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_syncPhase()));
 
   // tab4: read roi
+  connect(ui->tab4_roiRow_spinBox,&QSpinBox::editingFinished,[=](){if ( ui->tab4_roiRow_spinBox->value()%2==0 ) ui->tab4_roiRow_spinBox->setValue(ui->tab4_roiRow_spinBox->value()-1);});
+  connect(ui->tab4_roiCol_spinBox,&QSpinBox::editingFinished,[=](){if ( ui->tab4_roiCol_spinBox->value()%2==0 ) ui->tab4_roiCol_spinBox->setValue(ui->tab4_roiCol_spinBox->value()-1);});
+
   connect(ui->tab4_roiRow_spinBox,&QSpinBox::editingFinished,[=](){data_.set_roi(0,ui->tab4_roiRow_spinBox->value());});
   connect(ui->tab4_roiCol_spinBox,&QSpinBox::editingFinished,[=](){data_.set_roi(1,ui->tab4_roiCol_spinBox->value());});
-  // connect(ui->tab4_compute_pushButton,&QPushButton::clicked,[=](){data_.compute(); this->tab4_plotResult(); this->tab4_plotInterp(); this->tab4_saveResult(); this->tab4_saveInterp();});
-  connect(ui->tab4_save_pushButton   ,&QPushButton::clicked,[=](){this->tab4_saveResult(); this->tab4_saveInterp();});
 
-  connect(ui->tab4_climLow_raw_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotResult();});
-  connect(ui->tab4_climHgh_raw_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotResult();});
+  connect(ui->tab4_compute_pushButton,SIGNAL(clicked(bool)),this,SLOT(tab4_compute()));
+  // connect(ui->tab4_compute_pushButton,&QPushButton::clicked,[=](){data_.compute(&readImage); this->tab4_plotResult(); this->tab4_plotInterp(); this->tab4_saveResult(); this->tab4_saveInterp();});
+
+  connect(ui->tab4_save_pushButton   ,&QPushButton::clicked,[=](){this->tab4_saveResult(); this->tab4_saveInterp(); ui->tab4_save_pushButton->setEnabled(false);});
+
+  connect(ui->tab4_climLow_raw_doubleSpinBox   ,&QSpinBox::editingFinished,[=](){this->tab4_plotResult();});
+  connect(ui->tab4_climHgh_raw_doubleSpinBox   ,&QSpinBox::editingFinished,[=](){this->tab4_plotResult();});
   connect(ui->tab4_climLow_interp_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotInterp();});
   connect(ui->tab4_climHgh_interp_doubleSpinBox,&QSpinBox::editingFinished,[=](){this->tab4_plotInterp();});
+  connect(ui->tab4_cmap_raw_comboBox           ,SIGNAL(activated(int)),this,SLOT(tab4_plotResult()));
+  connect(ui->tab4_cmap_interp_comboBox        ,SIGNAL(activated(int)),this,SLOT(tab4_plotInterp()));
 
-  connect(ui->tab4_cmap_raw_comboBox,SIGNAL(activated(int)),this,SLOT(tab4_plotResult()));
-  connect(ui->tab4_cmap_interp_comboBox,SIGNAL(activated(int)),this,SLOT(tab4_plotInterp()));
+  connect(ui->tab4_climLow_raw_doubleSpinBox   ,&QSpinBox::editingFinished,[=](){ui->tab4_save_pushButton->setEnabled(true);});
+  connect(ui->tab4_climHgh_raw_doubleSpinBox   ,&QSpinBox::editingFinished,[=](){ui->tab4_save_pushButton->setEnabled(true);});
+  connect(ui->tab4_climLow_interp_doubleSpinBox,&QSpinBox::editingFinished,[=](){ui->tab4_save_pushButton->setEnabled(true);});
+  connect(ui->tab4_climHgh_interp_doubleSpinBox,&QSpinBox::editingFinished,[=](){ui->tab4_save_pushButton->setEnabled(true);});
+  connect(ui->tab4_cmap_raw_comboBox,static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged),[=](){ui->tab4_save_pushButton->setEnabled(true);});
+  connect(ui->tab4_cmap_interp_comboBox,static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged),[=](){ui->tab4_save_pushButton->setEnabled(true);});
 
 }
 
@@ -341,10 +362,18 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
       }
     }
 
-    ui->tab4_roiRow_spinBox->setMaximum(row   );
-    ui->tab4_roiRow_spinBox->setValue  (row/10);
-    ui->tab4_roiCol_spinBox->setMaximum(col   );
-    ui->tab4_roiCol_spinBox->setValue  (col/10);
+    size_t nrow = row/10;
+    size_t ncol = col/10;
+    if ( nrow%2==0 ) nrow--;
+    if ( ncol%2==0 ) ncol--;
+
+    ui->tab4_roiRow_spinBox->setMaximum( row);
+    ui->tab4_roiRow_spinBox->setValue  (nrow);
+    ui->tab4_roiCol_spinBox->setMaximum( col);
+    ui->tab4_roiCol_spinBox->setValue  (ncol);
+
+    data_.set_roi(0,nrow);
+    data_.set_roi(1,ncol);
 
   }
 
@@ -710,6 +739,12 @@ void MainWindow::tab1_selectStat(void)
   if ( !ui->tab1_periodic_checkBox->isChecked() && !ui->tab1_zeropad_checkBox->isChecked() )
     ui->tab1_periodic_checkBox->setChecked(true);
 
+  // store
+  data_.set_periodic   (ui->tab1_periodic_checkBox->isChecked());
+  data_.set_zeropad    (ui->tab1_zeropad_checkBox ->isChecked());
+  data_.set_mask_weight(ui->tab1_maskW_checkBox   ->isChecked());
+  data_.set_mode       (ui->tab1_pixelpath_comboBox->currentText().toStdString());
+
 }
 
 // =============================================================================
@@ -733,14 +768,17 @@ void MainWindow::filesAdd(QListWidget *list, size_t set)
   if (dialog.exec())
     fileNames = dialog.selectedFiles();
 
+  // store to data-structure in absolute path
+  for ( int i=0 ; i<fileNames.size() ; i++ )
+    data_.itemAdd(set,fileNames[i].toStdString());
+
+  // convert to relative path
   QDir dir(ui->tab0_outdir_lineEdit->text());
   for ( int i=0 ; i<fileNames.size() ; i++ )
     fileNames[i] = dir.relativeFilePath(fileNames[i]);
 
+  // store to list
   list->addItems(fileNames);
-
-   for ( int i=0 ; i<fileNames.size() ; i++ )
-     data_.itemAdd(set,fileNames[i].toStdString());
 }
 
 // -----------------------------------------------------------------------------
@@ -964,6 +1002,9 @@ void MainWindow::tab3_setDefault(void)
     colMin   = data_.colMin  (cmp,idx  );
     colMax   = data_.colMax  (cmp,idx  );
   }
+
+  if ( data_.dtype(set)=="binary" )
+    phaseMin = imgRaw_.mean();
 
   ui->tab3_phaseLow_spinBox->setValue(phaseMin);
   ui->tab3_phaseHgh_spinBox->setValue(phaseMax);
@@ -1199,73 +1240,171 @@ void MainWindow::tab3_syncPhase(void)
   this->tab3_viewPhase();
 }
 
+void MainWindow::tab4_compute(void)
+{
+  data_.compute(&readImage);
+
+  ui->tab4_climLow_raw_doubleSpinBox->setValue(data_.result().min());
+  ui->tab4_climHgh_raw_doubleSpinBox->setValue(data_.result().max());
+
+  if ( data_.stat()=="W2" || data_.stat()=="W2c" ) {
+    ui->tab4_climLow_interp_doubleSpinBox->setMinimum(-1.0);
+    ui->tab4_climLow_interp_doubleSpinBox->setValue(-1.*data_.norm());
+    ui->tab4_climHgh_interp_doubleSpinBox->setValue(+1.*data_.norm());
+  }
+  else {
+    ui->tab4_climLow_interp_doubleSpinBox->setValue(data_.result().min());
+    ui->tab4_climHgh_interp_doubleSpinBox->setValue(data_.result().max());
+  }
+
+  this->tab4_plotResult();
+  this->tab4_plotInterp();
+  this->tab4_saveResult();
+  this->tab4_saveInterp();
+
+}
+
 
 void MainWindow::tab4_plotResult(void)
 {
   // configure axis rect:
-ui->raw_customPlot->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom); // this will also allow rescaling the color scale by dragging/zooming
-ui->raw_customPlot->axisRect()->setupFullAxesBox(true);
-ui->raw_customPlot->xAxis->setLabel("x");
-ui->raw_customPlot->yAxis->setLabel("y");
+  ui->raw_customPlot->axisRect()->setupFullAxesBox(true);
+  ui->raw_customPlot->xAxis->setLabel("Delta x");
+  ui->raw_customPlot->yAxis->setLabel("Delta y");
 
-// set up the QCPColorMap:
-QCPColorMap *colorMap = new QCPColorMap(ui->raw_customPlot->xAxis, ui->raw_customPlot->yAxis);
-int nx = 200;
-int ny = 200;
-colorMap->data()->setSize(nx, ny); // we want the color map to have nx * ny data points
-colorMap->data()->setRange(QCPRange(-4, 4), QCPRange(-4, 4)); // and span the coordinate range -4..4 in both key (x) and value (y) dimensions
-// now we assign some data, by accessing the QCPColorMapData instance of the color map:
-double x, y, z;
-for (int xIndex=0; xIndex<nx; ++xIndex)
-{
-  for (int yIndex=0; yIndex<ny; ++yIndex)
-  {
-    colorMap->data()->cellToCoord(xIndex, yIndex, &x, &y);
-    double r = 3*qSqrt(x*x+y*y)+1e-2;
-    z = 2*x*(qCos(r+2)/r-qSin(r+2)/r); // the B field strength of dipole radiation (modulo physical constants)
-    colorMap->data()->setCell(xIndex, yIndex, z);
-  }
-}
+  // set up the QCPColorMap:
+  QCPColorMap *colorMap = new QCPColorMap(ui->raw_customPlot->xAxis, ui->raw_customPlot->yAxis);
+  std::vector<size_t>   N    = data_.roi();
+  Image::Matrix<double> data = data_.result();
+  int nx = (int)N[0];
+  int ny = (int)N[1];
+  colorMap->data()->setSize(nx, ny);
+  colorMap->data()->setRange(QCPRange(-(nx-1)/2,+(nx-1)/2), QCPRange(-(ny-1)/2,+(ny-1)/2));
+  // assign data, by accessing the QCPColorMapData instance of the color map:
+  for ( int i=0; i<nx; i++ )
+    for (int j=0; j<ny; j++ )
+      colorMap->data()->setCell(i,j,data(i,j));
 
-// add a color scale:
-QCPColorScale *colorScale = new QCPColorScale(ui->raw_customPlot);
-ui->raw_customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
-colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
-colorMap->setColorScale(colorScale); // associate the color map with the color scale
-colorScale->axis()->setLabel("Magnetic Field Strength");
+  // add a color scale:
+  ui->raw_customPlot->plotLayout()->remove(ui->raw_customPlot->plotLayout()->element(0,1));
+  QCPColorScale *colorScale = new QCPColorScale(ui->raw_customPlot);
+  ui->raw_customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+  colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+  colorMap->setColorScale(colorScale); // associate the color map with the color scale
 
-// set the color gradient of the color map to one of the presets:
-colorMap->setGradient(QCPColorGradient::gpPolar);
-// we could have also created a QCPColorGradient instance and added own colors to
-// the gradient, see the documentation of QCPColorGradient for what's possible.
+  QCPColorGradient cbar;
+  cbar.setLevelCount(256);
+  std::vector<int> src = cppcolormap::colormap(ui->tab4_cmap_raw_comboBox->currentText().toStdString(),256);
+  std::vector<float> x = cppcolormap::linspace(0.0,1.0,256);
+  for ( size_t i=9 ; i<256 ; i++ )
+    cbar.setColorStopAt(x[i],QColor(src[i*3+0],src[i*3+1],src[i*3+2]));
 
-// rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
-colorMap->rescaleDataRange();
+  // set the color gradient of the color map to one of the presets:
+  colorMap->setGradient(cbar);
 
-// make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
-QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->raw_customPlot);
-ui->raw_customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
-colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
+  colorMap->rescaleDataRange();
 
-// rescale the key (x) and value (y) axes so the whole color map is visible:
-ui->raw_customPlot->rescaleAxes();
+  // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
+  QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->raw_customPlot);
+  ui->raw_customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+
+  colorScale->axis()->setRangeLower(ui->tab4_climLow_raw_doubleSpinBox->value());
+  colorScale->axis()->setRangeUpper(ui->tab4_climHgh_raw_doubleSpinBox->value());
+
+  // rescale the key (x) and value (y) axes so the whole color map is visible:
+  ui->raw_customPlot->rescaleAxes();
+  ui->raw_customPlot->replot();
 }
 
 void MainWindow::tab4_plotInterp(void)
 {
+  // configure axis rect:
+  ui->interp_customPlot->axisRect()->setupFullAxesBox(true);
+  ui->interp_customPlot->xAxis->setLabel("Delta x");
+  ui->interp_customPlot->yAxis->setLabel("Delta y");
 
+  // set up the QCPColorMap:
+  QCPColorMap *colorMap = new QCPColorMap(ui->interp_customPlot->xAxis, ui->interp_customPlot->yAxis);
+  std::vector<size_t>   N    = data_.roi();
+  Image::Matrix<double> data = data_.result();
+  double                norm = data_.norm();
+
+  if ( data_.stat()=="W2" || data_.stat()=="W2c" )
+    data -= norm;
+
+  int nx = (int)N[0];
+  int ny = (int)N[1];
+  colorMap->data()->setSize(nx, ny);
+  colorMap->data()->setRange(QCPRange(-(nx-1)/2,+(nx-1)/2), QCPRange(-(ny-1)/2,+(ny-1)/2));
+  // assign data, by accessing the QCPColorMapData instance of the color map:
+  for ( int i=0; i<nx; i++ )
+    for (int j=0; j<ny; j++ )
+      colorMap->data()->setCell(i,j,data(i,j));
+
+  // add a color scale:
+  ui->interp_customPlot->plotLayout()->remove(ui->interp_customPlot->plotLayout()->element(0,1));
+  QCPColorScale *colorScale = new QCPColorScale(ui->interp_customPlot);
+  ui->interp_customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+  colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+  colorMap->setColorScale(colorScale); // associate the color map with the color scale
+
+  QCPColorGradient cbar;
+  cbar.setLevelCount(256);
+  std::vector<int> src = cppcolormap::colormap(ui->tab4_cmap_interp_comboBox->currentText().toStdString(),256);
+  std::vector<float> x = cppcolormap::linspace(0.0,1.0,256);
+  for ( size_t i=9 ; i<256 ; i++ )
+    cbar.setColorStopAt(x[i],QColor(src[i*3+0],src[i*3+1],src[i*3+2]));
+
+  // set the color gradient of the color map to one of the presets:
+  colorMap->setGradient(cbar);
+
+  // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
+  colorMap->rescaleDataRange();
+
+  // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
+  QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->interp_customPlot);
+  ui->interp_customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+
+  colorScale->axis()->setRangeLower(ui->tab4_climLow_interp_doubleSpinBox->value());
+  colorScale->axis()->setRangeUpper(ui->tab4_climHgh_interp_doubleSpinBox->value());
+
+  // rescale the key (x) and value (y) axes so the whole color map is visible:
+  ui->interp_customPlot->rescaleAxes();
+  ui->interp_customPlot->replot();
 }
 
 void MainWindow::tab4_saveResult(void)
 {
-
+  QString fname = QDir(ui->tab0_outdir_lineEdit->text()).filePath(ui->tab0_pdfRaw_lineEdit->text());
+  ui->raw_customPlot->savePdf(fname,0,0,QCP::epNoCosmetic);
 }
 
 void MainWindow::tab4_saveInterp(void)
 {
-
+  QString fname = QDir(ui->tab0_outdir_lineEdit->text()).filePath(ui->tab0_pdfInterp_lineEdit->text());
+  ui->interp_customPlot->savePdf(fname,0,0,QCP::epNoCosmetic);
 }
 
 
 
+
+void MainWindow::debug(void)
+{
+  // std::cout << "stat             = " << data_.stat()        << std::endl;
+  // std::cout << "nset             = " << data_.nset()        << std::endl;
+  // std::cout << "roi[0]           = " << data_.roi()[0]      << std::endl;
+  // std::cout << "roi[1]           = " << data_.roi()[1]      << std::endl;
+  // std::cout << "count(0)         = " << data_.count(0)      << std::endl;
+  // std::cout << "mask_weight      = " << data_.mask_weight() << std::endl;
+  // std::cout << "periodic         = " << data_.periodic   () << std::endl;
+  // std::cout << "zeropad          = " << data_.zeropad    () << std::endl;
+  // std::cout << "fname(0,0)       = " << data_.fname(0,0)    << std::endl;
+
+  // data_.compute(&readImage);
+
+
+}
 

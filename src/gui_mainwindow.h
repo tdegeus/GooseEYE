@@ -60,10 +60,13 @@ private slots:
   void tab3_applySelection(int idx=-1);
   void tab3_applyAll(void);
 
+  void tab4_compute(void);
   void tab4_plotResult(void);
   void tab4_plotInterp(void);
   void tab4_saveResult(void);
   void tab4_saveInterp(void);
+
+
 
   // write to message bar
   void on_tabWidget_tabBarClicked(int index);
@@ -78,6 +81,7 @@ private slots:
   // define "set" of images, create list of files
   void on_tab3_set_comboBox_currentIndexChanged(int index);
 
+  void debug(void);
 
 
 private:
@@ -106,5 +110,7 @@ private:
 
 
 };
+
+Image::Matrix<int> readImage ( std::string fname );
 
 #endif // MAINWINDOW_H

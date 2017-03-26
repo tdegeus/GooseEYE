@@ -541,7 +541,8 @@ void compute_matrix ( Image::Matrix<int> (*func)(std::string) )
   double norm;
   int    nnorm   , Nnorm    = 0;
   Image::Matrix<int>    nresult;
-  Image::Matrix<double> nresultd,Nresultd;
+  Image::Matrix<double> nresultd;
+  Image::Matrix<double> Nresultd(_roi);
 
   // loop over ensemble
   for ( size_t i=0 ; i<this->count(0) ; i++ ) {
@@ -576,7 +577,7 @@ void compute_matrix ( Image::Matrix<int> (*func)(std::string) )
 
     // compute correlation
     if ( _stat=="S2" ) {
-      if ( D0=="float"   && D1=="float" ) {
+      if ( D0=="float" && D1=="float" ) {
         std::tie(result,nresult) = Image::S2(fd,gd,_roi,fmask,gmask,_zeropad,_periodic);
         nresultd = nresult.as_double();
       }
