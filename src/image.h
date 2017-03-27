@@ -273,7 +273,13 @@ template <class T> class Matrix
     void zeros ( void )
     {
       for ( size_t i=0 ; i<this->size() ; i++ )
-        _data[i] *= static_cast<T>(0);
+        _data[i] = static_cast<T>(0);
+    }
+
+    void ones ( void )
+    {
+      for ( size_t i=0 ; i<this->size() ; i++ )
+        _data[i] = static_cast<T>(1);
     }
 
     // convert type
@@ -376,8 +382,7 @@ Mi path ( Vi &xa, Vi &xb, s mode="Bresenham" );
 Mi stamp_points ( Vs &shape );
 
 // (zero)pad "pad_shape" entries on each side of "src" (with a certain "value")
-Mi pad ( Mi &src, Vs &pad_shape, i value=0  );
-Md pad ( Md &src, Vs &pad_shape, d value=0. );
+template <class T> Matrix<T> pad ( Matrix<T> &src, Vs &pad_shape, T value=0 );
 
 // define kernel
 // mode: "default"

@@ -303,24 +303,24 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 // pad "pad_shape" entries on each side of "src" with a certain "value"
 // =============================================================================
 
-Matrix<int> pad ( Matrix<int> &src , std::vector<size_t> &pad_shape ,
-  int value )
+template <class T>
+Matrix<T> pad ( Matrix<T> &src , std::vector<size_t> &pad_shape ,
+  T value )
 {
   std::vector<size_t> shape = src.shape();
 
   for ( size_t i=0 ; i<pad_shape.size() ; i++ )
     shape[i] += 2*pad_shape[i];
 
-  Matrix<int> ret(shape);
+  Matrix<T> ret(shape);
 
   int h,i,j,H,I,J,dH,dI,dJ;
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(pad_shape  ,0);
 
-  if ( value!=0 )
-    for ( auto &i : ret )
-      i = value;
+  ret.ones();
+  ret *= value;
 
   for ( h=0 ; h<H ; h++ )
     for ( i=0 ; i<I ; i++ )
@@ -330,34 +330,8 @@ Matrix<int> pad ( Matrix<int> &src , std::vector<size_t> &pad_shape ,
   return ret;
 }
 
-// =============================================================================
-
-Matrix<double> pad ( Matrix<double> &src , std::vector<size_t> &pad_shape ,
-  double value )
-{
-  std::vector<size_t> shape = src.shape();
-
-  for ( size_t i=0 ; i<pad_shape.size() ; i++ )
-    shape[i] += 2*pad_shape[i];
-
-  Matrix<double> ret(shape);
-
-  int h,i,j,H,I,J,dH,dI,dJ;
-
-  std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(pad_shape  ,0);
-
-  if ( value!=0. )
-    for ( auto &i : ret )
-      i = value;
-
-  for ( h=0 ; h<H ; h++ )
-    for ( i=0 ; i<I ; i++ )
-      for ( j=0 ; j<J ; j++ )
-        ret(h+dH,i+dI,j+dJ) = src(h,i,j);
-
-  return ret;
-}
+template Matrix<int   > pad<int   > (Matrix<int   > &, std::vector<size_t> &, int   );
+template Matrix<double> pad<double> (Matrix<double> &, std::vector<size_t> &, double);
 
 // =============================================================================
 // dilate image
