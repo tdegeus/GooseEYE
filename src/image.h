@@ -41,35 +41,60 @@ template <class T> class Matrix
     // explicit constructor
     // --------------------
 
-    Matrix<T>( std::vector<size_t> shape, const T *data=NULL )
+    Matrix ( std::vector<size_t> shape )
+    {
+      resize(shape);
+
+      // TODO: remove zero initializer, when the code has been checked
+      for ( auto &i : _data )
+        i = (T)0;
+    };
+
+    Matrix ( std::vector<size_t> shape, T value )
+    {
+      resize(shape);
+
+      for ( auto &i : _data )
+        i = value;
+    };
+
+    Matrix ( std::vector<size_t> shape, const T *data )
+    {
+      resize(shape);
+
+      for ( size_t i=0 ; i<size() ; ++i )
+        _data[i] = data[i];
+    };
+
+    void resize ( std::vector<size_t> shape )
     {
       if ( shape.size()<1 || shape.size()>3 )
         throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
 
-      // store '_strides' and '_shape' always in 3-D,
-      // use unit-length for "extra" dimensions (> 'shape.size()')
-      while ( _shape  .size()<3 ) { _shape  .push_back(1); }
-      while ( _strides.size()<3 ) { _strides.push_back(1); }
+      _shape  .resize(3);
+      _strides.resize(3);
 
-      for ( size_t i=0 ; i<shape.size() ; i++ )
-        _shape[i] = shape[i];
+      for ( auto &i : _shape ) { i = 1; }
+
+      for ( size_t i=0 ; i<shape.size() ; ++i ) { _shape[i] = shape[i]; }
 
       _strides[0] = _shape[2]*_shape[1];
       _strides[1] = _shape[2];
       _strides[2] = 1;
 
-      size_t size = _shape[0]*_shape[1]*_shape[2];
-
-      for ( size_t i=0 ; i<_data.size() ; i++ )
-        _data[i] = (T)0;
-
-      while ( _data.size()<size )
-        _data.push_back((T)0);
-
-      if ( data!=NULL )
-        for ( size_t i=0 ; i<size ; i++ )
-          _data[i] = data[i];
+      _data.resize(_shape[0]*_shape[1]*_shape[2]);
     };
+
+    template<typename U, typename V=T, typename=typename std::enable_if<std::is_convertible<T,U>::value>::type>
+    operator Matrix<U> ()
+    {
+      Matrix<U> out(shape());
+      for ( size_t i=0 ; i<size() ; ++i ) {
+        out[i] = static_cast<T>(_data[i]);
+      }
+      return out;
+    };
+
 
     // index operators
     // ---------------
@@ -154,31 +179,31 @@ template <class T> class Matrix
     // resize
     // ------
 
-    void resize ( std::vector<size_t> shape )
-    {
-      if ( shape.size()<1 || shape.size()>3 )
-        throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
+    // void resize ( std::vector<size_t> shape )
+    // {
+    //   if ( shape.size()<1 || shape.size()>3 )
+    //     throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
 
-      // store '_strides' and '_shape' always in 3-D,
-      // use unit-length for "extra" dimensions (> 'shape.size()')
-      while ( _shape  .size()<3 ) { _shape  .push_back(1); }
-      while ( _strides.size()<3 ) { _strides.push_back(1); }
+    //   // store '_strides' and '_shape' always in 3-D,
+    //   // use unit-length for "extra" dimensions (> 'shape.size()')
+    //   while ( _shape  .size()<3 ) { _shape  .push_back(1); }
+    //   while ( _strides.size()<3 ) { _strides.push_back(1); }
 
-      for ( size_t i=0 ; i<_shape.size() ; i++ )
-        _shape[i] = 1;
+    //   for ( size_t i=0 ; i<_shape.size() ; i++ )
+    //     _shape[i] = 1;
 
-      for ( size_t i=0 ; i<shape.size() ; i++ )
-        _shape[i] = shape[i];
+    //   for ( size_t i=0 ; i<shape.size() ; i++ )
+    //     _shape[i] = shape[i];
 
-      _strides[0] = _shape[2]*_shape[1];
-      _strides[1] = _shape[2];
-      _strides[2] = 1;
+    //   _strides[0] = _shape[2]*_shape[1];
+    //   _strides[1] = _shape[2];
+    //   _strides[2] = 1;
 
-      size_t size = _shape[0]*_shape[1]*_shape[2];
+    //   size_t size = _shape[0]*_shape[1]*_shape[2];
 
-      while ( _data.size()<size )
-        _data.push_back((T)0);
-    };
+    //   while ( _data.size()<size )
+    //     _data.push_back((T)0);
+    // };
 
     // return pointer to data
     // ----------------------
@@ -382,7 +407,7 @@ Mi path ( Vi &xa, Vi &xb, s mode="Bresenham" );
 Mi stamp_points ( Vs &shape );
 
 // (zero)pad "pad_shape" entries on each side of "src" (with a certain "value")
-template <class T> Matrix<T> pad ( Matrix<T> &src, Vs &pad_shape, T value=0 );
+template <class T> Matrix<T> pad ( Matrix<T> &src, Vs pad_shape, T value=0 );
 
 // define kernel
 // mode: "default"

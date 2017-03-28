@@ -304,8 +304,7 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 // =============================================================================
 
 template <class T>
-Matrix<T> pad ( Matrix<T> &src , std::vector<size_t> &pad_shape ,
-  T value )
+Matrix<T> pad ( Matrix<T> &src, std::vector<size_t> pad_shape, T value )
 {
   std::vector<size_t> shape = src.shape();
 
@@ -330,8 +329,8 @@ Matrix<T> pad ( Matrix<T> &src , std::vector<size_t> &pad_shape ,
   return ret;
 }
 
-template Matrix<int   > pad<int   > (Matrix<int   > &, std::vector<size_t> &, int   );
-template Matrix<double> pad<double> (Matrix<double> &, std::vector<size_t> &, double);
+template Matrix<int>    pad<int>    (Matrix<int>    &, std::vector<size_t>, int   );
+template Matrix<double> pad<double> (Matrix<double> &, std::vector<size_t>, double);
 
 // =============================================================================
 // dilate image
@@ -1754,7 +1753,33 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
   Matrix<int> &clusters, Matrix<int> &centers, std::vector<size_t> &roi,
   std::string mode, bool periodic )
 {
-  Matrix<int> mask(I.shape());
+  Matrix<int> mask(I.shape(),0);
+  return W2c(I,clusters,centers,roi,mask,mode,periodic);
+}
+
+
+// TODO: header + remove int in clusters
+std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
+  Matrix<int> &W, std::vector<size_t> &roi, Matrix<int> &mask,
+  std::string mode, bool periodic )
+{
+  Matrix<int> clusters,centers;
+
+  std::tie(clusters,centers) = Image::clusters(W,0,periodic);
+
+  return W2c(I,clusters,centers,roi,mask,mode,periodic);
+}
+
+// TODO: header + remove int in clusters
+std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
+  Matrix<int> &W, std::vector<size_t> &roi,
+  std::string mode, bool periodic )
+{
+  Matrix<int> clusters,centers;
+  Matrix<int> mask(I.shape(),0);
+
+  std::tie(clusters,centers) = Image::clusters(W,0,periodic);
+
   return W2c(I,clusters,centers,roi,mask,mode,periodic);
 }
 

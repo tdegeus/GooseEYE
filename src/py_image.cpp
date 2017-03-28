@@ -79,8 +79,8 @@ mi.def("path",&Image::path,"Voxel path",py::arg("xa"),py::arg("xb"),py::arg("mod
 
 mi.def("stamp_points",&Image::stamp_points,"End points of voxel stamp",py::arg("shape"));
 
-mi.def("pad",py::overload_cast<Mi&,Vs&,i>(&Image::pad<int>   ),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0 );
-mi.def("pad",py::overload_cast<Md&,Vs&,d>(&Image::pad<double>),"Pad image",py::arg("im"),py::arg("pad_shape"),py::arg("value")=0.);
+mi.def("pad",py::overload_cast<Md&,Vs,d>(&Image::pad<double>),"Pad image",py::arg("im").noconvert(),py::arg("pad_shape"),py::arg("value")=0.);
+mi.def("pad",py::overload_cast<Mi&,Vs,i>(&Image::pad<int>   ),"Pad image",py::arg("im")            ,py::arg("pad_shape"),py::arg("value")=0 );
 
 mi.def("kernel",&Image::kernel,py::arg("ndim"),py::arg("mode")="default");
 
