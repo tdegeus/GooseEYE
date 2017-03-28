@@ -994,6 +994,8 @@ template double mean<double>(Matrix<double> &);
 // 2-point probability (binary) / 2-point cluster function (int)      [periodic]
 // =============================================================================
 
+// TODO: combine with different versions
+// TODO: make "roi" a combine to enhance usability from C++
 std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
   std::vector<size_t> &roi )
 {
