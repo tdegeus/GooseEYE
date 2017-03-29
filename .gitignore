@@ -4,6 +4,8 @@ src/pybind11
 src/cppcolormap
 
 # custom variables
+.qmake*
+Makefile*
 test*
 build*
 *.pro.user

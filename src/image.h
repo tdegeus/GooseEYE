@@ -7,6 +7,10 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <set>
+#include <tuple>
+#include <ctime>
 
 #define BND(i,N) ( (i<0) ?   0 : (i>=N) ?   0 : 1 )
 #define P(i,N)   ( (i<0) ? i+N : (i>=N) ? i-N : i )
