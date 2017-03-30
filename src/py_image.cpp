@@ -34,7 +34,7 @@ namespace pybind11 { namespace detail {
 
         std::vector<size_t> shape(buf.ndim());
 
-        for ( int i=0 ; i<buf.ndim() ; i++ )
+        for ( size_t i=0 ; i<buf.ndim() ; i++ )
           shape[i] = buf.shape()[i];
 
         value = Image::Matrix<T>(shape,buf.data());
@@ -87,8 +87,9 @@ mi.def("kernel",&Image::kernel,py::arg("ndim"),py::arg("mode")="default");
 // image manipulation
 // ------------------
 
-mi.def("dummy_circles",py::overload_cast<Vs&,            bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),                                           py::arg("periodic")=true);
-mi.def("dummy_circles",py::overload_cast<Vs&,Vi&,Vi&,Vi&,bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),py::arg("row"),py::arg("col"),py::arg("r"),py::arg("periodic")=true);
+mi.def("dummy_circles",py::overload_cast<               bool>(&Image::dummy_circles),"Dummy image",                                                            py::arg("periodic")=true);
+mi.def("dummy_circles",py::overload_cast<Vs,            bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),                                           py::arg("periodic")=true);
+mi.def("dummy_circles",py::overload_cast<Vs,Vi&,Vi&,Vi&,bool>(&Image::dummy_circles),"Dummy image",py::arg("shape"),py::arg("row"),py::arg("col"),py::arg("r"),py::arg("periodic")=true);
 
 mi.def("clusters",py::overload_cast<Mi&,    i,b>(&Image::clusters),"Identify clusters",py::arg("im"),                  py::arg("min_size")=0,py::arg("periodic")=true);
 mi.def("clusters",py::overload_cast<Mi&,Mi&,i,b>(&Image::clusters),"Identify clusters",py::arg("im"),py::arg("kernel"),py::arg("min_size")=0,py::arg("periodic")=true);

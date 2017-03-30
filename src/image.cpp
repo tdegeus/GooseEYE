@@ -12,7 +12,7 @@ template class Matrix<double>;
 // =============================================================================
 
 Matrix<int> path (
-  std::vector<int> &xa, std::vector<int> &xb, std::string mode )
+  std::vector<int> xa, std::vector<int> xb, std::string mode )
 {
   int ndim = (int)xa.size();
 
@@ -438,7 +438,7 @@ Matrix<int> dilate ( Matrix<int> &src, std::vector<int> &iterations,
 // create a dummy image with circles at position "row","col" with radius "r"
 // =============================================================================
 
-Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &row,
+Matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &row,
   std::vector<int> &col, std::vector<int> &r, bool periodic )
 {
   if ( row.size()!=col.size() || row.size()!=r.size() )
@@ -468,7 +468,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, std::vector<int> &row,
 // at random positions and random radii
 // =============================================================================
 
-Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
+Matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
 {
   if ( shape.size()!=2 )
     throw std::length_error("Only allowed in 2 dimensions");
@@ -506,6 +506,15 @@ Matrix<int> dummy_circles ( std::vector<size_t> &shape, bool periodic )
 
   // convert to image
   return dummy_circles(shape,row,col,r,periodic);
+}
+
+// =============================================================================
+// create dummy image with default shape
+// =============================================================================
+
+Matrix<int> dummy_circles ( bool periodic )
+{
+  return dummy_circles({100,100},periodic);
 }
 
 // =============================================================================

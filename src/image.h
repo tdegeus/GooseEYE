@@ -66,6 +66,22 @@ template <class T> class Matrix
         _data[i] = data[i];
     };
 
+    // constructor to copy + change data type
+    // --------------------------------------
+
+    template<typename U, typename V=T, typename=typename std::enable_if<std::is_convertible<T,U>::value>::type>
+    operator Matrix<U> ()
+    {
+      Matrix<U> out(shape());
+      for ( size_t i=0 ; i<size() ; ++i ) {
+        out[i] = static_cast<T>(_data[i]);
+      }
+      return out;
+    };
+
+    // resize matrix + store shape
+    // ---------------------------
+
     void resize ( std::vector<size_t> shape )
     {
       if ( shape.size()<1 || shape.size()>3 )
@@ -84,17 +100,6 @@ template <class T> class Matrix
 
       _data.resize(_shape[0]*_shape[1]*_shape[2]);
     };
-
-    template<typename U, typename V=T, typename=typename std::enable_if<std::is_convertible<T,U>::value>::type>
-    operator Matrix<U> ()
-    {
-      Matrix<U> out(shape());
-      for ( size_t i=0 ; i<size() ; ++i ) {
-        out[i] = static_cast<T>(_data[i]);
-      }
-      return out;
-    };
-
 
     // index operators
     // ---------------
@@ -175,35 +180,6 @@ template <class T> class Matrix
 
     auto end ( void )
     { return _data.end  (); }
-
-    // resize
-    // ------
-
-    // void resize ( std::vector<size_t> shape )
-    // {
-    //   if ( shape.size()<1 || shape.size()>3 )
-    //     throw std::runtime_error("Input should be 1-D, 2-D, or 3-D");
-
-    //   // store '_strides' and '_shape' always in 3-D,
-    //   // use unit-length for "extra" dimensions (> 'shape.size()')
-    //   while ( _shape  .size()<3 ) { _shape  .push_back(1); }
-    //   while ( _strides.size()<3 ) { _strides.push_back(1); }
-
-    //   for ( size_t i=0 ; i<_shape.size() ; i++ )
-    //     _shape[i] = 1;
-
-    //   for ( size_t i=0 ; i<shape.size() ; i++ )
-    //     _shape[i] = shape[i];
-
-    //   _strides[0] = _shape[2]*_shape[1];
-    //   _strides[1] = _shape[2];
-    //   _strides[2] = 1;
-
-    //   size_t size = _shape[0]*_shape[1]*_shape[2];
-
-    //   while ( _data.size()<size )
-    //     _data.push_back((T)0);
-    // };
 
     // return pointer to data
     // ----------------------
@@ -292,8 +268,8 @@ template <class T> class Matrix
       return out;
     }
 
-    // zero initialize
-    // ---------------
+    // initialize to zero/one
+    // ----------------------
 
     void zeros ( void )
     {
@@ -318,6 +294,51 @@ template <class T> class Matrix
         out[i] = static_cast<double>(_data[i])/norm;
 
       return out;
+    }
+
+    // print to screen
+    // ---------------
+
+    void print(std::string fmt)
+    {
+      std::string sep;
+      std::string str;
+
+      if ( ndim()==1 ) {
+        sep = ",";
+        str = fmt+sep;
+        for ( size_t h=0 ; h<shape()[0]-1 ; ++h )
+          printf(str.c_str(),_data[h]);
+        sep = "\n";
+        str = fmt+sep;
+        printf(str.c_str(),_data[shape()[0]-1]);
+      }
+      else if ( ndim()==2 ) {
+        for ( size_t h=0 ; h<shape()[0] ; ++h ) {
+          sep = ",";
+          str = fmt+sep;
+          for ( size_t i=0 ; i<shape()[1]-1 ; ++i )
+            printf(str.c_str(),_data[h*_strides[0]+i*_strides[1]]);
+          sep = ";\n";
+          str = fmt+sep;
+          printf(str.c_str(),_data[h*_strides[0]+(shape()[1]-1)*_strides[1]]);
+        }
+      }
+      else if ( ndim()==3 ) {
+        for ( size_t h=0 ; h<shape()[0] ; ++h ) {
+          for ( size_t i=0 ; i<shape()[1] ; ++i ) {
+            sep = ",";
+            str = fmt+sep;
+            for ( size_t j=0 ; j<shape()[2]-1 ; ++j )
+              printf(str.c_str(),_data[h*_strides[0]+i*_strides[1]+j*_strides[2]]);
+            sep = ";\n";
+            str = fmt+sep;
+            printf(str.c_str(),_data[h*_strides[0]+i*_strides[1]+(shape()[2]-1)*_strides[2]]);
+          }
+          if ( h<shape()[0]-1 )
+            printf("\n");
+        }
+      }
     }
 
 }; // class Matrix
@@ -373,6 +394,41 @@ template <class T>
 Matrix<T> operator- (T A, const Matrix<T> &B)
 { Matrix<T> C = B; return C -= A; }
 
+// print to "std::cout"
+// --------------------
+
+template <class T>
+std::ostream& operator<<(std::ostream& out, Matrix<T>& src) {
+
+  if ( src.ndim()==1 ) {
+    for ( size_t i=0 ; i<src.shape()[0]-1 ; ++i )
+      out << src(i) << " , ";
+    out << src(src.shape()[0]-1) << std::endl;
+  }
+  else if ( src.ndim()==2 ) {
+    for ( size_t i=0 ; i<src.shape()[0] ; ++i ) {
+      for ( size_t j=0 ; j<src.shape()[1]-1 ; ++j ) {
+        out << src(i,j) << ", ";
+      }
+      out << src(i,src.shape()[1]-1) << "; " << std::endl;
+    }
+  }
+  else if ( src.ndim()==3 ) {
+    for ( size_t h=0 ; h<src.shape()[0] ; ++h ) {
+      for ( size_t i=0 ; i<src.shape()[1] ; ++i ) {
+        for ( size_t j=0 ; j<src.shape()[2]-1 ; ++j ) {
+          out << src(h,i,j) << ", ";
+        }
+        out << src(i,src.shape()[1]-1) << "; " << std::endl;
+      }
+      if ( h<src.shape()[0]-1 )
+        out << std::endl;
+    }
+  }
+
+  return out;
+}
+
 // =============================================================================
 // Image::... (functions)
 // =============================================================================
@@ -401,7 +457,7 @@ Vs midpoint ( Vs shape );
 
 // pixel/voxel path between two points "xa" and "xb"
 // mode: "Bresenham", "actual", or "full"
-Mi path ( Vi &xa, Vi &xb, s mode="Bresenham" );
+Mi path ( Vi xa, Vi xb, s mode="Bresenham" );
 
 // list of end-points of ROI-stamp used in path-based correlations
 Mi stamp_points ( Vs &shape );
@@ -417,8 +473,9 @@ Mi kernel ( i ndim , s mode="default" );
 // ------------------
 
 // create a dummy image with circles at position "row","col" with radius "r"
-Mi dummy_circles ( Vs &shape,                          b periodic=true );
-Mi dummy_circles ( Vs &shape, Vi &row, Vi &col, Vi &r, b periodic=true );
+Mi dummy_circles (                                    b periodic=true );
+Mi dummy_circles ( Vs shape,                          b periodic=true );
+Mi dummy_circles ( Vs shape, Vi &row, Vi &col, Vi &r, b periodic=true );
 
 // determine clusters in image (for "min_size=0" the minimum size is ignored)
 std::tuple<Mi,Mi> clusters ( Mi &src,             i min_size=0, b periodic=true);

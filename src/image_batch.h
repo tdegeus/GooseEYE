@@ -442,7 +442,7 @@ void compute_scalar ( Image::Matrix<int> (*func)(std::string) )
   // load variables
   double norm;
   int    nnorm   , Nnorm    = 0;
-  int    nresult , Nresult  = 0;
+  int    nresult ;
   double nresultd, Nresultd = 0.0;
 
   // loop over ensemble
