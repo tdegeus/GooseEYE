@@ -369,16 +369,13 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
   if ( (int)iterations.size()!=src.max()+1 )
     throw std::length_error("Iteration must be specified for each label");
 
-  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,nlab,ilab,iter;
+  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,ilab,iter;
   int max_iter = 0;
 
   Matrix<int> l = src;
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
-
-  // number of labels
-  nlab = l.max();
 
   // find maximum number of iterations
   max_iter = *std::max_element(iterations.begin(),iterations.end());

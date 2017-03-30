@@ -5,6 +5,9 @@ src/cppcolormap
 
 # custom variables
 .qmake*
+release/*
+src/release/*
+src/ui_gui_mainwindow.h
 Makefile*
 test*
 build*
