@@ -27,6 +27,14 @@ Python examples
    examples/python/readme.rst
 
 
+Develop
+-------
+
+.. toctree::
+   :maxdepth: 1
+
+   dev_qt.rst
+
 Indices and tables
 ==================
 
@@ -40,7 +48,7 @@ Indices and tables
 
   * All implementation is in C++.
 
-  * The Python interface is generated using `pybind11 <http://pybind11.readthedocs.io/en/master/>`_. This project is particularly worth mentioning as it is extremely easy to use, and requires almost no code. Moreover it is header-only, so it requires no installation whatsoever. One just clone from `GitHub <https://github.com/pybind/pybind11>`_ and gets on its way.
+  * The Python interface is generated using `pybind11 <http://pybind11.readthedocs.io/en/master/>`_. This project is particularly worth mentioning as it is extremely easy to use, and requires almost no code. Moreover it is header-only, so it requires no installation whatsoever. One just clone from `github.com/pybind/pybind11 <https://github.com/pybind/pybind11>`_ and gets on its way.
 
   * The GUI is build using `Qt <https://www.qt.io>`_ which is completely free professional platform, that even comes with a graphical design tool: Qt Creator. Using the latter the full GUI is designed in a graphical way. One just connects some functionality using a C++ back-end. This code is even generated and accessed from Qt Creator.
 
