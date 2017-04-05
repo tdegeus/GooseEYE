@@ -20,8 +20,8 @@
 #include <vector>
 #include <math.h>
 
-#include "image.h"
-#include "image_batch.h"
+#include "../core/image.h"
+#include "../core/image_batch.h"
 #include "cppcolormap/cppcolormap.h"
 
 namespace Ui {

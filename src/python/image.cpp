@@ -3,7 +3,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-#include "image.h"
+#include "../core/image.h"
 
 namespace py = pybind11;
 

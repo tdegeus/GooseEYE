@@ -1,5 +1,5 @@
-#include "gui_mainwindow.h"
-#include "ui_gui_mainwindow.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 // load the image
 Image::Matrix<int> readImage ( std::string fname )

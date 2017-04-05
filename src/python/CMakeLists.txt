@@ -4,4 +4,4 @@ project(gooseeye)
 set (CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(pybind11)
-pybind11_add_module(gooseeye image.cpp py_image.cpp)
+pybind11_add_module(gooseeye image.cpp ../core/image.cpp)
