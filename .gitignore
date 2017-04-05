@@ -1,7 +1,7 @@
 
 # submodules
-src/pybind11
-src/cppcolormap
+src/python/pybind11
+src/gui/cppcolormap
 
 # custom variables
 test*
