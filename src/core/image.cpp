@@ -5,6 +5,8 @@ template class mat::matrix<unsigned char>;
 template class mat::matrix<int>;
 template class mat::matrix<double>;
 
+// TODO: check for zero initialization
+
 namespace Image {
 
 // =============================================================================
