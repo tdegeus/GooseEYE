@@ -351,17 +351,17 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,nlab,ilab,iter;
   int max_iter = 0;
 
-  mat::matrix<int> l = src;
+  mat::matrix<int> lab = src;
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
 
   src .atleast_3d();
   kern.atleast_3d();
-  l   .atleast_3d();
+  lab .atleast_3d();
 
   // number of labels
-  nlab = l.max();
+  nlab = lab.max();
 
   // find maximum number of iterations
   max_iter = *std::max_element(iterations.begin(),iterations.end());
@@ -374,7 +374,7 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
       for ( i=0 ; i<I ; i++ ) {
         for ( j=0 ; j<J ; j++ ) {
           // label over the current voxel
-          ilab = l(h,i,j);
+          ilab = lab(h,i,j);
           // proceed:
           // - for non-zero label
           // - if the number of iterations for this label has not been exceeded
@@ -386,13 +386,13 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
                   // check to dilate for non-zero kernel value
                   if ( kern(dh+dH,di+dI,dj+dJ) && !(dh==0 && di==0 && dj==0) ) {
                     if ( periodic ) {
-                      if ( !l(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                        l(P(h+dh,H),P(i+di,I),P(j+dj,J)) = -1*ilab;
+                      if ( !lab(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
+                        lab(P(h+dh,H),P(i+di,I),P(j+dj,J)) = -1*ilab;
                     }
                     else {
                       if ( BND(h+dh,H) && BND(i+di,I) && BND(j+dj,J) )
-                        if ( !l(h+dh,i+di,j+dj) )
-                          l(h+dh,i+di,j+dj) = -1*ilab;
+                        if ( !lab(h+dh,i+di,j+dj) )
+                          lab(h+dh,i+di,j+dj) = -1*ilab;
                     }
                   }
                 }
@@ -403,11 +403,11 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
       }
     }
     // accept all new labels (which were stored as negative)
-    for ( auto &i : l )
+    for ( auto &i : lab )
       i = std::abs(i);
   }
 
-  return l;
+  return lab;
 }
 
 // =============================================================================
@@ -1018,6 +1018,7 @@ template double mean<int   >(mat::matrix<int   > &);
 template double mean<double>(mat::matrix<double> &);
 
 // =============================================================================
+// TODO tot hier
 // 2-point probability (binary) / 2-point cluster function (int)      [periodic]
 // =============================================================================
 
