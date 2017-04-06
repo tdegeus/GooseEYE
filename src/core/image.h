@@ -44,7 +44,7 @@ Vs midpoint ( Vs shape );
 Mi path ( Vi xa, Vi xb, s mode="Bresenham" );
 
 // list of end-points of ROI-stamp used in path-based correlations
-Mi stamp_points ( Vs &shape );
+Mi stamp_points ( Vs shape );
 
 // (zero)pad "pad_shape" entries on each side of "src" (with a certain "value")
 template <class T> mat::matrix<T> pad ( mat::matrix<T> &src, Vs pad_shape, T value=0 );

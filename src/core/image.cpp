@@ -16,9 +16,9 @@ namespace Image {
 mat::matrix<int> path (
   std::vector<int> xa, std::vector<int> xb, std::string mode )
 {
-  int ndim = (int)xa.size();
+  int ndim = static_cast<int>(xa.size());
 
-  if ( (int)xb.size()!=ndim )
+  if ( xa.size()!=xb.size() )
     throw std::length_error("'xa' and 'xb' must have the same dimension");
   if ( ndim<1 || ndim>3 )
     throw std::length_error("Only allowed in 1, 2, or 3 dimensions");
@@ -191,7 +191,7 @@ mat::matrix<int> path (
 // list of end-points of ROI-stamp used in path-based correlations
 // =============================================================================
 
-mat::matrix<int> stamp_points ( std::vector<size_t> &N )
+mat::matrix<int> stamp_points ( std::vector<size_t> N )
 {
   if ( N.size()<1 || N.size()>3 )
     throw std::length_error("'shape' must be 1-, 2-, or 3-D");
@@ -213,7 +213,7 @@ mat::matrix<int> stamp_points ( std::vector<size_t> &N )
   if ( nd==3 ) n = POS(J-2)*(2*H+2*POS(I-2))+2*H*I;
 
   // allocate
-  mat::matrix<int> ret({(size_t)n,(size_t)nd}); ret.zeros();
+  mat::matrix<int> ret({(size_t)n,(size_t)nd});
 
   // 1-D
   // ---
@@ -313,6 +313,7 @@ mat::matrix<T> pad ( mat::matrix<T> &src, std::vector<size_t> pad_shape, T value
   for ( size_t i=0 ; i<pad_shape.size() ; i++ )
     shape[i] += 2*pad_shape[i];
 
+  // allocate to supplied value
   mat::matrix<T> ret(shape);
   ret.ones();
   ret *= value;
@@ -322,6 +323,10 @@ mat::matrix<T> pad ( mat::matrix<T> &src, std::vector<size_t> pad_shape, T value
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(pad_shape  ,0);
 
+  src.atleast_3d();
+  ret.atleast_3d();
+
+  // copy input matrix to inner region
   for ( h=0 ; h<H ; h++ )
     for ( i=0 ; i<I ; i++ )
       for ( j=0 ; j<J ; j++ )
@@ -350,6 +355,10 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
+
+  src .atleast_3d();
+  kern.atleast_3d();
+  l   .atleast_3d();
 
   // number of labels
   nlab = l.max();
@@ -394,8 +403,8 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
       }
     }
     // accept all new labels (which were stored as negative)
-    for ( size_t i=0 ; i<l.size() ; i++ )
-      l[i] = std::abs(l[i]);
+    for ( auto &i : l )
+      i = std::abs(i);
   }
 
   return l;
@@ -644,6 +653,11 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
   std::tie( H, I, J) = unpack3d(f.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
 
+  f   .atleast_3d();
+  kern.atleast_3d();
+  l   .atleast_3d();
+  c   .atleast_3d();
+
   // --------------
   // basic labeling
   // --------------
@@ -851,6 +865,9 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
     mat::matrix<int> l_,c_;
     std::tie(l_,c_) = clusters(f,kern,min_size,false);
 
+    l_.atleast_3d();
+    c_.atleast_3d();
+
     // delete clusters that are also not present in "l"
     for ( size_t i=0 ; i<f.size() ; i++ )
       if ( f[i] )
@@ -1025,6 +1042,10 @@ std::tuple<mat::matrix<double>,int> S2 ( mat::matrix<int> &f, mat::matrix<int> &
   std::tie( H, I, J) = unpack3d(f.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid      ,0);
 
+  f  .atleast_3d();
+  g  .atleast_3d();
+  ret.atleast_3d();
+
   // compute correlation
   for ( h=0 ; h<H ; h++ )
     for ( i=0 ; i<I ; i++ )
@@ -1065,6 +1086,10 @@ std::tuple<mat::matrix<double>,int> S2 ( mat::matrix<double> &f, mat::matrix<dou
 
   std::tie( H, I, J) = unpack3d(f.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid      ,0);
+
+  f  .atleast_3d();
+  g  .atleast_3d();
+  ret.atleast_3d();
 
   // compute correlation
   for ( h=0 ; h<H ; h++ )
@@ -1108,6 +1133,13 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<int> &f, mat::
 
   mat::matrix<double> ret (roi); ret .zeros();
   mat::matrix<int   > norm(roi); norm.zeros();
+
+  f   .atleast_3d();
+  g   .atleast_3d();
+  fmsk.atleast_3d();
+  gmsk.atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1218,6 +1250,13 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<double> &f,
   std::tie( H, I, J) = unpack3d(f.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid      ,0);
 
+  f   .atleast_3d();
+  g   .atleast_3d();
+  fmsk.atleast_3d();
+  gmsk.atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
+
   // define boundary region to skip
   if ( !periodic )
     std::tie(bH,bI,bJ) = unpack3d(mid,0);
@@ -1304,6 +1343,10 @@ std::tuple<mat::matrix<double>,int> W2 ( mat::matrix<int> &W, mat::matrix<int> &
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
 
+  W   .atleast_3d();
+  src .atleast_3d();
+  ret .atleast_3d();
+
   // compute correlation
   for ( h=0 ; h<H ; h++ )
     for ( i=0 ; i<I ; i++ )
@@ -1355,6 +1398,10 @@ std::tuple<mat::matrix<double>,int> W2 ( mat::matrix<int> &W, mat::matrix<double
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
 
+  W   .atleast_3d();
+  src .atleast_3d();
+  ret .atleast_3d();
+
   // compute correlation
   for ( h=0 ; h<H ; h++ )
     for ( i=0 ; i<I ; i++ )
@@ -1401,6 +1448,10 @@ std::tuple<mat::matrix<double>,double> W2 ( mat::matrix<double> &W, mat::matrix<
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  W   .atleast_3d();
+  src .atleast_3d();
+  ret .atleast_3d();
 
   // compute correlation
   for ( h=0 ; h<H ; h++ )
@@ -1459,6 +1510,12 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  W   .atleast_3d();
+  src .atleast_3d();
+  mask.atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
 
   // define boundary region to skip
   if ( !periodic )
@@ -1537,6 +1594,12 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  W   .atleast_3d();
+  src .atleast_3d();
+  mask.atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
 
   // define boundary region to skip
   if ( !periodic )
@@ -1617,6 +1680,12 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> W2 ( mat::matrix<double> &W,
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
 
+  W   .atleast_3d();
+  src .atleast_3d();
+  mask.atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
+
   // define boundary region to skip
   if ( !periodic )
     std::tie(bH,bI,bJ) = unpack3d(mid,0);
@@ -1694,6 +1763,13 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &src,
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  src .atleast_3d();
+  clusters.atleast_3d();
+  centers.atleast_3d();
+  mask.atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
 
   // define boundary region to skip
   if ( !periodic )
@@ -1818,6 +1894,10 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> L ( mat::matrix<int> &src,
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
+
+  src .atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
 
   // define boundary region to skip
   if ( !periodic )
