@@ -3,7 +3,7 @@ from setuptools.command.build_ext import build_ext
 import sys
 import setuptools
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 
 class get_pybind_include(object):
@@ -23,9 +23,10 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         'gooseeye',
-        ['src/image.cpp','src/py_image.cpp'],
+        ['src/core/image.cpp','src/python/image.cpp'],
         include_dirs=[
             # Path to pybind11 headers
+            'src/core/cppmat',
             get_pybind_include(),
             get_pybind_include(user=True),
         ],

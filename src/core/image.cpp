@@ -1,17 +1,17 @@
 
 #include "image.h"
 
-namespace Image {
+template class mat::matrix<unsigned char>;
+template class mat::matrix<int>;
+template class mat::matrix<double>;
 
-template class Matrix<unsigned char>;
-template class Matrix<int>;
-template class Matrix<double>;
+namespace Image {
 
 // =============================================================================
 // pixel/voxel path between two points "xa" and "xb"
 // =============================================================================
 
-Matrix<int> path (
+mat::matrix<int> path (
   std::vector<int> xa, std::vector<int> xb, std::string mode )
 {
   int ndim = (int)xa.size();
@@ -75,7 +75,7 @@ Matrix<int> path (
       nnz += 1;
       // check convergence
       if ( x[j]==xb[j] ) {
-        Matrix<int> retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
+        mat::matrix<int> retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
         return retmat;
       }
       // check increment in other directions
@@ -178,7 +178,7 @@ Matrix<int> path (
 
     }
 
-    Matrix<int> retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
+    mat::matrix<int> retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
     return retmat;
   }
 
@@ -189,7 +189,7 @@ Matrix<int> path (
 // list of end-points of ROI-stamp used in path-based correlations
 // =============================================================================
 
-Matrix<int> stamp_points ( std::vector<size_t> &N )
+mat::matrix<int> stamp_points ( std::vector<size_t> &N )
 {
   if ( N.size()<1 || N.size()>3 )
     throw std::length_error("'shape' must be 1-, 2-, or 3-D");
@@ -211,7 +211,7 @@ Matrix<int> stamp_points ( std::vector<size_t> &N )
   if ( nd==3 ) n = POS(J-2)*(2*H+2*POS(I-2))+2*H*I;
 
   // allocate
-  Matrix<int> ret({(size_t)n,(size_t)nd});
+  mat::matrix<int> ret({(size_t)n,(size_t)nd}); ret.zeros();
 
   // 1-D
   // ---
@@ -304,22 +304,21 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 // =============================================================================
 
 template <class T>
-Matrix<T> pad ( Matrix<T> &src, std::vector<size_t> pad_shape, T value )
+mat::matrix<T> pad ( mat::matrix<T> &src, std::vector<size_t> pad_shape, T value )
 {
   std::vector<size_t> shape = src.shape();
 
   for ( size_t i=0 ; i<pad_shape.size() ; i++ )
     shape[i] += 2*pad_shape[i];
 
-  Matrix<T> ret(shape);
+  mat::matrix<T> ret(shape);
+  ret.ones();
+  ret *= value;
 
   int h,i,j,H,I,J,dH,dI,dJ;
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(pad_shape  ,0);
-
-  ret.ones();
-  ret *= value;
 
   for ( h=0 ; h<H ; h++ )
     for ( i=0 ; i<I ; i++ )
@@ -329,14 +328,14 @@ Matrix<T> pad ( Matrix<T> &src, std::vector<size_t> pad_shape, T value )
   return ret;
 }
 
-template Matrix<int>    pad<int>    (Matrix<int>    &, std::vector<size_t>, int   );
-template Matrix<double> pad<double> (Matrix<double> &, std::vector<size_t>, double);
+template mat::matrix<int>    pad<int>    (mat::matrix<int>    &, std::vector<size_t>, int   );
+template mat::matrix<double> pad<double> (mat::matrix<double> &, std::vector<size_t>, double);
 
 // =============================================================================
 // dilate image
 // =============================================================================
 
-Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
+mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
   std::vector<int> &iterations, bool periodic )
 {
   if ( (int)iterations.size()!=src.max()+1 )
@@ -345,7 +344,7 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,nlab,ilab,iter;
   int max_iter = 0;
 
-  Matrix<int> l = src;
+  mat::matrix<int> l = src;
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
@@ -402,9 +401,9 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kern,
 
 // =============================================================================
 
-Matrix<int> dilate ( Matrix<int> &src, int iterations, bool periodic )
+mat::matrix<int> dilate ( mat::matrix<int> &src, int iterations, bool periodic )
 {
-  Matrix<int> kern = kernel(src.ndim());
+  mat::matrix<int> kern = kernel(src.ndim());
 
   std::vector<int> iter(src.max()+1);
   for ( auto &i : iter )
@@ -415,7 +414,7 @@ Matrix<int> dilate ( Matrix<int> &src, int iterations, bool periodic )
 
 // =============================================================================
 
-Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kernel, int iterations,
+mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kernel, int iterations,
   bool periodic )
 {
   std::vector<int> iter(src.max()+1);
@@ -427,10 +426,10 @@ Matrix<int> dilate ( Matrix<int> &src, Matrix<int> &kernel, int iterations,
 
 // =============================================================================
 
-Matrix<int> dilate ( Matrix<int> &src, std::vector<int> &iterations,
+mat::matrix<int> dilate ( mat::matrix<int> &src, std::vector<int> &iterations,
   bool periodic )
 {
-  Matrix<int> kern = kernel(src.ndim());
+  mat::matrix<int> kern = kernel(src.ndim());
   return dilate(src,kern,iterations,periodic);
 }
 
@@ -438,7 +437,7 @@ Matrix<int> dilate ( Matrix<int> &src, std::vector<int> &iterations,
 // create a dummy image with circles at position "row","col" with radius "r"
 // =============================================================================
 
-Matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &row,
+mat::matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &row,
   std::vector<int> &col, std::vector<int> &r, bool periodic )
 {
   if ( row.size()!=col.size() || row.size()!=r.size() )
@@ -448,7 +447,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &row,
 
   int    di,dj,I,J;
   size_t i;
-  Matrix<int> ret(shape);
+  mat::matrix<int> ret(shape); ret.zeros();
 
   I = shape[0];
   J = shape[1];
@@ -468,7 +467,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &row,
 // at random positions and random radii
 // =============================================================================
 
-Matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
+mat::matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
 {
   if ( shape.size()!=2 )
     throw std::length_error("Only allowed in 2 dimensions");
@@ -512,7 +511,7 @@ Matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
 // create dummy image with default shape
 // =============================================================================
 
-Matrix<int> dummy_circles ( bool periodic )
+mat::matrix<int> dummy_circles ( bool periodic )
 {
   return dummy_circles({100,100},periodic);
 }
@@ -521,7 +520,7 @@ Matrix<int> dummy_circles ( bool periodic )
 // define kernel
 // =============================================================================
 
-Matrix<int> kernel ( int ndim , std::string mode )
+mat::matrix<int> kernel ( int ndim , std::string mode )
 {
   std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
 
@@ -531,7 +530,7 @@ Matrix<int> kernel ( int ndim , std::string mode )
     for ( int i=0 ; i<ndim ; i++ )
       shape[i] = 3;
 
-    Matrix<int> kern(shape);
+    mat::matrix<int> kern(shape); kern.zeros();
 
     if      ( ndim==1 ) {
       kern(0) = 1; kern(1) = 1; kern(2) = 1;
@@ -628,8 +627,8 @@ void _link ( std::vector<int> &linked, int a, int b )
 
 // -----------------------------------------------------------------------------
 
-std::tuple<Matrix<int>,Matrix<int>> clusters (
-  Matrix<int> &f, Matrix<int> &kern, int min_size, bool periodic )
+std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
+  mat::matrix<int> &f, mat::matrix<int> &kern, int min_size, bool periodic )
 {
   int h,i,j,di,dj,dh,H,I,J,lH,lI,lJ,uH,uI,uJ,dI,dJ,dH,ii,jj,ilab,nlab;
   // cluster links (e.g. 4 coupled to 2: lnk[4]=2)
@@ -637,8 +636,8 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
   // saved clusters: 1=saved, 0=not-saved
   std::vector<int> inc(f.size());
 
-  Matrix<int> l(f.shape());
-  Matrix<int> c(f.shape());
+  mat::matrix<int> l(f.shape()); l.zeros();
+  mat::matrix<int> c(f.shape()); c.zeros();
 
   std::tie( H, I, J) = unpack3d(f.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
@@ -802,7 +801,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 
     // allocate matrix to contain the average position and total size:
     // [ [ h,i,j , size_feature ] , ... ]
-    Matrix<int> x({(size_t)nlab,4});
+    mat::matrix<int> x({(size_t)nlab,4}); x.zeros();
 
     // loop over the image to update the position and size of each label
     for ( h=0 ; h<H ; h++ ) {
@@ -847,7 +846,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
     int h,i,j,dh,di,dj,ilab,nlab,nlab_;
 
     // "l_": labels for the non-periodic version image "f"
-    Matrix<int> l_,c_;
+    mat::matrix<int> l_,c_;
     std::tie(l_,c_) = clusters(f,kern,min_size,false);
 
     // delete clusters that are also not present in "l"
@@ -862,9 +861,9 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 
     // matrix to contain the average position and total size:
     // [ [ h,i,j , size_feature ] , ... ]
-    Matrix<int>  x({(size_t)nlab ,4});
+    mat::matrix<int>  x({(size_t)nlab ,4});  x.zeros();
     // if dx(ilab,ix)==1 than N[ix] is subtracted from the position in averaging
-    Matrix<int> dx({(size_t)nlab_,3});
+    mat::matrix<int> dx({(size_t)nlab_,3}); dx.zeros();
 
     // label dependency: which labels in "l_" correspond to which labels in "l"
     std::vector<int> lnk(nlab_);
@@ -957,10 +956,10 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 // determine clusters from image: default kernel
 // =============================================================================
 
-std::tuple<Matrix<int>,Matrix<int>> clusters (
-  Matrix<int> &f, int min_size, bool periodic )
+std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
+  mat::matrix<int> &f, int min_size, bool periodic )
 {
-  Matrix<int> kern = kernel(f.ndim());
+  mat::matrix<int> kern = kernel(f.ndim());
   return clusters(f,kern,min_size,periodic);
 }
 
@@ -969,7 +968,7 @@ std::tuple<Matrix<int>,Matrix<int>> clusters (
 // =============================================================================
 
 template <class T>
-double mean ( Matrix<T> &src , Matrix<int> &mask )
+double mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
 {
   T      out = static_cast<T>(0);
   size_t n   = 0;
@@ -984,20 +983,20 @@ double mean ( Matrix<T> &src , Matrix<int> &mask )
   return static_cast<double>(out)/static_cast<double>(n);
 }
 
-template double mean<int   >(Matrix<int   > &, Matrix<int> &);
-template double mean<double>(Matrix<double> &, Matrix<int> &);
+template double mean<int   >(mat::matrix<int   > &, mat::matrix<int> &);
+template double mean<double>(mat::matrix<double> &, mat::matrix<int> &);
 
 
 // -----------------------------------------------------------------------------
 
 template <class T>
-double mean ( Matrix<T> &src )
+double mean ( mat::matrix<T> &src )
 {
   return src.mean();
 }
 
-template double mean<int   >(Matrix<int   > &);
-template double mean<double>(Matrix<double> &);
+template double mean<int   >(mat::matrix<int   > &);
+template double mean<double>(mat::matrix<double> &);
 
 // =============================================================================
 // 2-point probability (binary) / 2-point cluster function (int)      [periodic]
@@ -1005,7 +1004,7 @@ template double mean<double>(Matrix<double> &);
 
 // TODO: combine with different versions
 // TODO: make "roi" a combine to enhance usability from C++
-std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
+std::tuple<mat::matrix<double>,int> S2 ( mat::matrix<int> &f, mat::matrix<int> &g,
   std::vector<size_t> &roi )
 {
   if ( f.shape()!=g.shape() )
@@ -1017,7 +1016,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
 
-  Matrix<double> ret(roi);
+  mat::matrix<double> ret(roi); ret.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1046,7 +1045,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<int> &f, Matrix<int> &g,
 // 2-point correlation (floating-point)                               [periodic]
 // =============================================================================
 
-std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
+std::tuple<mat::matrix<double>,int> S2 ( mat::matrix<double> &f, mat::matrix<double> &g,
   std::vector<size_t> &roi )
 {
   if ( f.shape()!=g.shape() )
@@ -1058,7 +1057,7 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
 
-  Matrix<double> ret(roi);
+  mat::matrix<double> ret(roi); ret.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1086,8 +1085,8 @@ std::tuple<Matrix<double>,int> S2 ( Matrix<double> &f, Matrix<double> &g,
 // masked 2-point probability (binary) / 2-point cluster function (int)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
-  std::vector<size_t> &roi, Matrix<int> &fmsk, Matrix<int> &gmsk,
+std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<int> &f, mat::matrix<int> &g,
+  std::vector<size_t> &roi, mat::matrix<int> &fmsk, mat::matrix<int> &gmsk,
   bool zeropad, bool periodic )
 {
   if ( f.shape()!=g.shape() )
@@ -1105,8 +1104,8 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  Matrix<double> ret (roi);
-  Matrix<int   > norm(roi);
+  mat::matrix<double> ret (roi); ret .zeros();
+  mat::matrix<int   > norm(roi); norm.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1159,10 +1158,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 // - default "gmask"
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
-  std::vector<size_t> &roi, Matrix<int> &fmask, bool zeropad, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<int> &f, mat::matrix<int> &g,
+  std::vector<size_t> &roi, mat::matrix<int> &fmask, bool zeropad, bool periodic )
 {
-  Matrix<int> gmask(g.shape());
+  mat::matrix<int> gmask(g.shape());
   return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
@@ -1171,11 +1170,11 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 // - default "fmask" and "gmask"
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
+std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<int> &f, mat::matrix<int> &g,
   std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
-  Matrix<int> fmask(f.shape());
-  Matrix<int> gmask(g.shape());
+  mat::matrix<int> fmask(f.shape());
+  mat::matrix<int> gmask(g.shape());
   return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
@@ -1183,9 +1182,9 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<int> &f, Matrix<int> &g,
 // masked 2-point correlation (floating-point)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
-  Matrix<double> &g, std::vector<size_t> &roi, Matrix<int> &fmsk,
-  Matrix<int> &gmsk, bool zeropad, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<double> &f,
+  mat::matrix<double> &g, std::vector<size_t> &roi, mat::matrix<int> &fmsk,
+  mat::matrix<int> &gmsk, bool zeropad, bool periodic )
 {
   if ( f.shape()!=g.shape() )
     throw std::length_error("'f' and 'g' are inconsistent");
@@ -1202,8 +1201,8 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  Matrix<double> ret (roi);
-  Matrix<int   > norm(roi);
+  mat::matrix<double> ret (roi); ret. zeros();
+  mat::matrix<int   > norm(roi); norm.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1256,10 +1255,10 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
 // - default "gmask"
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g,
-  std::vector<size_t> &roi, Matrix<int> &fmask, bool zeropad, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<double> &f, mat::matrix<double> &g,
+  std::vector<size_t> &roi, mat::matrix<int> &fmask, bool zeropad, bool periodic )
 {
-  Matrix<int> gmask(g.shape());
+  mat::matrix<int> gmask(g.shape());
   return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
@@ -1268,11 +1267,11 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f, Matrix<double> &g
 // - default "fmask" and "gmask"
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
-  Matrix<double> &g, std::vector<size_t> &roi, bool zeropad, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( mat::matrix<double> &f,
+  mat::matrix<double> &g, std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
-  Matrix<int> fmask(f.shape());
-  Matrix<int> gmask(g.shape());
+  mat::matrix<int> fmask(f.shape());
+  mat::matrix<int> gmask(g.shape());
   return S2(f,g,roi,fmask,gmask,zeropad,periodic);
 }
 
@@ -1280,7 +1279,7 @@ std::tuple<Matrix<double>,Matrix<int>> S2 ( Matrix<double> &f,
 // conditional 2-point probability (binary image, binary weight)      [periodic]
 // =============================================================================
 
-std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
+std::tuple<mat::matrix<double>,int> W2 ( mat::matrix<int> &W, mat::matrix<int> &src,
   std::vector<size_t> &roi )
 {
   if ( W.shape()!=src.shape() )
@@ -1296,7 +1295,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
 
-  Matrix<double> ret(roi);
+  mat::matrix<double> ret(roi); ret.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1331,7 +1330,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<int> &src,
 // conditional 2-point correlation (float. image, binary weight)      [periodic]
 // =============================================================================
 
-std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<double> &src,
+std::tuple<mat::matrix<double>,int> W2 ( mat::matrix<int> &W, mat::matrix<double> &src,
   std::vector<size_t> &roi )
 {
   if ( W.shape()!=src.shape() )
@@ -1347,7 +1346,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<double> &src,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
 
-  Matrix<double> ret(roi);
+  mat::matrix<double> ret(roi); ret.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1382,7 +1381,7 @@ std::tuple<Matrix<double>,int> W2 ( Matrix<int> &W, Matrix<double> &src,
 // weighted 2-point correlation (float. image, float. weight)         [periodic]
 // =============================================================================
 
-std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
+std::tuple<mat::matrix<double>,double> W2 ( mat::matrix<double> &W, mat::matrix<double> &src,
   std::vector<size_t> &roi )
 {
   if ( W.shape()!=src.shape() )
@@ -1394,7 +1393,7 @@ std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
 
-  Matrix<double> ret(roi);
+  mat::matrix<double> ret(roi); ret.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1427,8 +1426,8 @@ std::tuple<Matrix<double>,double> W2 ( Matrix<double> &W, Matrix<double> &src,
 // masked conditional 2-point probability (binary image, binary weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
-  std::vector<size_t> &roi, Matrix<int> &mask, bool zeropad, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<int> &src,
+  std::vector<size_t> &roi, mat::matrix<int> &mask, bool zeropad, bool periodic )
 {
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
     throw std::length_error("'W', 'I', and 'mask' are inconsistent");
@@ -1446,8 +1445,8 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  Matrix<double> ret (roi);
-  Matrix<int   > norm(roi);
+  mat::matrix<double> ret (roi); ret .zeros();
+  mat::matrix<int   > norm(roi); norm.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1497,10 +1496,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
 // conditional 2-point probability (binary image, binary weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<int> &src,
   std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
-  Matrix<int> mask(src.shape());
+  mat::matrix<int> mask(src.shape());
   return W2(W,src,roi,mask,zeropad,periodic);
 }
 
@@ -1508,8 +1507,8 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<int> &src,
 // masked conditional 2-point correlation (float. image, binary weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
-  std::vector<size_t> &roi, Matrix<int> &mask, bool zeropad, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<double> &src,
+  std::vector<size_t> &roi, mat::matrix<int> &mask, bool zeropad, bool periodic )
 {
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
     throw std::length_error("'W', 'I', and 'mask' are inconsistent");
@@ -1524,8 +1523,8 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  Matrix<double> ret (roi);
-  Matrix<int   > norm(roi);
+  mat::matrix<double> ret (roi); ret .zeros();
+  mat::matrix<int   > norm(roi); norm.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1575,10 +1574,10 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
 // conditional 2-point correlation (float. image, binary weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<double> &src,
   std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
-  Matrix<int> mask(src.shape());
+  mat::matrix<int> mask(src.shape());
   return W2(W,src,roi,mask,zeropad,periodic);
 }
 
@@ -1586,8 +1585,8 @@ std::tuple<Matrix<double>,Matrix<int>> W2 ( Matrix<int> &W, Matrix<double> &src,
 // weighted conditional 2-point correlation (float. image, float. weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
-  Matrix<double> &src, std::vector<size_t> &roi, Matrix<int> &mask,
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2 ( mat::matrix<double> &W,
+  mat::matrix<double> &src, std::vector<size_t> &roi, mat::matrix<int> &mask,
   bool zeropad, bool periodic )
 {
   if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
@@ -1603,8 +1602,8 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  Matrix<double> ret (roi);
-  Matrix<double> norm(roi);
+  mat::matrix<double> ret (roi); ret .zeros();
+  mat::matrix<double> norm(roi); norm.zeros();
 
   std::vector<size_t> mid = midpoint(roi);
 
@@ -1652,10 +1651,10 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
 // weighted 2-point correlation (float. image, float. weight)
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
-  Matrix<double> &src, std::vector<size_t> &roi, bool zeropad, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2 ( mat::matrix<double> &W,
+  mat::matrix<double> &src, std::vector<size_t> &roi, bool zeropad, bool periodic )
 {
-  Matrix<int> mask(src.shape());
+  mat::matrix<int> mask(src.shape());
   return W2(W,src,roi,mask,zeropad,periodic);
 }
 
@@ -1663,9 +1662,9 @@ std::tuple<Matrix<double>,Matrix<double>> W2 ( Matrix<double> &W,
 // weighted 2-point correlation -> collapse to center
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
-  Matrix<int> &clusters, Matrix<int> &centers, std::vector<size_t> &roi,
-  Matrix<int> &mask, std::string mode, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &src,
+  mat::matrix<int> &clusters, mat::matrix<int> &centers, std::vector<size_t> &roi,
+  mat::matrix<int> &mask, std::string mode, bool periodic )
 {
  if ( src.shape()!=clusters.shape() || src.shape()!=centers.shape() )
     throw std::length_error("'I', 'clusters', and 'centers' are inconsistent");
@@ -1683,8 +1682,8 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
   int jpix,label;
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  Matrix<double> ret (roi);
-  Matrix<int   > norm(roi);
+  mat::matrix<double> ret (roi); ret .zeros();
+  mat::matrix<int   > norm(roi); norm.zeros();
 
   std::vector<int> begin(3),end(3);
   for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
@@ -1699,7 +1698,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
     std::tie(bH,bI,bJ) = unpack3d(mid,0);
 
   // define the "end"-point of each voxel path
-  Matrix<int> pnt = stamp_points(roi);
+  mat::matrix<int> pnt = stamp_points(roi);
 
   // loop over ROI
   for ( size_t ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
@@ -1708,7 +1707,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
     for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
-    Matrix<int> pix = path(begin,end,mode);
+    mat::matrix<int> pix = path(begin,end,mode);
 
     // loop over image
     for ( h=bH ; h<(H-bH) ; h++ ) {
@@ -1760,21 +1759,21 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &src,
 
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
-  Matrix<int> &clusters, Matrix<int> &centers, std::vector<size_t> &roi,
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &I,
+  mat::matrix<int> &clusters, mat::matrix<int> &centers, std::vector<size_t> &roi,
   std::string mode, bool periodic )
 {
-  Matrix<int> mask(I.shape(),0);
+  mat::matrix<int> mask(I.shape()); mask.zeros();
   return W2c(I,clusters,centers,roi,mask,mode,periodic);
 }
 
 
 // TODO: header + remove int in clusters
-std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
-  Matrix<int> &W, std::vector<size_t> &roi, Matrix<int> &mask,
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &I,
+  mat::matrix<int> &W, std::vector<size_t> &roi, mat::matrix<int> &mask,
   std::string mode, bool periodic )
 {
-  Matrix<int> clusters,centers;
+  mat::matrix<int> clusters,centers;
 
   std::tie(clusters,centers) = Image::clusters(W,0,periodic);
 
@@ -1782,12 +1781,12 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
 }
 
 // TODO: header + remove int in clusters
-std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
-  Matrix<int> &W, std::vector<size_t> &roi,
+std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &I,
+  mat::matrix<int> &W, std::vector<size_t> &roi,
   std::string mode, bool periodic )
 {
-  Matrix<int> clusters,centers;
-  Matrix<int> mask(I.shape(),0);
+  mat::matrix<int> clusters,centers;
+  mat::matrix<int> mask(I.shape()); mask.zeros();
 
   std::tie(clusters,centers) = Image::clusters(W,0,periodic);
 
@@ -1798,7 +1797,7 @@ std::tuple<Matrix<double>,Matrix<int>> W2c ( Matrix<double> &I,
 // lineal path function
 // =============================================================================
 
-std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
+std::tuple<mat::matrix<double>,mat::matrix<int>> L ( mat::matrix<int> &src,
   std::vector<size_t> &roi, std::string mode, bool periodic )
 {
   for ( auto i : roi )
@@ -1807,8 +1806,8 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  Matrix<double> ret (roi);
-  Matrix<int   > norm(roi);
+  mat::matrix<double> ret (roi); ret .zeros();
+  mat::matrix<int   > norm(roi); norm.zeros();
 
   std::vector<int> begin(3),end(3);
   for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
@@ -1823,7 +1822,7 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
     std::tie(bH,bI,bJ) = unpack3d(mid,0);
 
   // define the "end"-point of each voxel path
-  Matrix<int> pnt = stamp_points(roi);
+  mat::matrix<int> pnt = stamp_points(roi);
 
   // correlation
   for ( size_t ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
@@ -1832,7 +1831,7 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
     for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
-    Matrix<int> pix = path(begin,end,mode);
+    mat::matrix<int> pix = path(begin,end,mode);
 
     // loop over image
     for ( h=bH ; h<(H-bH) ; h++ ) {
@@ -1861,7 +1860,7 @@ std::tuple<Matrix<double>,Matrix<int>> L ( Matrix<int> &src,
     for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
-    Matrix<int> pix = path(begin,end,mode);
+    mat::matrix<int> pix = path(begin,end,mode);
 
     // loop over voxel-path
     for ( size_t ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
