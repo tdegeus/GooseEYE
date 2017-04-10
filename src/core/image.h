@@ -16,6 +16,7 @@
 #define POS(a)   ( (a<0) ?   0                : a )
 
 // abbreviate data types to enhance readability -> templates fit on one line
+template <class T> using M = mat::matrix<T>;
 using Md = mat::matrix<double>;
 using Mi = mat::matrix<int>;
 using Vs = std::vector<size_t>;
@@ -76,18 +77,14 @@ Mi dilate ( Mi &src, Mi &kernel, Vi& iterations  , b periodic=true );
 // ----------
 
 // spatial average
-template <class T> double mean ( mat::matrix<T> &src                          );
-template <class T> double mean ( mat::matrix<T> &src , mat::matrix<int> &mask );
+template <class T> double mean ( M<T> &src            );
+template <class T> double mean ( M<T> &src , Mi &mask );
 
 // 2-point probability (binary), 2-point cluster function (int), and 2-point correlations (double)
-std::tuple<Md,i > S2 ( Mi &f, Mi &g, Vs &roi                                                   );
-std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi,                     b pad      , b periodic      );
-std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
-std::tuple<Md,Mi> S2 ( Mi &f, Mi &g, Vs &roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
-std::tuple<Md,i > S2 ( Md &f, Md &g, Vs &roi                                                   );
-std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi,                     b pad      , b periodic      );
-std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk,           b pad=false, b periodic=true );
-std::tuple<Md,Mi> S2 ( Md &f, Md &g, Vs &roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
+template <class T> std::tuple<Md,i > S2 ( M<T> &f, M<T> &g, Vs roi                                                   );
+template <class T> std::tuple<Md,Mi> S2 ( M<T> &f, M<T> &g, Vs roi,                     b pad=false, b periodic=true );
+template <class T> std::tuple<Md,Mi> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk,           b pad=false, b periodic=true );
+template <class T> std::tuple<Md,Mi> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
 
 // weighted 2-point probability (binary) or 2-point correlation (float)
 std::tuple<Md,i > W2 ( Mi &W, Mi &I, Vs &roi                                        );

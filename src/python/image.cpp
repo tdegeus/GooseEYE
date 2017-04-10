@@ -57,14 +57,14 @@ mi.def("mean",py::overload_cast<Md&    >(&Image::mean<double>),"Spatial average"
 mi.def("mean",py::overload_cast<Mi&,Mi&>(&Image::mean<int>   ),"Spatial average",py::arg("im"),py::arg("mask"));
 mi.def("mean",py::overload_cast<Md&,Mi&>(&Image::mean<double>),"Spatial average",py::arg("im"),py::arg("mask"));
 
-mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&            >(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
-mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,        b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("zeropad")=false,py::arg("periodic")=true);
-mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,Mi&,    b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),                 py::arg("zeropad")=false,py::arg("periodic")=true);
-mi.def("S2",py::overload_cast<Mi&,Mi&,Vs&,Mi&,Mi&,b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),py::arg("gmask"),py::arg("zeropad")=false,py::arg("periodic")=true);
-mi.def("S2",py::overload_cast<Md&,Md&,Vs&            >(&Image::S2),"2-point correlation",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
-mi.def("S2",py::overload_cast<Md&,Md&,Vs&,        b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("zeropad")=false,py::arg("periodic")=true);
-mi.def("S2",py::overload_cast<Md&,Md&,Vs&,Mi&,    b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),                 py::arg("zeropad")=false,py::arg("periodic")=true);
-mi.def("S2",py::overload_cast<Md&,Md&,Vs&,Mi&,Mi&,b,b>(&Image::S2),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),py::arg("gmask"),py::arg("zeropad")=false,py::arg("periodic")=true);
+mi.def("S2",py::overload_cast<Mi&,Mi&,Vs            >(&Image::S2<int>   ),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
+mi.def("S2",py::overload_cast<Mi&,Mi&,Vs,        b,b>(&Image::S2<int>   ),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("zeropad")=false,py::arg("periodic")=true);
+mi.def("S2",py::overload_cast<Mi&,Mi&,Vs,Mi&,    b,b>(&Image::S2<int>   ),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),                 py::arg("zeropad")=false,py::arg("periodic")=true);
+mi.def("S2",py::overload_cast<Mi&,Mi&,Vs,Mi&,Mi&,b,b>(&Image::S2<int>   ),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),py::arg("gmask"),py::arg("zeropad")=false,py::arg("periodic")=true);
+mi.def("S2",py::overload_cast<Md&,Md&,Vs            >(&Image::S2<double>),"2-point correlation",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );
+mi.def("S2",py::overload_cast<Md&,Md&,Vs,        b,b>(&Image::S2<double>),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),                                  py::arg("zeropad")=false,py::arg("periodic")=true);
+mi.def("S2",py::overload_cast<Md&,Md&,Vs,Mi&,    b,b>(&Image::S2<double>),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),                 py::arg("zeropad")=false,py::arg("periodic")=true);
+mi.def("S2",py::overload_cast<Md&,Md&,Vs,Mi&,Mi&,b,b>(&Image::S2<double>),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi"),py::arg("fmask"),py::arg("gmask"),py::arg("zeropad")=false,py::arg("periodic")=true);
 
 mi.def("W2",py::overload_cast<Mi&,Mi&,Vs&        >(&Image::W2),"Conditional 2-point probability",py::arg("W"), py::arg("I"), py::arg("roi")                                                                  );
 mi.def("W2",py::overload_cast<Mi&,Mi&,Vs&,    b,b>(&Image::W2),"Conditional 2-point probability",py::arg("W"), py::arg("I"), py::arg("roi"),                py::arg("zeropad")=false,py::arg("periodic")=true);
