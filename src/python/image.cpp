@@ -53,8 +53,8 @@ mi.def("dilate",py::overload_cast<Mi&,Mi&,Vi&,b>(&Image::dilate),"Dilate image",
 // ----------
 
 mi.def("mean",py::overload_cast<Mi&    >(&Image::mean<int>   ),"Spatial average",py::arg("im")                );
-mi.def("mean",py::overload_cast<Md&    >(&Image::mean<double>),"Spatial average",py::arg("im")                );
 mi.def("mean",py::overload_cast<Mi&,Mi&>(&Image::mean<int>   ),"Spatial average",py::arg("im"),py::arg("mask"));
+mi.def("mean",py::overload_cast<Md&    >(&Image::mean<double>),"Spatial average",py::arg("im")                );
 mi.def("mean",py::overload_cast<Md&,Mi&>(&Image::mean<double>),"Spatial average",py::arg("im"),py::arg("mask"));
 
 mi.def("S2",py::overload_cast<Mi&,Mi&,Vs            >(&Image::S2<int>   ),"2-point probability",py::arg("f"),py::arg("g"),py::arg("roi")                                                                                    );

@@ -987,6 +987,14 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
 // =============================================================================
 
 template <class T>
+double mean ( mat::matrix<T> &src )
+{
+  return src.mean();
+}
+
+// -----------------------------------------------------------------------------
+
+template <class T>
 double mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
 {
   T      out = static_cast<T>(0);
@@ -1002,20 +1010,12 @@ double mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
   return static_cast<double>(out)/static_cast<double>(n);
 }
 
-template double mean<int   >(mat::matrix<int   > &, mat::matrix<int> &);
-template double mean<double>(mat::matrix<double> &, mat::matrix<int> &);
-
-
 // -----------------------------------------------------------------------------
-
-template <class T>
-double mean ( mat::matrix<T> &src )
-{
-  return src.mean();
-}
 
 template double mean<int   >(mat::matrix<int   > &);
 template double mean<double>(mat::matrix<double> &);
+template double mean<int   >(mat::matrix<int   > &, mat::matrix<int> &);
+template double mean<double>(mat::matrix<double> &, mat::matrix<int> &);
 
 // =============================================================================
 // TODO include in header
@@ -1030,11 +1030,22 @@ inline double compare ( int f, int g )
     return 0.;
 }
 
+// -----------------------------------------------------------------------------
+
+inline double compare ( int f, double g )
+{
+  if ( f )
+    return g;
+  else
+    return 0.;
+}
+
+// -----------------------------------------------------------------------------
+
 inline double compare ( double f, double g )
 {
   return f*g;
 }
-
 
 // =============================================================================
 // TODO rename in header
