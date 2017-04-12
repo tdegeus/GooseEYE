@@ -1019,45 +1019,30 @@ template double mean<double>(mat::matrix<double> &, mat::matrix<int> &);
 
 // =============================================================================
 // TODO include in header
-// comparison functions to allow int/double overload
+// comparison functions to allow int/double overload in "S2_core"
 // =============================================================================
 
-inline double compare ( int f, int g )
-{
-  if ( f==g )
-    return 1.;
-  else
-    return 0.;
-}
-
-// -----------------------------------------------------------------------------
-
-inline double compare ( int f, double g )
-{
-  if ( f )
-    return g;
-  else
-    return 0.;
-}
-
-// -----------------------------------------------------------------------------
-
-inline double compare ( double f, double g )
-{
-  return f*g;
-}
+inline double compare ( int    f, int    g ) { return (f==g)? 1. : 0.; }
+inline double compare ( int    f, double g ) { return (f   )? g  : 0.; }
+inline double compare ( double f, int    g ) { return (g   )? f  : 0.; }
+inline double compare ( double f, double g ) { return f*g            ; }
+inline double compare ( int    f           ) { return (f   )? 1. : 0.; }
+inline double compare ( double f           ) { return f              ; }
+inline double unity   ( int    f           ) { return 1.             ; }
+inline double unity   ( double f           ) { return 1.             ; }
 
 // =============================================================================
-// TODO rename in header
-// 2-point probability/cluster (binary/int) / correlation (double)    [periodic]
+// TODO include in header
+// core functions for "S2" and "W2"
 // =============================================================================
 
-template <class T>
-std::tuple<mat::matrix<double>,int> S2 ( mat::matrix<T> &f, mat::matrix<T> &g,
-  std::vector<size_t> roi )
+template <class T, class U>
+std::tuple<mat::matrix<double>,double> S2_core (\
+  mat::matrix<T> &f, mat::matrix<U> &g, std::vector<size_t> roi,\
+  double (*func)(U) )
 {
   if ( f.shape()!=g.shape() )
-    throw std::length_error("'f' and 'g' are inconsistent");
+    throw std::length_error("Shape of input images inconsistent");
 
   for ( auto i : roi )
     if ( i%2==0 )
@@ -1087,39 +1072,35 @@ std::tuple<mat::matrix<double>,int> S2 ( mat::matrix<T> &f, mat::matrix<T> &g,
                 ret(dh+dH,di+dI,dj+dJ) +=\
                   compare(f(h,i,j),g(P(h+dh,H),P(i+di,I),P(j+dj,J)));
 
-  // apply normalization
-  ret /= static_cast<double>(f.size());
+  // compute normalization
+  double norm = 0.;
+  for ( size_t i=0 ; i<f.size() ; i++ )
+    norm += func(f[i]);
 
-  return std::make_tuple(ret,f.size());
+  return std::make_tuple(ret/norm,norm);
 }
 
-// =======x======================================================================
-// masked 2-point probability/cluster (binary/int) / correlation (double)
-// =============================================================================
+// -----------------------------------------------------------------------------
 
-template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( \
-  mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi, \
-  mat::matrix<int> &fmsk, mat::matrix<int> &gmsk,
-  bool zeropad, bool periodic )
+template <class T, class U>
+std::tuple<mat::matrix<double>,mat::matrix<double>> S2_core (\
+  mat::matrix<T> &f, mat::matrix<U> &g, std::vector<size_t> roi,\
+  mat::matrix<int> &fmsk, mat::matrix<int> &gmsk, bool zeropad, bool periodic,\
+  double (*func)(U) )
 {
   if ( f.shape()!=g.shape() )
-    throw std::length_error("'f' and 'g' are inconsistent");
+    throw std::length_error("Shape of input images inconsistent");
   if ( f.shape()!=fmsk.shape() || f.shape()!=gmsk.shape() )
-    throw std::length_error("'f', 'fmask', and 'gmask' are inconsistent");
+    throw std::length_error("Shape of input images is inconsistent with mask(s)");
 
   for ( auto i : roi )
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( size_t i=0 ; i<fmsk.size() ; i++ )
-    if ( !(fmsk[i]==0 || fmsk[i]==1) || !(gmsk[i]==0 || gmsk[i]==1) )
-      throw std::out_of_range("'fmask' and 'gmask' must be binary");
-
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
   mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<int   > norm(roi); norm.zeros();
+  mat::matrix<double> norm(roi); norm.zeros();
 
   f   .atleast_3d();
   g   .atleast_3d();
@@ -1165,493 +1146,167 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( \
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
                 if ( !gmsk(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                  norm(dh+dH,di+dI,dj+dJ)++;
+                  norm(dh+dH,di+dI,dj+dJ) += func(f(h,i,j));
 
-  // apply normalization
-  for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= (double)norm[i];
-
-  return std::make_tuple(ret,norm);
+  // apply normalization & return
+  return std::make_tuple(ret/norm,norm);
 }
 
 // =============================================================================
-// masked 2-point probability/cluster (binary/int) / correlation (double)
-// - default "gmsk"
+// 2-point probability/cluster (binary/int) / correlation (double)
 // =============================================================================
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( \
+std::tuple<mat::matrix<double>,double> S2 (\
+  mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi )
+{
+  return S2_core(f,g,roi,&unity); // (norm == f.size())
+}
+
+// -----------------------------------------------------------------------------
+
+template <class T>
+std::tuple<mat::matrix<double>,mat::matrix<double>> S2 (\
+  mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi,\
+  mat::matrix<int> &fmsk, mat::matrix<int> &gmsk, bool zeropad, bool periodic )
+{
+  return S2_core(f,g,roi,fmsk,gmsk,zeropad,periodic,&unity);
+}
+
+// -----------------------------------------------------------------------------
+
+template <class T>
+std::tuple<mat::matrix<double>,mat::matrix<double>> S2 (\
   mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi,\
   mat::matrix<int> &fmsk, bool zeropad, bool periodic )
 {
   mat::matrix<int> gmsk(g.shape()); gmsk.zeros();
-  return S2(f,g,roi,fmsk,gmsk,zeropad,periodic);
+  return S2_core(f,g,roi,fmsk,gmsk,zeropad,periodic,&unity);
 }
 
-// =============================================================================
-// masked 2-point probability/cluster (binary/int) / correlation (double)
-// - default "fmsk" and "gmsk"
-// =============================================================================
+// -----------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<int>> S2 ( \
+std::tuple<mat::matrix<double>,mat::matrix<double>> S2 (\
   mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi,\
   bool zeropad, bool periodic )
 {
   mat::matrix<int> fmsk(f.shape()); fmsk.zeros();
   mat::matrix<int> gmsk(g.shape()); gmsk.zeros();
-  return S2(f,g,roi,fmsk,gmsk,zeropad,periodic);
+  return S2_core(f,g,roi,fmsk,gmsk,zeropad,periodic,&unity);
 }
 
-// =============================================================================
-// force create "S2" functions for "int" and "double"
-// =============================================================================
+// -----------------------------------------------------------------------------
 
-template std::tuple<mat::matrix<double>,            int > S2<int   >(\
+template std::tuple<mat::matrix<double>,            double > S2<int   >(\
   mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>);
 
-template std::tuple<mat::matrix<double>,            int > S2<double>(\
+template std::tuple<mat::matrix<double>,            double > S2<double>(\
   mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>);
 
-template std::tuple<mat::matrix<double>,mat::matrix<int>> S2<int   >(\
+template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<int   >(\
   mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
   mat::matrix<int   > &, mat::matrix<int   > &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<int>> S2<double>(\
+template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<double>(\
   mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
   mat::matrix<int   > &, mat::matrix<int   > &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<int>> S2<int   >(\
+template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<int   >(\
   mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
   mat::matrix<int   > &,                        bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<int>> S2<double>(\
+template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<double>(\
   mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
   mat::matrix<int   > &,                        bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<int>> S2<int   >(\
+template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<int   >(\
   mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
                                                 bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<int>> S2<double>(\
+template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<double>(\
   mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
                                                 bool, bool );
+
+// =============================================================================
+// conditional 2-point probability
+// =============================================================================
+
+template <class T, class U> std::tuple<mat::matrix<double>,double> W2 (\
+  mat::matrix<T> &W, mat::matrix<U> &I, std::vector<size_t> roi )
+{
+  return S2_core(W,I,roi,&compare);
+}
+
+// -----------------------------------------------------------------------------
+
+template <class T, class U> std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<T> &W, mat::matrix<U> &I, std::vector<size_t> roi,\
+  mat::matrix<int> &mask, bool zeropad, bool periodic )
+{
+  mat::matrix<int> fmsk(I.shape()); fmsk.zeros();
+  return S2_core(W,I,roi,fmsk,mask,zeropad,periodic,&compare);
+}
+
+// -----------------------------------------------------------------------------
+
+template <class T, class U> std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<T> &W, mat::matrix<U> &I, std::vector<size_t> roi,\
+  bool zeropad, bool periodic )
+{
+  mat::matrix<int> fmsk(I.shape()); fmsk.zeros();
+  mat::matrix<int> mask(I.shape()); mask.zeros();
+  return S2_core(W,I,roi,fmsk,mask,zeropad,periodic,&compare);
+}
+
+// -----------------------------------------------------------------------------
+
+template std::tuple<mat::matrix<double>,            double > W2 (\
+  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t> );
+
+template std::tuple<mat::matrix<double>,            double > W2 (\
+  mat::matrix<int   > &, mat::matrix<double> &, std::vector<size_t> );
+
+template std::tuple<mat::matrix<double>,            double > W2 (\
+  mat::matrix<double> &, mat::matrix<int   > &, std::vector<size_t> );
+
+template std::tuple<mat::matrix<double>,            double > W2 (\
+  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t> );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
+  mat::matrix<int> &, bool, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<int   > &, mat::matrix<double> &, std::vector<size_t>,\
+  mat::matrix<int> &, bool, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<double> &, mat::matrix<int   > &, std::vector<size_t>,\
+  mat::matrix<int> &, bool, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
+  mat::matrix<int> &, bool, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
+                      bool, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<int   > &, mat::matrix<double> &, std::vector<size_t>,\
+                      bool, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<double> &, mat::matrix<int   > &, std::vector<size_t>,\
+                      bool, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
+  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
+                      bool, bool );
 
 // =============================================================================
 // TODO tot hier
-// conditional 2-point probability (binary image, binary weight)      [periodic]
-// =============================================================================
-
-std::tuple<mat::matrix<double>,int> W2 ( mat::matrix<int> &W, mat::matrix<int> &src,
-  std::vector<size_t> &roi )
-{
-  if ( W.shape()!=src.shape() )
-    throw std::length_error("'W' and 'I' are inconsistent");
-
-  for ( auto i : roi )
-    if ( i%2==0 )
-      throw std::length_error("'roi' must be odd shaped");
-
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) )
-      throw std::out_of_range("'W' and 'I' must be binary");
-
-  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
-
-  mat::matrix<double> ret(roi); ret.zeros();
-
-  std::vector<size_t> mid = midpoint(roi);
-
-  std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
-
-  W   .atleast_3d();
-  src .atleast_3d();
-  ret .atleast_3d();
-
-  // compute correlation
-  for ( h=0 ; h<H ; h++ )
-    for ( i=0 ; i<I ; i++ )
-      for ( j=0 ; j<J ; j++ )
-        if ( W(h,i,j) )
-          for ( dh=-dH ; dh<=dH ; dh++ )
-            for ( di=-dI ; di<=dI ; di++ )
-              for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( src(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                  ret(dh+dH,di+dI,dj+dJ) += 1.;
-
-  // compute normalization: sum of weight factors (binary)
-  int norm = 0;
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( W[i] )
-      norm++;
-
-  // apply normalization
-  for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= (double)norm;
-
-  return std::make_tuple(ret,norm);
-}
-
-// =============================================================================
-// conditional 2-point correlation (float. image, binary weight)      [periodic]
-// =============================================================================
-
-std::tuple<mat::matrix<double>,int> W2 ( mat::matrix<int> &W, mat::matrix<double> &src,
-  std::vector<size_t> &roi )
-{
-  if ( W.shape()!=src.shape() )
-    throw std::length_error("'W' and 'I' are inconsistent");
-
-  for ( auto i : roi )
-    if ( i%2==0 )
-      throw std::length_error("'roi' must be odd shaped");
-
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( !(W[i]==0 || W[i]==1) )
-      throw std::out_of_range("'W' must be binary");
-
-  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
-
-  mat::matrix<double> ret(roi); ret.zeros();
-
-  std::vector<size_t> mid = midpoint(roi);
-
-  std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
-
-  W   .atleast_3d();
-  src .atleast_3d();
-  ret .atleast_3d();
-
-  // compute correlation
-  for ( h=0 ; h<H ; h++ )
-    for ( i=0 ; i<I ; i++ )
-      for ( j=0 ; j<J ; j++ )
-        if ( W(h,i,j) )
-          for ( dh=-dH ; dh<=dH ; dh++ )
-            for ( di=-dI ; di<=dI ; di++ )
-              for ( dj=-dJ ; dj<=dJ ; dj++ )
-                ret(dh+dH,di+dI,dj+dJ) += \
-                  src(P(h+dh,H),P(i+di,I),P(j+dj,J));
-
-  // compute normalization: sum of weight factors (binary)
-  int norm = 0;
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( W[i] )
-      norm++;
-
-  // apply normalization
-  for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= (double)norm;
-
-  return std::make_tuple(ret,norm);
-}
-
-// =============================================================================
-// weighted 2-point correlation (float. image, float. weight)         [periodic]
-// =============================================================================
-
-std::tuple<mat::matrix<double>,double> W2 ( mat::matrix<double> &W, mat::matrix<double> &src,
-  std::vector<size_t> &roi )
-{
-  if ( W.shape()!=src.shape() )
-    throw std::length_error("'W' and 'I' are inconsistent");
-
-  for ( auto i : roi )
-    if ( i%2==0 )
-      throw std::length_error("'roi' must be odd shaped");
-
-  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
-
-  mat::matrix<double> ret(roi); ret.zeros();
-
-  std::vector<size_t> mid = midpoint(roi);
-
-  std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
-
-  W   .atleast_3d();
-  src .atleast_3d();
-  ret .atleast_3d();
-
-  // compute correlation
-  for ( h=0 ; h<H ; h++ )
-    for ( i=0 ; i<I ; i++ )
-      for ( j=0 ; j<J ; j++ )
-        for ( dh=-dH ; dh<=dH ; dh++ )
-          for ( di=-dI ; di<=dI ; di++ )
-            for ( dj=-dJ ; dj<=dJ ; dj++ )
-              ret(dh+dH,di+dI,dj+dJ) += \
-                W(h,i,j)*src(P(h+dh,H),P(i+di,I),P(j+dj,J));
-
-  // compute normalization: sum of weight factors (binary)
-  double norm = 0.;
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    norm += W[i];
-
-  // apply normalization
-  for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= norm;
-
-  return std::make_tuple(ret,norm);
-}
-
-// =============================================================================
-// masked conditional 2-point probability (binary image, binary weight)
-// =============================================================================
-
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<int> &src,
-  std::vector<size_t> &roi, mat::matrix<int> &mask, bool zeropad, bool periodic )
-{
-  if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
-    throw std::length_error("'W', 'I', and 'mask' are inconsistent");
-
-  for ( auto i : roi )
-    if ( i%2==0 )
-      throw std::length_error("'roi' must be odd shaped");
-
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( !(W[i]==0 || W[i]==1) || !(src[i]==0 || src[i]==1) )
-      throw std::out_of_range("'W' and 'I' must be binary");
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( !(mask[i]==0 || mask[i]==1) )
-      throw std::out_of_range("'mask' must be binary");
-
-  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
-
-  mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<int   > norm(roi); norm.zeros();
-
-  std::vector<size_t> mid = midpoint(roi);
-
-  if ( zeropad ) {
-    src  = pad(src ,mid  );
-    mask = pad(mask,mid,1);
-  }
-
-  std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
-
-  W   .atleast_3d();
-  src .atleast_3d();
-  mask.atleast_3d();
-  ret .atleast_3d();
-  norm.atleast_3d();
-
-  // define boundary region to skip
-  if ( !periodic )
-    std::tie(bH,bI,bJ) = unpack3d(mid,0);
-
-  // compute correlation
-  for ( h=bH ; h<H-bH ; h++ )
-    for ( i=bI ; i<I-bI ; i++ )
-      for ( j=bJ ; j<J-bJ ; j++ )
-        if ( W(h,i,j) )
-          for ( dh=-dH ; dh<=dH ; dh++ )
-            for ( di=-dI ; di<=dI ; di++ )
-              for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                  if ( src(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                    ret(dh+dH,di+dI,dj+dJ) += 1.;
-
-  // compute normalization: sum of weight factors (binary) of unmasked voxels
-  for ( h=bH ; h<H-bH ; h++ )
-    for ( i=bI ; i<I-bI ; i++ )
-      for ( j=bJ ; j<J-bJ ; j++ )
-        if ( W(h,i,j) )
-          for ( dh=-dH ; dh<=dH ; dh++ )
-            for ( di=-dI ; di<=dI ; di++ )
-              for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                  norm(dh+dH,di+dI,dj+dJ)++;
-
-  // apply normalization
-  for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= (double)norm[i];
-
-  return std::make_tuple(ret,norm);
-}
-
-// =============================================================================
-// conditional 2-point probability (binary image, binary weight)
-// =============================================================================
-
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<int> &src,
-  std::vector<size_t> &roi, bool zeropad, bool periodic )
-{
-  mat::matrix<int> mask(src.shape());
-  return W2(W,src,roi,mask,zeropad,periodic);
-}
-
-// =============================================================================
-// masked conditional 2-point correlation (float. image, binary weight)
-// =============================================================================
-
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<double> &src,
-  std::vector<size_t> &roi, mat::matrix<int> &mask, bool zeropad, bool periodic )
-{
-  if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
-    throw std::length_error("'W', 'I', and 'mask' are inconsistent");
-
-  for ( auto i : roi )
-    if ( i%2==0 )
-      throw std::length_error("'roi' must be odd shaped");
-
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( !(W[i]==0 || W[i]==1) || !(mask[i]==0 || mask[i]==1) )
-      throw std::out_of_range("'W' and 'mask' must be binary");
-
-  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
-
-  mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<int   > norm(roi); norm.zeros();
-
-  std::vector<size_t> mid = midpoint(roi);
-
-  if ( zeropad ) {
-    src  = pad(src ,mid  );
-    mask = pad(mask,mid,1);
-  }
-
-  std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
-
-  W   .atleast_3d();
-  src .atleast_3d();
-  mask.atleast_3d();
-  ret .atleast_3d();
-  norm.atleast_3d();
-
-  // define boundary region to skip
-  if ( !periodic )
-    std::tie(bH,bI,bJ) = unpack3d(mid,0);
-
-  // compute correlation
-  for ( h=bH ; h<H-bH ; h++ )
-    for ( i=bI ; i<I-bI ; i++ )
-      for ( j=bJ ; j<J-bJ ; j++ )
-        if ( W(h,i,j) )
-          for ( dh=-dH ; dh<=dH ; dh++ )
-            for ( di=-dI ; di<=dI ; di++ )
-              for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                  ret(dh+dH,di+dI,dj+dJ) += \
-                    src(P(h+dh,H),P(i+di,I),P(j+dj,J));
-
-  // compute normalization: sum of weight factors (binary) of unmasked voxels
-  for ( h=bH ; h<H-bH ; h++ )
-    for ( i=bI ; i<I-bI ; i++ )
-      for ( j=bJ ; j<J-bJ ; j++ )
-        if ( W(h,i,j) )
-          for ( dh=-dH ; dh<=dH ; dh++ )
-            for ( di=-dI ; di<=dI ; di++ )
-              for ( dj=-dJ ; dj<=dJ ; dj++ )
-                if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                  norm(dh+dH,di+dI,dj+dJ)++;
-
-  // apply normalization
-  for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= (double)norm[i];
-
-  return std::make_tuple(ret,norm);
-}
-
-// =============================================================================
-// conditional 2-point correlation (float. image, binary weight)
-// =============================================================================
-
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2 ( mat::matrix<int> &W, mat::matrix<double> &src,
-  std::vector<size_t> &roi, bool zeropad, bool periodic )
-{
-  mat::matrix<int> mask(src.shape());
-  return W2(W,src,roi,mask,zeropad,periodic);
-}
-
-// =============================================================================
-// weighted conditional 2-point correlation (float. image, float. weight)
-// =============================================================================
-
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2 ( mat::matrix<double> &W,
-  mat::matrix<double> &src, std::vector<size_t> &roi, mat::matrix<int> &mask,
-  bool zeropad, bool periodic )
-{
-  if ( W.shape()!=src.shape() || W.shape()!=mask.shape() )
-    throw std::length_error("'W', 'I', and 'mask' are inconsistent");
-
-  for ( auto i : roi )
-    if ( i%2==0 )
-      throw std::length_error("'roi' must be odd shaped");
-
-  for ( size_t i=0 ; i<W.size() ; i++ )
-    if ( !(mask[i]==0 || mask[i]==1) )
-      throw std::out_of_range("'mask' must be binary");
-
-  int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
-
-  mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<double> norm(roi); norm.zeros();
-
-  std::vector<size_t> mid = midpoint(roi);
-
-  if ( zeropad ) {
-    src  = pad(src ,mid  );
-    mask = pad(mask,mid,1);
-  }
-
-  std::tie( H, I, J) = unpack3d(src.shape(),1);
-  std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
-
-  W   .atleast_3d();
-  src .atleast_3d();
-  mask.atleast_3d();
-  ret .atleast_3d();
-  norm.atleast_3d();
-
-  // define boundary region to skip
-  if ( !periodic )
-    std::tie(bH,bI,bJ) = unpack3d(mid,0);
-
-  // compute correlation
-  for ( h=bH ; h<H-bH ; h++ )
-    for ( i=bI ; i<I-bI ; i++ )
-      for ( j=bJ ; j<J-bJ ; j++ )
-        for ( dh=-dH ; dh<=dH ; dh++ )
-          for ( di=-dI ; di<=dI ; di++ )
-            for ( dj=-dJ ; dj<=dJ ; dj++ )
-              if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                ret(dh+dH,di+dI,dj+dJ) += \
-                  W(h,i,j)*src(P(h+dh,H),P(i+di,I),P(j+dj,J));
-
-  // compute normalization: sum of weight factors (binary) of unmasked voxels
-  for ( h=bH ; h<H-bH ; h++ )
-    for ( i=bI ; i<I-bI ; i++ )
-      for ( j=bJ ; j<J-bJ ; j++ )
-        for ( dh=-dH ; dh<=dH ; dh++ )
-          for ( di=-dI ; di<=dI ; di++ )
-            for ( dj=-dJ ; dj<=dJ ; dj++ )
-              if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) )
-                norm(dh+dH,di+dI,dj+dJ) += W(h,i,j);
-
-  // apply normalization
-  for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= norm[i];
-
-  return std::make_tuple(ret,norm);
-}
-
-// =============================================================================
-// weighted 2-point correlation (float. image, float. weight)
-// =============================================================================
-
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2 ( mat::matrix<double> &W,
-  mat::matrix<double> &src, std::vector<size_t> &roi, bool zeropad, bool periodic )
-{
-  mat::matrix<int> mask(src.shape());
-  return W2(W,src,roi,mask,zeropad,periodic);
-}
-
-// =============================================================================
 // weighted 2-point correlation -> collapse to center
 // =============================================================================
 

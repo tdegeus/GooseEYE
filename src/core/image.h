@@ -81,21 +81,15 @@ template <class T> double mean ( M<T> &src            );
 template <class T> double mean ( M<T> &src , Mi &mask );
 
 // 2-point probability (binary), 2-point cluster function (int), and 2-point correlations (double)
-template <class T> std::tuple<Md,i > S2 ( M<T> &f, M<T> &g, Vs roi                                                   );
-template <class T> std::tuple<Md,Mi> S2 ( M<T> &f, M<T> &g, Vs roi,                     b pad=false, b periodic=true );
-template <class T> std::tuple<Md,Mi> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk,           b pad=false, b periodic=true );
-template <class T> std::tuple<Md,Mi> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
+template <class T> std::tuple<Md,d > S2 ( M<T> &f, M<T> &g, Vs roi                                                   );
+template <class T> std::tuple<Md,Md> S2 ( M<T> &f, M<T> &g, Vs roi,                     b pad      , b periodic      );
+template <class T> std::tuple<Md,Md> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk,           b pad=false, b periodic=true );
+template <class T> std::tuple<Md,Md> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
 
 // weighted 2-point probability (binary) or 2-point correlation (float)
-std::tuple<Md,i > W2 ( Mi &W, Mi &I, Vs &roi                                        );
-std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi,          b pad      , b periodic      );
-std::tuple<Md,Mi> W2 ( Mi &W, Mi &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
-std::tuple<Md,i > W2 ( Mi &W, Md &I, Vs &roi                                        );
-std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi,          b pad      , b periodic      );
-std::tuple<Md,Mi> W2 ( Mi &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
-std::tuple<Md,d > W2 ( Md &W, Md &I, Vs &roi                                        );
-std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi,          b pad      , b periodic      );
-std::tuple<Md,Md> W2 ( Md &W, Md &I, Vs &roi, Mi &msk, b pad=false, b periodic=true );
+template <class T, class U> std::tuple<Md,d > W2 ( M<T> &W, M<U> &I, Vs roi                                        );
+template <class T, class U> std::tuple<Md,Md> W2 ( M<T> &W, M<U> &I, Vs roi,          b pad      , b periodic      );
+template <class T, class U> std::tuple<Md,Md> W2 ( M<T> &W, M<U> &I, Vs roi, Mi &msk, b pad=false, b periodic=true );
 
 // collapsed weighted 2-point correlation
 std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi, Mi &msk, s mode="Bresenham", b periodic=true );
