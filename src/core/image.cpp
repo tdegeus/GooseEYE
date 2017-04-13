@@ -5,8 +5,6 @@ template class mat::matrix<unsigned char>;
 template class mat::matrix<int>;
 template class mat::matrix<double>;
 
-// TODO: check for zero initialization
-
 namespace Image {
 
 // =============================================================================
@@ -971,15 +969,22 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
   return std::make_tuple(l,c);
 }
 
-// =============================================================================
-// determine clusters from image: default kernel
-// =============================================================================
+// -----------------------------------------------------------------------------
 
 std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
   mat::matrix<int> &f, int min_size, bool periodic )
 {
   mat::matrix<int> kern = kernel(f.ndim());
   return clusters(f,kern,min_size,periodic);
+}
+
+// -----------------------------------------------------------------------------
+
+std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
+  mat::matrix<int> &f, bool periodic )
+{
+  mat::matrix<int> kern = kernel(f.ndim());
+  return clusters(f,kern,0,periodic);
 }
 
 // =============================================================================
@@ -1032,8 +1037,8 @@ inline double unity   ( int    f           ) { return 1.             ; }
 inline double unity   ( double f           ) { return 1.             ; }
 
 // =============================================================================
-// TODO include in header
 // core functions for "S2" and "W2"
+// the function "func" will determine the normalization
 // =============================================================================
 
 template <class T, class U>
@@ -1141,7 +1146,7 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> S2_core (\
   for ( h=bH ; h<H-bH ; h++ )
     for ( i=bI ; i<I-bI ; i++ )
       for ( j=bJ ; j<J-bJ ; j++ )
-        if ( !fmsk(h,i,j) )
+        if ( func(f(h,i,j)) && !fmsk(h,i,j) )
           for ( dh=-dH ; dh<=dH ; dh++ )
             for ( di=-dI ; di<=dI ; di++ )
               for ( dj=-dJ ; dj<=dJ ; dj++ )
@@ -1306,13 +1311,14 @@ template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
                       bool, bool );
 
 // =============================================================================
-// TODO tot hier
 // weighted 2-point correlation -> collapse to center
 // =============================================================================
 
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &src,
-  mat::matrix<int> &clusters, mat::matrix<int> &centers, std::vector<size_t> &roi,
-  mat::matrix<int> &mask, std::string mode, bool periodic )
+template <class T>
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<T>   &src    , mat::matrix<int> &clusters,\
+  mat::matrix<int> &centers, std::vector<size_t> roi,
+  mat::matrix<int> &mask   , std::string mode, bool periodic )
 {
  if ( src.shape()!=clusters.shape() || src.shape()!=centers.shape() )
     throw std::length_error("'I', 'clusters', and 'centers' are inconsistent");
@@ -1323,15 +1329,11 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &src,
     if ( i%2==0 )
       throw std::length_error("'roi' must be odd shaped");
 
-  for ( size_t i=0 ; i<mask.size() ; i++ )
-    if ( !(mask[i]==0 || mask[i]==1) )
-      throw std::out_of_range("'mask' must be binary");
-
   int jpix,label;
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
   mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<int   > norm(roi); norm.zeros();
+  mat::matrix<double> norm(roi); norm.zeros();
 
   std::vector<int> begin(3),end(3);
   for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
@@ -1341,12 +1343,12 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &src,
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
 
-  src .atleast_3d();
+  src     .atleast_3d();
   clusters.atleast_3d();
-  centers.atleast_3d();
-  mask.atleast_3d();
-  ret .atleast_3d();
-  norm.atleast_3d();
+  centers .atleast_3d();
+  mask    .atleast_3d();
+  ret     .atleast_3d();
+  norm    .atleast_3d();
 
   // define boundary region to skip
   if ( !periodic )
@@ -1389,9 +1391,9 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &src,
                 // store: loop from the beginning of the path and store there
                 if ( jpix>=0 ) {
                   if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) ) {
-                    norm(dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))++;
+                    norm(dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))+=1.;
                     ret (dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))+=\
-                      src(P(h+dh,H),P(i+di,I),P(j+dj,J));
+                      compare(src(P(h+dh,H),P(i+di,I),P(j+dj,J)));
                   }
                 }
                 // update counter
@@ -1406,54 +1408,92 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &src,
 
   // apply normalization
   for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= (double)std::max(norm[i],1);
+    ret[i] /= std::max(norm[i],1.);
 
   return std::make_tuple(ret,norm);
 
 }
 
-// =============================================================================
+// -----------------------------------------------------------------------------
 
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &I,
-  mat::matrix<int> &clusters, mat::matrix<int> &centers, std::vector<size_t> &roi,
+template <class T>
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c ( mat::matrix<T> &I,
+  mat::matrix<int> &clusters, mat::matrix<int> &centers, std::vector<size_t> roi,
   std::string mode, bool periodic )
 {
   mat::matrix<int> mask(I.shape()); mask.zeros();
   return W2c(I,clusters,centers,roi,mask,mode,periodic);
 }
 
+// -----------------------------------------------------------------------------
 
-// TODO: header + remove int in clusters
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &I,
-  mat::matrix<int> &W, std::vector<size_t> &roi, mat::matrix<int> &mask,
+template <class T>
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c ( mat::matrix<T> &I,
+  mat::matrix<int> &W, std::vector<size_t> roi, mat::matrix<int> &mask,
   std::string mode, bool periodic )
 {
   mat::matrix<int> clusters,centers;
 
-  std::tie(clusters,centers) = Image::clusters(W,0,periodic);
+  std::tie(clusters,centers) = Image::clusters(W,periodic);
 
   return W2c(I,clusters,centers,roi,mask,mode,periodic);
 }
 
-// TODO: header + remove int in clusters
-std::tuple<mat::matrix<double>,mat::matrix<int>> W2c ( mat::matrix<double> &I,
-  mat::matrix<int> &W, std::vector<size_t> &roi,
+// -----------------------------------------------------------------------------
+
+template <class T>
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c ( mat::matrix<T> &I,
+  mat::matrix<int> &W, std::vector<size_t> roi,
   std::string mode, bool periodic )
 {
   mat::matrix<int> clusters,centers;
   mat::matrix<int> mask(I.shape()); mask.zeros();
 
-  std::tie(clusters,centers) = Image::clusters(W,0,periodic);
+  std::tie(clusters,centers) = Image::clusters(W,periodic);
 
   return W2c(I,clusters,centers,roi,mask,mode,periodic);
 }
+
+// -----------------------------------------------------------------------------
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<double> &, mat::matrix<int> &, mat::matrix<int> &,\
+  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<int   > &, mat::matrix<int> &, mat::matrix<int> &,\
+  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<double> &, mat::matrix<int> &, mat::matrix<int> &,\
+  std::vector<size_t>  ,                     std::string, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<int   > &, mat::matrix<int> &, mat::matrix<int> &,\
+  std::vector<size_t>  ,                     std::string, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<double> &, mat::matrix<int> &,\
+  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<int   > &, mat::matrix<int> &,\
+  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<double> &, mat::matrix<int> &,\
+  std::vector<size_t>  ,                     std::string, bool );
+
+template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
+  mat::matrix<int   > &, mat::matrix<int> &,\
+  std::vector<size_t>  ,                     std::string, bool );
 
 // =============================================================================
 // lineal path function
 // =============================================================================
 
-std::tuple<mat::matrix<double>,mat::matrix<int>> L ( mat::matrix<int> &src,
-  std::vector<size_t> &roi, std::string mode, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
+  std::vector<size_t> roi, std::string mode, bool periodic )
 {
   for ( auto i : roi )
     if ( i%2==0 )
@@ -1462,7 +1502,7 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> L ( mat::matrix<int> &src,
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
   mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<int   > norm(roi); norm.zeros();
+  mat::matrix<double> norm(roi); norm.zeros();
 
   std::vector<int> begin(3),end(3);
   for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
@@ -1524,12 +1564,12 @@ std::tuple<mat::matrix<double>,mat::matrix<int>> L ( mat::matrix<int> &src,
     // loop over voxel-path
     for ( size_t ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
       norm(pix(ipix,0)+dH,pix(ipix,1)+dI,pix(ipix,2)+dJ) += \
-        (H-bH)*(I-bI)*(J-bJ);
+        static_cast<double>((H-bH)*(I-bI)*(J-bJ));
   }
 
   // apply normalization
   for ( size_t i=0 ; i<ret.size() ; i++ )
-    ret[i] /= (double)std::max(norm[i],1);
+    ret[i] /= std::max(norm[i],1.);
 
   return std::make_tuple(ret,norm);
 }

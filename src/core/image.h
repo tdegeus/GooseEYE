@@ -37,6 +37,19 @@ std::tuple<i,i,i> unpack3d ( Vs src, i value=1 );
 // compute midpoint from "shape"-vector
 Vs midpoint ( Vs shape );
 
+// core functions for "S2"/"W2" (the input function determines the normalization)
+template <class T, class U> std::tuple<Md, d> S2_core ( M<T> &f, M<U> &g, Vs roi,                                            double (*func)(U) );
+template <class T, class U> std::tuple<Md,Md> S2_core ( M<T> &f, M<U> &g, Vs roi, Mi &fmsk, Mi &gmsk, b zeropad, b periodic, double (*func)(U) );
+// support
+inline double compare ( int    f, int    g );
+inline double compare ( int    f, double g );
+inline double compare ( double f, int    g );
+inline double compare ( double f, double g );
+inline double compare ( int    f           );
+inline double compare ( double f           );
+inline double unity   ( int    f           );
+inline double unity   ( double f           );
+
 // toolbox
 // -------
 
@@ -63,7 +76,8 @@ Mi dummy_circles ( Vs shape,                          b periodic=true );
 Mi dummy_circles ( Vs shape, Vi &row, Vi &col, Vi &r, b periodic=true );
 
 // determine clusters in image (for "min_size=0" the minimum size is ignored)
-std::tuple<Mi,Mi> clusters ( Mi &src,             i min_size=0, b periodic=true);
+std::tuple<Mi,Mi> clusters ( Mi &src,                           b periodic=true);
+std::tuple<Mi,Mi> clusters ( Mi &src,             i min_size  , b periodic=true);
 std::tuple<Mi,Mi> clusters ( Mi &src, Mi &kernel, i min_size=0, b periodic=true);
 
 // dilate image (binary or int)
@@ -92,11 +106,13 @@ template <class T, class U> std::tuple<Md,Md> W2 ( M<T> &W, M<U> &I, Vs roi,    
 template <class T, class U> std::tuple<Md,Md> W2 ( M<T> &W, M<U> &I, Vs roi, Mi &msk, b pad=false, b periodic=true );
 
 // collapsed weighted 2-point correlation
-std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi, Mi &msk, s mode="Bresenham", b periodic=true );
-std::tuple<Md,Mi> W2c ( Md &I, Mi &clus, Mi &cntr, Vs &roi,          s mode="Bresenham", b periodic=true );
+template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &clus, Mi &cntr, Vs roi, Mi &msk, s mode="Bresenham", b periodic=true );
+template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &clus, Mi &cntr, Vs roi,          s mode="Bresenham", b periodic=true );
+template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &W             , Vs roi, Mi &msk, s mode="Bresenham", b periodic=true );
+template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &W             , Vs roi,          s mode="Bresenham", b periodic=true );
 
 // lineal path function (binary or int)
-std::tuple<Md,Mi> L ( Mi &f, Vs &roi, s mode="Bresenham", b periodic=true );
+std::tuple<Md,Md> L ( Mi &f, Vs roi, s mode="Bresenham", b periodic=true );
 
 }; // namespace Image
 
