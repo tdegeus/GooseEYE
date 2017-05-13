@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>836</width>
+    <width>868</width>
     <height>657</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage0">
        <attribute name="title">
@@ -191,7 +191,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>764</width>
+             <width>796</width>
              <height>160</height>
             </rect>
            </property>
@@ -2813,7 +2813,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>836</width>
+     <width>868</width>
      <height>22</height>
     </rect>
    </property>
@@ -2925,8 +2925,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab1_im0"/>
   <buttongroup name="buttonGroup_tab3_mouse"/>
+  <buttongroup name="buttonGroup_tab1_im0"/>
   <buttongroup name="buttonGroup_tab1_im1"/>
  </buttongroups>
 </ui>

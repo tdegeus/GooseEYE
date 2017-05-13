@@ -1,5 +1,6 @@
 
 # submodules
+examples_local
 src/python/pybind11
 src/gui/cppcolormap
 src/core/cppmat
