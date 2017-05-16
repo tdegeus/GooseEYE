@@ -1,5 +1,5 @@
-#ifndef GUI_MAINWINDOW_H
-#define GUI_MAINWINDOW_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <QSet>
 #include <QMainWindow>
@@ -24,7 +24,7 @@
 #include <vector>
 #include <math.h>
 
-//#include "../core/image.h"
+#include "../core/image.h"
 #include "cppcolormap/cppcolormap.h"
 #include "json/json.hpp"
 
@@ -69,7 +69,6 @@ private slots:
   void tab0_show();                               // refresh with new "data"
   void tab1_show();                               // refresh with new "data"
   void tab2_show();                               // refresh with new "data"
-
 
 private:
   Ui::MainWindow *ui;

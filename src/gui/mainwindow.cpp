@@ -123,6 +123,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 // =================================================================================================
 
+MainWindow::~MainWindow()
+{
+  delete ui;
+}
+
+// =================================================================================================
+
 void MainWindow::promptWarning(QString msg)
 {
   QMessageBox::warning(this,tr("GooseEYE"),msg,QMessageBox::Ok,QMessageBox::Ok);
