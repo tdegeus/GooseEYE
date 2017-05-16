@@ -15,7 +15,7 @@
 #define SIGN(a)  ( (a<0) ?  -1 :  a>0   ?   1 : 0 )
 #define POS(a)   ( (a<0) ?   0                : a )
 
-// abbreviate data types to enhance readability -> templates fit on one line
+// abbreviate data types to enhance readability below
 template <class T> using M = mat::matrix<T>;
 using Md = mat::matrix<double>;
 using Mi = mat::matrix<int>;
@@ -31,16 +31,20 @@ namespace Image {
 // implementation support
 // ----------------------
 
-// return vector as "(h,i,j)", using a default "value" if "src.size()<3"
-std::tuple<i,i,i> unpack3d ( Vs src, i value=1 );
+// return vector as "(h,i,j)", using a default "value" if "shape.size()<3"
+std::tuple<i,i,i> unpack3d ( Vs shape, i value=1 );
 
 // compute midpoint from "shape"-vector
 Vs midpoint ( Vs shape );
 
 // core functions for "S2"/"W2" (the input function determines the normalization)
-template <class T, class U> std::tuple<Md, d> S2_core ( M<T> &f, M<U> &g, Vs roi,                                            double (*func)(U) );
-template <class T, class U> std::tuple<Md,Md> S2_core ( M<T> &f, M<U> &g, Vs roi, Mi &fmsk, Mi &gmsk, b zeropad, b periodic, double (*func)(U) );
-// support
+template <class T, class U> std::tuple<Md, d> S2_core (
+  M<T> &f, M<U> &g, Vs roi,                                            double (*func)(U)
+);
+template <class T, class U> std::tuple<Md,Md> S2_core (
+  M<T> &f, M<U> &g, Vs roi, Mi &fmsk, Mi &gmsk, b zeropad, b periodic, double (*func)(U)
+);
+// support function that allow overload
 inline double compare ( int    f, int    g );
 inline double compare ( int    f, double g );
 inline double compare ( double f, int    g );
@@ -91,28 +95,56 @@ Mi dilate ( Mi &src, Mi &kernel, Vi& iterations  , b periodic=true );
 // ----------
 
 // spatial average
-template <class T> double mean ( M<T> &src            );
-template <class T> double mean ( M<T> &src , Mi &mask );
+template <class T> double mean (
+  M<T> &src
+);
+template <class T> double mean (
+  M<T> &src , Mi &mask
+);
 
 // 2-point probability (binary), 2-point cluster function (int), and 2-point correlations (double)
-template <class T> std::tuple<Md,d > S2 ( M<T> &f, M<T> &g, Vs roi                                                   );
-template <class T> std::tuple<Md,Md> S2 ( M<T> &f, M<T> &g, Vs roi,                     b pad      , b periodic      );
-template <class T> std::tuple<Md,Md> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk,           b pad=false, b periodic=true );
-template <class T> std::tuple<Md,Md> S2 ( M<T> &f, M<T> &g, Vs roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true );
+template <class T> std::tuple<Md,d > S2 (
+  M<T> &f, M<T> &g, Vs roi
+);
+template <class T> std::tuple<Md,Md> S2 (
+  M<T> &f, M<T> &g, Vs roi,                     b pad      , b periodic
+);
+template <class T> std::tuple<Md,Md> S2 (
+  M<T> &f, M<T> &g, Vs roi, Mi &fmsk,           b pad=false, b periodic=true
+);
+template <class T> std::tuple<Md,Md> S2 (
+  M<T> &f, M<T> &g, Vs roi, Mi &fmsk, Mi &gmsk, b pad=false, b periodic=true
+);
 
 // weighted 2-point probability (binary) or 2-point correlation (float)
-template <class T, class U> std::tuple<Md,d > W2 ( M<T> &W, M<U> &I, Vs roi                                        );
-template <class T, class U> std::tuple<Md,Md> W2 ( M<T> &W, M<U> &I, Vs roi,          b pad      , b periodic      );
-template <class T, class U> std::tuple<Md,Md> W2 ( M<T> &W, M<U> &I, Vs roi, Mi &msk, b pad=false, b periodic=true );
+template <class T, class U> std::tuple<Md,d > W2 (
+  M<T> &W, M<U> &I, Vs roi
+);
+template <class T, class U> std::tuple<Md,Md> W2 (
+  M<T> &W, M<U> &I, Vs roi,          b pad      , b periodic
+);
+template <class T, class U> std::tuple<Md,Md> W2 (
+  M<T> &W, M<U> &I, Vs roi, Mi &msk, b pad=false, b periodic=true
+);
 
 // collapsed weighted 2-point correlation
-template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &clus, Mi &cntr, Vs roi, Mi &msk, s mode="Bresenham", b periodic=true );
-template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &clus, Mi &cntr, Vs roi,          s mode="Bresenham", b periodic=true );
-template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &W             , Vs roi, Mi &msk, s mode="Bresenham", b periodic=true );
-template <class T> std::tuple<Md,Md> W2c ( M<T> &I, Mi &W             , Vs roi,          s mode="Bresenham", b periodic=true );
+template <class T> std::tuple<Md,Md> W2c (
+  M<T> &I, Mi &clus, Mi &cntr, Vs roi, Mi &msk, s mode="Bresenham", b periodic=true
+);
+template <class T> std::tuple<Md,Md> W2c (
+  M<T> &I, Mi &clus, Mi &cntr, Vs roi,          s mode="Bresenham", b periodic=true
+);
+template <class T> std::tuple<Md,Md> W2c (
+  M<T> &I, Mi &W             , Vs roi, Mi &msk, s mode="Bresenham", b periodic=true
+);
+template <class T> std::tuple<Md,Md> W2c (
+  M<T> &I, Mi &W             , Vs roi,          s mode="Bresenham", b periodic=true
+);
 
 // lineal path function (binary or int)
-std::tuple<Md,Md> L ( Mi &f, Vs roi, s mode="Bresenham", b periodic=true );
+std::tuple<Md,Md> L (
+  Mi &f, Vs roi, s mode="Bresenham", b periodic=true
+);
 
 }; // namespace Image
 

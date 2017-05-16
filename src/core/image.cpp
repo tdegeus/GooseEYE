@@ -7,9 +7,9 @@ template class mat::matrix<double>;
 
 namespace Image {
 
-// =============================================================================
+// =================================================================================================
 // pixel/voxel path between two points "xa" and "xb"
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> path (
   std::vector<int> xa, std::vector<int> xb, std::string mode )
@@ -185,9 +185,9 @@ mat::matrix<int> path (
   throw std::out_of_range("Unknown 'mode'");
 }
 
-// =============================================================================
+// =================================================================================================
 // list of end-points of ROI-stamp used in path-based correlations
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> stamp_points ( std::vector<size_t> N )
 {
@@ -261,11 +261,11 @@ mat::matrix<int> stamp_points ( std::vector<size_t> N )
   return ret;
 }
 
-// =============================================================================
-// return vector as "(h,i,j)", using a default "value" if "src.size()<3"
-// =============================================================================
+// =================================================================================================
+// return vector as "(h,i,j)", using a default "value" if "shape.size()<3"
+// =================================================================================================
 
-std::tuple<int,int,int> unpack3d ( std::vector<size_t> src, int value )
+std::tuple<int,int,int> unpack3d ( std::vector<size_t> shape, int value )
 {
   int h,i,j;
 
@@ -273,16 +273,16 @@ std::tuple<int,int,int> unpack3d ( std::vector<size_t> src, int value )
   i = value;
   j = value;
 
-  if ( src.size()>=1 ) h = (int)src[0];
-  if ( src.size()>=2 ) i = (int)src[1];
-  if ( src.size()>=3 ) j = (int)src[2];
+  if ( shape.size()>=1 ) h = (int)shape[0];
+  if ( shape.size()>=2 ) i = (int)shape[1];
+  if ( shape.size()>=3 ) j = (int)shape[2];
 
   return std::make_tuple(h,i,j);
 }
 
-// =============================================================================
+// =================================================================================================
 // compute midpoint from "shape"-vector
-// =============================================================================
+// =================================================================================================
 
 std::vector<size_t> midpoint ( std::vector<size_t> shape )
 {
@@ -299,9 +299,9 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 
 }
 
-// =============================================================================
+// =================================================================================================
 // pad "pad_shape" entries on each side of "src" with a certain "value"
-// =============================================================================
+// =================================================================================================
 
 template <class T>
 mat::matrix<T> pad ( mat::matrix<T> &src, std::vector<size_t> pad_shape, T value )
@@ -336,9 +336,9 @@ mat::matrix<T> pad ( mat::matrix<T> &src, std::vector<size_t> pad_shape, T value
 template mat::matrix<int>    pad<int>    (mat::matrix<int>    &, std::vector<size_t>, int   );
 template mat::matrix<double> pad<double> (mat::matrix<double> &, std::vector<size_t>, double);
 
-// =============================================================================
+// =================================================================================================
 // dilate image
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
   std::vector<int> &iterations, bool periodic )
@@ -408,7 +408,7 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
   return lab;
 }
 
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> dilate ( mat::matrix<int> &src, int iterations, bool periodic )
 {
@@ -421,7 +421,7 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, int iterations, bool periodic )
   return dilate(src,kern,iter,periodic);
 }
 
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kernel, int iterations,
   bool periodic )
@@ -433,7 +433,7 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kernel, int i
   return dilate(src,kernel,iter,periodic);
 }
 
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> dilate ( mat::matrix<int> &src, std::vector<int> &iterations,
   bool periodic )
@@ -442,9 +442,9 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, std::vector<int> &iterations,
   return dilate(src,kern,iterations,periodic);
 }
 
-// =============================================================================
+// =================================================================================================
 // create a dummy image with circles at position "row","col" with radius "r"
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &row,
   std::vector<int> &col, std::vector<int> &r, bool periodic )
@@ -471,10 +471,10 @@ mat::matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &ro
   return ret;
 }
 
-// =============================================================================
+// =================================================================================================
 // create a dummy image with a default number of circles
 // at random positions and random radii
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
 {
@@ -516,18 +516,18 @@ mat::matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
   return dummy_circles(shape,row,col,r,periodic);
 }
 
-// =============================================================================
+// =================================================================================================
 // create dummy image with default shape
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> dummy_circles ( bool periodic )
 {
   return dummy_circles({100,100},periodic);
 }
 
-// =============================================================================
+// =================================================================================================
 // define kernel
-// =============================================================================
+// =================================================================================================
 
 mat::matrix<int> kernel ( int ndim , std::string mode )
 {
@@ -562,9 +562,9 @@ mat::matrix<int> kernel ( int ndim , std::string mode )
   throw std::length_error("Unknown mode");
 }
 
-// =============================================================================
+// =================================================================================================
 // determine clusters in image
-// =============================================================================
+// =================================================================================================
 
 void _link ( std::vector<int> &linked, int a, int b )
 {
@@ -987,9 +987,9 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
   return clusters(f,kern,0,periodic);
 }
 
-// =============================================================================
+// =================================================================================================
 // mean
-// =============================================================================
+// =================================================================================================
 
 template <class T>
 double mean ( mat::matrix<T> &src )
@@ -1022,10 +1022,10 @@ template double mean<double>(mat::matrix<double> &);
 template double mean<int   >(mat::matrix<int   > &, mat::matrix<int> &);
 template double mean<double>(mat::matrix<double> &, mat::matrix<int> &);
 
-// =============================================================================
+// =================================================================================================
 // TODO include in header
 // comparison functions to allow int/double overload in "S2_core"
-// =============================================================================
+// =================================================================================================
 
 inline double compare ( int    f, int    g ) { return (f==g)? 1. : 0.; }
 inline double compare ( int    f, double g ) { return (f   )? g  : 0.; }
@@ -1036,10 +1036,10 @@ inline double compare ( double f           ) { return f              ; }
 inline double unity   ( int    f           ) { return 1.             ; }
 inline double unity   ( double f           ) { return 1.             ; }
 
-// =============================================================================
+// =================================================================================================
 // core functions for "S2" and "W2"
 // the function "func" will determine the normalization
-// =============================================================================
+// =================================================================================================
 
 template <class T, class U>
 std::tuple<mat::matrix<double>,double> S2_core (\
@@ -1157,9 +1157,9 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> S2_core (\
   return std::make_tuple(ret/norm,norm);
 }
 
-// =============================================================================
+// =================================================================================================
 // 2-point probability/cluster (binary/int) / correlation (double)
-// =============================================================================
+// =================================================================================================
 
 template <class T>
 std::tuple<mat::matrix<double>,double> S2 (\
@@ -1233,9 +1233,9 @@ template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<double>(\
   mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
                                                 bool, bool );
 
-// =============================================================================
+// =================================================================================================
 // conditional 2-point probability
-// =============================================================================
+// =================================================================================================
 
 template <class T, class U> std::tuple<mat::matrix<double>,double> W2 (\
   mat::matrix<T> &W, mat::matrix<U> &I, std::vector<size_t> roi )
@@ -1310,9 +1310,9 @@ template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
   mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
                       bool, bool );
 
-// =============================================================================
+// =================================================================================================
 // weighted 2-point correlation -> collapse to center
-// =============================================================================
+// =================================================================================================
 
 template <class T>
 std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
@@ -1488,9 +1488,9 @@ template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
   mat::matrix<int   > &, mat::matrix<int> &,\
   std::vector<size_t>  ,                     std::string, bool );
 
-// =============================================================================
+// =================================================================================================
 // lineal path function
-// =============================================================================
+// =================================================================================================
 
 std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
   std::vector<size_t> roi, std::string mode, bool periodic )
@@ -1574,6 +1574,6 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
   return std::make_tuple(ret,norm);
 }
 
-// =============================================================================
+// =================================================================================================
 
 } // namespace Image
