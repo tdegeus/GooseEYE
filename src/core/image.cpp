@@ -1315,10 +1315,9 @@ template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
 // =================================================================================================
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<T>   &src    , mat::matrix<int> &clusters,\
-  mat::matrix<int> &centers, std::vector<size_t> roi,
-  mat::matrix<int> &mask   , std::string mode, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
+  mat::matrix<int> &clusters, mat::matrix<int> &centers, mat::matrix<T> &src,
+  std::vector<size_t> roi, mat::matrix<int> &mask, std::string mode, bool periodic )
 {
  if ( src.shape()!=clusters.shape() || src.shape()!=centers.shape() )
     throw std::length_error("'I', 'clusters', and 'centers' are inconsistent");
@@ -1417,33 +1416,33 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
 // -----------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c ( mat::matrix<T> &I,
-  mat::matrix<int> &clusters, mat::matrix<int> &centers, std::vector<size_t> roi,
-  std::string mode, bool periodic )
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
+  mat::matrix<int> &clusters, mat::matrix<int> &centers, mat::matrix<T> &I,
+  std::vector<size_t> roi, std::string mode, bool periodic )
 {
   mat::matrix<int> mask(I.shape()); mask.zeros();
-  return W2c(I,clusters,centers,roi,mask,mode,periodic);
+  return W2c(clusters,centers,I,roi,mask,mode,periodic);
 }
 
 // -----------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c ( mat::matrix<T> &I,
-  mat::matrix<int> &W, std::vector<size_t> roi, mat::matrix<int> &mask,
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
+  mat::matrix<int> &W, mat::matrix<T> &I, std::vector<size_t> roi, mat::matrix<int> &mask,
   std::string mode, bool periodic )
 {
   mat::matrix<int> clusters,centers;
 
   std::tie(clusters,centers) = Image::clusters(W,periodic);
 
-  return W2c(I,clusters,centers,roi,mask,mode,periodic);
+  return W2c(clusters,centers,I,roi,mask,mode,periodic);
 }
 
 // -----------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c ( mat::matrix<T> &I,
-  mat::matrix<int> &W, std::vector<size_t> roi,
+std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
+  mat::matrix<int> &W, mat::matrix<T> &I, std::vector<size_t> roi,
   std::string mode, bool periodic )
 {
   mat::matrix<int> clusters,centers;
@@ -1451,42 +1450,42 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> W2c ( mat::matrix<T> &I,
 
   std::tie(clusters,centers) = Image::clusters(W,periodic);
 
-  return W2c(I,clusters,centers,roi,mask,mode,periodic);
+  return W2c(clusters,centers,I,roi,mask,mode,periodic);
 }
 
 // -----------------------------------------------------------------------------
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<double> &, mat::matrix<int> &, mat::matrix<int> &,\
-  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<double> &, \
+  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int> &, mat::matrix<int> &,\
-  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<int   > &,\
+  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<double> &, mat::matrix<int> &, mat::matrix<int> &,\
-  std::vector<size_t>  ,                     std::string, bool );
+  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<double> &,\
+  std::vector<size_t>  ,                        std::string, bool );
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int> &, mat::matrix<int> &,\
-  std::vector<size_t>  ,                     std::string, bool );
+  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<int   > &,\
+  std::vector<size_t>  ,                        std::string, bool );
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<double> &, mat::matrix<int> &,\
-  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+  mat::matrix<int   > &, mat::matrix<double> &,\
+  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int> &,\
-  std::vector<size_t>  , mat::matrix<int> &, std::string, bool );
+  mat::matrix<int   > &, mat::matrix<int   > &,\
+  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<double> &, mat::matrix<int> &,\
-  std::vector<size_t>  ,                     std::string, bool );
+  mat::matrix<int   > &, mat::matrix<double> &,\
+  std::vector<size_t>  ,                        std::string, bool );
 
 template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int> &,\
-  std::vector<size_t>  ,                     std::string, bool );
+  mat::matrix<int   > &, mat::matrix<int   > &,\
+  std::vector<size_t>  ,                        std::string, bool );
 
 // =================================================================================================
 // lineal path function

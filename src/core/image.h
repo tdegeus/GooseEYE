@@ -129,16 +129,16 @@ template <class T, class U> std::tuple<Md,Md> W2 (
 
 // collapsed weighted 2-point correlation
 template <class T> std::tuple<Md,Md> W2c (
-  M<T> &I, Mi &clus, Mi &cntr, Vs roi, Mi &msk, s mode="Bresenham", b periodic=true
+  Mi &clus, Mi &cntr, M<T> &I, Vs roi, Mi &msk, s mode="Bresenham", b periodic=true
 );
 template <class T> std::tuple<Md,Md> W2c (
-  M<T> &I, Mi &clus, Mi &cntr, Vs roi,          s mode="Bresenham", b periodic=true
+  Mi &clus, Mi &cntr, M<T> &I, Vs roi,          s mode="Bresenham", b periodic=true
 );
 template <class T> std::tuple<Md,Md> W2c (
-  M<T> &I, Mi &W             , Vs roi, Mi &msk, s mode="Bresenham", b periodic=true
+  Mi &W             , M<T> &I, Vs roi, Mi &msk, s mode="Bresenham", b periodic=true
 );
 template <class T> std::tuple<Md,Md> W2c (
-  M<T> &I, Mi &W             , Vs roi,          s mode="Bresenham", b periodic=true
+  Mi &W             , M<T> &I, Vs roi,          s mode="Bresenham", b periodic=true
 );
 
 // lineal path function (binary or int)

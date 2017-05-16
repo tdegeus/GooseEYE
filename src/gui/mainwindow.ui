@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage0">
        <attribute name="title">
@@ -665,7 +665,7 @@
               <item>
                <widget class="QLabel" name="label_5">
                 <property name="text">
-                 <string>Images 1</string>
+                 <string>Images 1 (&quot;set0&quot;)</string>
                 </property>
                </widget>
               </item>
@@ -796,7 +796,7 @@
               <item>
                <widget class="QLabel" name="label_6">
                 <property name="text">
-                 <string>Images 2</string>
+                 <string>Images 2 (&quot;set1&quot;)</string>
                 </property>
                </widget>
               </item>
@@ -1162,16 +1162,6 @@
              </widget>
             </item>
            </layout>
-          </item>
-          <item>
-           <widget class="QPushButton" name="tab3_load_pushButton">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>(Re)Load</string>
-            </property>
-           </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -2909,7 +2899,6 @@
   <tabstop>tab3_im_comboBox</tabstop>
   <tabstop>tab3_imPrev_pushButton</tabstop>
   <tabstop>tab3_imNext_pushButton</tabstop>
-  <tabstop>tab3_load_pushButton</tabstop>
   <tabstop>tab3_imDefault_pushButton</tabstop>
   <tabstop>tab3_imApply_pushButton</tabstop>
   <tabstop>tab3_zoom_slider</tabstop>
@@ -2948,9 +2937,9 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_tab1_im0"/>
   <buttongroup name="buttonGroup_tab1_im1"/>
+  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_tab3_mouse"/>
  </buttongroups>
 </ui>

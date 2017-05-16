@@ -81,8 +81,8 @@ mi.def("W2",py::overload_cast<Md&,Md&,Vs,Mi&,b,b>(&Image::W2<double,double>),"We
 
 mi.def("W2c",py::overload_cast<Mi&,Mi&,Mi&,Vs,    s,b>(&Image::W2c<int   >),"Collapsed conditional 2-point probability",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),                py::arg("mode")="Bresenham",py::arg("periodic")=true);
 mi.def("W2c",py::overload_cast<Mi&,Mi&,Mi&,Vs,Mi&,s,b>(&Image::W2c<int   >),"Collapsed conditional 2-point probability",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),py::arg("mask"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
-mi.def("W2c",py::overload_cast<Md&,Mi&,Mi&,Vs,    s,b>(&Image::W2c<double>),"Collapsed conditional 2-point correlation",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),                py::arg("mode")="Bresenham",py::arg("periodic")=true);
-mi.def("W2c",py::overload_cast<Md&,Mi&,Mi&,Vs,Mi&,s,b>(&Image::W2c<double>),"Collapsed conditional 2-point correlation",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),py::arg("mask"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
+mi.def("W2c",py::overload_cast<Mi&,Mi&,Md&,Vs,    s,b>(&Image::W2c<double>),"Collapsed conditional 2-point correlation",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),                py::arg("mode")="Bresenham",py::arg("periodic")=true);
+mi.def("W2c",py::overload_cast<Mi&,Mi&,Md&,Vs,Mi&,s,b>(&Image::W2c<double>),"Collapsed conditional 2-point correlation",py::arg("I"),py::arg("clusters"),py::arg("centers"),py::arg("roi"),py::arg("mask"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
 
 mi.def("L",&Image::L,"Lineal path function",py::arg("im"),py::arg("roi"),py::arg("mode")="Bresenham",py::arg("periodic")=true);
 
