@@ -28,22 +28,22 @@ MainWindow::MainWindow(QWidget *parent) :
   data["output"]["result"] = "";
   data["output"]["interp"] = "";
   // - statistics settings
-  data["stat"       ] = ""         ;
-  data["nset"       ] = 1          ;
-  data["periodic"   ] = true       ;
-  data["zeropad"    ] = false      ;
-  data["mask_weight"] = true       ;
-  data["pixel_path" ] = "Bresenham";
-  data["roi"        ] = {51,51}    ;
+  data["stat"            ] = ""         ;
+  data["nset"            ] = 1          ;
+  data["periodic"        ] = true       ;
+  data["zeropad"         ] = false      ;
+  data["mask_weight"     ] = true       ;
+  data["pixel_path"      ] = "Bresenham";
+  data["roi"             ] = {51,51}    ;
   // - empty file sets
-  data["set0"]["field" ] = "";
-  data["set0"]["dtype" ] = "";
-  data["set0"]["files" ] = {};
-  data["set0"]["config"] = {};
-  data["set1"]["field" ] = "";
-  data["set1"]["dtype" ] = "";
-  data["set1"]["files" ] = {};
-  data["set1"]["config"] = {};
+  data["set0"]["field"   ] = "";
+  data["set0"]["dtype"   ] = "";
+  data["set0"]["files"   ] = {};
+  data["set0"]["config"  ] = {};
+  data["set1"]["field"   ] = "";
+  data["set1"]["dtype"   ] = "";
+  data["set1"]["files"   ] = {};
+  data["set1"]["config"  ] = {};
 
   // tab3: link scroll position of graphicsViews
   QScrollBar *I1h = ui->graphicsViewT3_img->horizontalScrollBar();
@@ -57,14 +57,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
   // tab3: switch set/image
   // - alias variables
-  QComboBox *im  = ui->comboBoxT3_img;
+  QComboBox *img = ui->comboBoxT3_img;
   QComboBox *set = ui->comboBoxT3_set;
   // - previous image
   connect(ui->pushButtonT3_imgPrev ,&QPushButton::clicked,[=](){
-    if (im ->currentIndex()>0             ) im ->setCurrentIndex(im ->currentIndex()-1);});
+    if (img->currentIndex()>0             ) img->setCurrentIndex(img->currentIndex()-1);});
   // - next image
   connect(ui->pushButtonT3_imgNext ,&QPushButton::clicked,[=](){
-    if (im ->currentIndex()<im ->count()-1) im ->setCurrentIndex(im ->currentIndex()+1);});
+    if (img->currentIndex()<img->count()-1) img->setCurrentIndex(img->currentIndex()+1);});
   // - previous iset
   connect(ui->pushButtonT3_setPrev,&QPushButton::clicked,[=](){
     if (set->currentIndex()>0             ) set->setCurrentIndex(set->currentIndex()-1);});
@@ -132,6 +132,9 @@ MainWindow::MainWindow(QWidget *parent) :
   imgBtn.push_back(ui->pushButtonT3_zoomIm  );
   imgBtn.push_back(ui->pushButtonT3_zoomOut );
 
+  imgCombo.push_back(ui->comboBoxT3_set);
+  imgCombo.push_back(ui->comboBoxT3_img);
+
   btnGroup.push_back(ui->buttonGroupT1_stat );
   btnGroup.push_back(ui->buttonGroupT1_set0 );
   btnGroup.push_back(ui->buttonGroupT1_set1 );
@@ -162,17 +165,19 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( size_t i=0; i<2; ++i ) connect(fileBtnDwn[i],&QPushButton::clicked,this,[=](){fileDwn(i);});
   for ( size_t i=0; i<2; ++i ) connect(fileBtnSrt[i],&QPushButton::clicked,this,[=](){fileSrt(i);});
 
-  size_t j;
-  for ( j=0; j<imgSpin.size(); ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
-  for ( j=1; j<imgSpin.size(); ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
+  size_t j,N=imgSpin.size();
+  for ( j=0; j<N; ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
+  for ( j=1; j<N; ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
 
   // tab2: button pressed -> refresh view with new "data"
-  for ( auto &i : statBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
-  for ( auto &i : typeBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
-  for ( auto &i : nsetBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
-  for ( auto &i : fileBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab2_show();});
-  for ( auto &i : imgBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab3_show();});
-  for ( auto &i : imgSpin ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_show();});
+  for ( auto &i : statBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab1_show();});
+  for ( auto &i : typeBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab1_show();});
+  for ( auto &i : nsetBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab1_show();});
+  for ( auto &i : fileBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab2_show();});
+  for ( auto &i : imgBtn   ) connect(i,&QPushButton::clicked          ,this,[=](){tab3_show();});
+  for ( auto &i : imgSpin  ) connect(i,&QSpinBox::editingFinished     ,this,[=](){tab3_show();});
+//  for ( auto &i : imgCombo ) connect(i,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_show()));
+
 }
 
 // =================================================================================================
@@ -341,14 +346,14 @@ void MainWindow::on_lineEditT0_json_textEdited(const QString &arg1)
 
 // =================================================================================================
 
-void MainWindow::on_tab0_res1path_lineEdit_textEdited(const QString &arg1)
+void MainWindow::on_lineEditT0_res1_textEdited(const QString &arg1)
 {
   data["output"]["result"] = arg1.toStdString();
 }
 
 // =================================================================================================
 
-void MainWindow::on_tab0_res2path_lineEdit_textEdited(const QString &arg1)
+void MainWindow::on_lineEditT0_res2_textEdited(const QString &arg1)
 {
   data["output"]["interp"] = arg1.toStdString();
 }
@@ -359,8 +364,8 @@ void MainWindow::tab0_show()
 {
   ui->lineEditT0_path->setText(out_path.absolutePath());
   ui->lineEditT0_json->setText(out_json);
-  ui->tab0_res1path_lineEdit->setText(QString::fromStdString(data["output"]["result"]));
-  ui->tab0_res2path_lineEdit->setText(QString::fromStdString(data["output"]["interp"]));
+  ui->lineEditT0_res1->setText(QString::fromStdString(data["output"]["result"]));
+  ui->lineEditT0_res2->setText(QString::fromStdString(data["output"]["interp"]));
 }
 
 // =================================================================================================
@@ -478,7 +483,10 @@ void MainWindow::tab1_show()
 
 // =================================================================================================
 
-
+QString MainWindow::readFilePath(size_t iset, size_t iimg)
+{
+  return out_path.absoluteFilePath(readFile(iset,iimg));
+}
 
 // =================================================================================================
 
@@ -683,7 +691,6 @@ void MainWindow::fileDwn(size_t set)
 
 void MainWindow::fileSrt(size_t set)
 {
-
   // read current file list
   std::vector<std::string> files = readFiles(set);
 
@@ -758,188 +765,6 @@ void MainWindow::tab2_show()
 
 // =================================================================================================
 
-std::vector<size_t> MainWindow::imageSettings(size_t iset, size_t iimg)
-{
-  // zero initialize output (phase,mask1,mask2,mask3,row,col) as a single vector (min,max,...)
-  std::vector<size_t> out(12,0);
-  // read keys
-  std::string key   = nsetKey[iset];
-  std::string fname = data[key]["files"][iimg];
-
-  std::vector<size_t> phase = {0,255};
-  std::vector<size_t> row   = {0,imgRaw_.shape()[0]};
-  std::vector<size_t> col   = {0,imgRaw_.shape()[1]};
-  // imgRaw_
-
-  // no information specified -> quit
-  if ( !data[key].count("config") )
-    data[key]["config"][fname]["phase"] = phase;
-    data[key]["config"][fname]["row"  ] = row;
-    data[key]["config"][fname]["col"  ] = col;
-  // no information specified -> quit
-  if ( !data[key]["config"].count(fname) ) {
-    data[key]["config"][fname]["phase"] = phase;
-    data[key]["config"][fname]["row"  ] = row;
-    data[key]["config"][fname]["col"  ] = col;
-  }
-
-  // read from "data"
-  // - phase: lower and upper bound
-  if ( data[key]["config"][fname].count("phase") )
-    for ( size_t i=0; i<data[key]["config"][fname]["phase"].size(); ++i )
-      out[0*2+i] = data[key]["config"][fname]["phase"][i];
-  // - mask1,mask2,mask3: lower and upper bound
-  if ( data[key]["config"][fname].count("mask") )
-    for ( size_t i=0; i<data[key]["config"][fname]["mask"].size(); ++i )
-      out[1*2+i] = data[key]["config"][fname]["mask"][i];
-  // - rows: lower and upper bound
-  if ( data[key]["config"][fname].count("row") )
-    for ( size_t i=0; i<data[key]["config"][fname]["row"].size(); ++i )
-      out[4*2+i] = data[key]["config"][fname]["row"][i];
-  // - columns: lower and upper bound
-  if ( data[key]["config"][fname].count("col") )
-    for ( size_t i=0; i<data[key]["config"][fname]["col"].size(); ++i )
-      out[5*2+i] = data[key]["config"][fname]["col"][i];
-
-  return out;
-}
-
-// =================================================================================================
-
-double MainWindow::tab3_scaleImage()
-{
-  double wdthView  = (double)ui->graphicsViewT3_img->width ();
-  double hghtView  = (double)ui->graphicsViewT3_img->height();
-  double wdthImage = (double)ui->spinBoxT3_colHgh->maximum();
-  double hghtImage = (double)ui->spinBoxT3_rowHgh->maximum();
-  double zoomScale = pow(1.066,(double)ui->sliderT3_zoom->sliderPosition());
-  double wdth      = zoomScale*wdthView/wdthImage;
-  double hght      = zoomScale*hghtView/hghtImage;
-
-  return 0.95*std::min(wdth,hght);
-}
-
-// =================================================================================================
-
-std::tuple<mat::matrix<int>,QImage> MainWindow::readImage(size_t iset, size_t iimg)
-{
-  // load image
-  QImage img;
-  img.load(out_path.filePath(readFile(iset,iimg)));
-  // read the size
-  size_t nrow = img.height();
-  size_t ncol = img.width ();
-  // allocate data
-  mat::matrix<int> out({nrow,ncol});
-  // read image
-  for ( size_t i=0; i<nrow; ++i )
-    for ( size_t j=0; j<ncol; ++j )
-      out(i,j) = qGray(img.pixel(j,i));
-
-  return std::make_tuple(out,img);
-}
-
-// =================================================================================================
-
-std::tuple<mat::matrix<int>,mat::matrix<int>> MainWindow::interpretImage(
-  size_t iset, size_t iimg, mat::matrix<int> im, int crop)
-{
-  // read keys
-  std::string key      = nsetKey[iset];
-  bool        periodic = data["periodic"];
-  std::string fname    = data[key]["files" ][iimg ];
-  json        file     = data[key]["config"][fname];
-  std::string dtype    = data[key]["dtype" ];
-
-  // default shape of output matrix
-  size_t irow = 0;
-  size_t jrow = im.shape()[0];
-  size_t icol = 0;
-  size_t jcol = im.shape()[1];
-
-  // default range of the output matrix
-  int min  = 0;
-  int max  = 255;
-
-  // crop: modify dimensions of the output matrix
-  if ( crop==-1 && file.count("row") ) {
-    irow = file["row"][0];
-    jrow = file["row"][1];
-  }
-  if ( crop==-1 && file.count("col") ) {
-    icol = file["col"][0];
-    jcol = file["col"][1];
-  }
-
-  // threshold: read range
-  if ( file.count("phase") ) {
-    min  = static_cast<int>(file["phase"][0]);
-    max  = static_cast<int>(file["phase"][1]);
-  }
-
-  // convert "crop" such that it can be used as pre-factor
-  if ( crop==-1 )
-    crop = 0;
-  // allocate output
-  mat::matrix<int> out({jrow-irow,jcol-icol}); out.ones (); out *= crop;
-  mat::matrix<int> msk({jrow-irow,jcol-icol}); msk.zeros();
-
-  // phase threshold float: retain values; everything outside bounds is masked
-  if ( dtype=="float" ) {
-    for ( size_t i=0; i<(jrow-irow); ++i ) {
-      for ( size_t j=0; j<(jcol-icol); ++j ) {
-        if ( im(i+irow,j+icol)>=min && im(i+irow,j+icol)<=max )
-          out(i,j) = im(i+irow,j+icol);
-        else
-          msk(i,j) = 1;
-      }
-    }
-  }
-  // phase threshold binary/int: between (min,max)->1, else->0 (nothing masked)
-  else {
-    for ( size_t i=0; i<(jrow-irow); ++i )
-      for ( size_t j=0; j<(jcol-icol); ++j )
-        if ( im(i+irow,j+icol)>=min && im(i+irow,j+icol)<=max )
-          out(i,j) = 1;
-  }
-
-  // int: determine clusters from binary image
-  if ( dtype=="int" ) {
-    mat::matrix<int> clusters,centers;
-    std::tie(clusters,centers) = Image::clusters(out,periodic);
-    for ( size_t i=0; i<out.size(); ++i )
-      out[i] = clusters[i];
-  }
-
-  // mask threshold
-  if ( file.count("mask") ) {
-    if ( file["mask"].size()%2!=0 )
-      throw std::runtime_error("masks must be specified min,max , min,max , ...");
-    for ( size_t imsk=0; imsk<file["mask"].size(); imsk+=2 )
-      for ( size_t i=0 ; i<(jrow-irow) ; i++ )
-        for ( size_t j=0 ; j<(jcol-icol) ; j++ )
-          if ( im(i+irow,j+icol)>=file["mask"][imsk] && im(i+irow,j+icol)<=file["mask"][imsk+1] )
-            msk(i,j) = 1;
-  }
-
-  return std::make_tuple(out,msk);
-};
-
-// =================================================================================================
-
-std::tuple<mat::matrix<int>,mat::matrix<int>> MainWindow::interpretImage(
-  size_t iset, size_t iimg, int crop)
-{
-  QImage imQt;
-  mat::matrix<int> im;
-
-  std::tie(im,imQt) = readImage(iset,iimg);
-
-  return interpretImage(iset,iimg,im,crop);
-}
-
-// =================================================================================================
-
 void MainWindow::tab3_show()
 {
   // initialization
@@ -948,6 +773,9 @@ void MainWindow::tab3_show()
   // store the current indices
   int iset = ui->comboBoxT3_set->currentIndex();
   int iimg = ui->comboBoxT3_img->currentIndex();
+
+  // read number of sets
+  int nset = static_cast<int>(data["nset"]);
 
   // clear both comboBoxes (enable below)
   ui->comboBoxT3_set->clear();
@@ -959,13 +787,13 @@ void MainWindow::tab3_show()
   // ----------------
 
   // fill comboBox with set name / field / type
-  if ( data["nset"]>0 ) {
+  if ( nset>0 ) {
     // - enable
     ui->comboBoxT3_set->setEnabled(true);
     // - set name format
     QString name = "set%1: %2 (%3)";
     // - add items
-    for ( int i=0; i<static_cast<int>(data["nset"]); ++i ) {
+    for ( int i=0; i<nset; ++i ) {
       ui->comboBoxT3_set->addItem(name.arg(
         QString::number(i),
         QString::fromStdString(data[nsetKey[i]]["field"]),
@@ -973,8 +801,8 @@ void MainWindow::tab3_show()
       ));
     }
     // - enable navigation buttons
-    if ( data["nset"]>1 ) ui->pushButtonT3_setPrev->setEnabled(true);
-    if ( data["nset"]>1 ) ui->pushButtonT3_setNext->setEnabled(true);
+    if ( nset>1 && iset>0      ) ui->pushButtonT3_setPrev->setEnabled(true);
+    if ( nset>1 && iset<nset-1 ) ui->pushButtonT3_setNext->setEnabled(true);
     // - select the first set
     if ( iset<0 )
       iset = 0;
@@ -986,18 +814,19 @@ void MainWindow::tab3_show()
   if ( iset<0 )
     return;
 
-  // images -> comboBox
-  // ------------------
+  // images in set -> comboBox
+  // -------------------------
 
   // read files in current set
-  std::vector<std::string> files = readFiles(static_cast<size_t>(iset));
+  std::vector<std::string> files  = readFiles(static_cast<size_t>(iset));
+  int                      nfiles = static_cast<int>(files.size());
   // add files to comboBox
   for ( auto &file : files )
     ui->comboBoxT3_img->addItem(QString::fromStdString(file));
   // enable comboBox and navigation buttons
-  if ( files.size()>0 ) ui->comboBoxT3_img      ->setEnabled(true);
-  if ( files.size()>1 ) ui->pushButtonT3_imgPrev->setEnabled(true);
-  if ( files.size()>1 ) ui->pushButtonT3_imgNext->setEnabled(true);
+  if ( files.size()>0                  ) ui->comboBoxT3_img      ->setEnabled(true);
+  if ( files.size()>1 && iimg>0        ) ui->pushButtonT3_imgPrev->setEnabled(true);
+  if ( files.size()>1 && iimg<nfiles-1 ) ui->pushButtonT3_imgNext->setEnabled(true);
   // reapply index
   ui->comboBoxT3_img->setCurrentIndex(iimg);
 
@@ -1005,54 +834,82 @@ void MainWindow::tab3_show()
   if ( iimg<0 )
     return;
 
+  // extract keys
+  // ------------
 
+  std::string key      = nsetKey[iset];
+  std::string fname    = data[key]["files"][iimg];
+  std::string dtype    = data[key]["dtype"];
+  bool        periodic = data["periodic"];
 
-  // read image from file and show
-  // -----------------------------
+  // read image from file -> show
+  // ----------------------------
 
-  // read image, if the image is different than last time
-  if ( iimg!=iimg_ || iset!=iset_ ) {
-    // update "previous index"
-    iimg_ = iimg;
-    iset_ = iset;
-    // load image
-    QImage imQt;
-    std::tie(imgRaw_,imQt) = readImage(iset,iimg);
+  // read image (nothing done if "iimg" and "iset" are the same as the last time)
+  bool read = image.read(readFilePath(iset,iimg),iset,iimg,
+    ui->graphicsViewT3_img->width(),
+    ui->graphicsViewT3_img->height(),
+    ui->sliderT3_zoom->sliderPosition()
+  );
+  // optionally update view
+  if ( read ) {
     // set maxima
-    ui->spinBoxT3_rowHgh->setMaximum(imgRaw_.shape()[0]);
-    ui->spinBoxT3_colHgh->setMaximum(imgRaw_.shape()[1]);
-    // load image
-
+    ui->spinBoxT3_rowHgh->setMaximum(image.nrow);
+    ui->spinBoxT3_colHgh->setMaximum(image.ncol);
     // create a "scene" with containing the image
-    QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(imQt));
+    QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(image.dataQt));
     QGraphicsScene      *scene = new QGraphicsScene;
     scene->addItem(item);
     ui->graphicsViewT3_img->setScene(scene);
     // show the image with the correct scaling applied
-    double scale = this->tab3_scaleImage();
-    ui->graphicsViewT3_img->setTransform(QTransform::fromScale(scale,scale));
+    ui->graphicsViewT3_img->setTransform(QTransform::fromScale(image.scale,image.scale));
     ui->graphicsViewT3_img->show();
   }
 
-  // read settings
-  std::vector<size_t> values = imageSettings(iset,iimg);
-  // apply all image settings
-  for ( size_t i=0; i<values.size(); ++i )
-    imgSpin[i]->setValue(values[i]);
+  // update interpretation settings (spinBox)
+  // ----------------------------------------
+
+  // zero initialize
+  for ( auto &i : imgSpin ) i->setValue(0);
+  // defaults
+  std::vector<size_t> phase = {0,255};
+  std::vector<size_t> row   = {0,image.data.shape()[0]};
+  std::vector<size_t> col   = {0,image.data.shape()[1]};
+  // no information specified -> defaults
+  if ( !data[key]["config"].count(fname) ) {
+    data[key]["config"][fname]["phase"] = phase;
+    data[key]["config"][fname]["row"  ] = row;
+    data[key]["config"][fname]["col"  ] = col;
+  }
+  // alias
+  json config = data[key]["config"][fname];
+  // read from "data"
+  // - read "phase" from "data": lower and upper bound
+  if ( config.count("phase") )
+    for ( size_t i=0; i<config["phase"].size(); ++i )
+      imgSpin[0*2+i]->setValue(config["phase"][i]);
+  // - read "mask1,mask2,mask3" from "data": lower and upper bound
+  if ( config.count("mask") )
+    for ( size_t i=0; i<config["mask"].size(); ++i )
+      imgSpin[1*2+i]->setValue(config["mask"][i]);
+  // - read "rows" from "data": lower and upper bound
+  if ( config.count("row") )
+    for ( size_t i=0; i<config["row"].size(); ++i )
+      imgSpin[4*2+i]->setValue(config["row"][i]);
+  // - read "columns" from "data": lower and upper bound
+  if ( config.count("col") )
+    for ( size_t i=0; i<config["col"].size(); ++i )
+      imgSpin[5*2+i]->setValue(config["col"][i]);
 
   // interpret image based on settings
   // ---------------------------------
 
   // get image and mask
   mat::matrix<int> im,mask;
-  std::tie(im,mask) = interpretImage(iset,iimg,imgRaw_,254);
+  std::tie(im,mask) = image.config(config,periodic,dtype,254);
   double fac        = 255./static_cast<double>(im.max());
 
   mat::matrix<unsigned char> imgview(im.shape());
-
-  std::string key   = nsetKey[iset];
-  std::string fname = data[key]["files"][iimg];
-  std::string dtype = data[key]["dtype"];
 
   // float: max -> 254 (to make room for mask)
   if ( dtype=="float" )
@@ -1074,31 +931,23 @@ void MainWindow::tab3_show()
   // mask weights
   // ------------
 
-  // if ( data["mask_weight"] && data[key]["filed"]=="phase" ) {
-  //   if ( data_.saved(0,ui->comboBoxT3_img->currentIndex()) ) {
-  //     std::tie(im,mask) = data_.image(0,idx,imgRaw_,false);
-  //     for ( size_t i=0 ; i<im.size() ; i++ )
-  //       if ( im[i] )
-  //         imgview[i] = 255;
-  //   }
-  // }
+  if ( data["mask_weight"] && data[key]["field"]=="phase" && iset==1 ) {
+    QtImage image_;
+    mat::matrix<int> im_,mask_;
+    std::string key_    = nsetKey[0];
+    std::string fname_  = data[key_]["files"][iimg];
+    std::string dtype_  = data[key_]["dtype"];
+    json        config_ = data[key_]["config"][fname_];
+    std::tie(im_,mask_) = image_.config(config,periodic,dtype_,0);
+    image_.read(readFilePath(0,iimg));
+    image_.config(config_,periodic,dtype_,0);
+    for ( size_t i=0 ; i<im_.size() ; i++ )
+      if ( im_[i] )
+        imgview[i] = 255;
+  }
 
-  // crop the image
-  // --------------
-
-  // size_t nrow = imgRaw_.shape()[0];
-  // size_t ncol = imgRaw_.shape()[1];
-  // size_t irow = data[key]["config"][fname][""];
-  // size_t jrow = data[key]["config"][fname][""];
-  // size_t icol = data[key]["config"][fname][""];
-  // size_t jcol = data[key]["config"][fname][""];
-
-  // if ( irow>0 || jrow<nrow || icol>0 || jcol<ncol )
-  // for ( size_t i=0 ; i<nrow ; i++ )
-  //   for ( size_t j=0 ; j<ncol ; j++ )
-  //     if ( i<irow || i>jrow || j<icol || j>jcol )
-  //       imgview(i,j) = 254;
-
+  // view interpreted image
+  // ----------------------
 
   // read colormap
   std::vector<int> cols;
@@ -1120,11 +969,11 @@ void MainWindow::tab3_show()
   for ( size_t i = 0; i < 256; ++i)
     cmap.append(qRgb(cols[i*3+0],cols[i*3+1],cols[i*3+2]));
   // convert Image::Matrix -> image to view
-  QImage imQt(\
-    imgview.data(),\
-    imgview.shape()[1],\
-    imgview.shape()[0],\
-    QImage::QImage::Format_Indexed8\
+  QImage imQt(
+    imgview.data(),
+    imgview.shape()[1],
+    imgview.shape()[0],
+    QImage::QImage::Format_Indexed8
   );
   imQt.setColorTable(cmap);
   // create a "scene" with containing the image
@@ -1133,12 +982,8 @@ void MainWindow::tab3_show()
   scene->addItem(item);
   ui->graphicsViewT3_seg->setScene(scene);
   // show the image with the correct scaling applied
-  double scale = this->tab3_scaleImage();
-  ui->graphicsViewT3_seg->setTransform(QTransform::fromScale(scale,scale));
+  ui->graphicsViewT3_seg->setTransform(QTransform::fromScale(image.scale,image.scale));
   ui->graphicsViewT3_seg->show();
-
-
-
 }
 
 // =================================================================================================

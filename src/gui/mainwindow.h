@@ -38,6 +38,140 @@ std::string updatePath (QDir old, QDir current, std::string fname);
 
 // =================================================================================================
 
+class QtImage
+{
+public:
+int              iset    = -1; // set-index of this image
+int              iimg    = -1; // image-index (within the set) of this image
+mat::matrix<int> data        ; // image, as matrix
+QImage           dataQt      ; // image, as Qt object
+size_t           nrow     = 0;
+size_t           ncol     = 0;
+double           scale       ; // scale factor, to be used to display
+
+// -------------------------------------------------------------------------------------------------
+
+QtImage            (const QtImage &) = default;
+QtImage& operator= (const QtImage &) = default;
+QtImage(){};
+
+// -------------------------------------------------------------------------------------------------
+
+bool read(QString fname, int Iset=-1, int Iimg=-1, int width=-1, int height=-1, int zoom=-1)
+{
+  // check to read
+ if ( Iimg==iimg && Iset==iset && Iset>=0 && Iimg>=0 )
+   return false;
+  // store input
+  iimg  = Iimg;
+  iset  = Iset;
+  // load from file
+  dataQt.load(fname);
+  // read the size
+  nrow = dataQt.height();
+  ncol = dataQt.width ();
+  // allocate data
+  data.resize({nrow,ncol});
+  // read image
+  for ( size_t i=0; i<nrow; ++i )
+    for ( size_t j=0; j<ncol; ++j )
+      data(i,j) = qGray(dataQt.pixel(j,i));
+  // continue only if the widget's width is known
+  if ( width<0 || height<0 || zoom<0 )
+    return true;
+  // convert zoom + widget's width/heigth to unit-scale
+  double zm   = pow(1.066,static_cast<double>(zoom));
+  double wdth = zm*static_cast<double>(width )/static_cast<double>(data.shape()[1]);
+  double hght = zm*static_cast<double>(height)/static_cast<double>(data.shape()[0]);
+  // find scale factor
+  scale = 0.95*std::min(wdth,hght);
+
+  return true;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+// crop==-1 -> image is cropped; crop>=0 -> "crop" is assigned to pixels that are out-of-bounds
+std::tuple<mat::matrix<int>,mat::matrix<int>> config(
+  json file, bool periodic, std::string dtype, int crop=-1)
+{
+  // default shape of output matrix
+  size_t irow = 0;
+  size_t jrow = data.shape()[0];
+  size_t icol = 0;
+  size_t jcol = data.shape()[1];
+
+  // default range of the output matrix
+  int min  = 0;
+  int max  = 255;
+
+  // crop: modify dimensions of the output matrix
+  if ( crop==-1 && file.count("row") ) {
+    irow = file["row"][0];
+    jrow = file["row"][1];
+  }
+  if ( crop==-1 && file.count("col") ) {
+    icol = file["col"][0];
+    jcol = file["col"][1];
+  }
+
+  // threshold: read range
+  if ( file.count("phase") ) {
+    min  = static_cast<int>(file["phase"][0]);
+    max  = static_cast<int>(file["phase"][1]);
+  }
+
+  // convert "crop" such that it can be used as pre-factor
+  if ( crop==-1 )
+    crop = 0;
+  // allocate output
+  mat::matrix<int> out({jrow-irow,jcol-icol}); out.ones (); out *= crop;
+  mat::matrix<int> msk({jrow-irow,jcol-icol}); msk.zeros();
+
+  // phase threshold float: retain values; everything outside bounds is masked
+  if ( dtype=="float" ) {
+    for ( size_t i=0; i<(jrow-irow); ++i ) {
+      for ( size_t j=0; j<(jcol-icol); ++j ) {
+        if ( data(i+irow,j+icol)>=min && data(i+irow,j+icol)<=max )
+          out(i,j) = data(i+irow,j+icol);
+        else
+          msk(i,j) = 1;
+      }
+    }
+  }
+  // phase threshold binary/int: between (min,max)->1, else->0 (nothing masked)
+  else {
+    for ( size_t i=0; i<(jrow-irow); ++i )
+      for ( size_t j=0; j<(jcol-icol); ++j )
+        if ( data(i+irow,j+icol)>=min && data(i+irow,j+icol)<=max )
+          out(i,j) = 1;
+  }
+
+  // int: determine clusters from binary image
+  if ( dtype=="int" ) {
+    mat::matrix<int> clusters,centers;
+    std::tie(clusters,centers) = Image::clusters(out,periodic);
+    for ( size_t i=0; i<out.size(); ++i )
+      out[i] = clusters[i];
+  }
+
+  // mask threshold
+  if ( file.count("mask") ) {
+    if ( file["mask"].size()%2!=0 )
+      throw std::runtime_error("masks must be specified min,max , min,max , ...");
+    for ( size_t imsk=0; imsk<file["mask"].size(); imsk+=2 )
+      for ( size_t i=0 ; i<(jrow-irow) ; i++ )
+        for ( size_t j=0 ; j<(jcol-icol) ; j++ )
+          if ( data(i+irow,j+icol)>=file["mask"][imsk] && data(i+irow,j+icol)<=file["mask"][imsk+1] )
+            msk(i,j) = 1;
+  }
+
+  return std::make_tuple(out,msk);
+};
+};
+
+// =================================================================================================
+
 namespace Ui {
 class MainWindow;
 }
@@ -56,8 +190,8 @@ private slots:
   void on_pushButtonT0_path_clicked();                    // change path    -> update "data"
   void on_lineEditT0_path_textEdited(const QString &arg1);// change path    -> update "data"
   void on_lineEditT0_json_textEdited(const QString &arg1);// manual file-name change
-  void on_tab0_res1path_lineEdit_textEdited(const QString &arg1);// manual file-name change
-  void on_tab0_res2path_lineEdit_textEdited(const QString &arg1);// manual file-name change
+  void on_lineEditT0_res1_textEdited(const QString &arg1);// manual file-name change
+  void on_lineEditT0_res2_textEdited(const QString &arg1);// manual file-name change
   void on_pushButtonT2_cp_clicked();                          // copy files "set0" -> "set1"
   // connect groups of buttons
   void fileAdd(size_t); // add    files         -> update "data"
@@ -73,30 +207,21 @@ private slots:
   void tab3_show(); // refresh with new "data"
   void tab3_read(size_t idx);
   // support functions
+  // - read single file "iimg" from "iset", output as Qt string (absolute path)
+  QString readFilePath(size_t iset, size_t iimg);
   // - read single file "iimg" from "iset", output as Qt string
   QString readFile(size_t iset, size_t iimg);
   // - read files from "iset", output as vector of strings
   std::vector<std::string> readFiles(size_t iset);
   // - replace all files in "iset" with vector of strings
   void setFiles(size_t iset, std::vector<std::string> files);
-  // - compute scale factor, to show the image widget spanning
-  double tab3_scaleImage();
-  // - read all image settings (phase,mask1,mask2,mask3,row,col) as a single vector (min,max,...)
-  std::vector<size_t> imageSettings(size_t iset, size_t iimg);
-  // - read image from file
-  std::tuple<mat::matrix<int>,QImage> readImage(size_t iset, size_t iimg);
-  // - interpret image
-  std::tuple<mat::matrix<int>,mat::matrix<int>> interpretImage(
-    size_t iset, size_t iimg, mat::matrix<int> im, int crop=-1 );
-  // - read and interpret image
-  std::tuple<mat::matrix<int>,mat::matrix<int>> interpretImage(
-    size_t iset, size_t iimg, int crop=-1 );
 
 private:
   Ui::MainWindow  *ui;
   json             data;
   QDir             out_path = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
   QString          out_json = "";
+  QtImage          image;
   int              iset_    = -1;        // store last read set/image
   int              iimg_    = -1;        // store last read set/image
   mat::matrix<int> imgRaw_      ;        // store image to view interpreted image without reread
@@ -117,6 +242,7 @@ private:
   std::vector<QLabel*>       typeLbl;    // list with labels to denote the data-type
   std::vector<std::string>   imgCheckLbl;
   std::vector<QSpinBox*>     imgSpin;
+  std::vector<QComboBox*>    imgCombo;
   std::vector<QCheckBox*>    imgCheck;
   std::vector<QPushButton*>  imgBtn;     // list with all image selection buttons
   std::vector<QButtonGroup*> btnGroup;   // list with all groups of radioButtons
