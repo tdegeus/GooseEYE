@@ -57,8 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
   // tab3: switch set/image
   // - alias variables
-  QComboBox *im  = ui->tab3_im_comboBox;
-  QComboBox *set = ui->tab3_set_comboBox;
+  QComboBox *im  = ui->comboBoxT3_img;
+  QComboBox *set = ui->comboBoxT3_set;
   // - previous image
   connect(ui->pushButtonT3_imgPrev ,&QPushButton::clicked,[=](){
     if (im ->currentIndex()>0             ) im ->setCurrentIndex(im ->currentIndex()-1);});
@@ -74,67 +74,68 @@ MainWindow::MainWindow(QWidget *parent) :
 
   // combine buttons to list, for fast references
   // - tab1: radioButton group to select statistic, and their field-names
-  statBtn.push_back(ui->stat_S2_radioButton   ); statKey.push_back("S2"    );
-  statBtn.push_back(ui->stat_C2_radioButton   ); statKey.push_back("C2"    );
-  statBtn.push_back(ui->stat_L_radioButton    ); statKey.push_back("L"     );
-  statBtn.push_back(ui->stat_W2_radioButton   ); statKey.push_back("W2"    );
-  statBtn.push_back(ui->stat_W2c_radioButton  ); statKey.push_back("W2c"   );
+  statBtn.push_back(ui->radioButtonT1_S2    ); statKey.push_back("S2"    );
+  statBtn.push_back(ui->radioButtonT1_C2    ); statKey.push_back("C2"    );
+  statBtn.push_back(ui->radioButtonT1_L     ); statKey.push_back("L"     );
+  statBtn.push_back(ui->radioButtonT1_W2    ); statKey.push_back("W2"    );
+  statBtn.push_back(ui->radioButtonT1_W2c   ); statKey.push_back("W2c"   );
   // - tab1: checkBox group to select number of sets, and their field-names
-  nsetBtn.push_back(ui->tab1_im0_checkBox     ); nsetKey.push_back("set0"  );
-  nsetBtn.push_back(ui->checkBoxT1_img1     ); nsetKey.push_back("set1"  );
+  nsetBtn.push_back(ui->checkBoxT1_set1     ); nsetKey.push_back("set0"  );
+  nsetBtn.push_back(ui->checkBoxT1_set0     ); nsetKey.push_back("set1"  );
   // - tab1: radioButton group to select data-type (one for each set), and their field-names
-  typeBtn.push_back(ui->tab1_im0b_radioButton ); typeKey.push_back("binary");
-  typeBtn.push_back(ui->tab1_im0i_radioButton ); typeKey.push_back("int"   );
-  typeBtn.push_back(ui->tab1_im0f_radioButton ); typeKey.push_back("float" );
-  typeBtn.push_back(ui->tab1_im1b_radioButton ); typeKey.push_back("binary");
-  typeBtn.push_back(ui->tab1_im1i_radioButton ); typeKey.push_back("int"   );
-  typeBtn.push_back(ui->tab1_im1f_radioButton ); typeKey.push_back("float" );
+  typeBtn.push_back(ui->radioButtonT1_img0b ); typeKey.push_back("binary");
+  typeBtn.push_back(ui->radioButtonT1_img0i ); typeKey.push_back("int"   );
+  typeBtn.push_back(ui->radioButtonT1_img0f ); typeKey.push_back("float" );
+  typeBtn.push_back(ui->radioButtonT1_img1b ); typeKey.push_back("binary");
+  typeBtn.push_back(ui->radioButtonT1_img1i ); typeKey.push_back("int"   );
+  typeBtn.push_back(ui->radioButtonT1_img1f ); typeKey.push_back("float" );
   // - tab2: pushButton group of all buttons on this tab
-  fileBtn.push_back(ui->tab2_im0Add_pushButton); fileBtnAdd.push_back(ui->tab2_im0Add_pushButton);
-  fileBtn.push_back(ui->tab2_im1Add_pushButton); fileBtnAdd.push_back(ui->tab2_im1Add_pushButton);
-  fileBtn.push_back(ui->tab2_im0Rmv_pushButton); fileBtnRmv.push_back(ui->tab2_im0Rmv_pushButton);
-  fileBtn.push_back(ui->tab2_im1Rmv_pushButton); fileBtnRmv.push_back(ui->tab2_im1Rmv_pushButton);
-  fileBtn.push_back(ui->tab2_im0Up__pushButton); fileBtnUp .push_back(ui->tab2_im0Up__pushButton);
-  fileBtn.push_back(ui->tab2_im1Up__pushButton); fileBtnUp .push_back(ui->tab2_im1Up__pushButton);
-  fileBtn.push_back(ui->tab2_im0Dwn_pushButton); fileBtnDwn.push_back(ui->tab2_im0Dwn_pushButton);
-  fileBtn.push_back(ui->tab2_im1Dwn_pushButton); fileBtnDwn.push_back(ui->tab2_im1Dwn_pushButton);
-  fileBtn.push_back(ui->tab2_im0Srt_pushButton); fileBtnSrt.push_back(ui->tab2_im0Srt_pushButton);
-  fileBtn.push_back(ui->tab2_im1Srt_pushButton); fileBtnSrt.push_back(ui->tab2_im1Srt_pushButton);
-  fileBtn.push_back(ui->tab2_cp_pushButton    );
+  fileBtn.push_back(ui->pushButtonT2_set0Add); fileBtnAdd.push_back(ui->pushButtonT2_set0Add);
+  fileBtn.push_back(ui->pushButtonT2_set1Add); fileBtnAdd.push_back(ui->pushButtonT2_set1Add);
+  fileBtn.push_back(ui->pushButtonT2_set0Rmv); fileBtnRmv.push_back(ui->pushButtonT2_set0Rmv);
+  fileBtn.push_back(ui->pushButtonT2_set1Rmv); fileBtnRmv.push_back(ui->pushButtonT2_set1Rmv);
+  fileBtn.push_back(ui->pushButtonT2_set0Up ); fileBtnUp .push_back(ui->pushButtonT2_set0Up );
+  fileBtn.push_back(ui->pushButtonT2_set1Up ); fileBtnUp .push_back(ui->pushButtonT2_set1Up );
+  fileBtn.push_back(ui->pushButtonT2_set0Dwn); fileBtnDwn.push_back(ui->pushButtonT2_set0Dwn);
+  fileBtn.push_back(ui->pushButtonT2_set1Dwn); fileBtnDwn.push_back(ui->pushButtonT2_set1Dwn);
+  fileBtn.push_back(ui->pushButtonT2_set0Srt); fileBtnSrt.push_back(ui->pushButtonT2_set0Srt);
+  fileBtn.push_back(ui->pushButtonT2_set1Srt); fileBtnSrt.push_back(ui->pushButtonT2_set1Srt);
+  fileBtn.push_back(ui->pushButtonT2_cp     );
   // - tab2: listWidget group of all file-lists
-  fileLst.push_back(ui->tab2_im0_listWidget   );
-  fileLst.push_back(ui->tab2_im1_listWidget   );
+  fileLst.push_back(ui->listWidgetT2_img0   );
+  fileLst.push_back(ui->listWidgetT2_img1   );
   // - tab2: label group of all field labels ("phase","weight")
-  propLbl.push_back(ui->tab2_im0Phase_label   );
-  propLbl.push_back(ui->tab2_im1Phase_label   );
+  propLbl.push_back(ui->tab2_im0Phase_label );
+  propLbl.push_back(ui->tab2_im1Phase_label );
   // - tab2: label group of data-type labels ("binary","int","float")
-  typeLbl.push_back(ui->tab2_im0Dtype_label   );
-  typeLbl.push_back(ui->tab2_im1Dtype_label   );
+  typeLbl.push_back(ui->tab2_im0Dtype_label );
+  typeLbl.push_back(ui->tab2_im1Dtype_label );
   // - tab3: spinBox group to interpret the image
-  imgSpin.push_back(ui->tab3_phaseLow_spinBox ); imgSpin.push_back(ui->tab3_phaseHgh_spinBox);
-  imgSpin.push_back(ui->tab3_mask1Low_spinBox ); imgSpin.push_back(ui->tab3_mask1Hgh_spinBox);
-  imgSpin.push_back(ui->tab3_mask2Low_spinBox ); imgSpin.push_back(ui->tab3_mask2Hgh_spinBox);
-  imgSpin.push_back(ui->tab3_mask3Low_spinBox ); imgSpin.push_back(ui->tab3_mask3Hgh_spinBox);
-  imgSpin.push_back(ui->tab3_rowLow_spinBox   ); imgSpin.push_back(ui->tab3_rowHgh_spinBox  );
-  imgSpin.push_back(ui->tab3_colLow_spinBox   ); imgSpin.push_back(ui->tab3_colHgh_spinBox  );
+  imgSpin.push_back(ui->spinBoxT3_phaseLow  ); imgSpin.push_back(ui->spinBoxT3_phaseHgh);
+  imgSpin.push_back(ui->spinBoxT3_mask0Low  ); imgSpin.push_back(ui->spinBoxT3_mask0Hgh);
+  imgSpin.push_back(ui->spinBoxT3_mask1Low  ); imgSpin.push_back(ui->spinBoxT3_mask1Hgh);
+  imgSpin.push_back(ui->spinBoxT3_mask2Low  ); imgSpin.push_back(ui->spinBoxT3_mask2Hgh);
+  imgSpin.push_back(ui->spinBoxT3_rowLow    ); imgSpin.push_back(ui->spinBoxT3_rowHgh  );
+  imgSpin.push_back(ui->spinBoxT3_colLow    ); imgSpin.push_back(ui->spinBoxT3_colHgh  );
   // - tab3: checkBox to select a modification field, and their field-names
-  imgCheck.push_back(ui->tab3_phase_checkBox  ); imgCheckLbl.push_back("phase");
-  imgCheck.push_back(ui->tab3_mask1_checkBox  ); imgCheckLbl.push_back("mask" );
-  imgCheck.push_back(ui->tab3_mask2_checkBox  ); imgCheckLbl.push_back("mask" );
-  imgCheck.push_back(ui->tab3_mask3_checkBox  ); imgCheckLbl.push_back("mask" );
-  imgCheck.push_back(ui->tab3_row_checkBox    ); imgCheckLbl.push_back("row"  );
-  imgCheck.push_back(ui->tab3_col_checkBox    ); imgCheckLbl.push_back("col"  );
+  imgCheck.push_back(ui->checkBoxT3_phase   ); imgCheckLbl.push_back("phase");
+  imgCheck.push_back(ui->checkBoxT3_mask0   ); imgCheckLbl.push_back("mask" );
+  imgCheck.push_back(ui->checkBoxT3_mask1   ); imgCheckLbl.push_back("mask" );
+  imgCheck.push_back(ui->checkBoxT3_mask2   ); imgCheckLbl.push_back("mask" );
+  imgCheck.push_back(ui->checkBoxT3_row     ); imgCheckLbl.push_back("row"  );
+  imgCheck.push_back(ui->checkBoxT3_col     ); imgCheckLbl.push_back("col"  );
   // - tab3: pushButton to navigate through images
-  imgBtn.push_back(ui->pushButtonT3_setPrev); imgBtn.push_back(ui->pushButtonT3_setNext);
-  imgBtn.push_back(ui->pushButtonT3_imgPrev ); imgBtn.push_back(ui->pushButtonT3_imgNext );
-  imgBtn.push_back(ui->tab3_imEmpty_pushButton);
-  imgBtn.push_back(ui->tab3_imApply_pushButton);
-  imgBtn.push_back(ui->tab3_zoomIn__pushButton);
-  imgBtn.push_back(ui->tab3_zoomOut_pushButton);
+  imgBtn.push_back(ui->pushButtonT3_setPrev ); imgBtn.push_back(ui->pushButtonT3_setNext);
+  imgBtn.push_back(ui->pushButtonT3_imgPrev ); imgBtn.push_back(ui->pushButtonT3_imgNext);
+  imgBtn.push_back(ui->pushButtonT3_clear   );
+  imgBtn.push_back(ui->pushButtonT3_apply   );
+  imgBtn.push_back(ui->pushButtonT3_zoomIm  );
+  imgBtn.push_back(ui->pushButtonT3_zoomOut );
 
-  btnGroup.push_back(ui->buttonGroup          );
-  btnGroup.push_back(ui->buttonGroup_tab1_im0 );
-  btnGroup.push_back(ui->buttonGroup_tab1_im1 );
+  btnGroup.push_back(ui->buttonGroupT1_stat );
+  btnGroup.push_back(ui->buttonGroupT1_set0 );
+  btnGroup.push_back(ui->buttonGroupT1_set1 );
+  btnGroup.push_back(ui->buttonGroupT3_mouse);
 
   // refresh tabs when tab is changed
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab0_show();});
@@ -145,9 +146,9 @@ MainWindow::MainWindow(QWidget *parent) :
   // refresh file related views when JSON is loaded or "out_path" is changed
   connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab0_show();});
   connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab2_show();});
-  connect(ui->pushButtonT0_load    ,&QPushButton::clicked,this,[=](){tab0_show();});
-  connect(ui->pushButtonT0_load    ,&QPushButton::clicked,this,[=](){tab1_show();});
-  connect(ui->pushButtonT0_load    ,&QPushButton::clicked,this,[=](){tab2_show();});
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab0_show();});
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab1_show();});
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab2_show();});
 
   // tab1: button pressed -> update "data"
   for ( auto &i : statBtn ) connect(i,&QPushButton::clicked,this,[=](){tab1_read();});
@@ -171,7 +172,7 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( auto &i : nsetBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
   for ( auto &i : fileBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab2_show();});
   for ( auto &i : imgBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab3_show();});
-  for ( auto &i : imgSpin  ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_show();});
+  for ( auto &i : imgSpin ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_show();});
 }
 
 // =================================================================================================
@@ -385,10 +386,10 @@ void MainWindow::tab1_read()
       if ( typeBtn[j*3+i]->isChecked() )
         data[nsetKey[j]]["dtype"] = typeKey[i];
   // miscellaneous settings
-  data["periodic"   ] = ui->tab1_periodic_checkBox ->isChecked();
-  data["zeropad"    ] = ui->tab1_zeropad_checkBox  ->isChecked();
-  data["mask_weight"] = ui->tab1_maskW_checkBox    ->isChecked();
-  data["pixel_path" ] = ui->tab1_pixelpath_comboBox->currentText().toStdString();
+  data["periodic"   ] = ui->checkBoxT1_periodic  ->isChecked();
+  data["zeropad"    ] = ui->checkBoxT1_zeropad   ->isChecked();
+  data["mask_weight"] = ui->checkBoxT1_maskWeight->isChecked();
+  data["pixel_path" ] = ui->checkBoxT1_pixelPath->currentText().toStdString();
 }
 
 // =================================================================================================
@@ -452,27 +453,27 @@ void MainWindow::tab1_show()
 
   // selectively enable settings buttons
   // - defaults
-  ui->tab1_periodic_checkBox   ->setEnabled(true );
-  ui->tab1_zeropad_checkBox    ->setEnabled(true );
-  ui->tab1_maskW_checkBox      ->setEnabled(false);
-  ui->tab1_pixelpath_label     ->setEnabled(false);
-  ui->tab1_pixelpath_comboBox  ->setEnabled(false);
+  ui->checkBoxT1_periodic    ->setEnabled(true );
+  ui->checkBoxT1_zeropad     ->setEnabled(true );
+  ui->checkBoxT1_maskWeight  ->setEnabled(false);
+  ui->labelT1_pixelPath      ->setEnabled(false);
+  ui->checkBoxT1_pixelPath   ->setEnabled(false);
   // - statistic specific: mask weights
   if ( data["stat"]=="W2" || data["stat"]=="W2c" )
-    ui->tab1_maskW_checkBox    ->setEnabled(true);
+    ui->checkBoxT1_maskWeight->setEnabled(true);
   // - statistic specific: pixel path
   if ( data["stat"]=="L" || data["stat"]=="W2c" ) {
-    ui->tab1_zeropad_checkBox  ->setEnabled(false);
-    ui->tab1_pixelpath_label   ->setEnabled(true );
-    ui->tab1_pixelpath_comboBox->setEnabled(true );
+    ui->checkBoxT1_zeropad   ->setEnabled(false);
+    ui->labelT1_pixelPath    ->setEnabled(true );
+    ui->checkBoxT1_pixelPath ->setEnabled(true );
   }
 
   // apply settings
   QString pth = QString::fromStdString(data["pixel_path"]);
-  ui->tab1_pixelpath_comboBox  ->setCurrentIndex(ui->tab1_pixelpath_comboBox->findText(pth));
-  ui->tab1_periodic_checkBox   ->setChecked(data["periodic"   ]);
-  ui->tab1_zeropad_checkBox    ->setChecked(data["zeropad"    ]);
-  ui->tab1_maskW_checkBox      ->setChecked(data["mask_weight"]);
+  ui->checkBoxT1_pixelPath  ->setCurrentIndex(ui->checkBoxT1_pixelPath->findText(pth));
+  ui->checkBoxT1_periodic   ->setChecked(data["periodic"   ]);
+  ui->checkBoxT1_zeropad    ->setChecked(data["zeropad"    ]);
+  ui->checkBoxT1_maskWeight ->setChecked(data["mask_weight"]);
 }
 
 // =================================================================================================
@@ -699,7 +700,7 @@ void MainWindow::fileSrt(size_t set)
 
 // =================================================================================================
 
-void MainWindow::on_tab2_cp_pushButton_clicked()
+void MainWindow::on_pushButtonT2_cp_clicked()
 {
   setFiles(1,readFiles(0));
 }
@@ -746,12 +747,12 @@ void MainWindow::tab2_show()
     for ( int j=0; j<items.size(); ++j )
       fileLst[set]->item(row[j])->setSelected(true);
     // - enable buttons
-    if ( true                              ) fileBtnAdd[set]       ->setEnabled(true);
-    if ( files.size()>0                    ) fileBtnRmv[set]       ->setEnabled(true);
-    if ( files.size()>0                    ) fileBtnUp [set]       ->setEnabled(true);
-    if ( files.size()>0                    ) fileBtnDwn[set]       ->setEnabled(true);
-    if ( files.size()>0                    ) fileBtnSrt[set]       ->setEnabled(true);
-    if ( files.size()>0 && data["nset"]==2 ) ui->tab2_cp_pushButton->setEnabled(true);
+    if ( true                              ) fileBtnAdd[set]    ->setEnabled(true);
+    if ( files.size()>0                    ) fileBtnRmv[set]    ->setEnabled(true);
+    if ( files.size()>0                    ) fileBtnUp [set]    ->setEnabled(true);
+    if ( files.size()>0                    ) fileBtnDwn[set]    ->setEnabled(true);
+    if ( files.size()>0                    ) fileBtnSrt[set]    ->setEnabled(true);
+    if ( files.size()>0 && data["nset"]==2 ) ui->pushButtonT2_cp->setEnabled(true);
   }
 }
 
@@ -809,9 +810,9 @@ double MainWindow::tab3_scaleImage()
 {
   double wdthView  = (double)ui->graphicsViewT3_img->width ();
   double hghtView  = (double)ui->graphicsViewT3_img->height();
-  double wdthImage = (double)ui->tab3_colHgh_spinBox->maximum();
-  double hghtImage = (double)ui->tab3_rowHgh_spinBox->maximum();
-  double zoomScale = pow(1.066,(double)ui->tab3_zoom_slider->sliderPosition());
+  double wdthImage = (double)ui->spinBoxT3_colHgh->maximum();
+  double hghtImage = (double)ui->spinBoxT3_rowHgh->maximum();
+  double zoomScale = pow(1.066,(double)ui->sliderT3_zoom->sliderPosition());
   double wdth      = zoomScale*wdthView/wdthImage;
   double hght      = zoomScale*hghtView/hghtImage;
 
@@ -945,14 +946,14 @@ void MainWindow::tab3_show()
   //---------------
 
   // store the current indices
-  int iset = ui->tab3_set_comboBox->currentIndex();
-  int iimg = ui->tab3_im_comboBox ->currentIndex();
+  int iset = ui->comboBoxT3_set->currentIndex();
+  int iimg = ui->comboBoxT3_img->currentIndex();
 
   // clear both comboBoxes (enable below)
-  ui->tab3_set_comboBox->clear();
-  ui->tab3_im_comboBox ->clear();
-  ui->tab3_im_comboBox ->setEnabled(false);
-  ui->tab3_set_comboBox->setEnabled(false);
+  ui->comboBoxT3_set->clear();
+  ui->comboBoxT3_img->clear();
+  ui->comboBoxT3_img->setEnabled(false);
+  ui->comboBoxT3_set->setEnabled(false);
 
   // sets -> comboBox
   // ----------------
@@ -960,12 +961,12 @@ void MainWindow::tab3_show()
   // fill comboBox with set name / field / type
   if ( data["nset"]>0 ) {
     // - enable
-    ui->tab3_set_comboBox->setEnabled(true);
+    ui->comboBoxT3_set->setEnabled(true);
     // - set name format
     QString name = "set%1: %2 (%3)";
     // - add items
     for ( int i=0; i<static_cast<int>(data["nset"]); ++i ) {
-      ui->tab3_set_comboBox->addItem(name.arg(
+      ui->comboBoxT3_set->addItem(name.arg(
         QString::number(i),
         QString::fromStdString(data[nsetKey[i]]["field"]),
         QString::fromStdString(data[nsetKey[i]]["dtype"])
@@ -978,7 +979,7 @@ void MainWindow::tab3_show()
     if ( iset<0 )
       iset = 0;
     // - (re)apply index
-    ui->tab3_set_comboBox->setCurrentIndex(iset);
+    ui->comboBoxT3_set->setCurrentIndex(iset);
   }
 
   // no set selected -> quit
@@ -992,13 +993,13 @@ void MainWindow::tab3_show()
   std::vector<std::string> files = readFiles(static_cast<size_t>(iset));
   // add files to comboBox
   for ( auto &file : files )
-    ui->tab3_im_comboBox->addItem(QString::fromStdString(file));
+    ui->comboBoxT3_img->addItem(QString::fromStdString(file));
   // enable comboBox and navigation buttons
-  if ( files.size()>0 ) ui->tab3_im_comboBox      ->setEnabled(true);
+  if ( files.size()>0 ) ui->comboBoxT3_img      ->setEnabled(true);
   if ( files.size()>1 ) ui->pushButtonT3_imgPrev->setEnabled(true);
   if ( files.size()>1 ) ui->pushButtonT3_imgNext->setEnabled(true);
   // reapply index
-  ui->tab3_im_comboBox->setCurrentIndex(iimg);
+  ui->comboBoxT3_img->setCurrentIndex(iimg);
 
   // no image selected -> quit
   if ( iimg<0 )
@@ -1018,8 +1019,8 @@ void MainWindow::tab3_show()
     QImage imQt;
     std::tie(imgRaw_,imQt) = readImage(iset,iimg);
     // set maxima
-    ui->tab3_rowHgh_spinBox->setMaximum(imgRaw_.shape()[0]);
-    ui->tab3_colHgh_spinBox->setMaximum(imgRaw_.shape()[1]);
+    ui->spinBoxT3_rowHgh->setMaximum(imgRaw_.shape()[0]);
+    ui->spinBoxT3_colHgh->setMaximum(imgRaw_.shape()[1]);
     // load image
 
     // create a "scene" with containing the image
@@ -1074,7 +1075,7 @@ void MainWindow::tab3_show()
   // ------------
 
   // if ( data["mask_weight"] && data[key]["filed"]=="phase" ) {
-  //   if ( data_.saved(0,ui->tab3_im_comboBox->currentIndex()) ) {
+  //   if ( data_.saved(0,ui->comboBoxT3_img->currentIndex()) ) {
   //     std::tie(im,mask) = data_.image(0,idx,imgRaw_,false);
   //     for ( size_t i=0 ; i<im.size() ; i++ )
   //       if ( im[i] )
@@ -1101,7 +1102,7 @@ void MainWindow::tab3_show()
 
   // read colormap
   std::vector<int> cols;
-  cols = cppcolormap::colormap(ui->tab3_cmap_comboBox->currentText().toStdString(),256);
+  cols = cppcolormap::colormap(ui->comboBoxT3_cmap->currentText().toStdString(),256);
   // excluded pixes -> white
   for ( size_t i=0 ; i<3 ; i++ )
     cols[254*3+i] = 255;
@@ -1144,8 +1145,8 @@ void MainWindow::tab3_show()
 
 void MainWindow::tab3_read(size_t idx)
 {
-  int iset = ui->tab3_set_comboBox->currentIndex();
-  int iimg = ui->tab3_im_comboBox ->currentIndex();
+  int iset = ui->comboBoxT3_set->currentIndex();
+  int iimg = ui->comboBoxT3_img->currentIndex();
 
   if ( iset<0 || iimg<0 )
     return;

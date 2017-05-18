@@ -58,7 +58,7 @@ private slots:
   void on_lineEditT0_json_textEdited(const QString &arg1);// manual file-name change
   void on_tab0_res1path_lineEdit_textEdited(const QString &arg1);// manual file-name change
   void on_tab0_res2path_lineEdit_textEdited(const QString &arg1);// manual file-name change
-  void on_tab2_cp_pushButton_clicked();                          // copy files "set0" -> "set1"
+  void on_pushButtonT2_cp_clicked();                          // copy files "set0" -> "set1"
   // connect groups of buttons
   void fileAdd(size_t); // add    files         -> update "data"
   void fileRmv(size_t); // remove files         -> update "data"
