@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->tabWidget->setCurrentIndex(0);
 
   // set default data (also useful to reduce the number of checks in the code)
-  // - output images -> default assigned in "on_tab0_out_path_pushButton_clicked"
+  // - output images -> default assigned in "on_pushButtonT0_path_clicked"
   data["output"]["result"] = "";
   data["output"]["interp"] = "";
   // - statistics settings
@@ -46,10 +46,10 @@ MainWindow::MainWindow(QWidget *parent) :
   data["set1"]["config"] = {};
 
   // tab3: link scroll position of graphicsViews
-  QScrollBar *I1h = ui->tab3_image_graphicsView->horizontalScrollBar();
-  QScrollBar *I2h = ui->tab3_phase_graphicsView->horizontalScrollBar();
-  QScrollBar *I1v = ui->tab3_image_graphicsView->verticalScrollBar  ();
-  QScrollBar *I2v = ui->tab3_phase_graphicsView->verticalScrollBar  ();
+  QScrollBar *I1h = ui->graphicsViewT3_img->horizontalScrollBar();
+  QScrollBar *I2h = ui->graphicsViewT3_seg->horizontalScrollBar();
+  QScrollBar *I1v = ui->graphicsViewT3_img->verticalScrollBar  ();
+  QScrollBar *I2v = ui->graphicsViewT3_seg->verticalScrollBar  ();
   connect(I1h,SIGNAL(valueChanged(int)),I2h,SLOT(setValue(int)));
   connect(I2h,SIGNAL(valueChanged(int)),I1h,SLOT(setValue(int)));
   connect(I1v,SIGNAL(valueChanged(int)),I2v,SLOT(setValue(int)));
@@ -60,67 +60,81 @@ MainWindow::MainWindow(QWidget *parent) :
   QComboBox *im  = ui->tab3_im_comboBox;
   QComboBox *set = ui->tab3_set_comboBox;
   // - previous image
-  connect(ui->tab3_imPrev_pushButton ,&QPushButton::clicked,[=](){
+  connect(ui->pushButtonT3_imgPrev ,&QPushButton::clicked,[=](){
     if (im ->currentIndex()>0             ) im ->setCurrentIndex(im ->currentIndex()-1);});
   // - next image
-  connect(ui->tab3_imNext_pushButton ,&QPushButton::clicked,[=](){
+  connect(ui->pushButtonT3_imgNext ,&QPushButton::clicked,[=](){
     if (im ->currentIndex()<im ->count()-1) im ->setCurrentIndex(im ->currentIndex()+1);});
   // - previous iset
-  connect(ui->tab3_setPrev_pushButton,&QPushButton::clicked,[=](){
+  connect(ui->pushButtonT3_setPrev,&QPushButton::clicked,[=](){
     if (set->currentIndex()>0             ) set->setCurrentIndex(set->currentIndex()-1);});
   // - next set
-  connect(ui->tab3_setNext_pushButton,&QPushButton::clicked,[=](){
+  connect(ui->pushButtonT3_setNext,&QPushButton::clicked,[=](){
     if (set->currentIndex()<set->count()-1) set->setCurrentIndex(set->currentIndex()+1);});
 
   // combine buttons to list, for fast references
-  statBtn .push_back(ui->stat_S2_radioButton   ); statKey   .push_back("S2"    );
-  statBtn .push_back(ui->stat_C2_radioButton   ); statKey   .push_back("C2"    );
-  statBtn .push_back(ui->stat_L_radioButton    ); statKey   .push_back("L"     );
-  statBtn .push_back(ui->stat_W2_radioButton   ); statKey   .push_back("W2"    );
-  statBtn .push_back(ui->stat_W2c_radioButton  ); statKey   .push_back("W2c"   );
-  typeBtn .push_back(ui->tab1_im0b_radioButton ); typeKey   .push_back("binary");
-  typeBtn .push_back(ui->tab1_im0i_radioButton ); typeKey   .push_back("int"   );
-  typeBtn .push_back(ui->tab1_im0f_radioButton ); typeKey   .push_back("float" );
-  typeBtn .push_back(ui->tab1_im1b_radioButton ); typeKey   .push_back("binary");
-  typeBtn .push_back(ui->tab1_im1i_radioButton ); typeKey   .push_back("int"   );
-  typeBtn .push_back(ui->tab1_im1f_radioButton ); typeKey   .push_back("float" );
-  nsetBtn .push_back(ui->tab1_im0_checkBox     ); nsetKey   .push_back("set0"  );
-  nsetBtn .push_back(ui->tab1_im1_checkBox     ); nsetKey   .push_back("set1"  );
-  fileBtn .push_back(ui->tab2_im0Add_pushButton); fileBtnAdd.push_back(ui->tab2_im0Add_pushButton);
-  fileBtn .push_back(ui->tab2_im1Add_pushButton); fileBtnAdd.push_back(ui->tab2_im1Add_pushButton);
-  fileBtn .push_back(ui->tab2_im0Rmv_pushButton); fileBtnRmv.push_back(ui->tab2_im0Rmv_pushButton);
-  fileBtn .push_back(ui->tab2_im1Rmv_pushButton); fileBtnRmv.push_back(ui->tab2_im1Rmv_pushButton);
-  fileBtn .push_back(ui->tab2_im0Up__pushButton); fileBtnUp .push_back(ui->tab2_im0Up__pushButton);
-  fileBtn .push_back(ui->tab2_im1Up__pushButton); fileBtnUp .push_back(ui->tab2_im1Up__pushButton);
-  fileBtn .push_back(ui->tab2_im0Dwn_pushButton); fileBtnDwn.push_back(ui->tab2_im0Dwn_pushButton);
-  fileBtn .push_back(ui->tab2_im1Dwn_pushButton); fileBtnDwn.push_back(ui->tab2_im1Dwn_pushButton);
-  fileBtn .push_back(ui->tab2_im0Srt_pushButton); fileBtnSrt.push_back(ui->tab2_im0Srt_pushButton);
-  fileBtn .push_back(ui->tab2_im1Srt_pushButton); fileBtnSrt.push_back(ui->tab2_im1Srt_pushButton);
-  fileBtn .push_back(ui->tab2_cp_pushButton    );
-  fileLst .push_back(ui->tab2_im0_listWidget   );
-  fileLst .push_back(ui->tab2_im1_listWidget   );
-  propLbl .push_back(ui->tab2_im0Phase_label   );
-  propLbl .push_back(ui->tab2_im1Phase_label   );
-  typeLbl .push_back(ui->tab2_im0Dtype_label   );
-  typeLbl .push_back(ui->tab2_im1Dtype_label   );
+  // - tab1: radioButton group to select statistic, and their field-names
+  statBtn.push_back(ui->stat_S2_radioButton   ); statKey.push_back("S2"    );
+  statBtn.push_back(ui->stat_C2_radioButton   ); statKey.push_back("C2"    );
+  statBtn.push_back(ui->stat_L_radioButton    ); statKey.push_back("L"     );
+  statBtn.push_back(ui->stat_W2_radioButton   ); statKey.push_back("W2"    );
+  statBtn.push_back(ui->stat_W2c_radioButton  ); statKey.push_back("W2c"   );
+  // - tab1: checkBox group to select number of sets, and their field-names
+  nsetBtn.push_back(ui->tab1_im0_checkBox     ); nsetKey.push_back("set0"  );
+  nsetBtn.push_back(ui->checkBoxT1_img1     ); nsetKey.push_back("set1"  );
+  // - tab1: radioButton group to select data-type (one for each set), and their field-names
+  typeBtn.push_back(ui->tab1_im0b_radioButton ); typeKey.push_back("binary");
+  typeBtn.push_back(ui->tab1_im0i_radioButton ); typeKey.push_back("int"   );
+  typeBtn.push_back(ui->tab1_im0f_radioButton ); typeKey.push_back("float" );
+  typeBtn.push_back(ui->tab1_im1b_radioButton ); typeKey.push_back("binary");
+  typeBtn.push_back(ui->tab1_im1i_radioButton ); typeKey.push_back("int"   );
+  typeBtn.push_back(ui->tab1_im1f_radioButton ); typeKey.push_back("float" );
+  // - tab2: pushButton group of all buttons on this tab
+  fileBtn.push_back(ui->tab2_im0Add_pushButton); fileBtnAdd.push_back(ui->tab2_im0Add_pushButton);
+  fileBtn.push_back(ui->tab2_im1Add_pushButton); fileBtnAdd.push_back(ui->tab2_im1Add_pushButton);
+  fileBtn.push_back(ui->tab2_im0Rmv_pushButton); fileBtnRmv.push_back(ui->tab2_im0Rmv_pushButton);
+  fileBtn.push_back(ui->tab2_im1Rmv_pushButton); fileBtnRmv.push_back(ui->tab2_im1Rmv_pushButton);
+  fileBtn.push_back(ui->tab2_im0Up__pushButton); fileBtnUp .push_back(ui->tab2_im0Up__pushButton);
+  fileBtn.push_back(ui->tab2_im1Up__pushButton); fileBtnUp .push_back(ui->tab2_im1Up__pushButton);
+  fileBtn.push_back(ui->tab2_im0Dwn_pushButton); fileBtnDwn.push_back(ui->tab2_im0Dwn_pushButton);
+  fileBtn.push_back(ui->tab2_im1Dwn_pushButton); fileBtnDwn.push_back(ui->tab2_im1Dwn_pushButton);
+  fileBtn.push_back(ui->tab2_im0Srt_pushButton); fileBtnSrt.push_back(ui->tab2_im0Srt_pushButton);
+  fileBtn.push_back(ui->tab2_im1Srt_pushButton); fileBtnSrt.push_back(ui->tab2_im1Srt_pushButton);
+  fileBtn.push_back(ui->tab2_cp_pushButton    );
+  // - tab2: listWidget group of all file-lists
+  fileLst.push_back(ui->tab2_im0_listWidget   );
+  fileLst.push_back(ui->tab2_im1_listWidget   );
+  // - tab2: label group of all field labels ("phase","weight")
+  propLbl.push_back(ui->tab2_im0Phase_label   );
+  propLbl.push_back(ui->tab2_im1Phase_label   );
+  // - tab2: label group of data-type labels ("binary","int","float")
+  typeLbl.push_back(ui->tab2_im0Dtype_label   );
+  typeLbl.push_back(ui->tab2_im1Dtype_label   );
+  // - tab3: spinBox group to interpret the image
+  imgSpin.push_back(ui->tab3_phaseLow_spinBox ); imgSpin.push_back(ui->tab3_phaseHgh_spinBox);
+  imgSpin.push_back(ui->tab3_mask1Low_spinBox ); imgSpin.push_back(ui->tab3_mask1Hgh_spinBox);
+  imgSpin.push_back(ui->tab3_mask2Low_spinBox ); imgSpin.push_back(ui->tab3_mask2Hgh_spinBox);
+  imgSpin.push_back(ui->tab3_mask3Low_spinBox ); imgSpin.push_back(ui->tab3_mask3Hgh_spinBox);
+  imgSpin.push_back(ui->tab3_rowLow_spinBox   ); imgSpin.push_back(ui->tab3_rowHgh_spinBox  );
+  imgSpin.push_back(ui->tab3_colLow_spinBox   ); imgSpin.push_back(ui->tab3_colHgh_spinBox  );
+  // - tab3: checkBox to select a modification field, and their field-names
+  imgCheck.push_back(ui->tab3_phase_checkBox  ); imgCheckLbl.push_back("phase");
+  imgCheck.push_back(ui->tab3_mask1_checkBox  ); imgCheckLbl.push_back("mask" );
+  imgCheck.push_back(ui->tab3_mask2_checkBox  ); imgCheckLbl.push_back("mask" );
+  imgCheck.push_back(ui->tab3_mask3_checkBox  ); imgCheckLbl.push_back("mask" );
+  imgCheck.push_back(ui->tab3_row_checkBox    ); imgCheckLbl.push_back("row"  );
+  imgCheck.push_back(ui->tab3_col_checkBox    ); imgCheckLbl.push_back("col"  );
+  // - tab3: pushButton to navigate through images
+  imgBtn.push_back(ui->pushButtonT3_setPrev); imgBtn.push_back(ui->pushButtonT3_setNext);
+  imgBtn.push_back(ui->pushButtonT3_imgPrev ); imgBtn.push_back(ui->pushButtonT3_imgNext );
+  imgBtn.push_back(ui->tab3_imEmpty_pushButton);
+  imgBtn.push_back(ui->tab3_imApply_pushButton);
+  imgBtn.push_back(ui->tab3_zoomIn__pushButton);
+  imgBtn.push_back(ui->tab3_zoomOut_pushButton);
 
-  imgMod.push_back(ui->tab3_phaseLow_spinBox); imgMod.push_back(ui->tab3_phaseHgh_spinBox);
-  imgMod.push_back(ui->tab3_mask1Low_spinBox); imgMod.push_back(ui->tab3_mask1Hgh_spinBox);
-  imgMod.push_back(ui->tab3_mask2Low_spinBox); imgMod.push_back(ui->tab3_mask2Hgh_spinBox);
-  imgMod.push_back(ui->tab3_mask3Low_spinBox); imgMod.push_back(ui->tab3_mask3Hgh_spinBox);
-  imgMod.push_back(ui->tab3_rowLow_spinBox  ); imgMod.push_back(ui->tab3_rowHgh_spinBox  );
-  imgMod.push_back(ui->tab3_colLow_spinBox  ); imgMod.push_back(ui->tab3_colHgh_spinBox  );
-
-  imgSel.push_back(ui->tab3_setPrev_pushButton  ); imgSel.push_back(ui->tab3_setNext_pushButton);
-  imgSel.push_back(ui->tab3_imPrev_pushButton   ); imgSel.push_back(ui->tab3_imNext_pushButton );
-  imgSel.push_back(ui->tab3_imDefault_pushButton);
-  imgSel.push_back(ui->tab3_imApply_pushButton  );
-  imgSel.push_back(ui->tab3_zoomIn__pushButton  );
-  imgSel.push_back(ui->tab3_zoomOut_pushButton  );
-
-  btnGroup.push_back(ui->buttonGroup           );
-  btnGroup.push_back(ui->buttonGroup_tab1_im0  );
-  btnGroup.push_back(ui->buttonGroup_tab1_im1  );
+  btnGroup.push_back(ui->buttonGroup          );
+  btnGroup.push_back(ui->buttonGroup_tab1_im0 );
+  btnGroup.push_back(ui->buttonGroup_tab1_im1 );
 
   // refresh tabs when tab is changed
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab0_show();});
@@ -129,11 +143,11 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab3_show();});
 
   // refresh file related views when JSON is loaded or "out_path" is changed
-  connect(ui->tab0_out_path_pushButton,&QPushButton::clicked,this,[=](){tab0_show();});
-  connect(ui->tab0_out_path_pushButton,&QPushButton::clicked,this,[=](){tab2_show();});
-  connect(ui->tab0_load_pushButton    ,&QPushButton::clicked,this,[=](){tab0_show();});
-  connect(ui->tab0_load_pushButton    ,&QPushButton::clicked,this,[=](){tab1_show();});
-  connect(ui->tab0_load_pushButton    ,&QPushButton::clicked,this,[=](){tab2_show();});
+  connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab0_show();});
+  connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab2_show();});
+  connect(ui->pushButtonT0_load    ,&QPushButton::clicked,this,[=](){tab0_show();});
+  connect(ui->pushButtonT0_load    ,&QPushButton::clicked,this,[=](){tab1_show();});
+  connect(ui->pushButtonT0_load    ,&QPushButton::clicked,this,[=](){tab2_show();});
 
   // tab1: button pressed -> update "data"
   for ( auto &i : statBtn ) connect(i,&QPushButton::clicked,this,[=](){tab1_read();});
@@ -147,13 +161,17 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( size_t i=0; i<2; ++i ) connect(fileBtnDwn[i],&QPushButton::clicked,this,[=](){fileDwn(i);});
   for ( size_t i=0; i<2; ++i ) connect(fileBtnSrt[i],&QPushButton::clicked,this,[=](){fileSrt(i);});
 
+  size_t j;
+  for ( j=0; j<imgSpin.size(); ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
+  for ( j=1; j<imgSpin.size(); ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
+
   // tab2: button pressed -> refresh view with new "data"
   for ( auto &i : statBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
   for ( auto &i : typeBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
   for ( auto &i : nsetBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
   for ( auto &i : fileBtn ) connect(i,&QPushButton::clicked     ,this,[=](){tab2_show();});
-  for ( auto &i : imgSel  ) connect(i,&QPushButton::clicked     ,this,[=](){tab3_show();});
-  for ( auto &i : imgMod  ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_show();});
+  for ( auto &i : imgBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab3_show();});
+  for ( auto &i : imgSpin  ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_show();});
 }
 
 // =================================================================================================
@@ -211,7 +229,7 @@ size_t MainWindow::exists(QString f1, QString f2, QString f3)
 
 // =================================================================================================
 
-void MainWindow::on_tab0_load_pushButton_clicked()
+void MainWindow::on_pushButtonT0_load_clicked()
 {
   // load file using dialog
   QString fname = QFileDialog::getOpenFileName(
@@ -246,7 +264,7 @@ void MainWindow::on_tab0_load_pushButton_clicked()
 
 // =================================================================================================
 
-void MainWindow::on_tab0_out_path_pushButton_clicked()
+void MainWindow::on_pushButtonT0_path_clicked()
 {
   // back-up current working directory
   QString dirPrev = out_path.absolutePath();
@@ -308,14 +326,14 @@ void MainWindow::on_tab0_out_path_pushButton_clicked()
 
 // =================================================================================================
 
-void MainWindow::on_tab0_out_path_lineEdit_textEdited(const QString &arg1)
+void MainWindow::on_lineEditT0_path_textEdited(const QString &arg1)
 {
   out_path = QDir(arg1);
 }
 
 // =================================================================================================
 
-void MainWindow::on_tab0_out_json_lineEdit_textEdited(const QString &arg1)
+void MainWindow::on_lineEditT0_json_textEdited(const QString &arg1)
 {
   out_json = arg1;
 }
@@ -338,8 +356,8 @@ void MainWindow::on_tab0_res2path_lineEdit_textEdited(const QString &arg1)
 
 void MainWindow::tab0_show()
 {
-  ui->tab0_out_path_lineEdit->setText(out_path.absolutePath());
-  ui->tab0_out_json_lineEdit->setText(out_json);
+  ui->lineEditT0_path->setText(out_path.absolutePath());
+  ui->lineEditT0_json->setText(out_json);
   ui->tab0_res1path_lineEdit->setText(QString::fromStdString(data["output"]["result"]));
   ui->tab0_res2path_lineEdit->setText(QString::fromStdString(data["output"]["interp"]));
 }
@@ -459,29 +477,48 @@ void MainWindow::tab1_show()
 
 // =================================================================================================
 
-std::vector<std::string> MainWindow::readFiles(size_t set)
+
+
+// =================================================================================================
+
+QString MainWindow::readFile(size_t iset, size_t iimg)
+{
+  QString out = "";
+
+  if ( data.count(nsetKey[iset]) )
+    if ( data[nsetKey[iset]].count("files") )
+      out = QString::fromStdString(data[nsetKey[iset]]["files"][iimg]);
+
+  return out;
+}
+
+// =================================================================================================
+
+std::vector<std::string> MainWindow::readFiles(size_t iset)
 {
   // local list of files
   std::vector<std::string> files;
 
   // copy items currently present in the list
-  if ( data[nsetKey[set]].count("files") ) {
-    for ( size_t i=0; i<data[nsetKey[set]]["files"].size(); ++i )
-      files.push_back(data[nsetKey[set]]["files"][i]);
-  }
+  if ( data.count(nsetKey[iset]) )
+    if ( data[nsetKey[iset]].count("files") )
+      for ( size_t i=0; i<data[nsetKey[iset]]["files"].size(); ++i )
+        files.push_back(data[nsetKey[iset]]["files"][i]);
 
+
+  // output
   return files;
 }
 
 // =================================================================================================
 
-void MainWindow::setFiles(size_t set, std::vector<std::string> files)
+void MainWindow::setFiles(size_t iset, std::vector<std::string> files)
 {
-  if ( data[nsetKey[set]].count("files") ) {
-    data[nsetKey[set]].erase("files");
-  }
+  if ( data.count(nsetKey[iset]) )
+    if ( data[nsetKey[iset]].count("files") )
+      data[nsetKey[iset]].erase("files");
 
-  data[nsetKey[set]]["files"] = files;
+  data[nsetKey[iset]]["files"] = files;
 }
 
 // =================================================================================================
@@ -720,36 +757,65 @@ void MainWindow::tab2_show()
 
 // =================================================================================================
 
-std::vector<size_t> MainWindow::imageSettings(size_t set,size_t img)
+std::vector<size_t> MainWindow::imageSettings(size_t iset, size_t iimg)
 {
+  // zero initialize output (phase,mask1,mask2,mask3,row,col) as a single vector (min,max,...)
   std::vector<size_t> out(12,0);
-  std::string key   = nsetKey[set];
-  std::string fname = data[key]["files"][img];
+  // read keys
+  std::string key   = nsetKey[iset];
+  std::string fname = data[key]["files"][iimg];
 
-  out[1] = 255;
+  std::vector<size_t> phase = {0,255};
+  std::vector<size_t> row   = {0,imgRaw_.shape()[0]};
+  std::vector<size_t> col   = {0,imgRaw_.shape()[1]};
+  // imgRaw_
 
-  if ( !data[key].count("fname") ) {
-    data[key][fname]["phase"] = {};
-    data[key][fname]["mask" ] = {};
-    data[key][fname]["row"  ] = {};
-    data[key][fname]["col"  ] = {};
-    return out;
+  // no information specified -> quit
+  if ( !data[key].count("config") )
+    data[key]["config"][fname]["phase"] = phase;
+    data[key]["config"][fname]["row"  ] = row;
+    data[key]["config"][fname]["col"  ] = col;
+  // no information specified -> quit
+  if ( !data[key]["config"].count(fname) ) {
+    data[key]["config"][fname]["phase"] = phase;
+    data[key]["config"][fname]["row"  ] = row;
+    data[key]["config"][fname]["col"  ] = col;
   }
 
-  for ( size_t i=0; i<data[key][fname]["phase"].size(); ++i )
-    out[0*2+i] = data[key][fname]["phase"][i];
-
-  for ( size_t i=0; i<data[key][fname]["mask"].size(); ++i )
-    out[1*2+i] = data[key][fname]["mask"][i];
-
-  for ( size_t i=0; i<data[key][fname]["row"].size(); ++i )
-    out[4*2+i] = data[key][fname]["row"][i];
-
-  for ( size_t i=0; i<data[key][fname]["col"].size(); ++i )
-    out[5*2+i] = data[key][fname]["col"][i];
+  // read from "data"
+  // - phase: lower and upper bound
+  if ( data[key]["config"][fname].count("phase") )
+    for ( size_t i=0; i<data[key]["config"][fname]["phase"].size(); ++i )
+      out[0*2+i] = data[key]["config"][fname]["phase"][i];
+  // - mask1,mask2,mask3: lower and upper bound
+  if ( data[key]["config"][fname].count("mask") )
+    for ( size_t i=0; i<data[key]["config"][fname]["mask"].size(); ++i )
+      out[1*2+i] = data[key]["config"][fname]["mask"][i];
+  // - rows: lower and upper bound
+  if ( data[key]["config"][fname].count("row") )
+    for ( size_t i=0; i<data[key]["config"][fname]["row"].size(); ++i )
+      out[4*2+i] = data[key]["config"][fname]["row"][i];
+  // - columns: lower and upper bound
+  if ( data[key]["config"][fname].count("col") )
+    for ( size_t i=0; i<data[key]["config"][fname]["col"].size(); ++i )
+      out[5*2+i] = data[key]["config"][fname]["col"][i];
 
   return out;
+}
 
+// =================================================================================================
+
+double MainWindow::tab3_scaleImage()
+{
+  double wdthView  = (double)ui->graphicsViewT3_img->width ();
+  double hghtView  = (double)ui->graphicsViewT3_img->height();
+  double wdthImage = (double)ui->tab3_colHgh_spinBox->maximum();
+  double hghtImage = (double)ui->tab3_rowHgh_spinBox->maximum();
+  double zoomScale = pow(1.066,(double)ui->tab3_zoom_slider->sliderPosition());
+  double wdth      = zoomScale*wdthView/wdthImage;
+  double hght      = zoomScale*hghtView/hghtImage;
+
+  return 0.95*std::min(wdth,hght);
 }
 
 // =================================================================================================
@@ -758,7 +824,7 @@ std::tuple<mat::matrix<int>,QImage> MainWindow::readImage(size_t iset, size_t ii
 {
   // load image
   QImage img;
-  img.load(out_path.filePath(QString::fromStdString(data[nsetKey[iset]]["files"][iimg])));
+  img.load(out_path.filePath(readFile(iset,iimg)));
   // read the size
   size_t nrow = img.height();
   size_t ncol = img.width ();
@@ -774,17 +840,101 @@ std::tuple<mat::matrix<int>,QImage> MainWindow::readImage(size_t iset, size_t ii
 
 // =================================================================================================
 
-double MainWindow::tab3_scaleImage(void)
+std::tuple<mat::matrix<int>,mat::matrix<int>> MainWindow::interpretImage(
+  size_t iset, size_t iimg, mat::matrix<int> im, int crop)
 {
-  double wdthView  = (double)ui->tab3_image_graphicsView->width ();
-  double hghtView  = (double)ui->tab3_image_graphicsView->height();
-  double wdthImage = (double)ui->tab3_colHgh_spinBox->maximum();
-  double hghtImage = (double)ui->tab3_rowHgh_spinBox->maximum();
-  double zoomScale = pow(1.066,(double)ui->tab3_zoom_slider->sliderPosition());
-  double wdth      = zoomScale*wdthView/wdthImage;
-  double hght      = zoomScale*hghtView/hghtImage;
+  // read keys
+  std::string key      = nsetKey[iset];
+  bool        periodic = data["periodic"];
+  std::string fname    = data[key]["files" ][iimg ];
+  json        file     = data[key]["config"][fname];
+  std::string dtype    = data[key]["dtype" ];
 
-  return 0.95*std::min(wdth,hght);
+  // default shape of output matrix
+  size_t irow = 0;
+  size_t jrow = im.shape()[0];
+  size_t icol = 0;
+  size_t jcol = im.shape()[1];
+
+  // default range of the output matrix
+  int min  = 0;
+  int max  = 255;
+
+  // crop: modify dimensions of the output matrix
+  if ( crop==-1 && file.count("row") ) {
+    irow = file["row"][0];
+    jrow = file["row"][1];
+  }
+  if ( crop==-1 && file.count("col") ) {
+    icol = file["col"][0];
+    jcol = file["col"][1];
+  }
+
+  // threshold: read range
+  if ( file.count("phase") ) {
+    min  = static_cast<int>(file["phase"][0]);
+    max  = static_cast<int>(file["phase"][1]);
+  }
+
+  // convert "crop" such that it can be used as pre-factor
+  if ( crop==-1 )
+    crop = 0;
+  // allocate output
+  mat::matrix<int> out({jrow-irow,jcol-icol}); out.ones (); out *= crop;
+  mat::matrix<int> msk({jrow-irow,jcol-icol}); msk.zeros();
+
+  // phase threshold float: retain values; everything outside bounds is masked
+  if ( dtype=="float" ) {
+    for ( size_t i=0; i<(jrow-irow); ++i ) {
+      for ( size_t j=0; j<(jcol-icol); ++j ) {
+        if ( im(i+irow,j+icol)>=min && im(i+irow,j+icol)<=max )
+          out(i,j) = im(i+irow,j+icol);
+        else
+          msk(i,j) = 1;
+      }
+    }
+  }
+  // phase threshold binary/int: between (min,max)->1, else->0 (nothing masked)
+  else {
+    for ( size_t i=0; i<(jrow-irow); ++i )
+      for ( size_t j=0; j<(jcol-icol); ++j )
+        if ( im(i+irow,j+icol)>=min && im(i+irow,j+icol)<=max )
+          out(i,j) = 1;
+  }
+
+  // int: determine clusters from binary image
+  if ( dtype=="int" ) {
+    mat::matrix<int> clusters,centers;
+    std::tie(clusters,centers) = Image::clusters(out,periodic);
+    for ( size_t i=0; i<out.size(); ++i )
+      out[i] = clusters[i];
+  }
+
+  // mask threshold
+  if ( file.count("mask") ) {
+    if ( file["mask"].size()%2!=0 )
+      throw std::runtime_error("masks must be specified min,max , min,max , ...");
+    for ( size_t imsk=0; imsk<file["mask"].size(); imsk+=2 )
+      for ( size_t i=0 ; i<(jrow-irow) ; i++ )
+        for ( size_t j=0 ; j<(jcol-icol) ; j++ )
+          if ( im(i+irow,j+icol)>=file["mask"][imsk] && im(i+irow,j+icol)<=file["mask"][imsk+1] )
+            msk(i,j) = 1;
+  }
+
+  return std::make_tuple(out,msk);
+};
+
+// =================================================================================================
+
+std::tuple<mat::matrix<int>,mat::matrix<int>> MainWindow::interpretImage(
+  size_t iset, size_t iimg, int crop)
+{
+  QImage imQt;
+  mat::matrix<int> im;
+
+  std::tie(im,imQt) = readImage(iset,iimg);
+
+  return interpretImage(iset,iimg,im,crop);
 }
 
 // =================================================================================================
@@ -822,8 +972,8 @@ void MainWindow::tab3_show()
       ));
     }
     // - enable navigation buttons
-    if ( data["nset"]>1 ) ui->tab3_setPrev_pushButton->setEnabled(true);
-    if ( data["nset"]>1 ) ui->tab3_setNext_pushButton->setEnabled(true);
+    if ( data["nset"]>1 ) ui->pushButtonT3_setPrev->setEnabled(true);
+    if ( data["nset"]>1 ) ui->pushButtonT3_setNext->setEnabled(true);
     // - select the first set
     if ( iset<0 )
       iset = 0;
@@ -845,8 +995,8 @@ void MainWindow::tab3_show()
     ui->tab3_im_comboBox->addItem(QString::fromStdString(file));
   // enable comboBox and navigation buttons
   if ( files.size()>0 ) ui->tab3_im_comboBox      ->setEnabled(true);
-  if ( files.size()>1 ) ui->tab3_imPrev_pushButton->setEnabled(true);
-  if ( files.size()>1 ) ui->tab3_imNext_pushButton->setEnabled(true);
+  if ( files.size()>1 ) ui->pushButtonT3_imgPrev->setEnabled(true);
+  if ( files.size()>1 ) ui->pushButtonT3_imgNext->setEnabled(true);
   // reapply index
   ui->tab3_im_comboBox->setCurrentIndex(iimg);
 
@@ -854,14 +1004,10 @@ void MainWindow::tab3_show()
   if ( iimg<0 )
     return;
 
-  // read settings
-  std::vector<size_t> values = imageSettings(iset,iimg);
-  // apply all image settings
-  for ( size_t i=0; i<values.size(); ++i )
-    imgMod[i]->setValue(values[i]);
 
-  // read image from file, and show
-  // ------------------------------
+
+  // read image from file and show
+  // -----------------------------
 
   // read image, if the image is different than last time
   if ( iimg!=iimg_ || iset!=iset_ ) {
@@ -869,65 +1015,126 @@ void MainWindow::tab3_show()
     iimg_ = iimg;
     iset_ = iset;
     // load image
-    QImage img;
-    std::tie(imgRaw_,img) = readImage(iset,iimg);
+    QImage imQt;
+    std::tie(imgRaw_,imQt) = readImage(iset,iimg);
     // set maxima
     ui->tab3_rowHgh_spinBox->setMaximum(imgRaw_.shape()[0]);
     ui->tab3_colHgh_spinBox->setMaximum(imgRaw_.shape()[1]);
     // load image
 
     // create a "scene" with containing the image
-    QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(img));
+    QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(imQt));
     QGraphicsScene      *scene = new QGraphicsScene;
     scene->addItem(item);
-    ui->tab3_image_graphicsView->setScene(scene);
+    ui->graphicsViewT3_img->setScene(scene);
     // show the image with the correct scaling applied
     double scale = this->tab3_scaleImage();
-    ui->tab3_image_graphicsView->setTransform(QTransform::fromScale(scale,scale));
-    ui->tab3_image_graphicsView->show();
+    ui->graphicsViewT3_img->setTransform(QTransform::fromScale(scale,scale));
+    ui->graphicsViewT3_img->show();
   }
 
-  // interpret raw image
-  // -------------------
+  // read settings
+  std::vector<size_t> values = imageSettings(iset,iimg);
+  // apply all image settings
+  for ( size_t i=0; i<values.size(); ++i )
+    imgSpin[i]->setValue(values[i]);
+
+  // interpret image based on settings
+  // ---------------------------------
+
+  // get image and mask
+  mat::matrix<int> im,mask;
+  std::tie(im,mask) = interpretImage(iset,iimg,imgRaw_,254);
+  double fac        = 255./static_cast<double>(im.max());
+
+  mat::matrix<unsigned char> imgview(im.shape());
+
+  std::string key   = nsetKey[iset];
+  std::string fname = data[key]["files"][iimg];
+  std::string dtype = data[key]["dtype"];
+
+  // float: max -> 254 (to make room for mask)
+  if ( dtype=="float" )
+    for ( size_t i=0 ; i<im.size() ; i++ )
+      imgview[i] = std::min(im[i],253);
+  // binary: 1 -> 254
+  if ( dtype=="binary" )
+    for ( size_t i=0 ; i<im.size() ; i++ )
+      imgview[i] = im[i]*253;
+  // int: stretch scale
+  if ( dtype=="int" )
+    for ( size_t i=0 ; i<im.size() ; i++ )
+      imgview[i] = std::min(static_cast<int>(static_cast<double>(im[i])*fac),253);
+  // mask -> 255
+  for ( size_t i=0 ; i<im.size() ; i++ )
+    if ( mask[i] )
+      imgview[i] = 255;
+
+  // mask weights
+  // ------------
+
+  // if ( data["mask_weight"] && data[key]["filed"]=="phase" ) {
+  //   if ( data_.saved(0,ui->tab3_im_comboBox->currentIndex()) ) {
+  //     std::tie(im,mask) = data_.image(0,idx,imgRaw_,false);
+  //     for ( size_t i=0 ; i<im.size() ; i++ )
+  //       if ( im[i] )
+  //         imgview[i] = 255;
+  //   }
+  // }
+
+  // crop the image
+  // --------------
+
+  // size_t nrow = imgRaw_.shape()[0];
+  // size_t ncol = imgRaw_.shape()[1];
+  // size_t irow = data[key]["config"][fname][""];
+  // size_t jrow = data[key]["config"][fname][""];
+  // size_t icol = data[key]["config"][fname][""];
+  // size_t jcol = data[key]["config"][fname][""];
+
+  // if ( irow>0 || jrow<nrow || icol>0 || jcol<ncol )
+  // for ( size_t i=0 ; i<nrow ; i++ )
+  //   for ( size_t j=0 ; j<ncol ; j++ )
+  //     if ( i<irow || i>jrow || j<icol || j>jcol )
+  //       imgview(i,j) = 254;
 
 
-
-  // // read colormap
-  // std::vector<int> cols;
-  // cols = cppcolormap::colormap(ui->tab3_cmap_comboBox->currentText().toStdString(),256);
-  // // excluded pixes -> white
-  // for ( size_t i=0 ; i<3 ; i++ )
-  //   cols[254*3+i] = 255;
-  // // optionally set white background
-  // if ( data[nsetKey[iset]]["dtype"]=="int" )
-  //   for ( size_t i=0 ; i<3 ; i++ )
-  //     cols[0*3+i] = 255;
-  // // set mask color
-  // std::vector<int> tmp;
-  // tmp = cppcolormap::colormap(ui->tab3_maskCol_comboBox->currentText().toStdString(),1);
-  // for ( size_t i=0 ; i<3 ; i++ )
-  //   cols[255*3+i] = tmp[i];
-  // // convert to Qt format
-  // QVector<QRgb> cmap;
-  // for ( size_t i = 0; i < 256; ++i)
-  //   cmap.append(qRgb(cols[i*3+0],cols[i*3+1],cols[i*3+2]));
-  // // convert Image::Matrix -> image to view
-  // QImage image(\
-  //   imgView_.data(),\
-  //   imgView_.shape()[1],\
-  //   imgView_.shape()[0],\
-  //   QImage::QImage::Format_Indexed8\
-  // );
-  // image.setColorTable(cmap);
-  // // create a "scene" with containing the image
-  // QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-  // QGraphicsScene      *scene = new QGraphicsScene;
-  // scene->addItem(item);
-  // ui->tab3_phase_graphicsView->setScene(scene);
-  // // show the image with the correct scaling applied
-  // double scale = this->tab3_scaleImage();
-  // ui->tab3_phase_graphicsView->setTransform(QTransform::fromScale(scale,scale));
-  // ui->tab3_phase_graphicsView->show();
+  // read colormap
+  std::vector<int> cols;
+  cols = cppcolormap::colormap(ui->tab3_cmap_comboBox->currentText().toStdString(),256);
+  // excluded pixes -> white
+  for ( size_t i=0 ; i<3 ; i++ )
+    cols[254*3+i] = 255;
+  // optionally set white background
+  if ( data[nsetKey[iset]]["dtype"]=="int" )
+    for ( size_t i=0 ; i<3 ; i++ )
+      cols[0*3+i] = 255;
+  // set mask color
+  std::vector<int> tmp;
+  tmp = cppcolormap::colormap(ui->tab3_maskCol_comboBox->currentText().toStdString(),1);
+  for ( size_t i=0 ; i<3 ; i++ )
+    cols[255*3+i] = tmp[i];
+  // convert to Qt format
+  QVector<QRgb> cmap;
+  for ( size_t i = 0; i < 256; ++i)
+    cmap.append(qRgb(cols[i*3+0],cols[i*3+1],cols[i*3+2]));
+  // convert Image::Matrix -> image to view
+  QImage imQt(\
+    imgview.data(),\
+    imgview.shape()[1],\
+    imgview.shape()[0],\
+    QImage::QImage::Format_Indexed8\
+  );
+  imQt.setColorTable(cmap);
+  // create a "scene" with containing the image
+  QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(imQt));
+  QGraphicsScene      *scene = new QGraphicsScene;
+  scene->addItem(item);
+  ui->graphicsViewT3_seg->setScene(scene);
+  // show the image with the correct scaling applied
+  double scale = this->tab3_scaleImage();
+  ui->graphicsViewT3_seg->setTransform(QTransform::fromScale(scale,scale));
+  ui->graphicsViewT3_seg->show();
 
 
 
@@ -935,3 +1142,25 @@ void MainWindow::tab3_show()
 
 // =================================================================================================
 
+void MainWindow::tab3_read(size_t idx)
+{
+  int iset = ui->tab3_set_comboBox->currentIndex();
+  int iimg = ui->tab3_im_comboBox ->currentIndex();
+
+  if ( iset<0 || iimg<0 )
+    return;
+
+  if ( idx%2!=0 )
+    --idx;
+
+  std::string key   = nsetKey[iset];
+  std::string fname = data[key]["files"][iimg];
+
+  std::vector<int> range(2);
+
+  range[0] = imgSpin[idx+0]->value();
+  range[1] = imgSpin[idx+1]->value();
+
+  if ( imgCheck[idx/2]->isChecked() )
+    data[key]["config"][fname][imgCheckLbl[idx/2]] = range;
+}
