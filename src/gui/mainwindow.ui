@@ -1823,7 +1823,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QComboBox" name="tab3_maskCol_comboBox">
+             <widget class="QComboBox" name="comboBoxT3_cmapMask">
               <item>
                <property name="text">
                 <string>Red</string>

@@ -244,6 +244,7 @@ private:
   std::vector<QSpinBox*>     imgSpin;
   std::vector<QComboBox*>    imgCombo;
   std::vector<QCheckBox*>    imgCheck;
+  std::vector<QRadioButton*> imgRadio;
   std::vector<QPushButton*>  imgBtn;     // list with all image selection buttons
   std::vector<QButtonGroup*> btnGroup;   // list with all groups of radioButtons
   bool   promptQuestion(QString);        // prompt question to user (return response)

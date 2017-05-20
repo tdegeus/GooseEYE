@@ -131,14 +131,24 @@ MainWindow::MainWindow(QWidget *parent) :
   imgBtn.push_back(ui->pushButtonT3_apply   );
   imgBtn.push_back(ui->pushButtonT3_zoomIm  );
   imgBtn.push_back(ui->pushButtonT3_zoomOut );
-
-  imgCombo.push_back(ui->comboBoxT3_set);
-  imgCombo.push_back(ui->comboBoxT3_img);
-
+  // - tab3: comboBox to select set, image, and colormaps
+  imgCombo.push_back(ui->comboBoxT3_set     );
+  imgCombo.push_back(ui->comboBoxT3_img     );
+  imgCombo.push_back(ui->comboBoxT3_cmap    );
+  imgCombo.push_back(ui->comboBoxT3_cmapMask);
+  // - tab3: radioButtons to select pixels using mouse-click
+  imgRadio.push_back(ui->radioButtonT3_phase);
+  imgRadio.push_back(ui->radioButtonT3_mask );
+  imgRadio.push_back(ui->radioButtonT3_row  );
+  imgRadio.push_back(ui->radioButtonT3_col  );
+  // - groups of radioButtons
   btnGroup.push_back(ui->buttonGroupT1_stat );
   btnGroup.push_back(ui->buttonGroupT1_set0 );
   btnGroup.push_back(ui->buttonGroupT1_set1 );
   btnGroup.push_back(ui->buttonGroupT3_mouse);
+
+  // TODO: implement mouse selection
+  for ( auto &i : imgRadio ) i->setVisible(false);
 
   // refresh tabs when tab is changed
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab0_show();});
@@ -165,19 +175,21 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( size_t i=0; i<2; ++i ) connect(fileBtnDwn[i],&QPushButton::clicked,this,[=](){fileDwn(i);});
   for ( size_t i=0; i<2; ++i ) connect(fileBtnSrt[i],&QPushButton::clicked,this,[=](){fileSrt(i);});
 
-  size_t j,N=imgSpin.size();
-  for ( j=0; j<N; ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
-  for ( j=1; j<N; ++j ) connect(imgSpin[j],&QSpinBox::editingFinished,this,[=](){tab3_read(j);});
+  // tab3: read from spinBox
+  size_t j,N=imgSpin.size(),M=imgCheck.size();
+  for ( j=0; j<N; ++j ) connect(imgSpin [j],&QSpinBox::editingFinished,this,[=](){tab3_read(j  );});
+  for ( j=1; j<N; ++j ) connect(imgSpin [j],&QSpinBox::editingFinished,this,[=](){tab3_read(j  );});
+  for ( j=0; j<M; ++j ) connect(imgCheck[j],&QCheckBox::clicked       ,this,[=](){tab3_read(j*2);});
 
-  // tab2: button pressed -> refresh view with new "data"
-  for ( auto &i : statBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab1_show();});
-  for ( auto &i : typeBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab1_show();});
-  for ( auto &i : nsetBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab1_show();});
-  for ( auto &i : fileBtn  ) connect(i,&QPushButton::clicked          ,this,[=](){tab2_show();});
-  for ( auto &i : imgBtn   ) connect(i,&QPushButton::clicked          ,this,[=](){tab3_show();});
-  for ( auto &i : imgSpin  ) connect(i,&QSpinBox::editingFinished     ,this,[=](){tab3_show();});
-//  for ( auto &i : imgCombo ) connect(i,SIGNAL(currentIndexChanged(int)),this,SLOT(tab3_show()));
-
+  // tab2/tab3: button pressed -> refresh view with new "data"
+  for ( auto &i : statBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
+  for ( auto &i : typeBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
+  for ( auto &i : nsetBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
+  for ( auto &i : fileBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab2_show();});
+  for ( auto &i : imgBtn   ) connect(i,&QPushButton::clicked     ,this,[=](){tab3_show();});
+  for ( auto &i : imgSpin  ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_show();});
+  for ( auto &i : imgCheck ) connect(i,&QCheckBox::clicked       ,this,[=](){tab3_show();});
+  for ( auto &i : imgCombo ) connect(i,SIGNAL(activated(int)),this,SLOT(tab3_show()));
 }
 
 // =================================================================================================
@@ -783,6 +795,9 @@ void MainWindow::tab3_show()
   ui->comboBoxT3_img->setEnabled(false);
   ui->comboBoxT3_set->setEnabled(false);
 
+  // clear all settings checkBoxes
+  for ( auto &i : imgCheck ) i->setChecked(false);
+
   // sets -> comboBox
   // ----------------
 
@@ -885,21 +900,27 @@ void MainWindow::tab3_show()
   json config = data[key]["config"][fname];
   // read from "data"
   // - read "phase" from "data": lower and upper bound
-  if ( config.count("phase") )
-    for ( size_t i=0; i<config["phase"].size(); ++i )
-      imgSpin[0*2+i]->setValue(config["phase"][i]);
+  if ( config.count("phase") ) {
+    imgCheck[0]->setChecked(true);
+    for ( size_t i=0; i<config["phase"].size(); ++i ) imgSpin[0*2+i]->setValue(config["phase"][i]);
+  }
   // - read "mask1,mask2,mask3" from "data": lower and upper bound
-  if ( config.count("mask") )
-    for ( size_t i=0; i<config["mask"].size(); ++i )
-      imgSpin[1*2+i]->setValue(config["mask"][i]);
+  if ( config.count("mask") ) {
+    if ( config["mask"].size()>=2 ) imgCheck[1]->setChecked(true);
+    if ( config["mask"].size()>=4 ) imgCheck[2]->setChecked(true);
+    if ( config["mask"].size()>=6 ) imgCheck[3]->setChecked(true);
+    for ( size_t i=0; i<config["mask" ].size(); ++i ) imgSpin[1*2+i]->setValue(config["mask" ][i]);
+  }
   // - read "rows" from "data": lower and upper bound
-  if ( config.count("row") )
-    for ( size_t i=0; i<config["row"].size(); ++i )
-      imgSpin[4*2+i]->setValue(config["row"][i]);
+  if ( config.count("row") ) {
+    imgCheck[4]->setChecked(true);
+    for ( size_t i=0; i<config["row"  ].size(); ++i ) imgSpin[4*2+i]->setValue(config["row"  ][i]);
+  }
   // - read "columns" from "data": lower and upper bound
-  if ( config.count("col") )
-    for ( size_t i=0; i<config["col"].size(); ++i )
-      imgSpin[5*2+i]->setValue(config["col"][i]);
+  if ( config.count("col") ) {
+    imgCheck[5]->setChecked(true);
+    for ( size_t i=0; i<config["col"  ].size(); ++i ) imgSpin[5*2+i]->setValue(config["col"  ][i]);
+  }
 
   // interpret image based on settings
   // ---------------------------------
@@ -961,7 +982,7 @@ void MainWindow::tab3_show()
       cols[0*3+i] = 255;
   // set mask color
   std::vector<int> tmp;
-  tmp = cppcolormap::colormap(ui->tab3_maskCol_comboBox->currentText().toStdString(),1);
+  tmp = cppcolormap::colormap(ui->comboBoxT3_cmapMask->currentText().toStdString(),1);
   for ( size_t i=0 ; i<3 ; i++ )
     cols[255*3+i] = tmp[i];
   // convert to Qt format
@@ -1007,6 +1028,31 @@ void MainWindow::tab3_read(size_t idx)
   range[0] = imgSpin[idx+0]->value();
   range[1] = imgSpin[idx+1]->value();
 
-  if ( imgCheck[idx/2]->isChecked() )
+  if ( imgCheck[idx/2]->isChecked() ) {
     data[key]["config"][fname][imgCheckLbl[idx/2]] = range;
+    return;
+  }
+
+  if ( idx==0 || idx>=8 ) {
+    try { data[key]["config"][fname].erase(imgCheckLbl[idx/2]); }
+    catch (...) {};
+    return;
+  }
+
+  std::vector<int> mask;
+
+  for ( size_t i=1; i<4; i++ ) {
+    if ( imgCheck[i]->isChecked() ) {
+      mask.push_back(imgSpin[i*2+0]->value());
+      mask.push_back(imgSpin[i*2+1]->value());
+    }
+  }
+
+  if ( mask.size()>0 ) {
+    data[key]["config"][fname][imgCheckLbl[idx/2]] = mask;
+    return;
+  }
+
+  try { data[key]["config"][fname].erase(imgCheckLbl[idx/2]); }
+  catch (...) {};
 }
