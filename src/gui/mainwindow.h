@@ -106,33 +106,35 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> config(
   int max  = 255;
 
   // crop: modify dimensions of the output matrix
-  if ( crop==-1 && file.count("row") ) {
-    irow = file["row"][0];
-    jrow = file["row"][1];
-  }
-  if ( crop==-1 && file.count("col") ) {
-    icol = file["col"][0];
-    jcol = file["col"][1];
-  }
-
   // threshold: read range
+  if ( file.count("row") ) {
+    if ( file["row"]["active"] ) {
+      irow = file["row"]["values"][0];
+      jrow = file["row"]["values"][1];
+    }
+  }
+  if ( file.count("col") ) {
+    if ( file["col"]["active"] ) {
+      icol = file["col"]["values"][0];
+      jcol = file["col"]["values"][1];
+    }
+  }
   if ( file.count("phase") ) {
-    min  = static_cast<int>(file["phase"][0]);
-    max  = static_cast<int>(file["phase"][1]);
+    if ( file["phase"]["active"] ) {
+      min  = static_cast<int>(file["phase"]["values"][0]);
+      max  = static_cast<int>(file["phase"]["values"][1]);
+    }
   }
 
-  // convert "crop" such that it can be used as pre-factor
-  if ( crop==-1 )
-    crop = 0;
   // allocate output
-  mat::matrix<int> out({jrow-irow,jcol-icol}); out.ones (); out *= crop;
-  mat::matrix<int> msk({jrow-irow,jcol-icol}); msk.zeros();
+  mat::matrix<int> out({jrow-irow,jcol-icol});
+  mat::matrix<int> msk({jrow-irow,jcol-icol});
 
   // phase threshold float: retain values; everything outside bounds is masked
   if ( dtype=="float" ) {
     for ( size_t i=0; i<(jrow-irow); ++i ) {
       for ( size_t j=0; j<(jcol-icol); ++j ) {
-        if ( data(i+irow,j+icol)>=min && data(i+irow,j+icol)<=max )
+        if ( data(i+irow,j+icol)>=min && data(i+irow,j+icol)<max )
           out(i,j) = data(i+irow,j+icol);
         else
           msk(i,j) = 1;
@@ -143,7 +145,7 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> config(
   else {
     for ( size_t i=0; i<(jrow-irow); ++i )
       for ( size_t j=0; j<(jcol-icol); ++j )
-        if ( data(i+irow,j+icol)>=min && data(i+irow,j+icol)<=max )
+        if ( data(i+irow,j+icol)>=min && data(i+irow,j+icol)<max )
           out(i,j) = 1;
   }
 
@@ -157,16 +159,34 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> config(
 
   // mask threshold
   if ( file.count("mask") ) {
-    if ( file["mask"].size()%2!=0 )
-      throw std::runtime_error("masks must be specified min,max , min,max , ...");
-    for ( size_t imsk=0; imsk<file["mask"].size(); imsk+=2 )
-      for ( size_t i=0 ; i<(jrow-irow) ; i++ )
-        for ( size_t j=0 ; j<(jcol-icol) ; j++ )
-          if ( data(i+irow,j+icol)>=file["mask"][imsk] && data(i+irow,j+icol)<=file["mask"][imsk+1] )
-            msk(i,j) = 1;
+    if ( file["mask"]["active"] ) {
+      for ( size_t imsk=0; imsk<file["mask"]["values"].size(); imsk+=2 ) {
+        int low = file["mask"]["values"][imsk  ];
+        int hgh = file["mask"]["values"][imsk+1];
+        if ( low<hgh )
+          for ( size_t i=0; i<(jrow-irow); ++i )
+            for ( size_t j=0; j<(jcol-icol); ++j )
+              if ( data(i+irow,j+icol)>=low && data(i+irow,j+icol)<hgh )
+                msk(i,j) = 1;
+      }
+    }
   }
 
-  return std::make_tuple(out,msk);
+  if ( crop<0 )
+    return std::make_tuple(out,msk);
+
+  // allocate output
+  mat::matrix<int> out_tot(data.shape()); out_tot.ones (); out_tot *= crop;
+  mat::matrix<int> msk_tot(data.shape()); msk_tot.zeros();
+
+  for ( size_t i=0; i<out.shape()[0]; ++i ) {
+    for ( size_t j=0; j<out.shape()[1]; ++j ) {
+      out_tot(i+irow,j+icol) = out(i,j);
+      msk_tot(i+irow,j+icol) = msk(i,j);
+    }
+  }
+
+  return std::make_tuple(out_tot,msk_tot);
 };
 };
 
@@ -207,7 +227,7 @@ private slots:
   void tab1_show(); // refresh with new "data"
   void tab2_show(); // refresh with new "data"
   void tab3_show(); // refresh with new "data"
-  void tab3_read(size_t idx);
+  void tab3_read();
   // support functions
   // - read single file "iimg" from "iset", output as Qt string (absolute path)
   QString readFilePath(size_t iset, size_t iimg);
@@ -242,10 +262,11 @@ private:
   std::vector<QListWidget*>  fileLst;    // all file lists
   std::vector<QLabel*>       propLbl;    // list with labels to denote the field-type ["phase",...]
   std::vector<QLabel*>       typeLbl;    // list with labels to denote the data-type
-  std::vector<std::string>   imgCheckLbl;
-  std::vector<QSpinBox*>     imgSpin;
   std::vector<QComboBox*>    imgCombo;
+  std::vector<QSpinBox*>     imgSpin;
+  std::vector<size_t>        imgVal;
   std::vector<QCheckBox*>    imgCheck;
+  std::vector<std::string>   imgCheckLbl;
   std::vector<QRadioButton*> imgRadio;
   std::vector<QPushButton*>  imgBtn;     // list with all image selection buttons
   std::vector<QButtonGroup*> btnGroup;   // list with all groups of radioButtons

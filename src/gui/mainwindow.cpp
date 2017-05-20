@@ -24,26 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->tabWidget->setCurrentIndex(0);
 
   // set default data (also useful to reduce the number of checks in the code)
-  // - output images -> default assigned in "on_pushButtonT0_path_clicked"
-  data["output"]["result"] = "";
-  data["output"]["interp"] = "";
-  // - statistics settings
-  data["stat"            ] = ""         ;
-  data["nset"            ] = 1          ;
-  data["periodic"        ] = true       ;
-  data["zeropad"         ] = false      ;
-  data["mask_weight"     ] = true       ;
-  data["pixel_path"      ] = "Bresenham";
-  data["roi"             ] = {51,51}    ;
-  // - empty file sets
-  data["set0"]["field"   ] = "";
-  data["set0"]["dtype"   ] = "";
-  data["set0"]["files"   ] = {};
-  data["set0"]["config"  ] = {};
-  data["set1"]["field"   ] = "";
-  data["set1"]["dtype"   ] = "";
-  data["set1"]["files"   ] = {};
-  data["set1"]["config"  ] = {};
+  checkData();
 
   // tab3: link scroll position of graphicsViews
   QScrollBar *I1h = ui->graphicsViewT3_img->horizontalScrollBar();
@@ -118,10 +99,11 @@ MainWindow::MainWindow(QWidget *parent) :
   imgSpin.push_back(ui->spinBoxT3_rowLow    ); imgSpin.push_back(ui->spinBoxT3_rowHgh  );
   imgSpin.push_back(ui->spinBoxT3_colLow    ); imgSpin.push_back(ui->spinBoxT3_colHgh  );
   // - tab3: checkBox to select a modification field, and their field-names
-  imgCheck.push_back(ui->checkBoxT3_phase   ); imgCheckLbl.push_back("phase");
-  imgCheck.push_back(ui->checkBoxT3_mask    ); imgCheckLbl.push_back("mask" );
-  imgCheck.push_back(ui->checkBoxT3_row     ); imgCheckLbl.push_back("row"  );
-  imgCheck.push_back(ui->checkBoxT3_col     ); imgCheckLbl.push_back("col"  );
+                                                                               imgVal.push_back( 0);
+  imgCheck.push_back(ui->checkBoxT3_phase   ); imgCheckLbl.push_back("phase"); imgVal.push_back( 2);
+  imgCheck.push_back(ui->checkBoxT3_mask    ); imgCheckLbl.push_back("mask" ); imgVal.push_back( 8);
+  imgCheck.push_back(ui->checkBoxT3_row     ); imgCheckLbl.push_back("row"  ); imgVal.push_back(10);
+  imgCheck.push_back(ui->checkBoxT3_col     ); imgCheckLbl.push_back("col"  ); imgVal.push_back(12);
   // - tab3: pushButton to navigate through images
   imgBtn.push_back(ui->pushButtonT3_setPrev ); imgBtn.push_back(ui->pushButtonT3_setNext);
   imgBtn.push_back(ui->pushButtonT3_imgPrev ); imgBtn.push_back(ui->pushButtonT3_imgNext);
@@ -148,25 +130,7 @@ MainWindow::MainWindow(QWidget *parent) :
   // TODO: implement mouse selection
   for ( auto &i : imgRadio ) i->setVisible(false);
 
-  // -
-  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){checkData();});
-  for ( auto &i : fileBtnAdd ) connect(i,&QPushButton::clicked,this,[=](){checkData();});
-  for ( auto &i : fileBtnRmv ) connect(i,&QPushButton::clicked,this,[=](){checkData();});
-
-  // refresh tabs when tab is changed
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab0_show();});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab1_show();});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab2_show();});
-  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab3_show();});
-
-  // refresh file related views when JSON is loaded or "out_path" is changed
-  connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab0_show();});
-  connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab2_show();});
-  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab0_show();});
-  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab1_show();});
-  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab2_show();});
-
-  // tab1: button pressed -> update "data"
+    // tab1: button pressed -> update "data"
   for ( auto &i : statBtn ) connect(i,&QPushButton::clicked,this,[=](){tab1_read();});
   for ( auto &i : typeBtn ) connect(i,&QPushButton::clicked,this,[=](){tab1_read();});
   for ( auto &i : nsetBtn ) connect(i,&QPushButton::clicked,this,[=](){tab1_read();});
@@ -178,11 +142,30 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( size_t i=0; i<2; ++i ) connect(fileBtnDwn[i],&QPushButton::clicked,this,[=](){fileDwn(i);});
   for ( size_t i=0; i<2; ++i ) connect(fileBtnSrt[i],&QPushButton::clicked,this,[=](){fileSrt(i);});
 
+    // refresh file related views when JSON is loaded or "out_path" is changed
+  connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab0_show();});
+  connect(ui->pushButtonT0_path,&QPushButton::clicked,this,[=](){tab2_show();});
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab0_show();});
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab1_show();});
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){tab2_show();});
+
+  // -
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){checkData();});
+  for ( auto &i : fileBtnAdd ) connect(i,&QPushButton::clicked,this,[=](){checkData();});
+  for ( auto &i : fileBtnRmv ) connect(i,&QPushButton::clicked,this,[=](){checkData();});
+
+
+
+
+
   // tab3: read from spinBox
-  size_t j,N=imgSpin.size(),M=imgCheck.size();
-  for ( j=0; j<N; ++j ) connect(imgSpin [j],&QSpinBox::editingFinished,this,[=](){tab3_read(j  );});
-  for ( j=1; j<N; ++j ) connect(imgSpin [j],&QSpinBox::editingFinished,this,[=](){tab3_read(j  );});
-  for ( j=0; j<M; ++j ) connect(imgCheck[j],&QCheckBox::clicked       ,this,[=](){tab3_read(j*2);});
+  for ( auto &i : imgSpin  ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_read();});
+  for ( auto &i : imgCheck ) connect(i,&QCheckBox::clicked       ,this,[=](){tab3_read();});
+
+  // size_t j,N=imgSpin.size(),M=imgCheck.size();
+  // for ( j=0; j<N; ++j ) connect(imgSpin [j],&QSpinBox::editingFinished,this,[=](){tab3_read(j  );});
+  // for ( j=1; j<N; ++j ) connect(imgSpin [j],&QSpinBox::editingFinished,this,[=](){tab3_read(j  );});
+  // for ( j=0; j<M; ++j ) connect(imgCheck[j],&QCheckBox::clicked       ,this,[=](){tab3_read(j*2);});
 
   // tab2/tab3: button pressed -> refresh view with new "data"
   for ( auto &i : statBtn  ) connect(i,&QPushButton::clicked     ,this,[=](){tab1_show();});
@@ -193,6 +176,12 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( auto &i : imgSpin  ) connect(i,&QSpinBox::editingFinished,this,[=](){tab3_show();});
   for ( auto &i : imgCheck ) connect(i,&QCheckBox::clicked       ,this,[=](){tab3_show();});
   for ( auto &i : imgCombo ) connect(i,SIGNAL(activated(int)),this,SLOT(tab3_show()));
+
+  // refresh tabs when tab is changed
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab0_show();});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab1_show();});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab2_show();});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab3_show();});
 }
 
 // =================================================================================================
@@ -268,15 +257,15 @@ void MainWindow::checkData()
   if ( !data["output"].count("interp") ) data["output"]["interp"] = "";
 
   std::vector<std::string> sets;
-  sets.push_back("set0");
-  sets.push_back("set1");
+  if ( data["nset"]>=1 ) sets.push_back("set0");
+  if ( data["nset"]>=2 ) sets.push_back("set1");
 
   for ( auto &set : sets ) {
     if ( !data.count(set) ) {
-      data[set]["field"   ] = "";
-      data[set]["dtype"   ] = "";
-      data[set]["files"   ] = {};
-      data[set]["config"  ] = {};
+      data[set]["field" ] = "";
+      data[set]["dtype" ] = "";
+      data[set]["files" ] = {};
+      data[set]["config"] = {};
     }
     if ( !data[set].count("field" ) ) data[set]["field" ] = "";
     if ( !data[set].count("dtype" ) ) data[set]["dtype" ] = "";
@@ -289,14 +278,13 @@ void MainWindow::checkData()
     // - allocate
     std::vector<std::string> files;
     // - fill
-    if ( data.count(set) )
-      for ( size_t i=0; i<data[set]["files"].size(); ++i )
-        files.push_back(data[set]["files"][i]);
+    for ( size_t i=0; i<data[set]["files"].size(); ++i )
+      files.push_back(data[set]["files"][i]);
     // collect files stored in "config"
     // - allocate
     std::vector<std::string> config;
     // - fill
-    for ( json::iterator it =data[set]["config"].begin(); it!=data[set]["config"].end()  ; ++it )
+    for ( json::iterator it=data[set]["config"].begin(); it!=data[set]["config"].end(); ++it )
       config.push_back(it.key());
     // remove files present in "config", but not in "files"
     for ( auto &fname : config )
@@ -304,7 +292,7 @@ void MainWindow::checkData()
         data[set]["config"].erase(fname);
     // initialize defaults
     std::vector<int> phase = {0,256};
-    std::vector<int> mask  = {};
+    std::vector<int> mask  = {0,0,0,0,0,0};
     std::vector<int> row   = {0,0};
     std::vector<int> col   = {0,0};
     // apply defaults for files that are present in "files" but not in "config"
@@ -318,6 +306,24 @@ void MainWindow::checkData()
         data[set]["config"][fname]["row"  ]["active"] = false;
         data[set]["config"][fname]["col"  ]["values"] = col;
         data[set]["config"][fname]["col"  ]["active"] = false;
+      }
+      else {
+        if ( !data[set]["config"][fname].count("phase") ) {
+          data[set]["config"][fname]["phase"]["values"] = phase;
+          data[set]["config"][fname]["phase"]["active"] = false;
+        }
+        if ( !data[set]["config"][fname].count("mask") ) {
+          data[set]["config"][fname]["mask"]["values"] = mask;
+          data[set]["config"][fname]["mask"]["active"] = false;
+        }
+        if ( !data[set]["config"][fname].count("row") ) {
+          data[set]["config"][fname]["row"]["values"] = row;
+          data[set]["config"][fname]["row"]["active"] = false;
+        }
+        if ( !data[set]["config"][fname].count("col") ) {
+          data[set]["config"][fname]["col"]["values"] = col;
+          data[set]["config"][fname]["col"]["active"] = false;
+        }
       }
     }
   }
@@ -582,13 +588,7 @@ QString MainWindow::readFilePath(size_t iset, size_t iimg)
 
 QString MainWindow::readFile(size_t iset, size_t iimg)
 {
-  QString out = "";
-
-  if ( data.count(nsetKey[iset]) )
-    if ( data[nsetKey[iset]].count("files") )
-      out = QString::fromStdString(data[nsetKey[iset]]["files"][iimg]);
-
-  return out;
+  return QString::fromStdString(data[nsetKey[iset]]["files"][iimg]);
 }
 
 // =================================================================================================
@@ -599,11 +599,8 @@ std::vector<std::string> MainWindow::readFiles(size_t iset)
   std::vector<std::string> files;
 
   // copy items currently present in the list
-  if ( data.count(nsetKey[iset]) )
-    if ( data[nsetKey[iset]].count("files") )
-      for ( size_t i=0; i<data[nsetKey[iset]]["files"].size(); ++i )
-        files.push_back(data[nsetKey[iset]]["files"][i]);
-
+  for ( size_t i=0; i<data[nsetKey[iset]]["files"].size(); ++i )
+    files.push_back(data[nsetKey[iset]]["files"][i]);
 
   // output
   return files;
@@ -613,47 +610,8 @@ std::vector<std::string> MainWindow::readFiles(size_t iset)
 
 void MainWindow::setFiles(size_t iset, std::vector<std::string> files)
 {
-  // erase current list of files
-  if ( data.count(nsetKey[iset]) )
-    if ( data[nsetKey[iset]].count("files") )
-      data[nsetKey[iset]].erase("files");
-
-  // store list of files
+  data[nsetKey[iset]].erase("files");
   data[nsetKey[iset]]["files"] = files;
-
-  // collect files stored in "config"
-  // - allocate
-  std::vector<std::string> config;
-  // - fill
-  for ( json::iterator it =data[nsetKey[iset]]["config"].begin();
-                       it!=data[nsetKey[iset]]["config"].end()  ; ++it )
-  {
-    config.push_back(it.key());
-  }
-
-  // remove files present in "config", but not in "files"
-  for ( auto &fname : config )
-    if ( ! ( std::find(files.begin(),files.end(),fname)!=files.end() ) )
-      data[nsetKey[iset]]["config"].erase(fname);
-
-  // initialize defaults
-  std::vector<int> phase = {0,256};
-  std::vector<int> mask  = {};
-  std::vector<int> row   = {0,0};
-  std::vector<int> col   = {0,0};
-  // apply defaults for files that are present in "files" but not in "config"
-  for ( auto &fname : files ) {
-    if ( ! ( std::find(config.begin(),config.end(),fname)!=config.end() ) ) {
-      data[nsetKey[iset]]["config"][fname]["phase"]["values"] = phase;
-      data[nsetKey[iset]]["config"][fname]["phase"]["active"] = false;
-      data[nsetKey[iset]]["config"][fname]["mask" ]["values"] = mask;
-      data[nsetKey[iset]]["config"][fname]["mask" ]["active"] = false;
-      data[nsetKey[iset]]["config"][fname]["row"  ]["values"] = row;
-      data[nsetKey[iset]]["config"][fname]["row"  ]["active"] = false;
-      data[nsetKey[iset]]["config"][fname]["col"  ]["values"] = col;
-      data[nsetKey[iset]]["config"][fname]["col"  ]["active"] = false;
-    }
-  }
 }
 
 // =================================================================================================
@@ -909,9 +867,6 @@ void MainWindow::tab3_show()
   ui->comboBoxT3_img->setEnabled(false);
   ui->comboBoxT3_set->setEnabled(false);
 
-  // clear all settings checkBoxes
-  for ( auto &i : imgCheck ) i->setChecked(false);
-
   // sets -> comboBox
   // ----------------
 
@@ -966,9 +921,9 @@ void MainWindow::tab3_show()
   // extract keys
   // ------------
 
-  std::string key      = nsetKey[iset];
-  std::string fname    = data[key]["files"][iimg];
-  std::string dtype    = data[key]["dtype"];
+  std::string set      = nsetKey[iset];
+  std::string fname    = data[set]["files"][iimg];
+  std::string dtype    = data[set]["dtype"];
   bool        periodic = data["periodic"];
 
   // read image from file -> show
@@ -985,6 +940,11 @@ void MainWindow::tab3_show()
     // set maxima
     ui->spinBoxT3_rowHgh->setMaximum(image.nrow);
     ui->spinBoxT3_colHgh->setMaximum(image.ncol);
+    // store as defaults
+    if ( data[set]["config"][fname]["row"]["values"][1]==0 )
+      data[set]["config"][fname]["row"]["values"][1] = image.nrow;
+    if ( data[set]["config"][fname]["col"]["values"][1]==0 )
+      data[set]["config"][fname]["col"]["values"][1] = image.ncol;
     // create a "scene" with containing the image
     QGraphicsPixmapItem *item  = new QGraphicsPixmapItem(QPixmap::fromImage(image.dataQt));
     QGraphicsScene      *scene = new QGraphicsScene;
@@ -998,43 +958,25 @@ void MainWindow::tab3_show()
   // update interpretation settings (spinBox)
   // ----------------------------------------
 
-  // zero initialize
-  for ( auto &i : imgSpin ) i->setValue(0);
-  // defaults
-  std::vector<size_t> phase = {0,255};
-  std::vector<size_t> row   = {0,image.data.shape()[0]};
-  std::vector<size_t> col   = {0,image.data.shape()[1]};
-  // no information specified -> defaults
-  if ( !data[key]["config"].count(fname) ) {
-    data[key]["config"][fname]["phase"] = phase;
-    data[key]["config"][fname]["row"  ] = row;
-    data[key]["config"][fname]["col"  ] = col;
-  }
+  // default values to show (only zeros)
+  std::vector<int> val(imgVal[imgVal.size()-1],0);
   // alias
-  json config = data[key]["config"][fname];
-  // read from "data"
-  // - read "phase" from "data": lower and upper bound
-  if ( config.count("phase") ) {
-    imgCheck[0]->setChecked(true);
-    for ( size_t i=0; i<config["phase"].size(); ++i ) imgSpin[0*2+i]->setValue(config["phase"][i]);
+  json config = data[set]["config"][fname];
+  // loop over fields
+  for ( size_t i=0; i<imgCheckLbl.size(); ++i ) {
+    // - get field name
+    std::string key = imgCheckLbl[i];
+    // - get number of entries
+    size_t n = std::min(imgVal[i+1]-imgVal[i],config[key]["values"].size());
+    // - read entries
+    if ( n>0 )
+      for ( size_t j=0; j<n; ++j )
+        val[imgVal[i]+j] = config[key]["values"][j];
+    // - set checkBox
+    imgCheck[i]->setChecked(config[key]["active"]);
   }
-  // - read "mask1,mask2,mask3" from "data": lower and upper bound
-  if ( config.count("mask") ) {
-    if ( config["mask"].size()>=2 ) imgCheck[1]->setChecked(true);
-    if ( config["mask"].size()>=4 ) imgCheck[2]->setChecked(true);
-    if ( config["mask"].size()>=6 ) imgCheck[3]->setChecked(true);
-    for ( size_t i=0; i<config["mask" ].size(); ++i ) imgSpin[1*2+i]->setValue(config["mask" ][i]);
-  }
-  // - read "rows" from "data": lower and upper bound
-  if ( config.count("row") ) {
-    imgCheck[4]->setChecked(true);
-    for ( size_t i=0; i<config["row"  ].size(); ++i ) imgSpin[4*2+i]->setValue(config["row"  ][i]);
-  }
-  // - read "columns" from "data": lower and upper bound
-  if ( config.count("col") ) {
-    imgCheck[5]->setChecked(true);
-    for ( size_t i=0; i<config["col"  ].size(); ++i ) imgSpin[5*2+i]->setValue(config["col"  ][i]);
-  }
+  // store values
+  for ( size_t i=0; i<val.size(); ++i ) imgSpin[i]->setValue(val[i]);
 
   // interpret image based on settings
   // ---------------------------------
@@ -1066,7 +1008,7 @@ void MainWindow::tab3_show()
   // mask weights
   // ------------
 
-  if ( data["mask_weight"] && data[key]["field"]=="phase" && iset==1 ) {
+  if ( data["mask_weight"] && data[set]["field"]=="phase" && iset==1 ) {
     QtImage image_;
     mat::matrix<int> im_,mask_;
     std::string key_    = nsetKey[0];
@@ -1123,7 +1065,7 @@ void MainWindow::tab3_show()
 
 // =================================================================================================
 
-void MainWindow::tab3_read(size_t idx)
+void MainWindow::tab3_read()
 {
   int iset = ui->comboBoxT3_set->currentIndex();
   int iimg = ui->comboBoxT3_img->currentIndex();
@@ -1131,42 +1073,48 @@ void MainWindow::tab3_read(size_t idx)
   if ( iset<0 || iimg<0 )
     return;
 
-  if ( idx%2!=0 )
-    --idx;
+  std::string set   = nsetKey[iset];
+  std::string fname = data[set]["files"][iimg];
 
-  std::string key   = nsetKey[iset];
-  std::string fname = data[key]["files"][iimg];
-
-  std::vector<int> range(2);
-
-  range[0] = imgSpin[idx+0]->value();
-  range[1] = imgSpin[idx+1]->value();
-
-  if ( imgCheck[idx/2]->isChecked() ) {
-    data[key]["config"][fname][imgCheckLbl[idx/2]] = range;
-    return;
-  }
-
-  if ( idx==0 || idx>=8 ) {
-    try { data[key]["config"][fname].erase(imgCheckLbl[idx/2]); }
-    catch (...) {};
-    return;
-  }
-
-  std::vector<int> mask;
-
-  for ( size_t i=1; i<4; i++ ) {
-    if ( imgCheck[i]->isChecked() ) {
-      mask.push_back(imgSpin[i*2+0]->value());
-      mask.push_back(imgSpin[i*2+1]->value());
+  for ( size_t i=0; i<imgCheckLbl.size(); ++i ) {
+    data[set]["config"][fname][imgCheckLbl[i]]["active"] = imgCheck[i]->isChecked();
+    size_t k=0;
+    for ( size_t j=imgVal[i]; j<imgVal[i+1]; ++j ) {
+      data[set]["config"][fname][imgCheckLbl[i]]["values"][k] = imgSpin[j]->value();
+      ++k;
     }
   }
 
-  if ( mask.size()>0 ) {
-    data[key]["config"][fname][imgCheckLbl[idx/2]] = mask;
-    return;
-  }
+  // std::vector<int> range(2);
 
-  try { data[key]["config"][fname].erase(imgCheckLbl[idx/2]); }
-  catch (...) {};
+  // range[0] = imgSpin[idx+0]->value();
+  // range[1] = imgSpin[idx+1]->value();
+
+  // if ( imgCheck[idx/2]->isChecked() ) {
+  //   data[set]["config"][fname][imgCheckLbl[idx/2]] = range;
+  //   return;
+  // }
+
+  // if ( idx==0 || idx>=8 ) {
+  //   try { data[set]["config"][fname].erase(imgCheckLbl[idx/2]); }
+  //   catch (...) {};
+  //   return;
+  // }
+
+  // std::vector<int> mask;
+
+  // for ( size_t i=1; i<4; i++ ) {
+  //   if ( imgCheck[i]->isChecked() ) {
+  //     mask.push_back(imgSpin[i*2+0]->value());
+  //     mask.push_back(imgSpin[i*2+1]->value());
+  //   }
+  // }
+
+  // if ( mask.size()>0 ) {
+  //   data[set]["config"][fname][imgCheckLbl[idx/2]] = mask;
+  //   return;
+  // }
+
+  // try { data[set]["config"][fname].erase(imgCheckLbl[idx/2]); }
+  // catch (...) {};
 }
