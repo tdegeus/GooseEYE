@@ -199,6 +199,8 @@ private slots:
   void fileUp (size_t); // move   files up      -> update "data"
   void fileDwn(size_t); // move   files down    -> update "data"
   void fileSrt(size_t); // sort   files by name -> update "data"
+  //
+  void checkData();
   // synchronize widgets and "data"
   void tab1_read(); // update "data" with new information from widgets
   void tab0_show(); // refresh with new "data"

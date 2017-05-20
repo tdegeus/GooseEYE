@@ -119,9 +119,7 @@ MainWindow::MainWindow(QWidget *parent) :
   imgSpin.push_back(ui->spinBoxT3_colLow    ); imgSpin.push_back(ui->spinBoxT3_colHgh  );
   // - tab3: checkBox to select a modification field, and their field-names
   imgCheck.push_back(ui->checkBoxT3_phase   ); imgCheckLbl.push_back("phase");
-  imgCheck.push_back(ui->checkBoxT3_mask0   ); imgCheckLbl.push_back("mask" );
-  imgCheck.push_back(ui->checkBoxT3_mask1   ); imgCheckLbl.push_back("mask" );
-  imgCheck.push_back(ui->checkBoxT3_mask2   ); imgCheckLbl.push_back("mask" );
+  imgCheck.push_back(ui->checkBoxT3_mask    ); imgCheckLbl.push_back("mask" );
   imgCheck.push_back(ui->checkBoxT3_row     ); imgCheckLbl.push_back("row"  );
   imgCheck.push_back(ui->checkBoxT3_col     ); imgCheckLbl.push_back("col"  );
   // - tab3: pushButton to navigate through images
@@ -149,6 +147,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
   // TODO: implement mouse selection
   for ( auto &i : imgRadio ) i->setVisible(false);
+
+  // -
+  connect(ui->pushButtonT0_load,&QPushButton::clicked,this,[=](){checkData();});
+  for ( auto &i : fileBtnAdd ) connect(i,&QPushButton::clicked,this,[=](){checkData();});
+  for ( auto &i : fileBtnRmv ) connect(i,&QPushButton::clicked,this,[=](){checkData();});
 
   // refresh tabs when tab is changed
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab0_show();});
@@ -243,6 +246,81 @@ size_t MainWindow::exists(QString f1, QString f2, QString f3)
   if ( exists(f3) ) { ++out; }
 
   return out;
+}
+
+// =================================================================================================
+
+void MainWindow::checkData()
+{
+  if ( !data.count("stat"       ) ) data["stat"       ] = "";
+  if ( !data.count("nset"       ) ) data["nset"       ] = 1;
+  if ( !data.count("periodic"   ) ) data["periodic"   ] = true;
+  if ( !data.count("zeropad"    ) ) data["zeropad"    ] = false;
+  if ( !data.count("mask_weight") ) data["mask_weight"] = true;
+  if ( !data.count("pixel_path" ) ) data["pixel_path" ] = "Bresenham";
+  if ( !data.count("roi"        ) ) data["roi"        ] = {0,0};
+
+  if ( !data.count("output") ) {
+    data["output"]["result"] = "";
+    data["output"]["interp"] = "";
+  }
+  if ( !data["output"].count("result") ) data["output"]["result"] = "";
+  if ( !data["output"].count("interp") ) data["output"]["interp"] = "";
+
+  std::vector<std::string> sets;
+  sets.push_back("set0");
+  sets.push_back("set1");
+
+  for ( auto &set : sets ) {
+    if ( !data.count(set) ) {
+      data[set]["field"   ] = "";
+      data[set]["dtype"   ] = "";
+      data[set]["files"   ] = {};
+      data[set]["config"  ] = {};
+    }
+    if ( !data[set].count("field" ) ) data[set]["field" ] = "";
+    if ( !data[set].count("dtype" ) ) data[set]["dtype" ] = "";
+    if ( !data[set].count("files" ) ) data[set]["files" ] = "";
+    if ( !data[set].count("config") ) data[set]["config"] = "";
+  }
+
+  for ( auto &set : sets ) {
+    // collect files
+    // - allocate
+    std::vector<std::string> files;
+    // - fill
+    if ( data.count(set) )
+      for ( size_t i=0; i<data[set]["files"].size(); ++i )
+        files.push_back(data[set]["files"][i]);
+    // collect files stored in "config"
+    // - allocate
+    std::vector<std::string> config;
+    // - fill
+    for ( json::iterator it =data[set]["config"].begin(); it!=data[set]["config"].end()  ; ++it )
+      config.push_back(it.key());
+    // remove files present in "config", but not in "files"
+    for ( auto &fname : config )
+      if ( ! ( std::find(files.begin(),files.end(),fname)!=files.end() ) )
+        data[set]["config"].erase(fname);
+    // initialize defaults
+    std::vector<int> phase = {0,256};
+    std::vector<int> mask  = {};
+    std::vector<int> row   = {0,0};
+    std::vector<int> col   = {0,0};
+    // apply defaults for files that are present in "files" but not in "config"
+    for ( auto &fname : files ) {
+      if ( ! ( std::find(config.begin(),config.end(),fname)!=config.end() ) ) {
+        data[set]["config"][fname]["phase"]["values"] = phase;
+        data[set]["config"][fname]["phase"]["active"] = false;
+        data[set]["config"][fname]["mask" ]["values"] = mask;
+        data[set]["config"][fname]["mask" ]["active"] = false;
+        data[set]["config"][fname]["row"  ]["values"] = row;
+        data[set]["config"][fname]["row"  ]["active"] = false;
+        data[set]["config"][fname]["col"  ]["values"] = col;
+        data[set]["config"][fname]["col"  ]["active"] = false;
+      }
+    }
+  }
 }
 
 // =================================================================================================
@@ -535,11 +613,47 @@ std::vector<std::string> MainWindow::readFiles(size_t iset)
 
 void MainWindow::setFiles(size_t iset, std::vector<std::string> files)
 {
+  // erase current list of files
   if ( data.count(nsetKey[iset]) )
     if ( data[nsetKey[iset]].count("files") )
       data[nsetKey[iset]].erase("files");
 
+  // store list of files
   data[nsetKey[iset]]["files"] = files;
+
+  // collect files stored in "config"
+  // - allocate
+  std::vector<std::string> config;
+  // - fill
+  for ( json::iterator it =data[nsetKey[iset]]["config"].begin();
+                       it!=data[nsetKey[iset]]["config"].end()  ; ++it )
+  {
+    config.push_back(it.key());
+  }
+
+  // remove files present in "config", but not in "files"
+  for ( auto &fname : config )
+    if ( ! ( std::find(files.begin(),files.end(),fname)!=files.end() ) )
+      data[nsetKey[iset]]["config"].erase(fname);
+
+  // initialize defaults
+  std::vector<int> phase = {0,256};
+  std::vector<int> mask  = {};
+  std::vector<int> row   = {0,0};
+  std::vector<int> col   = {0,0};
+  // apply defaults for files that are present in "files" but not in "config"
+  for ( auto &fname : files ) {
+    if ( ! ( std::find(config.begin(),config.end(),fname)!=config.end() ) ) {
+      data[nsetKey[iset]]["config"][fname]["phase"]["values"] = phase;
+      data[nsetKey[iset]]["config"][fname]["phase"]["active"] = false;
+      data[nsetKey[iset]]["config"][fname]["mask" ]["values"] = mask;
+      data[nsetKey[iset]]["config"][fname]["mask" ]["active"] = false;
+      data[nsetKey[iset]]["config"][fname]["row"  ]["values"] = row;
+      data[nsetKey[iset]]["config"][fname]["row"  ]["active"] = false;
+      data[nsetKey[iset]]["config"][fname]["col"  ]["values"] = col;
+      data[nsetKey[iset]]["config"][fname]["col"  ]["active"] = false;
+    }
+  }
 }
 
 // =================================================================================================
