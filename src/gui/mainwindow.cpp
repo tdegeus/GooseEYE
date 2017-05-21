@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(I2v,SIGNAL(valueChanged(int)),I1v,SLOT(setValue(int)));
 
   QSlider *zoom = ui->sliderT3_zoom;
-  connect(ui->pushButtonT3_zoomIm ,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()-1);});
+  connect(ui->pushButtonT3_zoomIn ,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()-1);});
   connect(ui->pushButtonT3_zoomOut,&QPushButton::clicked,[=](){zoom->setValue(zoom->value()+1);});
 
   // tab3: switch set/image
@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
   imBtn.push_back(ui->pushButtonT3_imgPrev  ); imBtn.push_back(ui->pushButtonT3_imgNext);
   imBtn.push_back(ui->pushButtonT3_clear    );
   imBtn.push_back(ui->pushButtonT3_apply    );
-  imBtn.push_back(ui->pushButtonT3_zoomIm   );
+  imBtn.push_back(ui->pushButtonT3_zoomIn   );
   imBtn.push_back(ui->pushButtonT3_zoomOut  );
   // - tab3: comboBox to select set, image, and colormaps
   imCombo.push_back(ui->comboBoxT3_set      );
@@ -875,7 +875,6 @@ void MainWindow::tab3_show()
     }
   }
 }
-
 
 // =================================================================================================
 

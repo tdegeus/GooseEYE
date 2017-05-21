@@ -36,14 +36,16 @@ using json = nlohmann::json;
 class QtImage {
 public:
 
-mat::matrix<int> data        ; // image, as matrix
-QImage           dataQt      ; // image, as Qt object
-mat::matrix<int> img         ; // image, as matrix
-mat::matrix<int> msk         ; // image, as matrix
-mat::matrix<unsigned char> view        ; // image, as matrix
-size_t           nrow     = 0;
-size_t           ncol     = 0;
-double           scale       ; // scale factor, to be used to display
+// -------------------------------------------------------------------------------------------------
+
+mat::matrix<int>           data        ; // raw image
+QImage                     dataQt      ; // raw image
+mat::matrix<int>           img         ; // interpreted image
+mat::matrix<int>           msk         ; // mask corresponding to interpreted images
+mat::matrix<unsigned char> view        ; // image to view using Qt
+size_t                     nrow     = 0; // number of rows
+size_t                     ncol     = 0; // number of columns
+double                     scale       ; // scale factor to be used in rendering
 
 // -------------------------------------------------------------------------------------------------
 
@@ -53,7 +55,7 @@ QtImage(){};
 
 // -------------------------------------------------------------------------------------------------
 
-void setScale(int width=0, int height=0, int zoom=0)
+void setScale(int width, int height, int zoom)
 {
   double zm   = pow(1.066,static_cast<double>(zoom));
   double wdth = zm*static_cast<double>(width )/static_cast<double>(data.shape()[1]);
@@ -69,6 +71,8 @@ void setScale(int width=0, int height=0, int zoom=0)
 
 class Filter {
 public:
+
+// -------------------------------------------------------------------------------------------------
 
 bool                active = false;
 std::vector<size_t> data;
@@ -111,6 +115,8 @@ std::vector<size_t> aslist(size_t n)
 class File {
 public:
 
+// -------------------------------------------------------------------------------------------------
+
 QString name;
 Filter  phase;
 Filter  mask;
@@ -132,6 +138,8 @@ File(){};
 
 class Set {
 public:
+
+// -------------------------------------------------------------------------------------------------
 
 QString           field = "";
 QString           dtype = "";
@@ -160,12 +168,16 @@ void rm(std::vector<size_t> idx) {
 
 };
 
+// -------------------------------------------------------------------------------------------------
+
 };
 
 // =================================================================================================
 
 class Data {
 public:
+
+// -------------------------------------------------------------------------------------------------
 
 QDir    path        = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
 QString fname       = "";
@@ -385,6 +397,8 @@ bool read(QString fname) {
   return true;
 };
 
+// -------------------------------------------------------------------------------------------------
+
 };
 
 // =================================================================================================
@@ -403,12 +417,12 @@ public:
 
 private slots:
   // directly connect buttons
-  void on_pushButtonT0_load_clicked();                        // load JSON      -> update "data"
+  void on_pushButtonT0_load_clicked();                    // load JSON      -> update "data"
   void on_pushButtonT0_path_clicked();                    // change path    -> update "data"
   void on_lineEditT0_json_textEdited(const QString &text);// manual file-name change
   void on_lineEditT0_res1_textEdited(const QString &text);// manual file-name change
   void on_lineEditT0_res2_textEdited(const QString &text);// manual file-name change
-  void on_pushButtonT2_cp_clicked();                          // copy files "set0" -> "set1"
+  void on_pushButtonT2_cp_clicked();                      // copy files "data.sets[0]" to "...[1]"
   // connect groups of buttons
   void fileAdd(size_t); // add    files         -> update "data"
   void fileRmv(size_t); // remove files         -> update "data"
@@ -417,22 +431,21 @@ private slots:
   void fileSrt(size_t); // sort   files by name -> update "data"
   // synchronize widgets and "data"
   void tab1_read    (); // update "data" with new information from widgets
-  void tab3_read    ();
-  void tab3_default ();
-  void tab3_applyAll();
-  void tab0_show    (); // refresh with new "data"
-  void tab1_show    (); // refresh with new "data"
-  void tab2_show    (); // refresh with new "data"
-  void tab3_show    (); // refresh with new "data"
-  void tab3_imag    (); // refresh with new "data"
-
+  void tab3_read    (); // update "data" with new information from widgets
+  void tab3_default (); // set "File" defaults for current image
+  void tab3_applyAll(); // apply "File" of current image to all images in the set
+  void tab0_show    (); // refresh widget with new "data"
+  void tab1_show    (); // refresh widget with new "data"
+  void tab2_show    (); // refresh widget with new "data"
+  void tab3_show    (); // refresh widget with new "data"
+  void tab3_imag    (); // re-render image
 
 private:
-
+  // store fields
   Ui::MainWindow  *ui;
   Data             data;
   QtImage          image;
-
+  // arrays with buttons
   std::vector<QRadioButton*> statBtn;    // list with buttons, each corresponding to one statistic
   std::vector<QString>       statKey;    // names corresponding to "statBtn"
   std::vector<QRadioButton*> typeBtn;    // list with buttons with dtypes: [b0,i0,f0,b1,i1,f1]
@@ -447,20 +460,20 @@ private:
   std::vector<QListWidget*>  fileLst;    // all file lists
   std::vector<QLabel*>       propLbl;    // list with labels to denote the field-type ["phase",...]
   std::vector<QLabel*>       typeLbl;    // list with labels to denote the data-type
-  std::vector<QPushButton*>  imBtn;     // list with all image selection buttons
-  std::vector<QComboBox*>    imCombo;
-  std::vector<QCheckBox*>    imCheck;
-  std::vector<QSpinBox*>     imSpn;
-  std::vector<QSpinBox*>     imSpnPhase;
-  std::vector<QSpinBox*>     imSpnMask;
-  std::vector<QSpinBox*>     imSpnRow;
-  std::vector<QSpinBox*>     imSpnCol;
-  std::vector<QRadioButton*> imRadio;
+  std::vector<QPushButton*>  imBtn;      // list with all image selection buttons
+  std::vector<QComboBox*>    imCombo;    // list with all comboBoxes used to view the image
+  std::vector<QCheckBox*>    imCheck;    // list with all checkBoxes used for image manipulation
+  std::vector<QSpinBox*>     imSpn;      // list with all spinBoxes used for image manipulation
+  std::vector<QSpinBox*>     imSpnPhase; // - phase selection
+  std::vector<QSpinBox*>     imSpnMask;  // - mask  selection
+  std::vector<QSpinBox*>     imSpnRow;   // - row   selection
+  std::vector<QSpinBox*>     imSpnCol;   // - col   selection
+  std::vector<QRadioButton*> imRadio;    // list with all mouse selection buttons
   std::vector<QButtonGroup*> btnGroup;   // list with all groups of radioButtons
-
+  // support functions
   bool   promptQuestion(QString);        // prompt question to user (return response)
   void   promptWarning (QString);        // prompt warning to user
-  bool   exists(QString);                // check if a file exits (NB: relative path wrt "out_path")
+  bool   exists(QString);                // check if a file exits (relative w.r.t. "data.path")
   size_t exists(QString,QString,QString);// check how many of these files exist
 };
 

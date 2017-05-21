@@ -996,7 +996,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButtonT3_zoomIm">
+             <widget class="QPushButton" name="pushButtonT3_zoomIn">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -2924,7 +2924,7 @@
   <tabstop>pushButtonT3_apply</tabstop>
   <tabstop>sliderT3_zoom</tabstop>
   <tabstop>pushButtonT3_zoomOut</tabstop>
-  <tabstop>pushButtonT3_zoomIm</tabstop>
+  <tabstop>pushButtonT3_zoomIn</tabstop>
   <tabstop>spinBoxT3_phaseLow</tabstop>
   <tabstop>spinBoxT3_phaseHgh</tabstop>
   <tabstop>spinBoxT3_mask0Low</tabstop>
