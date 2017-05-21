@@ -669,7 +669,7 @@
               <item>
                <widget class="QLabel" name="label_5">
                 <property name="text">
-                 <string>Images 1 (&quot;set0&quot;)</string>
+                 <string>Images 1</string>
                 </property>
                </widget>
               </item>
@@ -800,7 +800,7 @@
               <item>
                <widget class="QLabel" name="label_6">
                 <property name="text">
-                 <string>Images 2 (&quot;set1&quot;)</string>
+                 <string>Images 2</string>
                 </property>
                </widget>
               </item>
@@ -2958,9 +2958,9 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="buttonGroupT1_stat"/>
+  <buttongroup name="buttonGroupT3_mouse"/>
   <buttongroup name="buttonGroupT1_set0"/>
   <buttongroup name="buttonGroupT1_set1"/>
-  <buttongroup name="buttonGroupT3_mouse"/>
-  <buttongroup name="buttonGroupT1_stat"/>
  </buttongroups>
 </ui>
