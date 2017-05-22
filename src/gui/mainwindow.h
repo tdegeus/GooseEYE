@@ -41,10 +41,13 @@ public:
 mat::matrix<int>           data        ; // raw image
 QImage                     dataQt      ; // raw image
 mat::matrix<int>           img         ; // interpreted image
+mat::matrix<double>        fmg         ; // interpreted image
 mat::matrix<int>           msk         ; // mask corresponding to interpreted images
 mat::matrix<unsigned char> view        ; // image to view using Qt
-size_t                     nrow     = 0; // number of rows
-size_t                     ncol     = 0; // number of columns
+size_t                     nrow = 0    ; // number of rows
+size_t                     ncol = 0    ; // number of columns
+double                     N    = 0.0  ; // number of data-points (points that are not masked)
+double                     mean = 0.0  ; // spatial average
 double                     scale       ; // scale factor to be used in rendering
 
 // -------------------------------------------------------------------------------------------------
@@ -190,6 +193,10 @@ QString pixel_path  = "Bresenham";
 std::vector<QString> pdf  = {"",""};
 std::vector<size_t>  roi  = {0,0};
 std::vector<Set>     sets;
+mat::matrix<double>  res;
+mat::matrix<double>  resnorm;
+double               mean;
+double               meannorm;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -272,15 +279,16 @@ void image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
   }
 
   // allocate output
-  out.img.resize({jrow-irow,jcol-icol});
-  out.msk.resize({jrow-irow,jcol-icol});
+  out.fmg.resize({jrow-irow,jcol-icol}); out.fmg.zeros();
+  out.img.resize({jrow-irow,jcol-icol}); out.img.zeros();
+  out.msk.resize({jrow-irow,jcol-icol}); out.msk.zeros();
 
   // phase threshold float: retain values; everything outside bounds is masked
   if ( sets[iset].dtype=="float" ) {
     for ( size_t i=0; i<(jrow-irow); ++i ) {
       for ( size_t j=0; j<(jcol-icol); ++j ) {
         if ( out.data(i+irow,j+icol)>=min && out.data(i+irow,j+icol)<max )
-          out.img(i,j) = out.data(i+irow,j+icol);
+          out.fmg(i,j) = static_cast<double>(out.data(i+irow,j+icol))/255.;
         else
           out.msk(i,j) = 1;
       }
@@ -292,14 +300,8 @@ void image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
       for ( size_t j=0; j<(jcol-icol); ++j )
         if ( out.data(i+irow,j+icol)>=min && out.data(i+irow,j+icol)<max )
           out.img(i,j) = 1;
-  }
 
-  // int: determine clusters from binary image
-  if ( sets[iset].dtype=="int" ) {
-    mat::matrix<int> clusters,centers;
-    std::tie(clusters,centers) = Image::clusters(out.img,periodic);
-    for ( size_t i=0; i<clusters.size(); ++i )
-      out.img[i] = clusters[i];
+    out.fmg = out.img;
   }
 
   // mask threshold
@@ -315,19 +317,38 @@ void image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
     }
   }
 
+  // compute average
+  std::tie(out.mean,out.N) = Image::mean(out.img,out.msk);
+
+  // int: determine clusters from binary image
+  if ( sets[iset].dtype=="int" ) {
+    for ( size_t i=0; i<out.img.size(); ++i )
+      if ( out.msk[i] )
+        out.img[i] = 0;
+
+    mat::matrix<int> clusters,centers;
+    std::tie(clusters,centers) = Image::clusters(out.img,periodic);
+    for ( size_t i=0; i<clusters.size(); ++i )
+      out.img[i] = clusters[i];
+  }
+
   if ( crop<-1 )
     return;
 
   // temporary copy
+
+  mat::matrix<double> fmg = out.fmg;
   mat::matrix<int> img = out.img;
   mat::matrix<int> msk = out.msk;
 
   // allocate output
+  out.fmg.resize(out.data.shape()); out.fmg.ones (); out.fmg *= static_cast<double>(crop);
   out.img.resize(out.data.shape()); out.img.ones (); out.img *= crop;
   out.msk.resize(out.data.shape()); out.msk.zeros();
 
   for ( size_t i=0; i<img.shape()[0]; ++i ) {
     for ( size_t j=0; j<img.shape()[1]; ++j ) {
+      out.fmg(i+irow,j+icol) = fmg(i,j);
       out.img(i+irow,j+icol) = img(i,j);
       out.msk(i+irow,j+icol) = msk(i,j);
     }
@@ -423,15 +444,19 @@ private slots:
   void on_lineEditT0_res1_textEdited(const QString &text);// manual file-name change
   void on_lineEditT0_res2_textEdited(const QString &text);// manual file-name change
   void on_pushButtonT2_cp_clicked();                      // copy files "data.sets[0]" to "...[1]"
+  void on_pushButtonT4_compute_clicked();                 // compute result
   // connect groups of buttons
-  void fileAdd(size_t); // add    files         -> update "data"
-  void fileRmv(size_t); // remove files         -> update "data"
-  void fileUp (size_t); // move   files up      -> update "data"
-  void fileDwn(size_t); // move   files down    -> update "data"
-  void fileSrt(size_t); // sort   files by name -> update "data"
+  void fileAdd(size_t iset); // add    files         -> update "data"
+  void fileRmv(size_t iset); // remove files         -> update "data"
+  void fileUp (size_t iset); // move   files up      -> update "data"
+  void fileDwn(size_t iset); // move   files down    -> update "data"
+  void fileSrt(size_t iset); // sort   files by name -> update "data"
+  // compute statistic (applies one 'increment')
+  void computeS2(size_t iimg);
   // synchronize widgets and "data"
   void tab1_read    (); // update "data" with new information from widgets
   void tab3_read    (); // update "data" with new information from widgets
+  void tab4_read    (); // update "data" with new information from widgets
   void tab3_default (); // set "File" defaults for current image
   void tab3_applyAll(); // apply "File" of current image to all images in the set
   void tab0_show    (); // refresh widget with new "data"
@@ -439,6 +464,9 @@ private slots:
   void tab2_show    (); // refresh widget with new "data"
   void tab3_show    (); // refresh widget with new "data"
   void tab3_imag    (); // re-render image
+  void tab4_show    (); // refresh widget with new "data"
+  void tab4_plot    (); // re-render results
+  void tab4_save    (); // save JSON and PDFs
 
 private:
   // store fields
@@ -446,30 +474,33 @@ private:
   Data             data;
   QtImage          image;
   // arrays with buttons
-  std::vector<QRadioButton*> statBtn;    // list with buttons, each corresponding to one statistic
-  std::vector<QString>       statKey;    // names corresponding to "statBtn"
-  std::vector<QRadioButton*> typeBtn;    // list with buttons with dtypes: [b0,i0,f0,b1,i1,f1]
-  std::vector<QString>       typeKey;    // names corresponding to "typeBtn"
-  std::vector<QCheckBox*>    nsetBtn;    // list with buttons to select the number of sets
-  std::vector<QPushButton*>  fileBtn;    // list with all file manipulation buttons (tab2)
-  std::vector<QPushButton*>  fileBtnAdd; // - add buttons ["set0","set1"]
-  std::vector<QPushButton*>  fileBtnRmv; // - add remove buttons
-  std::vector<QPushButton*>  fileBtnUp ; // - all move up buttons
-  std::vector<QPushButton*>  fileBtnDwn; // - all move down buttons
-  std::vector<QPushButton*>  fileBtnSrt; // - all sort buttons
-  std::vector<QListWidget*>  fileLst;    // all file lists
-  std::vector<QLabel*>       propLbl;    // list with labels to denote the field-type ["phase",...]
-  std::vector<QLabel*>       typeLbl;    // list with labels to denote the data-type
-  std::vector<QPushButton*>  imBtn;      // list with all image selection buttons
-  std::vector<QComboBox*>    imCombo;    // list with all comboBoxes used to view the image
-  std::vector<QCheckBox*>    imCheck;    // list with all checkBoxes used for image manipulation
-  std::vector<QSpinBox*>     imSpn;      // list with all spinBoxes used for image manipulation
-  std::vector<QSpinBox*>     imSpnPhase; // - phase selection
-  std::vector<QSpinBox*>     imSpnMask;  // - mask  selection
-  std::vector<QSpinBox*>     imSpnRow;   // - row   selection
-  std::vector<QSpinBox*>     imSpnCol;   // - col   selection
-  std::vector<QRadioButton*> imRadio;    // list with all mouse selection buttons
-  std::vector<QButtonGroup*> btnGroup;   // list with all groups of radioButtons
+  std::vector<QRadioButton*>   statBtn;    // list with buttons, each corresponding to one statistic
+  std::vector<QString>         statKey;    // names corresponding to "statBtn"
+  std::vector<QRadioButton*>   typeBtn;    // list with buttons with dtypes: [b0,i0,f0,b1,i1,f1]
+  std::vector<QString>         typeKey;    // names corresponding to "typeBtn"
+  std::vector<QCheckBox*>      nsetBtn;    // list with buttons to select the number of sets
+  std::vector<QPushButton*>    fileBtn;    // list with all file manipulation buttons (tab2)
+  std::vector<QPushButton*>    fileBtnAdd; // - add buttons ["set0","set1"]
+  std::vector<QPushButton*>    fileBtnRmv; // - add remove buttons
+  std::vector<QPushButton*>    fileBtnUp ; // - all move up buttons
+  std::vector<QPushButton*>    fileBtnDwn; // - all move down buttons
+  std::vector<QPushButton*>    fileBtnSrt; // - all sort buttons
+  std::vector<QListWidget*>    fileLst;    // all file lists
+  std::vector<QLabel*>         propLbl;    // list with labels denoting the field-type ["phase",...]
+  std::vector<QLabel*>         typeLbl;    // list with labels denoting the data-type
+  std::vector<QPushButton*>    imBtn;      // list with all image selection buttons
+  std::vector<QComboBox*>      imCombo;    // list with all comboBoxes used to view the image
+  std::vector<QCheckBox*>      imCheck;    // list with all checkBoxes used for image manipulation
+  std::vector<QSpinBox*>       imSpn;      // list with all spinBoxes used for image manipulation
+  std::vector<QSpinBox*>       imSpnPhase; // - phase selection
+  std::vector<QSpinBox*>       imSpnMask;  // - mask  selection
+  std::vector<QSpinBox*>       imSpnRow;   // - row   selection
+  std::vector<QSpinBox*>       imSpnCol;   // - col   selection
+  std::vector<QRadioButton*>   imRadio;    // list with all mouse selection buttons
+  std::vector<QSpinBox*>       roiSpin;    // list with ROI shape
+  std::vector<QDoubleSpinBox*> resSpin;    // list with colorbar ranges
+  std::vector<QComboBox*>      resCombo;   // list with colorbars
+  std::vector<QButtonGroup*>   btnGroup;   // list with all groups of radioButtons
   // support functions
   bool   promptQuestion(QString);        // prompt question to user (return response)
   void   promptWarning (QString);        // prompt warning to user

@@ -95,10 +95,10 @@ Mi dilate ( Mi &src, Mi &kernel, Vi& iterations  , b periodic=true );
 // ----------
 
 // spatial average
-template <class T> double mean (
+template <class T> std::tuple<double,double> mean (
   M<T> &src
 );
-template <class T> double mean (
+template <class T> std::tuple<double,double> mean (
   M<T> &src , Mi &mask
 );
 

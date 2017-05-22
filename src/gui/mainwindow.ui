@@ -1939,7 +1939,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QProgressBar" name="tab4_progressBar">
+           <widget class="QProgressBar" name="progressBarT4">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2837,7 +2837,6 @@
      <string>File</string>
     </property>
     <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -2958,9 +2957,9 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroupT1_stat"/>
   <buttongroup name="buttonGroupT3_mouse"/>
   <buttongroup name="buttonGroupT1_set0"/>
   <buttongroup name="buttonGroupT1_set1"/>
+  <buttongroup name="buttonGroupT1_stat"/>
  </buttongroups>
 </ui>

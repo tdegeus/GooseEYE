@@ -992,15 +992,15 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
 // =================================================================================================
 
 template <class T>
-double mean ( mat::matrix<T> &src )
+std::tuple<double,double> mean ( mat::matrix<T> &src )
 {
-  return src.mean();
+  return std::make_tuple(src.mean(),static_cast<double>(src.size()));
 }
 
 // -----------------------------------------------------------------------------
 
 template <class T>
-double mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
+std::tuple<double,double> mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
 {
   T      out = static_cast<T>(0);
   size_t n   = 0;
@@ -1012,15 +1012,15 @@ double mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
     }
   }
 
-  return static_cast<double>(out)/static_cast<double>(n);
+  return std::make_tuple(static_cast<double>(out)/static_cast<double>(n),static_cast<double>(n));
 }
 
 // -----------------------------------------------------------------------------
 
-template double mean<int   >(mat::matrix<int   > &);
-template double mean<double>(mat::matrix<double> &);
-template double mean<int   >(mat::matrix<int   > &, mat::matrix<int> &);
-template double mean<double>(mat::matrix<double> &, mat::matrix<int> &);
+template std::tuple<double,double> mean<int   >(mat::matrix<int   > &);
+template std::tuple<double,double> mean<double>(mat::matrix<double> &);
+template std::tuple<double,double> mean<int   >(mat::matrix<int   > &, mat::matrix<int> &);
+template std::tuple<double,double> mean<double>(mat::matrix<double> &, mat::matrix<int> &);
 
 // =================================================================================================
 // TODO include in header

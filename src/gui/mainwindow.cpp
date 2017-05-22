@@ -119,6 +119,17 @@ MainWindow::MainWindow(QWidget *parent) :
   imRadio.push_back(ui->radioButtonT3_mask  );
   imRadio.push_back(ui->radioButtonT3_row   );
   imRadio.push_back(ui->radioButtonT3_col   );
+  // - tab4: ROI shape
+  roiSpin.push_back(ui->spinBoxT4_roiRow    );
+  roiSpin.push_back(ui->spinBoxT4_roiCol    );
+  // - tab4: colorbar ranges
+  resSpin.push_back(ui->doubleSpinBoxT4_climLowRes1);
+  resSpin.push_back(ui->doubleSpinBoxT4_climHghRes1);
+  resSpin.push_back(ui->doubleSpinBoxT4_climLowRes2);
+  resSpin.push_back(ui->doubleSpinBoxT4_climHghRes2);
+  // - tab4: colorbars
+  resCombo.push_back(ui->comboBoxT4_cmapRes1);
+  resCombo.push_back(ui->comboBoxT4_cmapRes2);
   // - groups of radioButtons
   btnGroup.push_back(ui->buttonGroupT1_stat );
   btnGroup.push_back(ui->buttonGroupT1_set0 );
@@ -134,6 +145,7 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( auto &i : nsetBtn ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab1_read()));
   for ( auto &i : imCheck ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab3_read()));
   for ( auto &i : imSpn   ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab3_read()));
+  for ( auto &i : roiSpin ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab4_read()));
 
   // tab2: file manipulation button pressed -> update "data"
   for ( size_t i=0; i<2; ++i ) connect(fileBtnAdd[i],&QPushButton::clicked,this,[=](){fileAdd(i);});
@@ -142,10 +154,6 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( size_t i=0; i<2; ++i ) connect(fileBtnDwn[i],&QPushButton::clicked,this,[=](){fileDwn(i);});
   for ( size_t i=0; i<2; ++i ) connect(fileBtnSrt[i],&QPushButton::clicked,this,[=](){fileSrt(i);});
 
-  // tab3: mark to apply image defaults / apply settings to all images
-  connect(ui->pushButtonT3_clear,SIGNAL(clicked(bool)),this,SLOT(tab3_default ()));
-  connect(ui->pushButtonT3_apply,SIGNAL(clicked(bool)),this,SLOT(tab3_applyAll()));
-
   // refresh file related views when JSON is loaded or "data.path" is changed
   connect(ui->pushButtonT0_path,SIGNAL(clicked(bool)),this,SLOT(tab0_show()));
   connect(ui->pushButtonT0_path,SIGNAL(clicked(bool)),this,SLOT(tab2_show()));
@@ -153,8 +161,18 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->pushButtonT0_load,SIGNAL(clicked(bool)),this,SLOT(tab1_show()));
   connect(ui->pushButtonT0_load,SIGNAL(clicked(bool)),this,SLOT(tab2_show()));
 
+  // tab3: mark to apply image defaults / apply settings to all images
+  connect(ui->pushButtonT3_clear,SIGNAL(clicked(bool)),this,SLOT(tab3_default ()));
+  connect(ui->pushButtonT3_apply,SIGNAL(clicked(bool)),this,SLOT(tab3_applyAll()));
+
   // tab3: zoom changed -> re-render images
   connect(ui->sliderT3_zoom,SIGNAL(valueChanged(int)),this,SLOT(tab3_imag()));
+
+  connect(ui->pushButtonT4_save,SIGNAL(clicked(bool)),this,SLOT(tab4_plot()));
+
+  // tab4: save all
+  connect(ui->actionSave       ,SIGNAL(triggered(bool)),this,SLOT(tab4_save()));
+  connect(ui->pushButtonT4_save,SIGNAL(clicked(bool))  ,this,SLOT(tab4_save()));
 
   // tab2/tab3: button pressed -> refresh view with new "data"
   for ( auto &i : statBtn    ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab1_show()));
@@ -165,10 +183,13 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( auto &i : imBtn      ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab3_imag()));
   for ( auto &i : imCheck    ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab3_show()));
   for ( auto &i : imCheck    ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab3_imag()));
-  for ( auto &i : imSpn      ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab3_show()));
-  for ( auto &i : imSpn      ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab3_imag()));
   for ( auto &i : imCombo    ) connect(i,SIGNAL(activated(int))   ,this,SLOT(tab3_show()));
   for ( auto &i : imCombo    ) connect(i,SIGNAL(activated(int))   ,this,SLOT(tab3_imag()));
+  for ( auto &i : resCombo   ) connect(i,SIGNAL(activated(int))   ,this,SLOT(tab4_plot()));
+  for ( auto &i : imSpn      ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab3_show()));
+  for ( auto &i : imSpn      ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab3_imag()));
+  for ( auto &i : roiSpin    ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab4_show()));
+  for ( auto &i : resSpin    ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab4_plot()));
 
   // refresh tabs when tab is changed
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab0_show();});
@@ -176,6 +197,7 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab2_show();});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab3_show();});
   connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab3_imag();});
+  connect(ui->tabWidget,&QTabWidget::currentChanged,[=](){tab4_show();});
 }
 
 // =================================================================================================
@@ -403,6 +425,11 @@ void MainWindow::tab1_show()
       for ( size_t i=0; i<typeKey.size(); ++i )
         if ( dt[j*typeKey.size()+i] )
           data.sets[j].dtype = typeKey[i];
+  }
+  // link data-types
+  if ( data.sets.size()==2 ) {
+    if      ( data.stat=="S2"  ) data.sets[1].dtype = data.sets[0].dtype;
+    else if ( data.stat=="C2"  ) data.sets[1].dtype = data.sets[0].dtype;
   }
   // set fields
   QString n0,n1;
@@ -837,7 +864,7 @@ void MainWindow::tab3_show()
     // float: max -> 253 (to make room for mask)
     if ( data.sets[iset].dtype=="float" )
       for ( size_t i=0; i<image.img.size(); ++i )
-        image.view[i] = std::min(image.img[i],253);
+        image.view[i] = static_cast<int>(image.fmg[i]*253.);
     // binary: 1 -> 253
     if ( data.sets[iset].dtype=="binary" )
       for ( size_t i=0; i<image.img.size(); ++i )
@@ -945,3 +972,162 @@ void MainWindow::tab3_imag()
   }
 }
 
+// =================================================================================================
+
+void MainWindow::tab4_read()
+{
+  for ( size_t i=0; i<roiSpin.size(); ++i )
+  {
+    size_t val = roiSpin[i]->value();
+    if ( val%2==0 )
+      ++val;
+    data.roi[i] = val;
+  }
+}
+
+// =================================================================================================
+
+void MainWindow::tab4_show()
+{
+  for ( size_t i=0; i<roiSpin.size(); ++i )
+    roiSpin[i]->setValue(data.roi[i]);
+
+  ui->pushButtonT4_compute->setEnabled(false);
+
+  if ( data.sets.size()==2 ) {
+    if ( data.sets[0].files.size()!=data.sets[1].files.size() )
+      return;
+  }
+  else if ( data.sets.size()!=1 ) {
+    return;
+  }
+
+  if ( data.sets[0].files.size()<=0 )
+    return;
+
+  for ( auto &i : data.roi )
+    if ( i<=0 )
+      return;
+
+  ui->pushButtonT4_compute->setEnabled(true);
+}
+
+// =================================================================================================
+
+void MainWindow::tab4_plot()
+{
+  // configure axis rect:
+  ui->raw_customPlot->axisRect()->setupFullAxesBox(true);
+  ui->raw_customPlot->xAxis->setLabel("Delta x");
+  ui->raw_customPlot->yAxis->setLabel("Delta y");
+
+  // set up the QCPColorMap:
+  QCPColorMap *colorMap = new QCPColorMap(ui->raw_customPlot->xAxis, ui->raw_customPlot->yAxis);
+  std::vector<size_t> N = data.roi;
+  mat::matrix<double> D = data.res/data.resnorm;
+  int nx = (int)N[0];
+  int ny = (int)N[1];
+  colorMap->data()->setSize(nx, ny);
+  colorMap->data()->setRange(QCPRange(-(nx-1)/2,+(nx-1)/2), QCPRange(-(ny-1)/2,+(ny-1)/2));
+  // assign data, by accessing the QCPColorMapData instance of the color map:
+  for ( int i=0; i<nx; i++ )
+    for (int j=0; j<ny; j++ )
+      colorMap->data()->setCell(i,j,D(i,j));
+
+  // add a color scale:
+  ui->raw_customPlot->plotLayout()->remove(ui->raw_customPlot->plotLayout()->element(0,1));
+  QCPColorScale *colorScale = new QCPColorScale(ui->raw_customPlot);
+  ui->raw_customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+  colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+  colorMap->setColorScale(colorScale); // associate the color map with the color scale
+
+  QCPColorGradient cbar;
+  cbar.setLevelCount(256);
+  std::vector<int> src = cppcolormap::colormap(ui->comboBoxT4_cmapRes1->currentText().toStdString(),256);
+  std::vector<float> x = cppcolormap::linspace(0.0,1.0,256);
+  for ( size_t i=9 ; i<256 ; i++ )
+    cbar.setColorStopAt(x[i],QColor(src[i*3+0],src[i*3+1],src[i*3+2]));
+
+  // set the color gradient of the color map to one of the presets:
+  colorMap->setGradient(cbar);
+
+  // rescale the data dimension (color) such that all data points lie in the span visualized by the color gradient:
+  colorMap->rescaleDataRange();
+
+  // make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
+  QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->raw_customPlot);
+  ui->raw_customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+  colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+
+  colorScale->axis()->setRangeLower(ui->doubleSpinBoxT4_climLowRes1->value());
+  colorScale->axis()->setRangeUpper(ui->doubleSpinBoxT4_climHghRes1->value());
+
+  // rescale the key (x) and value (y) axes so the whole color map is visible:
+  ui->raw_customPlot->rescaleAxes();
+  ui->raw_customPlot->replot();
+}
+
+// =================================================================================================
+
+void MainWindow::tab4_save()
+{
+}
+
+// =================================================================================================
+
+void MainWindow::on_pushButtonT4_compute_clicked()
+{
+  // initialize result / average
+  data.res    .resize(data.roi); data.res    .zeros(); data.mean     *= 0.0;
+  data.resnorm.resize(data.roi); data.resnorm.zeros(); data.meannorm *= 0.0;
+
+  // set range progressBar
+  ui->progressBarT4->setMinimum(  0);
+  ui->progressBarT4->setMaximum(100);
+  double N = 100.0/static_cast<double>(data.sets[0].files.size());
+
+  // loop over images
+  for ( size_t iimg=0; iimg<data.sets[0].files.size(); ++iimg )
+  {
+    // - set progress
+    ui->progressBarT4->setValue(static_cast<int>(static_cast<double>(iimg)/N));
+    // - compute statistic
+    if ( data.stat=="S2" ) computeS2(iimg);
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+// TODO: check both phase, both float / binary
+void MainWindow::computeS2(size_t iimg)
+{
+  size_t jset=1;
+  if ( data.sets.size()==1 ) jset=0;
+
+  QtImage f    = data.image(0   ,iimg);
+  QtImage g    = data.image(jset,iimg);
+  bool    flt  = data.sets[0].dtype=="float";
+  bool    msk  = f.msk.sum()>0 || g.msk.sum()>0 || !data.periodic || data.zeropad;
+  bool    pad  = data.zeropad;
+  bool    per  = data.periodic;
+  double  ns   = 0.0;
+
+  mat::matrix<double> r;
+  mat::matrix<double> n   (data.roi); n   .zeros();
+  mat::matrix<double> ones(data.roi); ones.ones ();
+
+  if      (  flt && msk ) std::tie(r,n ) = Image::S2(f.fmg,g.fmg,data.roi,f.msk,g.msk,pad,per);
+  else if ( !flt && msk ) std::tie(r,n ) = Image::S2(f.img,g.img,data.roi,f.msk,g.msk,pad,per);
+  else if (  flt        ) std::tie(r,ns) = Image::S2(f.fmg,g.fmg,data.roi);
+  else if ( !flt        ) std::tie(r,ns) = Image::S2(f.img,g.img,data.roi);
+
+  n            += ns*ones; // if normalization is scalar, convert to matrix (does nothing otherwise)
+  data.res     += n *r;    // add unnormalized result to ensemble
+  data.resnorm += n;       // add normalization to ensemble
+
+  data.mean += f.mean*f.N; data.meannorm += f.N;
+  data.mean += g.mean*g.N; data.meannorm += g.N;
+
+  std::cout << data.mean/data.meannorm << std::endl;
+
+}
