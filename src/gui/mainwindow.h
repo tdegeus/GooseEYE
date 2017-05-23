@@ -32,23 +32,30 @@
 using json = nlohmann::json;
 
 // =================================================================================================
+// Store an image read from a file, and different interpreted versions, including view settings
+// =================================================================================================
 
 class QtImage {
 public:
 
 // -------------------------------------------------------------------------------------------------
 
-mat::matrix<int>           data        ; // raw image
-QImage                     dataQt      ; // raw image
-mat::matrix<int>           img         ; // interpreted image
-mat::matrix<double>        fmg         ; // interpreted image
-mat::matrix<int>           msk         ; // mask corresponding to interpreted images
+// Fields:
+mat::matrix<int>           data        ; // raw image as 8-bit matrix ('gray'-values 0..255)
+QImage                     dataQt      ; // raw image as Qt-object
+mat::matrix<int>           imgBin      ; // interpreted image (0    |  1  )
+mat::matrix<double>        imgFlt      ; // interpreted image (0.0 ... 1.0), exists always
+mat::matrix<int>           clsInt      ; // clusters (0...), corresponding to "imgBin"
+mat::matrix<int>           cenInt      ; // center of the clusters in "clsInt"
+mat::matrix<int>           msk         ; // mask (binary: 0 | 1)
 mat::matrix<unsigned char> view        ; // image to view using Qt
 size_t                     nrow = 0    ; // number of rows
 size_t                     ncol = 0    ; // number of columns
 double                     N    = 0.0  ; // number of data-points (points that are not masked)
-double                     mean = 0.0  ; // spatial average
-double                     scale       ; // scale factor to be used in rendering
+double                     mean = 0.0  ; // spatial average of "imgFlt" (bin images eqv to "imgBin")
+double                     scale       ; // scale factor to be used in rendering (see "setScale")
+// Methods:
+// - setScale: compute "scale" from a widget's with/height and a zoom-factor
 
 // -------------------------------------------------------------------------------------------------
 
@@ -71,14 +78,21 @@ void setScale(int width, int height, int zoom)
 };
 
 // =================================================================================================
+// Store threshold as [min0,max0,min1,max1,...] (e.g. gray-values, or rows/columns)
+// =================================================================================================
 
 class Filter {
 public:
 
 // -------------------------------------------------------------------------------------------------
 
-bool                active = false;
-std::vector<size_t> data;
+// Fields:
+bool                active = false; // filter can be set inactive (values or stored but ignored)
+std::vector<size_t> data;           // values stored as [min,max,...], convention: min <= I < max
+// Methods:
+// - fromList: overwrite values from input list
+// - asList: output values as list of a specified list (it is optionally zero-padded)
+// - newPath
 
 // -------------------------------------------------------------------------------------------------
 
@@ -90,8 +104,7 @@ Filter(){};
 
 void fromlist(std::vector<size_t> inp)
 {
-  while ( data.size()<inp.size() )
-    data.push_back(0);
+  data.resize(inp.size());
 
   for ( size_t i=0; i<inp.size(); ++i )
     data[i] = inp[i];
@@ -114,18 +127,21 @@ std::vector<size_t> aslist(size_t n)
 };
 
 // =================================================================================================
+// Store threshold settings and filename (in relative path)
+// =================================================================================================
 
 class File {
 public:
 
 // -------------------------------------------------------------------------------------------------
 
-QString name;
-Filter  phase;
-Filter  mask;
-Filter  row;
-Filter  col;
-bool    setDefault = true;
+// Fields:
+QString name;               // file-name (below a relative path is assumed)
+Filter  phase;              // phase threshold(s)
+Filter  mask;               // phase threshold(s)
+Filter  row;                // rows to select
+Filter  col;                // columns to select
+bool    setDefault = true;  // signal to overwrite all thresholds with defaults at the first chance
 
 // -------------------------------------------------------------------------------------------------
 
@@ -138,20 +154,26 @@ File(){};
 };
 
 // =================================================================================================
+// Store a batch of images, include their interpretation
+// =================================================================================================
 
 class Set {
 public:
 
 // -------------------------------------------------------------------------------------------------
 
-QString           field = "";
-QString           dtype = "";
-std::vector<File> files;
+// Fields:
+QString           field = "";   // type of field: "phase", "weight"
+QString           dtype = "";   // data-type to which to convert the image: "binary", "int", "float"
+std::vector<File> files;        // files (names, and thresholds)
+// Methods:
+// - fileNames: list with filenames (convention: relative paths)
+// - rm: take items with index "idx" from the list of files
 
 // -------------------------------------------------------------------------------------------------
 
-std::vector<QString> fileNames() {
-
+std::vector<QString> fileNames()
+{
   std::vector<QString> out;
 
   for ( auto &file : files )
@@ -162,13 +184,12 @@ std::vector<QString> fileNames() {
 
 // -------------------------------------------------------------------------------------------------
 
-void rm(std::vector<size_t> idx) {
-
+void rm(std::vector<size_t> idx)
+{
   std::sort(idx.begin(),idx.end(),[](size_t i,size_t j){return i>j;});
 
   for ( size_t &i : idx )
     files.erase(files.begin()+i);
-
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -176,27 +197,54 @@ void rm(std::vector<size_t> idx) {
 };
 
 // =================================================================================================
+// Store plot settings
+// =================================================================================================
+
+class Plot {
+public:
+
+// -------------------------------------------------------------------------------------------------
+
+// Fields:
+QString             name = "";        // file-name to store result (PDF)
+QString             cmap = "RdBu_r";  // name of the colormap
+std::vector<double> lim  = {0.0,1.0}; // range of the color-axis
+
+// -------------------------------------------------------------------------------------------------
+
+};
+
+// =================================================================================================
+// All data needed to read images, interpret them, and compute a statistic (incl. result)
+// =================================================================================================
 
 class Data {
 public:
 
 // -------------------------------------------------------------------------------------------------
 
+// Fields (scalars): ("path": path to which all filenames are relative)
 QDir    path        = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
-QString fname       = "";
-QString stat        = "";
-bool    periodic    = true;
-bool    zeropad     = false;
-bool    mask_weight = false;
-QString pixel_path  = "Bresenham";
-
-std::vector<QString> pdf  = {"",""};
-std::vector<size_t>  roi  = {0,0};
-std::vector<Set>     sets;
-mat::matrix<double>  res;
-mat::matrix<double>  resnorm;
-double               mean;
-double               meannorm;
+QString fname       = "";             // filename of the JSON file to store all settings
+QString stat        = "";             // name of the statistic: "S2", "C2", "L", "W2", "W2c"
+bool    periodic    = true;           // assume all images periodic or not
+bool    zeropad     = false;          // zero-pad all images (only for non-periodic analyses)
+bool    mask_weight = false;          // signal to mask weights (for "W2" and "W2c")
+QString pixel_path  = "Bresenham";    // pixel-path algorithm to use (for "L" and "W2c")
+// Fields (lists):
+std::vector<Plot>    plot;            // plot settings
+std::vector<size_t>  roi  = {0,0};    // shape of the output ROI
+std::vector<Set>     sets;            // sets of files (the order of files has to correspond)
+mat::matrix<double>  res;             // result, unnormalized                 (shape == "roi")
+mat::matrix<double>  resnorm;         // normalization to be applied to "res" (shape == "roi")
+double               mean;            // spatial average, unnormalized
+double               meannorm;        // normalization to be applied to "mean"
+// Methods:
+// imageRead: read one image file, convert to mat::matrix, apply defaults (if requested)
+// image: (read one image using "imageRead"), interpret to image by applied thresholds
+// newPath: change the path (changes or the files to a new relative path)
+// write: write all settings of this class to a JSON file
+// read: read settings (partly or all) from a JSON file (used to restore a previous state)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -223,34 +271,36 @@ QtImage imageRead(size_t iset, size_t iimg)
   // check to set defaults
   if ( !file->setDefault )
     return out;
-
+  // - signal that default has been set
+  file->setDefault   = false;
+  // - set all default inactive
   file->phase.active = false;
-  file->phase.data.resize(2);
-  file->phase.data[0] = 0;
-  file->phase.data[1] = 256;
-
-  file->mask.active = false;
-  file->mask.data.resize(0);
-
-  file->row.active = false;
-  file->row.data.resize(2);
-  file->row.data[0] = 0;
-  file->row.data[1] = out.nrow;
-
-  file->col.active = false;
-  file->col.data.resize(2);
-  file->col.data[0] = 0;
-  file->col.data[1] = out.ncol;
-
-  file->setDefault = false;
+  file->mask .active = false;
+  file->row  .active = false;
+  file->col  .active = false;
+  // - resize values
+  file->phase.data.resize(2); // - phase: all gray values in case of an 8-bit image (as read by Qt)
+  file->mask .data.resize(0); // - mask : no mask
+  file->row  .data.resize(2); // - row  : total image
+  file->col  .data.resize(2); // - col  : total image
+  // - apply values (see comments above)
+  file->phase.data[0] = 0;  file->phase.data[1] = 256;
+  file->row  .data[0] = 0;  file->row  .data[1] = out.nrow;
+  file->col  .data[0] = 0;  file->col  .data[1] = out.ncol;
 
   return out;
 };
 
 // -------------------------------------------------------------------------------------------------
 
-void image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
+QtImage image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
 {
+  // check
+  if ( iset>=sets.size() )
+    throw std::runtime_error("'iset' out-of-bounds");
+  if ( iimg>=sets[iset].files.size() )
+    throw std::runtime_error("'iimg' out-of-bounds");
+
   // alias
   File *file = &sets[iset].files[iimg];
 
@@ -279,80 +329,95 @@ void image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
   }
 
   // allocate output
-  out.fmg.resize({jrow-irow,jcol-icol}); out.fmg.zeros();
-  out.img.resize({jrow-irow,jcol-icol}); out.img.zeros();
-  out.msk.resize({jrow-irow,jcol-icol}); out.msk.zeros();
+  out.imgBin.resize({jrow-irow,jcol-icol}); out.imgBin.zeros();
+  out.imgFlt.resize({jrow-irow,jcol-icol}); out.imgFlt.zeros();
+  out.clsInt.resize({jrow-irow,jcol-icol}); out.clsInt.zeros();
+  out.cenInt.resize({jrow-irow,jcol-icol}); out.cenInt.zeros();
+  out.msk   .resize({jrow-irow,jcol-icol}); out.msk   .zeros();
+  out.view  .resize({jrow-irow,jcol-icol});
 
-  // phase threshold float: retain values; everything outside bounds is masked
-  if ( sets[iset].dtype=="float" ) {
+  // phase threshold
+  // - float: retain values; everything outside bounds is masked
+  if ( sets[iset].dtype=="float" )
+  {
     for ( size_t i=0; i<(jrow-irow); ++i ) {
       for ( size_t j=0; j<(jcol-icol); ++j ) {
         if ( out.data(i+irow,j+icol)>=min && out.data(i+irow,j+icol)<max )
-          out.fmg(i,j) = static_cast<double>(out.data(i+irow,j+icol))/255.;
+          out.imgFlt(i,j) = static_cast<double>(out.data(i+irow,j+icol))/255.;
         else
           out.msk(i,j) = 1;
       }
     }
   }
-  // phase threshold binary/int: between (min,max)->1, else->0 (nothing masked)
-  else {
+  // - binary (or int): between (min,max)->1, else->0 (nothing masked)
+  else
+  {
+    // -- apply threshold
     for ( size_t i=0; i<(jrow-irow); ++i )
       for ( size_t j=0; j<(jcol-icol); ++j )
         if ( out.data(i+irow,j+icol)>=min && out.data(i+irow,j+icol)<max )
-          out.img(i,j) = 1;
-
-    out.fmg = out.img;
+          out.imgBin(i,j) = 1;
+    // -- copy to float image (for convenience)
+    out.imgFlt = out.imgBin;
   }
 
   // mask threshold
-  if ( file->mask.active ) {
+  if ( file->mask.active )
+  {
     for ( size_t imsk=0; imsk<file->mask.data.size(); imsk+=2 ) {
-      int low = file->mask.data[imsk  ];
-      int hgh = file->mask.data[imsk+1];
-      if ( low<hgh )
-        for ( size_t i=0; i<(jrow-irow); ++i )
-          for ( size_t j=0; j<(jcol-icol); ++j )
-            if ( out.data(i+irow,j+icol)>=low && out.data(i+irow,j+icol)<hgh )
-              out.msk(i,j) = 1;
+      int min = file->mask.data[imsk  ];
+      int max = file->mask.data[imsk+1];
+      for ( size_t i=0; i<(jrow-irow); ++i )
+        for ( size_t j=0; j<(jcol-icol); ++j )
+          if ( out.data(i+irow,j+icol)>=min && out.data(i+irow,j+icol)<max )
+            out.msk(i,j) = 1;
     }
   }
 
   // compute average
-  std::tie(out.mean,out.N) = Image::mean(out.img,out.msk);
+  std::tie(out.mean,out.N) = Image::mean(out.imgFlt,out.msk);
 
   // int: determine clusters from binary image
-  if ( sets[iset].dtype=="int" ) {
-    for ( size_t i=0; i<out.img.size(); ++i )
+  if ( sets[iset].dtype=="int" )
+  {
+    // - apply mask
+    for ( size_t i=0; i<out.imgBin.size(); ++i )
       if ( out.msk[i] )
-        out.img[i] = 0;
-
-    mat::matrix<int> clusters,centers;
-    std::tie(clusters,centers) = Image::clusters(out.img,periodic);
-    for ( size_t i=0; i<clusters.size(); ++i )
-      out.img[i] = clusters[i];
+        out.imgBin[i] = 0;
+    // - compute clusters and centers
+    std::tie(out.clsInt,out.cenInt) = Image::clusters(out.imgBin,periodic);
   }
 
+  // keep cropped image -> quit here
+  // otherwise          -> extend the image
+  // - check
   if ( crop<-1 )
-    return;
-
-  // temporary copy
-
-  mat::matrix<double> fmg = out.fmg;
-  mat::matrix<int> img = out.img;
-  mat::matrix<int> msk = out.msk;
-
-  // allocate output
-  out.fmg.resize(out.data.shape()); out.fmg.ones (); out.fmg *= static_cast<double>(crop);
-  out.img.resize(out.data.shape()); out.img.ones (); out.img *= crop;
-  out.msk.resize(out.data.shape()); out.msk.zeros();
-
-  for ( size_t i=0; i<img.shape()[0]; ++i ) {
-    for ( size_t j=0; j<img.shape()[1]; ++j ) {
-      out.fmg(i+irow,j+icol) = fmg(i,j);
-      out.img(i+irow,j+icol) = img(i,j);
-      out.msk(i+irow,j+icol) = msk(i,j);
+    return out;
+  // - copy to temporary variables
+  mat::matrix<double> imgFlt = out.imgFlt;
+  mat::matrix<int>    imgBin = out.imgBin;
+  mat::matrix<int>    clsInt = out.clsInt;
+  mat::matrix<int>    cenInt = out.cenInt;
+  mat::matrix<int>    msk    = out.msk   ;
+  // - allocate output: assign the value of "crop" to the entire image (the interior is overwritten)
+  out.view  .resize(out.data.shape());
+  out.imgFlt.resize(out.data.shape()); out.imgFlt.ones (); out.imgFlt *= static_cast<double>(crop);
+  out.imgBin.resize(out.data.shape()); out.imgBin.ones (); out.imgBin *= crop;
+  out.clsInt.resize(out.data.shape()); out.clsInt.ones (); out.clsInt *= crop;
+  out.cenInt.resize(out.data.shape()); out.cenInt.ones (); out.cenInt *= crop;
+  out.msk   .resize(out.data.shape()); out.msk   .zeros();
+  // - copy interior
+  for ( size_t i=0; i<imgBin.shape()[0]; ++i ) {
+    for ( size_t j=0; j<imgBin.shape()[1]; ++j ) {
+      out.imgFlt(i+irow,j+icol) = imgFlt(i,j);
+      out.imgBin(i+irow,j+icol) = imgBin(i,j);
+      out.clsInt(i+irow,j+icol) = clsInt(i,j);
+      out.cenInt(i+irow,j+icol) = cenInt(i,j);
+      out.msk   (i+irow,j+icol) = msk   (i,j);
     }
   }
+
+  return out;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -368,8 +433,8 @@ QtImage image(size_t iset, size_t iimg, int crop=-2)
 
 // -------------------------------------------------------------------------------------------------
 
-void new_path(QDir new_path) {
-
+void newPath(QDir new_path)
+{
   if ( new_path==path )
     return;
 
@@ -377,51 +442,277 @@ void new_path(QDir new_path) {
     for ( auto &file : set.files )
       file.name = new_path.relativeFilePath(path.filePath(file.name));
 
-  for ( auto &name : pdf )
-    name = new_path.relativeFilePath(path.filePath(name));
+  for ( auto &pl : plot )
+    pl.name = new_path.relativeFilePath(path.filePath(pl.name));
 
   fname = new_path.relativeFilePath(path.filePath(fname));
 
-  path  = new_path;
+  path = new_path;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO
-void write(QString fname="") {
+void write() {
 
   // default file-name (absolute path)
-  if ( fname.size()==0 )
-    fname = path.absoluteFilePath(fname);
+  std::string outname = path.absoluteFilePath(fname).toStdString();
   // allocate
   json out;
-  // // basic settings
-  // out["nset"] = files.size();
-  // TODO
+  // variables that can be copied 'as is'
+  out["stat"       ] = stat.toStdString();
+  out["periodic"   ] = periodic;
+  out["zeropad"    ] = zeropad;
+  out["mask_weight"] = mask_weight;
+  out["pixel_path" ] = pixel_path.toStdString();
+  out["roi"        ] = roi;
+  out["mean"       ] = mean;
+  out["meannorm"   ] = meannorm;
+  // result
+  if ( res.size()>0 ) {
+    if ( roi[0]==res.shape()[0] && roi[1]==res.shape()[1] ) {
+      std::vector<double> tmp;
+      for ( size_t i=0; i<res.size(); ++i )
+        tmp.push_back(res[i]);
+      if ( tmp.size()>0 )
+        out["res"] = tmp;
+    }
+  }
+  // result normalization
+  if ( resnorm.size()>0 ) {
+    if ( roi[0]==resnorm.shape()[0] && roi[1]==resnorm.shape()[1] ) {
+      std::vector<double> tmp;
+      for ( size_t i=0; i<resnorm.size(); ++i )
+        tmp.push_back(resnorm[i]);
+      if ( tmp.size()>0 )
+        out["resnorm"] = tmp;
+    }
+  }
+  // output files
+  if ( true ) {
+    std::vector<std::string> keys = {"plot0","plot1"};
+    for ( size_t i=0; i<keys.size(); ++i ) {
+      out[keys[i]]["name"] = plot[i].name.toStdString();
+      out[keys[i]]["cmap"] = plot[i].cmap.toStdString();
+      out[keys[i]]["lim" ] = plot[i].lim;
+    }
+  }
+  // write all files
+  // - construct filenames
+  size_t                   n     = 0;
+  std::vector<std::string> sname = {"set0","set1"};
+  std::vector<std::string> keys;
+  // - maximum number of files
+  if ( sets.size()>=1 ) n = std::max(n,sets[0].files.size());
+  if ( sets.size()>=2 ) n = std::max(n,sets[1].files.size());
+  // - set file-index as string
+  for ( size_t i=0; i<n; ++i )
+    keys.push_back(QString::number(i).toStdString());
+  // - fill
+  for ( size_t iset=0; iset<sets.size(); ++iset ) {
+    // -- alias
+    std::string   s = sname[iset];
+    // -- write data-type and field name
+    out[s]["dtype"] = sets[iset].dtype.toStdString();
+    out[s]["field"] = sets[iset].field.toStdString();
+    // -- write images
+    for ( size_t iimg=0; iimg<sets[iset].files.size(); ++iimg ) {
+      // --- alias
+      File       *f = &sets[iset].files[iimg];
+      std::string k = keys [iimg];
+      // --- write filename
+      out[s]["files"][k]["name"] = f->name.toStdString();
+      // --- write phase threshold
+      if ( f->phase.active && f->phase.data.size()>0 ) {
+        std::vector<size_t> tmp;
+        for ( size_t i=0; i<f->phase.data.size(); i+=2 ) {
+          if ( f->phase.data[i]<f->phase.data[i+1] ) {
+            tmp.push_back(f->phase.data[i  ]);
+            tmp.push_back(f->phase.data[i+1]);
+          }
+        }
+        out[s]["files"][k]["phase"] = tmp;
+      }
+      // --- write mask threshold
+      if ( f->mask.active && f->mask.data.size()>0 ) {
+        std::vector<size_t> tmp;
+        for ( size_t i=0; i<f->mask.data.size(); i+=2 ) {
+          if ( f->mask.data[i]<f->mask.data[i+1] ) {
+            tmp.push_back(f->mask.data[i  ]);
+            tmp.push_back(f->mask.data[i+1]);
+          }
+        }
+        out[s]["files"][k]["mask"] = tmp;
+      }
+      // --- write row threshold
+      if ( f->row.active && f->row.data.size()>0 ) {
+        std::vector<size_t> tmp;
+        for ( size_t i=0; i<f->row.data.size(); i+=2 ) {
+          if ( f->row.data[i]<f->row.data[i+1] ) {
+            tmp.push_back(f->row.data[i  ]);
+            tmp.push_back(f->row.data[i+1]);
+          }
+        }
+        out[s]["files"][k]["row"] = tmp;
+      }
+      // --- write col threshold
+      if ( f->col.active && f->col.data.size()>0 ) {
+        std::vector<size_t> tmp;
+        for ( size_t i=0; i<f->col.data.size(); i+=2 ) {
+          if ( f->col.data[i]<f->col.data[i+1] ) {
+            tmp.push_back(f->col.data[i  ]);
+            tmp.push_back(f->col.data[i+1]);
+          }
+        }
+        out[s]["files"][k]["col"] = tmp;
+      }
+    }
+  }
+
+  // write JSON
+  std::ofstream o(outname);
+  o << std::setw(2) << out << std::endl;
 };
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO
-bool read(QString fname) {
-  try {
-    json inp;
-    std::ifstream fname_j(fname.toStdString());
-    fname_j >> inp;
+void read(QString iname)
+{
+  // read JSON file to "json" object
+  json inp;
+  std::ifstream fname_j(iname.toStdString());
+  fname_j >> inp;
 
-    if ( inp.count("periodic") ) periodic = inp["periodic"];
+  // temporary variable from checks
+  bool isroi = false;
+  // direct copy
+  if ( inp.count("stat"       ) ) stat        = QString::fromStdString(inp["stat"       ]);
+  if ( inp.count("periodic"   ) ) periodic    =                        inp["periodic"   ];
+  if ( inp.count("zeropad"    ) ) zeropad     =                        inp["zeropad"    ];
+  if ( inp.count("mask_weight") ) mask_weight =                        inp["mask_weight"];
+  if ( inp.count("pixel_path" ) ) pixel_path  = QString::fromStdString(inp["pixel_path" ]);
+  if ( inp.count("mean"       ) ) mean        =                        inp["mean"       ];
+  if ( inp.count("meannorm"   ) ) meannorm    =                        inp["meannorm"   ];
+  // region of interest
+  if ( inp.count("roi") ) {
+    if ( inp["roi"].size()==2 ) {
+      isroi = true;
+      roi.resize(2);
+      for ( size_t i=0; i<2; ++i )
+        roi[i] = inp["roi"][i];
+    }
   }
-  catch (...) {
-    return false;
+  // result
+  if ( inp.count("res") && isroi ) {
+    if ( inp["res"].size()==roi[0]*roi[1] ) {
+      res.resize(roi);
+      for ( size_t i=0; i<res.size(); ++i )
+        res[i] = inp["res"][i];
+    }
+    else {
+      isroi = false;
+    }
+  }
+  // result normalization
+  if ( inp.count("resnorm") && isroi ) {
+    if ( inp["resnorm"].size()==roi[0]*roi[1] ) {
+      resnorm.resize(roi);
+      for ( size_t i=0; i<resnorm.size(); ++i )
+        resnorm[i] = inp["resnorm"][i];
+    }
+  }
+  // output files
+  std::vector<std::string> keys = {"plot0","plot1"};
+  if ( plot.size()<keys.size() )
+    plot.resize(keys.size());
+  for ( size_t i=0; i<keys.size(); ++i ) {
+    if ( !inp.count(keys[i]) )
+      break;
+    if ( inp[keys[i]].count("name") ) {
+      plot[i].name = QString::fromStdString(inp[keys[i]]["name"]);
+    }
+    if ( inp[keys[i]].count("cmap") ) {
+      plot[i].cmap = QString::fromStdString(inp[keys[i]]["cmap"]);
+    }
+    if ( inp[keys[i]].count("lim") ) {
+      for ( size_t j=0; j<std::min(plot[i].lim.size(),inp[keys[i]]["lim"].size()); ++j )
+        plot[i].lim[j] = inp[keys[i]]["lim"][j];
+    }
+  }
+  // read files
+  // - construct filenames
+  std::vector<std::string> sname = {"set0","set1"};
+  // - read
+  for ( size_t iset=0; iset<sname.size(); ++iset ) {
+    if ( !inp.count(sname[iset]) )
+      break;
+    if ( sets.size()<iset+1 )
+      sets.resize(iset+1);
+    sets[iset].files.resize(0);
+
+    if ( inp[sname[iset]].count("dtype") )
+      sets[iset].dtype = QString::fromStdString(inp[sname[iset]]["dtype"]);
+    if ( inp[sname[iset]].count("field") )
+      sets[iset].field = QString::fromStdString(inp[sname[iset]]["field"]);
+
+    size_t iimg = 0;
+    while ( true ) {
+      std::string key = QString::number(iimg).toStdString();
+      if ( !inp[sname[iset]]["files"].count(key) )
+        break;
+      File i;
+      bool setDefault = true;
+      if ( inp[sname[iset]]["files"][key].count("name") ) {
+        i.name = QString::fromStdString(inp[sname[iset]]["files"][key]["name"]);
+      }
+      else {
+        continue;
+      }
+      if ( inp[sname[iset]]["files"][key].count("phase") ) {
+        setDefault = false;
+        i.phase.active = true;
+        i.phase.data.resize(inp[sname[iset]]["files"][key]["phase"].size());
+        for ( size_t j=0; j<i.phase.data.size(); ++j )
+          i.phase.data[j] = inp[sname[iset]]["files"][key]["phase"][j];
+      }
+      if ( inp[sname[iset]]["files"][key].count("mask") ) {
+        setDefault = false;
+        i.mask.active = true;
+        i.mask.data.resize(inp[sname[iset]]["files"][key]["mask"].size());
+        for ( size_t j=0; j<i.mask.data.size(); ++j )
+          i.mask.data[j] = inp[sname[iset]]["files"][key]["mask"][j];
+      }
+      if ( inp[sname[iset]]["files"][key].count("row") ) {
+        setDefault = false;
+        i.row.active = true;
+        i.row.data.resize(inp[sname[iset]]["files"][key]["row"].size());
+        for ( size_t j=0; j<i.row.data.size(); ++j )
+          i.row.data[j] = inp[sname[iset]]["files"][key]["row"][j];
+      }
+      if ( inp[sname[iset]]["files"][key].count("col") ) {
+        setDefault = false;
+        i.col.active = true;
+        i.col.data.resize(inp[sname[iset]]["files"][key]["col"].size());
+        for ( size_t j=0; j<i.col.data.size(); ++j )
+          i.col.data[j] = inp[sname[iset]]["files"][key]["col"][j];
+      }
+      i.setDefault = setDefault;
+      sets[iset].files.push_back(i);
+      ++iimg;
+
+    }
+
   }
 
-  return true;
+
+
 };
 
 // -------------------------------------------------------------------------------------------------
 
 };
 
+// =================================================================================================
+// MainWindow: the main (and only) widget (partly depends on the classes above)
 // =================================================================================================
 
 namespace Ui {
@@ -437,28 +728,33 @@ public:
   ~MainWindow();
 
 private slots:
-  // directly connect buttons
-  void on_pushButtonT0_load_clicked();                    // load JSON      -> update "data"
-  void on_pushButtonT0_path_clicked();                    // change path    -> update "data"
+  // Directly connect buttons
+  void on_pushButtonT0_load_clicked();                    // load JSON   -> update "data"
+  void on_pushButtonT0_path_clicked();                    // change path -> update "data"
   void on_lineEditT0_json_textEdited(const QString &text);// manual file-name change
   void on_lineEditT0_res1_textEdited(const QString &text);// manual file-name change
   void on_lineEditT0_res2_textEdited(const QString &text);// manual file-name change
   void on_pushButtonT2_cp_clicked();                      // copy files "data.sets[0]" to "...[1]"
-  void on_pushButtonT4_compute_clicked();                 // compute result
-  // connect groups of buttons
+  // Connect groups of buttons
   void fileAdd(size_t iset); // add    files         -> update "data"
   void fileRmv(size_t iset); // remove files         -> update "data"
   void fileUp (size_t iset); // move   files up      -> update "data"
   void fileDwn(size_t iset); // move   files down    -> update "data"
   void fileSrt(size_t iset); // sort   files by name -> update "data"
-  // compute statistic (applies one 'increment')
-  void computeS2(size_t iimg);
-  // synchronize widgets and "data"
+  // Compute statistic
+  void compute   ();
+  void computeS2 (size_t iimg); // applies one 'increment'
+  void computeL  (size_t iimg); // applies one 'increment'
+  void computeW2 (size_t iimg); // applies one 'increment'
+  void computeW2c(size_t iimg); // applies one 'increment'
+  // Help
+  void openHelp();
+  // Synchronize widgets and "data"
   void tab1_read    (); // update "data" with new information from widgets
   void tab3_read    (); // update "data" with new information from widgets
   void tab4_read    (); // update "data" with new information from widgets
-  void tab3_default (); // set "File" defaults for current image
-  void tab3_applyAll(); // apply "File" of current image to all images in the set
+  void tab3_default (); // signal to set "File" defaults for current image
+  void tab3_applyAll(); // apply settings in "File" of current image to all images in the set
   void tab0_show    (); // refresh widget with new "data"
   void tab1_show    (); // refresh widget with new "data"
   void tab2_show    (); // refresh widget with new "data"
@@ -469,39 +765,41 @@ private slots:
   void tab4_save    (); // save JSON and PDFs
 
 private:
-  // store fields
+  // Store fields
   Ui::MainWindow  *ui;
   Data             data;
   QtImage          image;
-  // arrays with buttons
-  std::vector<QRadioButton*>   statBtn;    // list with buttons, each corresponding to one statistic
-  std::vector<QString>         statKey;    // names corresponding to "statBtn"
-  std::vector<QRadioButton*>   typeBtn;    // list with buttons with dtypes: [b0,i0,f0,b1,i1,f1]
-  std::vector<QString>         typeKey;    // names corresponding to "typeBtn"
-  std::vector<QCheckBox*>      nsetBtn;    // list with buttons to select the number of sets
-  std::vector<QPushButton*>    fileBtn;    // list with all file manipulation buttons (tab2)
-  std::vector<QPushButton*>    fileBtnAdd; // - add buttons ["set0","set1"]
-  std::vector<QPushButton*>    fileBtnRmv; // - add remove buttons
-  std::vector<QPushButton*>    fileBtnUp ; // - all move up buttons
-  std::vector<QPushButton*>    fileBtnDwn; // - all move down buttons
-  std::vector<QPushButton*>    fileBtnSrt; // - all sort buttons
-  std::vector<QListWidget*>    fileLst;    // all file lists
-  std::vector<QLabel*>         propLbl;    // list with labels denoting the field-type ["phase",...]
-  std::vector<QLabel*>         typeLbl;    // list with labels denoting the data-type
-  std::vector<QPushButton*>    imBtn;      // list with all image selection buttons
-  std::vector<QComboBox*>      imCombo;    // list with all comboBoxes used to view the image
-  std::vector<QCheckBox*>      imCheck;    // list with all checkBoxes used for image manipulation
-  std::vector<QSpinBox*>       imSpn;      // list with all spinBoxes used for image manipulation
-  std::vector<QSpinBox*>       imSpnPhase; // - phase selection
-  std::vector<QSpinBox*>       imSpnMask;  // - mask  selection
-  std::vector<QSpinBox*>       imSpnRow;   // - row   selection
-  std::vector<QSpinBox*>       imSpnCol;   // - col   selection
-  std::vector<QRadioButton*>   imRadio;    // list with all mouse selection buttons
-  std::vector<QSpinBox*>       roiSpin;    // list with ROI shape
-  std::vector<QDoubleSpinBox*> resSpin;    // list with colorbar ranges
-  std::vector<QComboBox*>      resCombo;   // list with colorbars
-  std::vector<QButtonGroup*>   btnGroup;   // list with all groups of radioButtons
-  // support functions
+  // Arrays with buttons
+  std::vector<QRadioButton*>   statBtn;    // T1: buttons to select statistic
+  std::vector<QString>         statKey;    // T1: names corresponding to "statBtn"
+  std::vector<QCheckBox*>      statCheck;  // T1: algorithm choices (periodic, zero-pad)
+  std::vector<QComboBox*>      statCombo;  // T1: algorithm choices (pixel-path)
+  std::vector<QCheckBox*>      nsetBtn;    // T1: buttons to select the number of sets
+  std::vector<QRadioButton*>   typeBtn;    // T1: buttons to select the dtype: [b0,i0,f0,b1,i1,f1]
+  std::vector<QString>         typeKey;    // T1: names corresponding to "typeBtn"
+  std::vector<QLabel*>         propLbl;    // T2: labels denoting the field-type ["phase",...]
+  std::vector<QLabel*>         typeLbl;    // T2: labels denoting the data-type
+  std::vector<QListWidget*>    fileLst;    // T2: all file lists
+  std::vector<QPushButton*>    fileBtn;    // T2: all file manipulation buttons (tab2)
+  std::vector<QPushButton*>    fileBtnAdd; //     - add buttons ["set0","set1"]
+  std::vector<QPushButton*>    fileBtnRmv; //     - add remove buttons
+  std::vector<QPushButton*>    fileBtnUp ; //     - all move up buttons
+  std::vector<QPushButton*>    fileBtnDwn; //     - all move down buttons
+  std::vector<QPushButton*>    fileBtnSrt; //     - all sort buttons
+  std::vector<QPushButton*>    imBtn;      // T3: all image selection buttons
+  std::vector<QComboBox*>      imCombo;    // T3: all comboBoxes (selection and colormap)
+  std::vector<QRadioButton*>   imRadio;    // T3: all mouse selection buttons
+  std::vector<QCheckBox*>      imCheck;    // T3: all checkBoxes for image manipulation
+  std::vector<QSpinBox*>       imSpn;      // T3: all spinBoxes for image manipulation
+  std::vector<QSpinBox*>       imSpnPhase; // T3: - phase selection
+  std::vector<QSpinBox*>       imSpnMask;  // T3: - mask  selection
+  std::vector<QSpinBox*>       imSpnRow;   // T3: - row   selection
+  std::vector<QSpinBox*>       imSpnCol;   // T3: - col   selection
+  std::vector<QSpinBox*>       roiSpin;    // T4: ROI shape
+  std::vector<QDoubleSpinBox*> resSpin;    // T4: all color-scale ranges
+  std::vector<QComboBox*>      resCombo;   // T4: all colormaps
+  std::vector<QButtonGroup*>   btnGroup;   // all groups of radioButtons
+  // Support functions
   bool   promptQuestion(QString);        // prompt question to user (return response)
   void   promptWarning (QString);        // prompt warning to user
   bool   exists(QString);                // check if a file exits (relative w.r.t. "data.path")
