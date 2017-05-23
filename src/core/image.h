@@ -7,6 +7,10 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <set>
+#include <tuple>
+#include <ctime>
 
 #include "cppmat/cppmat.h"
 

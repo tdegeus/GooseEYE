@@ -6,6 +6,8 @@ src/gui/cppcolormap
 src/core/cppmat
 
 # custom variables
+.qmake*
+Makefile*
 test*
 build*
 *.pro.user
