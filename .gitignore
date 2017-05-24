@@ -1,13 +1,12 @@
 
 # submodules
-src/pybind11
-src/cppcolormap
+examples_local
+src/python/pybind11
+src/gui/cppcolormap
+src/core/cppmat
 
 # custom variables
 .qmake*
-release/*
-src/release/*
-src/ui_gui_mainwindow.h
 Makefile*
 test*
 build*

@@ -8,15 +8,16 @@ TEMPLATE  = app
 
 DEFINES  += QT_DEPRECATED_WARNINGS
 
-SOURCES  += image.cpp\
+SOURCES  += ../core/image.cpp\
             qcustomplot.cpp\
-            gui_main.cpp\
-            gui_mainwindow.cpp
+            main.cpp\
+            mainwindow.cpp
 
-HEADERS  += image.h\
+HEADERS  += ../core/image.h\
+            cppcolormap/cppcolormap.h\
             qcustomplot.h\
-            gui_mainwindow.h
+            mainwindow.h
 
-FORMS    += gui_mainwindow.ui
+FORMS    += mainwindow.ui
 
 CONFIG   += c++14

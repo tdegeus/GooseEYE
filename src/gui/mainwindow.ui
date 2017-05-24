@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>836</width>
+    <width>868</width>
     <height>657</height>
    </rect>
   </property>
@@ -33,12 +33,12 @@
              <string>&amp;Open pre-existing state:</string>
             </property>
             <property name="buddy">
-             <cstring>tab0_load_pushButton</cstring>
+             <cstring>pushButtonT0_load</cstring>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="tab0_load_pushButton">
+           <widget class="QPushButton" name="pushButtonT0_load">
             <property name="text">
              <string>Select</string>
             </property>
@@ -68,21 +68,15 @@
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="1" column="2">
-           <widget class="QPushButton" name="tab0_result_pushButton">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEditT0_path">
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="text">
-             <string>Select</string>
-            </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="tab0_outdir_lineEdit"/>
-          </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="tab0_outdir_pushButton">
+           <widget class="QPushButton" name="pushButtonT0_path">
             <property name="text">
              <string>Select</string>
             </property>
@@ -93,9 +87,6 @@
             <property name="text">
              <string>Store result/settings as (relative path):</string>
             </property>
-            <property name="buddy">
-             <cstring>tab0_result_pushButton</cstring>
-            </property>
            </widget>
           </item>
           <item row="0" column="0">
@@ -104,14 +95,14 @@
              <string>Working directory:</string>
             </property>
             <property name="buddy">
-             <cstring>tab0_outdir_pushButton</cstring>
+             <cstring>pushButtonT0_path</cstring>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="tab0_result_lineEdit">
+           <widget class="QLineEdit" name="lineEditT0_json">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string/>
@@ -119,36 +110,16 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="tab0_pdfRaw_lineEdit">
+           <widget class="QLineEdit" name="lineEditT0_res1">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="tab0_pdfInterp_lineEdit">
+           <widget class="QLineEdit" name="lineEditT0_res2">
             <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QPushButton" name="tab0_pdfInterp_pushButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Select</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QPushButton" name="tab0_pdfRaw_pushButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Select</string>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -157,18 +128,12 @@
             <property name="text">
              <string>Store PDF of raw result (relative path):</string>
             </property>
-            <property name="buddy">
-             <cstring>tab0_pdfInterp_pushButton</cstring>
-            </property>
            </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
              <string>Store PDF of interpreted result (relative path):</string>
-            </property>
-            <property name="buddy">
-             <cstring>tab0_pdfRaw_pushButton</cstring>
             </property>
            </widget>
           </item>
@@ -182,7 +147,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QScrollArea" name="tab0_scrollArea">
+         <widget class="QScrollArea" name="scrollAreaT0">
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -191,7 +156,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>764</width>
+             <width>796</width>
              <height>160</height>
             </rect>
            </property>
@@ -276,7 +241,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QLabel" name="label_17">
+           <widget class="QLabel" name="label_23">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -289,64 +254,91 @@
            </widget>
           </item>
           <item>
-           <widget class="QTreeWidget" name="tab1_measure_treeWidget">
-            <property name="headerHidden">
-             <bool>true</bool>
+           <widget class="QLabel" name="label_16">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
             </property>
-            <property name="columnCount">
-             <number>1</number>
+            <property name="text">
+             <string>Spatial correlations</string>
             </property>
-            <column>
-             <property name="text">
-              <string notr="true">1</string>
-             </property>
-            </column>
-            <item>
-             <property name="text">
-              <string>Spatial correlations</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>2-point probability</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>2-point cluster</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Lineal path</string>
-              </property>
-             </item>
-            </item>
-            <item>
-             <property name="text">
-              <string>Conditional spatial correlations</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>2-point probability</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Collapsed 2-point probability</string>
-              </property>
-             </item>
-            </item>
-            <item>
-             <property name="text">
-              <string>Prediction from conditional statistics</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>2-point probability</string>
-              </property>
-             </item>
-            </item>
            </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButtonT1_S2">
+            <property name="text">
+             <string>2-point probability (S2)</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroupT1_stat</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButtonT1_C2">
+            <property name="text">
+             <string>2-point cluster (C2): calls S2</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroupT1_stat</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButtonT1_L">
+            <property name="text">
+             <string>Lineal path (L)</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroupT1_stat</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_18">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Conditional spatial correlations</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButtonT1_W2">
+            <property name="text">
+             <string>2-point probablity (W2)</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroupT1_stat</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButtonT1_W2c">
+            <property name="text">
+             <string>Collapsed 2-point probability (W2c)</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroupT1_stat</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -369,7 +361,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QCheckBox" name="tab1_im0_checkBox">
+           <widget class="QCheckBox" name="checkBoxT1_set1">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -390,7 +382,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="tab1_im0f_radioButton">
+           <widget class="QRadioButton" name="radioButtonT1_img0f">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -398,12 +390,12 @@
              <string>float</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">buttonGroup_tab1_im0</string>
+             <string notr="true">buttonGroupT1_set0</string>
             </attribute>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="tab1_im0i_radioButton">
+           <widget class="QRadioButton" name="radioButtonT1_img0i">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -411,12 +403,12 @@
              <string>int</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">buttonGroup_tab1_im0</string>
+             <string notr="true">buttonGroupT1_set0</string>
             </attribute>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="tab1_im0b_radioButton">
+           <widget class="QRadioButton" name="radioButtonT1_img0b">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -424,7 +416,7 @@
              <string>binary</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">buttonGroup_tab1_im0</string>
+             <string notr="true">buttonGroupT1_set0</string>
             </attribute>
            </widget>
           </item>
@@ -478,7 +470,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QCheckBox" name="tab1_im1_checkBox">
+           <widget class="QCheckBox" name="checkBoxT1_set0">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -493,7 +485,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="tab1_im1f_radioButton">
+           <widget class="QRadioButton" name="radioButtonT1_img1f">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -501,12 +493,12 @@
              <string>float</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">buttonGroup_tab1_im1</string>
+             <string notr="true">buttonGroupT1_set1</string>
             </attribute>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="tab1_im1i_radioButton">
+           <widget class="QRadioButton" name="radioButtonT1_img1i">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -514,12 +506,12 @@
              <string>int</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">buttonGroup_tab1_im1</string>
+             <string notr="true">buttonGroupT1_set1</string>
             </attribute>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="tab1_im1b_radioButton">
+           <widget class="QRadioButton" name="radioButtonT1_img1b">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -527,7 +519,7 @@
              <string>binary</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">buttonGroup_tab1_im1</string>
+             <string notr="true">buttonGroupT1_set1</string>
             </attribute>
            </widget>
           </item>
@@ -578,24 +570,27 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="tab1_measure_textEdit">
+           <widget class="QTextEdit" name="textEditT1_field">
             <property name="readOnly">
              <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="tab1_periodic_checkBox">
+           <widget class="QCheckBox" name="checkBoxT1_periodic">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
              <string>Assume periodic (faster)</string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="tab1_zeropad_checkBox">
+           <widget class="QCheckBox" name="checkBoxT1_zeropad">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -605,19 +600,22 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="tab1_maskW_checkBox">
+           <widget class="QCheckBox" name="checkBoxT1_maskWeight">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
              <string>Use weights as mask </string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QLabel" name="tab1_pixelpath_label">
+             <widget class="QLabel" name="labelT1_pixelPath">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -625,12 +623,12 @@
                <string>Pixel path algorithm</string>
               </property>
               <property name="buddy">
-               <cstring>tab1_pixelpath_comboBox</cstring>
+               <cstring>checkBoxT1_pixelPath</cstring>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="tab1_pixelpath_comboBox">
+             <widget class="QComboBox" name="checkBoxT1_pixelPath">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -717,7 +715,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QListWidget" name="tab2_im0_listWidget">
+             <widget class="QListWidget" name="listWidgetT2_img0">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -735,7 +733,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QPushButton" name="tab2_im0Add_pushButton">
+               <widget class="QPushButton" name="pushButtonT2_set0Add">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
@@ -745,7 +743,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im0Rmv_pushButton">
+               <widget class="QPushButton" name="pushButtonT2_set0Rmv">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
@@ -754,12 +752,33 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonT2_set0Up">
+                <property name="text">
+                 <string>Up</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonT2_set0Dwn">
+                <property name="text">
+                 <string>Down</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonT2_set0Srt">
+                <property name="text">
+                 <string>Sort</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="tab2_cp_pushButton">
+           <widget class="QPushButton" name="pushButtonT2_cp">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -827,7 +846,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QListWidget" name="tab2_im1_listWidget">
+             <widget class="QListWidget" name="listWidgetT2_img1">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -839,7 +858,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
-               <widget class="QPushButton" name="tab2_im1Add_pushButton">
+               <widget class="QPushButton" name="pushButtonT2_set1Add">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -849,7 +868,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im1Rmv_pushButton">
+               <widget class="QPushButton" name="pushButtonT2_set1Rmv">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -859,7 +878,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im1Up__pushButton">
+               <widget class="QPushButton" name="pushButtonT2_set1Up">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -869,12 +888,22 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="tab2_im1Dwn_pushButton">
+               <widget class="QPushButton" name="pushButtonT2_set1Dwn">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
                 <property name="text">
                  <string>Down</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButtonT2_set1Srt">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Sort</string>
                 </property>
                </widget>
               </item>
@@ -931,14 +960,14 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_11">
           <item>
-           <widget class="QGraphicsView" name="tab3_image_graphicsView">
+           <widget class="QGraphicsView" name="graphicsViewT3_img">
             <property name="enabled">
              <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QGraphicsView" name="tab3_phase_graphicsView">
+           <widget class="QGraphicsView" name="graphicsViewT3_seg">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -947,7 +976,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_23">
             <item>
-             <widget class="QPushButton" name="tab3_zoomOut_pushButton">
+             <widget class="QPushButton" name="pushButtonT3_zoomOut">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -957,7 +986,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="tab3_zoom_slider">
+             <widget class="QSlider" name="sliderT3_zoom">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -967,7 +996,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="tab3_zoomIn__pushButton">
+             <widget class="QPushButton" name="pushButtonT3_zoomIn">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -985,7 +1014,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
-             <widget class="QPushButton" name="tab3_setPrev_pushButton">
+             <widget class="QPushButton" name="pushButtonT3_setPrev">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1017,7 +1046,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QComboBox" name="tab3_set_comboBox">
+             <widget class="QComboBox" name="comboBoxT3_set">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1046,7 +1075,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="tab3_setNext_pushButton">
+             <widget class="QPushButton" name="pushButtonT3_setNext">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1066,7 +1095,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
-             <widget class="QPushButton" name="tab3_imPrev_pushButton">
+             <widget class="QPushButton" name="pushButtonT3_imgPrev">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1098,7 +1127,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QComboBox" name="tab3_im_comboBox">
+             <widget class="QComboBox" name="comboBoxT3_img">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1121,7 +1150,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="tab3_imNext_pushButton">
+             <widget class="QPushButton" name="pushButtonT3_imgNext">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1139,19 +1168,9 @@
            </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="tab3_load_pushButton">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>(Re)Load</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <widget class="QPushButton" name="tab3_imDefault_pushButton">
+             <widget class="QPushButton" name="pushButtonT3_clear">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1161,7 +1180,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="tab3_imApply_pushButton">
+             <widget class="QPushButton" name="pushButtonT3_apply">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1174,21 +1193,8 @@
           </item>
           <item>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="1" column="0">
-             <widget class="QLabel" name="tab3_mask_label">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Mask:</string>
-              </property>
-              <property name="buddy">
-               <cstring>tab3_mask1Low_spinBox</cstring>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="4">
-             <widget class="QRadioButton" name="tab3_phase_radioButton">
+             <widget class="QRadioButton" name="radioButtonT3_phase">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1196,12 +1202,12 @@
                <string/>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab3_mouse</string>
+               <string notr="true">buttonGroupT3_mouse</string>
               </attribute>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QSpinBox" name="tab3_mask1Low_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_mask0Low">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1218,7 +1224,7 @@
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QSpinBox" name="tab3_mask3Low_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_mask2Low">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1228,7 +1234,7 @@
              </widget>
             </item>
             <item row="1" column="4">
-             <widget class="QRadioButton" name="tab3_mask_radioButton">
+             <widget class="QRadioButton" name="radioButtonT3_mask">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -1236,12 +1242,12 @@
                <string/>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab3_mouse</string>
+               <string notr="true">buttonGroupT3_mouse</string>
               </attribute>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QSpinBox" name="tab3_phaseLow_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_phaseLow">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1265,7 +1271,7 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QSpinBox" name="tab3_mask2Low_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_mask1Low">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1282,7 +1288,7 @@
              </widget>
             </item>
             <item row="3" column="3">
-             <widget class="QSpinBox" name="tab3_mask3Hgh_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_mask2Hgh">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1292,7 +1298,7 @@
              </widget>
             </item>
             <item row="5" column="4">
-             <widget class="QRadioButton" name="tab3_col_radioButton">
+             <widget class="QRadioButton" name="radioButtonT3_col">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1300,38 +1306,25 @@
                <string/>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab3_mouse</string>
+               <string notr="true">buttonGroupT3_mouse</string>
               </attribute>
              </widget>
             </item>
             <item row="0" column="3">
-             <widget class="QSpinBox" name="tab3_phaseHgh_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_phaseHgh">
               <property name="enabled">
                <bool>true</bool>
               </property>
               <property name="maximum">
-               <number>255</number>
+               <number>256</number>
               </property>
               <property name="value">
-               <number>255</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="tab3_phase_label">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Phase:</string>
-              </property>
-              <property name="buddy">
-               <cstring>tab3_phaseLow_spinBox</cstring>
+               <number>0</number>
               </property>
              </widget>
             </item>
             <item row="1" column="3">
-             <widget class="QSpinBox" name="tab3_mask1Hgh_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_mask0Hgh">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1348,7 +1341,7 @@
              </widget>
             </item>
             <item row="5" column="1">
-             <widget class="QSpinBox" name="tab3_colLow_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_colLow">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1357,21 +1350,8 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="tab3_row_label">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Rows:</string>
-              </property>
-              <property name="buddy">
-               <cstring>tab3_rowLow_spinBox</cstring>
-              </property>
-             </widget>
-            </item>
             <item row="2" column="3">
-             <widget class="QSpinBox" name="tab3_mask2Hgh_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_mask1Hgh">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1381,7 +1361,7 @@
              </widget>
             </item>
             <item row="5" column="3">
-             <widget class="QSpinBox" name="tab3_colHgh_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_colHgh">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1391,7 +1371,7 @@
              </widget>
             </item>
             <item row="4" column="3">
-             <widget class="QSpinBox" name="tab3_rowHgh_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_rowHgh">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1408,7 +1388,7 @@
              </widget>
             </item>
             <item row="4" column="1">
-             <widget class="QSpinBox" name="tab3_rowLow_spinBox">
+             <widget class="QSpinBox" name="spinBoxT3_rowLow">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1417,21 +1397,8 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="tab3_col_label">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="text">
-               <string>Columns:</string>
-              </property>
-              <property name="buddy">
-               <cstring>tab3_colLow_spinBox</cstring>
-              </property>
-             </widget>
-            </item>
             <item row="4" column="4">
-             <widget class="QRadioButton" name="tab3_row_radioButton">
+             <widget class="QRadioButton" name="radioButtonT3_row">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1439,8 +1406,50 @@
                <string/>
               </property>
               <attribute name="buttonGroup">
-               <string notr="true">buttonGroup_tab3_mouse</string>
+               <string notr="true">buttonGroupT3_mouse</string>
               </attribute>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="checkBoxT3_phase">
+              <property name="text">
+               <string>Phase:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="checkBoxT3_mask">
+              <property name="text">
+               <string>Mask:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QCheckBox" name="checkBoxT3_row">
+              <property name="text">
+               <string>Rows:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QCheckBox" name="checkBoxT3_col">
+              <property name="text">
+               <string>Columns:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_28">
+              <property name="text">
+               <string>...</string>
+              </property>
              </widget>
             </item>
            </layout>
@@ -1456,12 +1465,12 @@
                <string>Colormap:</string>
               </property>
               <property name="buddy">
-               <cstring>tab3_cmap_comboBox</cstring>
+               <cstring>comboBoxT3_cmap</cstring>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="tab3_cmap_comboBox">
+             <widget class="QComboBox" name="comboBoxT3_cmap">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -1818,7 +1827,7 @@
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QComboBox" name="tab3_maskCol_comboBox">
+             <widget class="QComboBox" name="comboBoxT3_cmapMask">
               <item>
                <property name="text">
                 <string>Red</string>
@@ -1868,12 +1877,12 @@
              <string>Shape of region-of-interest (ROI) [rows x cols]:</string>
             </property>
             <property name="buddy">
-             <cstring>tab4_roiRow_spinBox</cstring>
+             <cstring>spinBoxT4_roiRow</cstring>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="tab4_roiRow_spinBox">
+           <widget class="QSpinBox" name="spinBoxT4_roiRow">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1893,7 +1902,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="tab4_roiCol_spinBox">
+           <widget class="QSpinBox" name="spinBoxT4_roiCol">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1915,14 +1924,31 @@
             </property>
            </spacer>
           </item>
+          <item>
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>Spatial average: </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_mean">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
-           <widget class="QPushButton" name="tab4_compute_pushButton">
+           <widget class="QPushButton" name="pushButtonT4_compute">
             <property name="enabled">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Compute statistics (might take a long time!). Before the computation start the JSON is stored. It is updated with the result once the computation is complete.</string>
             </property>
             <property name="text">
              <string>Compute</string>
@@ -1930,7 +1956,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QProgressBar" name="tab4_progressBar">
+           <widget class="QProgressBar" name="progressBarT4">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1940,9 +1966,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="tab4_save_pushButton">
+           <widget class="QPushButton" name="pushButtonT4_save">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Save the output images (below).</string>
             </property>
             <property name="text">
              <string>Save</string>
@@ -1954,7 +1983,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
-           <widget class="QCustomPlot" name="raw_customPlot" native="true">
+           <widget class="QCustomPlot" name="customPlot_res0" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>100</horstretch>
@@ -1964,7 +1993,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCustomPlot" name="interp_customPlot" native="true">
+           <widget class="QCustomPlot" name="customPlot_res1" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>100</horstretch>
@@ -1978,7 +2007,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_16">
           <item>
-           <widget class="QLabel" name="tab4_cmap_raw_label">
+           <widget class="QLabel" name="tab4_cmapRes1_label">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1986,12 +2015,12 @@
              <string>Colormap:</string>
             </property>
             <property name="buddy">
-             <cstring>tab4_cmap_raw_comboBox</cstring>
+             <cstring>comboBoxT4_cmapRes1</cstring>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="tab4_cmap_raw_comboBox">
+           <widget class="QComboBox" name="comboBoxT4_cmapRes1">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2349,12 +2378,12 @@
              <string>Range:</string>
             </property>
             <property name="buddy">
-             <cstring>tab4_climLow_raw_doubleSpinBox</cstring>
+             <cstring>doubleSpinBoxT4_climLowRes1</cstring>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="tab4_climLow_raw_doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxT4_climLowRes1">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2367,7 +2396,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="tab4_climHgh_raw_doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxT4_climHghRes1">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2396,7 +2425,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="tab4_cmap_interp_label">
+           <widget class="QLabel" name="tab4_cmapRes2_label">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2404,12 +2433,12 @@
              <string>Colormap:</string>
             </property>
             <property name="buddy">
-             <cstring>tab4_cmap_interp_comboBox</cstring>
+             <cstring>comboBoxT4_cmapRes2</cstring>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="tab4_cmap_interp_comboBox">
+           <widget class="QComboBox" name="comboBoxT4_cmapRes2">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2767,17 +2796,20 @@
              <string>Range:</string>
             </property>
             <property name="buddy">
-             <cstring>tab4_climLow_interp_doubleSpinBox</cstring>
+             <cstring>doubleSpinBoxT4_climLowRes2</cstring>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="tab4_climLow_interp_doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxT4_climLowRes2">
             <property name="enabled">
              <bool>true</bool>
             </property>
             <property name="decimals">
              <number>3</number>
+            </property>
+            <property name="minimum">
+             <double>-1.000000000000000</double>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -2785,12 +2817,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="tab4_climHgh_interp_doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="doubleSpinBoxT4_climHghRes2">
             <property name="enabled">
              <bool>true</bool>
             </property>
             <property name="decimals">
              <number>3</number>
+            </property>
+            <property name="minimum">
+             <double>-1.000000000000000</double>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -2813,7 +2848,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>836</width>
+     <width>868</width>
      <height>22</height>
     </rect>
    </property>
@@ -2823,6 +2858,13 @@
     </property>
     <addaction name="actionOnline_documentation"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -2838,6 +2880,20 @@
    <property name="text">
     <string>Online documentation</string>
    </property>
+   <property name="shortcut">
+    <string>F7</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -2850,83 +2906,81 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>tab0_load_pushButton</tabstop>
-  <tabstop>tab0_outdir_pushButton</tabstop>
-  <tabstop>tab0_outdir_lineEdit</tabstop>
-  <tabstop>tab0_result_pushButton</tabstop>
-  <tabstop>tab0_result_lineEdit</tabstop>
-  <tabstop>tab0_scrollArea</tabstop>
-  <tabstop>tab1_measure_treeWidget</tabstop>
-  <tabstop>tab1_im1_checkBox</tabstop>
-  <tabstop>tab1_im1b_radioButton</tabstop>
-  <tabstop>tab1_im0i_radioButton</tabstop>
-  <tabstop>tab1_im1f_radioButton</tabstop>
-  <tabstop>tab1_im0_checkBox</tabstop>
-  <tabstop>tab1_im0b_radioButton</tabstop>
-  <tabstop>tab1_im1i_radioButton</tabstop>
-  <tabstop>tab1_im0f_radioButton</tabstop>
-  <tabstop>tab1_measure_textEdit</tabstop>
-  <tabstop>tab1_periodic_checkBox</tabstop>
-  <tabstop>tab1_zeropad_checkBox</tabstop>
-  <tabstop>tab1_maskW_checkBox</tabstop>
-  <tabstop>tab1_pixelpath_comboBox</tabstop>
-  <tabstop>tab2_im0Add_pushButton</tabstop>
-  <tabstop>tab2_im0Rmv_pushButton</tabstop>
-  <tabstop>tab2_im0_listWidget</tabstop>
-  <tabstop>tab2_cp_pushButton</tabstop>
-  <tabstop>tab2_im1Add_pushButton</tabstop>
-  <tabstop>tab2_im1Rmv_pushButton</tabstop>
-  <tabstop>tab2_im1Up__pushButton</tabstop>
-  <tabstop>tab2_im1Dwn_pushButton</tabstop>
-  <tabstop>tab2_im1_listWidget</tabstop>
+  <tabstop>pushButtonT0_load</tabstop>
+  <tabstop>pushButtonT0_path</tabstop>
+  <tabstop>lineEditT0_path</tabstop>
+  <tabstop>lineEditT0_json</tabstop>
+  <tabstop>scrollAreaT0</tabstop>
+  <tabstop>checkBoxT1_set0</tabstop>
+  <tabstop>radioButtonT1_img1b</tabstop>
+  <tabstop>radioButtonT1_img0i</tabstop>
+  <tabstop>radioButtonT1_img1f</tabstop>
+  <tabstop>checkBoxT1_set1</tabstop>
+  <tabstop>radioButtonT1_img0b</tabstop>
+  <tabstop>radioButtonT1_img1i</tabstop>
+  <tabstop>radioButtonT1_img0f</tabstop>
+  <tabstop>textEditT1_field</tabstop>
+  <tabstop>checkBoxT1_periodic</tabstop>
+  <tabstop>checkBoxT1_zeropad</tabstop>
+  <tabstop>checkBoxT1_maskWeight</tabstop>
+  <tabstop>checkBoxT1_pixelPath</tabstop>
+  <tabstop>pushButtonT2_set0Add</tabstop>
+  <tabstop>pushButtonT2_set0Rmv</tabstop>
+  <tabstop>listWidgetT2_img0</tabstop>
+  <tabstop>pushButtonT2_cp</tabstop>
+  <tabstop>pushButtonT2_set1Add</tabstop>
+  <tabstop>pushButtonT2_set1Rmv</tabstop>
+  <tabstop>pushButtonT2_set1Up</tabstop>
+  <tabstop>pushButtonT2_set1Dwn</tabstop>
+  <tabstop>listWidgetT2_img1</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>tab3_set_comboBox</tabstop>
-  <tabstop>tab3_setPrev_pushButton</tabstop>
-  <tabstop>tab3_setNext_pushButton</tabstop>
-  <tabstop>tab3_im_comboBox</tabstop>
-  <tabstop>tab3_imPrev_pushButton</tabstop>
-  <tabstop>tab3_imNext_pushButton</tabstop>
-  <tabstop>tab3_load_pushButton</tabstop>
-  <tabstop>tab3_imDefault_pushButton</tabstop>
-  <tabstop>tab3_imApply_pushButton</tabstop>
-  <tabstop>tab3_zoom_slider</tabstop>
-  <tabstop>tab3_zoomOut_pushButton</tabstop>
-  <tabstop>tab3_zoomIn__pushButton</tabstop>
-  <tabstop>tab3_phaseLow_spinBox</tabstop>
-  <tabstop>tab3_phaseHgh_spinBox</tabstop>
-  <tabstop>tab3_mask1Low_spinBox</tabstop>
-  <tabstop>tab3_mask1Hgh_spinBox</tabstop>
-  <tabstop>tab3_mask2Low_spinBox</tabstop>
-  <tabstop>tab3_mask2Hgh_spinBox</tabstop>
-  <tabstop>tab3_mask3Low_spinBox</tabstop>
-  <tabstop>tab3_mask3Hgh_spinBox</tabstop>
-  <tabstop>tab3_rowLow_spinBox</tabstop>
-  <tabstop>tab3_rowHgh_spinBox</tabstop>
-  <tabstop>tab3_colLow_spinBox</tabstop>
-  <tabstop>tab3_colHgh_spinBox</tabstop>
-  <tabstop>tab3_phase_radioButton</tabstop>
-  <tabstop>tab3_mask_radioButton</tabstop>
-  <tabstop>tab3_row_radioButton</tabstop>
-  <tabstop>tab3_col_radioButton</tabstop>
-  <tabstop>tab3_phase_graphicsView</tabstop>
-  <tabstop>tab3_image_graphicsView</tabstop>
-  <tabstop>tab3_cmap_comboBox</tabstop>
+  <tabstop>comboBoxT3_set</tabstop>
+  <tabstop>pushButtonT3_setPrev</tabstop>
+  <tabstop>pushButtonT3_setNext</tabstop>
+  <tabstop>comboBoxT3_img</tabstop>
+  <tabstop>pushButtonT3_imgPrev</tabstop>
+  <tabstop>pushButtonT3_imgNext</tabstop>
+  <tabstop>pushButtonT3_clear</tabstop>
+  <tabstop>pushButtonT3_apply</tabstop>
+  <tabstop>sliderT3_zoom</tabstop>
+  <tabstop>pushButtonT3_zoomOut</tabstop>
+  <tabstop>pushButtonT3_zoomIn</tabstop>
+  <tabstop>spinBoxT3_phaseLow</tabstop>
+  <tabstop>spinBoxT3_phaseHgh</tabstop>
+  <tabstop>spinBoxT3_mask0Low</tabstop>
+  <tabstop>spinBoxT3_mask0Hgh</tabstop>
+  <tabstop>spinBoxT3_mask1Low</tabstop>
+  <tabstop>spinBoxT3_mask1Hgh</tabstop>
+  <tabstop>spinBoxT3_mask2Low</tabstop>
+  <tabstop>spinBoxT3_mask2Hgh</tabstop>
+  <tabstop>spinBoxT3_rowLow</tabstop>
+  <tabstop>spinBoxT3_rowHgh</tabstop>
+  <tabstop>spinBoxT3_colLow</tabstop>
+  <tabstop>spinBoxT3_colHgh</tabstop>
+  <tabstop>radioButtonT3_phase</tabstop>
+  <tabstop>radioButtonT3_mask</tabstop>
+  <tabstop>radioButtonT3_row</tabstop>
+  <tabstop>radioButtonT3_col</tabstop>
+  <tabstop>graphicsViewT3_seg</tabstop>
+  <tabstop>graphicsViewT3_img</tabstop>
+  <tabstop>comboBoxT3_cmap</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>tab4_roiRow_spinBox</tabstop>
-  <tabstop>tab4_roiCol_spinBox</tabstop>
-  <tabstop>tab4_compute_pushButton</tabstop>
-  <tabstop>tab4_cmap_raw_comboBox</tabstop>
-  <tabstop>tab4_climLow_raw_doubleSpinBox</tabstop>
-  <tabstop>tab4_climHgh_raw_doubleSpinBox</tabstop>
-  <tabstop>tab4_cmap_interp_comboBox</tabstop>
-  <tabstop>tab4_climLow_interp_doubleSpinBox</tabstop>
-  <tabstop>tab4_climHgh_interp_doubleSpinBox</tabstop>
+  <tabstop>spinBoxT4_roiRow</tabstop>
+  <tabstop>spinBoxT4_roiCol</tabstop>
+  <tabstop>pushButtonT4_compute</tabstop>
+  <tabstop>comboBoxT4_cmapRes1</tabstop>
+  <tabstop>doubleSpinBoxT4_climLowRes1</tabstop>
+  <tabstop>doubleSpinBoxT4_climHghRes1</tabstop>
+  <tabstop>comboBoxT4_cmapRes2</tabstop>
+  <tabstop>doubleSpinBoxT4_climLowRes2</tabstop>
+  <tabstop>doubleSpinBoxT4_climHghRes2</tabstop>
  </tabstops>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_tab1_im0"/>
-  <buttongroup name="buttonGroup_tab3_mouse"/>
-  <buttongroup name="buttonGroup_tab1_im1"/>
+  <buttongroup name="buttonGroupT1_set0"/>
+  <buttongroup name="buttonGroupT1_set1"/>
+  <buttongroup name="buttonGroupT1_stat"/>
+  <buttongroup name="buttonGroupT3_mouse"/>
  </buttongroups>
 </ui>
