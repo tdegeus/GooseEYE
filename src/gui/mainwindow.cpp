@@ -153,6 +153,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
   // T1/T3: button pressed -> update "data"
   for ( auto &i : statCombo ) connect(i,SIGNAL(activated(int))   ,this,SLOT(tab1_read()));
+  for ( auto &i : resCombo  ) connect(i,SIGNAL(activated(int))   ,this,SLOT(tab4_read()));
   for ( auto &i : statBtn   ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab1_read()));
   for ( auto &i : statCheck ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab1_read()));
   for ( auto &i : typeBtn   ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab1_read()));
@@ -160,6 +161,7 @@ MainWindow::MainWindow(QWidget *parent) :
   for ( auto &i : imCheck   ) connect(i,SIGNAL(clicked(bool))    ,this,SLOT(tab3_read()));
   for ( auto &i : imSpn     ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab3_read()));
   for ( auto &i : roiSpin   ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab4_read()));
+  for ( auto &i : resSpin   ) connect(i,SIGNAL(editingFinished()),this,SLOT(tab4_read()));
 
   // T2: file manipulation button pressed -> update "data"
   for ( size_t i=0; i<2; ++i ) connect(fileBtnAdd[i],&QPushButton::clicked,this,[=](){fileAdd(i);});
@@ -283,7 +285,7 @@ void MainWindow::on_pushButtonT0_load_clicked()
   QString fname = QFileDialog::getOpenFileName(
     this,
      tr("Open previously stored state"),
-     QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+     data.path.absolutePath(),
      tr("JSON Files (*.json *.JSON)")
   );
   if ( !QFileInfo(fname).exists() )
@@ -670,29 +672,41 @@ void MainWindow::tab2_show()
   for ( auto &i : typeLbl ) i->setText   (""   );
 
   // for all sets
-  for ( size_t iset=0; iset<data.sets.size(); ++iset ) {
-    // - set labels
-    propLbl[iset]->setText(data.sets[iset].field);
-    typeLbl[iset]->setText(data.sets[iset].dtype);
-    // - enable file list
-    fileLst[iset]->setEnabled(true);
-    // - store selected items
-    std::vector<int> rows;
-    foreach ( QListWidgetItem *item, fileLst[iset]->selectedItems() )
-      rows.push_back(fileLst[iset]->row(item));
+  for ( size_t iset=0; iset<2; ++iset ) {
+    // - allocate selected rows and filenames
+    std::vector<int>     rows;
+    std::vector<QString> files;
+    // - if set enabled:
+    if ( iset<data.sets.size() ) {
+      // -- set labels
+      propLbl[iset]->setText(data.sets[iset].field);
+      typeLbl[iset]->setText(data.sets[iset].dtype);
+      // -- enable file list
+      fileLst[iset]->setEnabled(true);
+      // -- store selected items
+      foreach ( QListWidgetItem *item, fileLst[iset]->selectedItems() )
+        rows.push_back(fileLst[iset]->row(item));
+    }
     // - empty file lists
     while ( fileLst[iset]->count()>0 )
       fileLst[iset]->takeItem(0);
-    // - read files
-    std::vector<QString> files = data.sets[iset].fileNames();
-    // - fill file list
-    for ( auto &file : files )
-      fileLst[iset]->addItem(file);
-    // - restore file selection
+    // - if set enabled:
+    if ( iset<data.sets.size() ) {
+      // -- read files
+      files = data.sets[iset].fileNames();
+      // -- fill file list
+      for ( auto &file : files )
+        fileLst[iset]->addItem(file);
+    }
+    // - clear selection
     for ( int j=0; j<fileLst[iset]->count(); ++j )
       fileLst[iset]->item(j)->setSelected(false);
-    for ( auto &row : rows )
-      fileLst[iset]->item(row)->setSelected(true);
+    // - if set enabled:
+    if ( iset<data.sets.size() ) {
+      // - restore file selection
+      for ( auto &row : rows )
+        fileLst[iset]->item(row)->setSelected(true);
+    }
     // - enable buttons
     if ( true                                  ) fileBtnAdd[iset]   ->setEnabled(true);
     if ( files.size()>0                        ) fileBtnRmv[iset]   ->setEnabled(true);
