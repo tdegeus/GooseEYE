@@ -139,6 +139,9 @@ MainWindow::MainWindow(QWidget *parent) :
   // - T4: all colorbars
   resCombo.push_back(ui->comboBoxT4_cmapRes1);
   resCombo.push_back(ui->comboBoxT4_cmapRes2);
+  // - T4: all plots
+  resPlot .push_back(ui->customPlot_res0);
+  resPlot .push_back(ui->customPlot_res1);
   // - all radioButtons-groups (on all tabs)
   btnGroup.push_back(ui->buttonGroupT1_stat );
   btnGroup.push_back(ui->buttonGroupT1_set0 );
@@ -1019,18 +1022,28 @@ void MainWindow::tab3_imag()
 
 void MainWindow::tab4_read()
 {
+  // read ROI-size: make sure that the value is always odd
   for ( size_t i=0; i<roiSpin.size(); ++i )
   {
-    size_t val = roiSpin[i]->value();
+    // - read value from spinBox
+    int val = roiSpin[i]->value();
+    // - ignore negative values
+    if ( val<0 )
+      continue;
+    // - make even values odd
     if ( val%2==0 )
       ++val;
-    data.roi[i] = val;
+    // - store
+    data.roi[i] = static_cast<size_t>(val);
   }
 
-  for ( size_t i=0; i<resCombo.size(); ++i ) {
-    data.plot[i].cmap = resCombo[i]->currentText();
-    for ( size_t j=0; j<resSpin.size()/resCombo.size(); ++j )
-      data.plot[i].lim[j] = resSpin[j]->value();
+  // loop over plots
+  for ( size_t iplt=0; iplt<resPlot.size(); ++iplt )
+  {
+    // - read colormap
+    data.plot[iplt].cmap = resCombo[iplt]->currentText();
+    // - read limits
+    for ( size_t j=0; j<2; ++j ) data.plot[iplt].lim[j] = resSpin[iplt*2+j]->value();
   }
 
 }
@@ -1039,42 +1052,37 @@ void MainWindow::tab4_read()
 
 void MainWindow::tab4_show()
 {
-  for ( size_t iset=1; iset<data.sets.size(); ++iset ) {
-    if ( data.sets[iset].files.size()!=data.sets[0].files.size() ) {
-      promptWarning("Inconsistent number of input files");
-      return;
-    }
-  }
-
+  // ROI
   for ( size_t i=0; i<roiSpin.size(); ++i )
     roiSpin[i]->setValue(data.roi[i]);
 
-  for ( size_t i=0; i<resCombo.size(); ++i ) {
-    int row = resCombo[i]->findText(data.plot[i].cmap);
-    if ( row>=0 )
-      resCombo[i]->setCurrentIndex(row);
-    for ( size_t j=0; j<resSpin.size()/resCombo.size(); ++j ) {
-      resSpin[j]->setValue(data.plot[i].lim[j]);
-    }
+  // set colormaps
+  for ( size_t iplt=0; iplt<resPlot.size(); ++iplt )
+  {
+    // - convert "cmap" text to index, and apply index
+    int row = resCombo[iplt]->findText(data.plot[iplt].cmap);
+    if ( row>=0 ) resCombo[iplt]->setCurrentIndex(row);
+    // - set limits
+    for ( size_t j=0; j<2; ++j ) resSpin[iplt*2+j]->setValue(data.plot[iplt].lim[j]);
   }
 
+  // default: disable compute button, only enable if conditions are met
   ui->pushButtonT4_compute->setEnabled(false);
 
-  if ( data.sets.size()==2 ) {
-    if ( data.sets[0].files.size()!=data.sets[1].files.size() )
-      return;
-  }
-  else if ( data.sets.size()!=1 ) {
-    return;
-  }
-
+  // - check that at least one file is selected
   if ( data.sets[0].files.size()<=0 )
     return;
-
-  for ( auto &i : data.roi )
-    if ( i<=0 )
+  // - check file selection consistency, to avoid going out of bounds
+  for ( size_t iset=1; iset<data.sets.size(); ++iset )
+    if ( data.sets[iset].files.size()!=data.sets[0].files.size() )
       return;
+  // - check that the ROI is positive, and odd
+  for ( auto &i : data.roi ) {
+    if ( i  <=0 ) return;
+    if ( i%2==0 ) return;
+  }
 
+  // all checks passed: enable compute button
   ui->pushButtonT4_compute->setEnabled(true);
 }
 
@@ -1099,23 +1107,21 @@ void MainWindow::tab4_plot()
   int                 ny   = static_cast<int>(data.roi[1]);
   size_t              ncol = 256;
 
-  // plot: 1
-  // -------
-
-  if ( true )
+  // loop over plots
+  for ( size_t iplt=0; iplt<data.plot.size(); ++iplt )
   {
     // read colormap
-    std::string         name = ui->comboBoxT4_cmapRes1->currentText().toStdString();
+    std::string         name = resCombo[iplt]->currentText().toStdString();
     std::vector<int>    cmap = cppcolormap::colormap(name,ncol);
     std::vector<float>  x    = cppcolormap::linspace(0.0,1.0,ncol);
 
     // configure axis
-    ui->raw_customPlot->axisRect()->setupFullAxesBox(true);
-    ui->raw_customPlot->xAxis->setLabel("Delta x");
-    ui->raw_customPlot->yAxis->setLabel("Delta y");
+    resPlot[iplt]->axisRect()->setupFullAxesBox(true);
+    resPlot[iplt]->xAxis->setLabel("Delta x");
+    resPlot[iplt]->yAxis->setLabel("Delta y");
 
     // initialize the plot
-    QCPColorMap *im = new QCPColorMap(ui->raw_customPlot->xAxis,ui->raw_customPlot->yAxis);
+    QCPColorMap *im = new QCPColorMap(resPlot[iplt]->xAxis,resPlot[iplt]->yAxis);
     // set size
     im->data()->setSize(nx,ny);
     // assign numbers of the range
@@ -1126,11 +1132,11 @@ void MainWindow::tab4_plot()
         im->data()->setCell(i,j,D(i,j));
 
     // remove previous colorbar
-    ui->raw_customPlot->plotLayout()->remove(ui->raw_customPlot->plotLayout()->element(0,1));
+    resPlot[iplt]->plotLayout()->remove(resPlot[iplt]->plotLayout()->element(0,1));
     // initialize new colorbar
-    QCPColorScale *cbar = new QCPColorScale(ui->raw_customPlot);
+    QCPColorScale *cbar = new QCPColorScale(resPlot[iplt]);
     // add colorbar to the plot
-    ui->raw_customPlot->plotLayout()->addElement(0,1,cbar);
+    resPlot[iplt]->plotLayout()->addElement(0,1,cbar);
     // set location
     cbar->setType(QCPAxis::atRight);
     // link to plot
@@ -1146,75 +1152,16 @@ void MainWindow::tab4_plot()
     im->setGradient(qmap);
     im->rescaleDataRange();
     // - position
-    QCPMarginGroup *margin = new QCPMarginGroup(ui->raw_customPlot);
-    ui->raw_customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop,margin);
+    QCPMarginGroup *margin = new QCPMarginGroup(resPlot[iplt]);
+    resPlot[iplt]->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop,margin);
     cbar->setMarginGroup(QCP::msBottom|QCP::msTop,margin);
     // - set the color-scale (from buttons)
-    cbar->axis()->setRangeLower(ui->doubleSpinBoxT4_climLowRes1->value());
-    cbar->axis()->setRangeUpper(ui->doubleSpinBoxT4_climHghRes1->value());
+    cbar->axis()->setRangeLower(data.plot[iplt].lim[0]);
+    cbar->axis()->setRangeUpper(data.plot[iplt].lim[1]);
 
     // update the plot
-    ui->raw_customPlot->rescaleAxes();
-    ui->raw_customPlot->replot();
-  }
-
-  // plot: 2
-  // -------
-
-  if ( true )
-  {
-    // read colormap
-    std::string         name = ui->comboBoxT4_cmapRes2->currentText().toStdString();
-    std::vector<int>    cmap = cppcolormap::colormap(name,ncol);
-    std::vector<float>  x    = cppcolormap::linspace(0.0,1.0,ncol);
-
-    // configure axis
-    ui->interp_customPlot->axisRect()->setupFullAxesBox(true);
-    ui->interp_customPlot->xAxis->setLabel("Delta x");
-    ui->interp_customPlot->yAxis->setLabel("Delta y");
-
-    // initialize the plot
-    QCPColorMap *im = new QCPColorMap(ui->interp_customPlot->xAxis,ui->interp_customPlot->yAxis);
-    // set size
-    im->data()->setSize(nx,ny);
-    // assign numbers of the range
-    im->data()->setRange(QCPRange(-(nx-1)/2,+(nx-1)/2),QCPRange(-(ny-1)/2,+(ny-1)/2));
-    // assign data
-    for ( int i=0; i<nx; i++ )
-      for (int j=0; j<ny; j++ )
-        im->data()->setCell(i,j,D(i,j));
-
-    // remove previous colorbar
-    ui->interp_customPlot->plotLayout()->remove(ui->interp_customPlot->plotLayout()->element(0,1));
-    // initialize new colorbar
-    QCPColorScale *cbar = new QCPColorScale(ui->interp_customPlot);
-    // add colorbar to the plot
-    ui->interp_customPlot->plotLayout()->addElement(0,1,cbar);
-    // set location
-    cbar->setType(QCPAxis::atRight);
-    // link to plot
-    im->setColorScale(cbar);
-    // set colors
-    // - allocate
-    QCPColorGradient qmap;
-    qmap.setLevelCount(ncol);
-    // - copy from colormap (read from library above)
-    for ( size_t i=9; i<ncol; ++i )
-      qmap.setColorStopAt(x[i],QColor(cmap[i*3+0],cmap[i*3+1],cmap[i*3+2]));
-    // - apply
-    im->setGradient(qmap);
-    im->rescaleDataRange();
-    // - position
-    QCPMarginGroup *margin = new QCPMarginGroup(ui->interp_customPlot);
-    ui->interp_customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop,margin);
-    cbar->setMarginGroup(QCP::msBottom|QCP::msTop,margin);
-    // - set the color-scale (from buttons)
-    cbar->axis()->setRangeLower(ui->doubleSpinBoxT4_climLowRes2->value());
-    cbar->axis()->setRangeUpper(ui->doubleSpinBoxT4_climHghRes2->value());
-
-    // update the plot
-    ui->interp_customPlot->rescaleAxes();
-    ui->interp_customPlot->replot();
+    resPlot[iplt]->rescaleAxes();
+    resPlot[iplt]->replot();
   }
 }
 
@@ -1226,8 +1173,8 @@ void MainWindow::tab4_save()
   data.write();
 
   // results
-  ui->raw_customPlot   ->savePdf(data.path.filePath(data.plot[0].name),0,0,QCP::epNoCosmetic);
-  ui->interp_customPlot->savePdf(data.path.filePath(data.plot[1].name),0,0,QCP::epNoCosmetic);
+  for ( size_t iplt=0; iplt<resPlot.size(); ++iplt )
+    resPlot[iplt]->savePdf(data.path.filePath(data.plot[iplt].name),0,0,QCP::epNoCosmetic);
 }
 
 // =================================================================================================

@@ -1983,7 +1983,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
-           <widget class="QCustomPlot" name="raw_customPlot" native="true">
+           <widget class="QCustomPlot" name="customPlot_res0" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>100</horstretch>
@@ -1993,7 +1993,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QCustomPlot" name="interp_customPlot" native="true">
+           <widget class="QCustomPlot" name="customPlot_res1" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>100</horstretch>

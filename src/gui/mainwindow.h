@@ -25,6 +25,8 @@
 #include <vector>
 #include <math.h>
 
+#include "qcustomplot.h"
+
 #include "../core/image.h"
 #include "cppcolormap/cppcolormap.h"
 #include "json/json.hpp"
@@ -225,26 +227,26 @@ public:
 
 // Fields (scalars): ("path": path to which all filenames are relative)
 QDir    path        = QDir(QStandardPaths::writableLocation(QStandardPaths::HomeLocation));
-QString fname       = "";             // filename of the JSON file to store all settings
-QString stat        = "";             // name of the statistic: "S2", "C2", "L", "W2", "W2c"
-bool    periodic    = true;           // assume all images periodic or not
-bool    zeropad     = false;          // zero-pad all images (only for non-periodic analyses)
-bool    mask_weight = false;          // signal to mask weights (for "W2" and "W2c")
-QString pixel_path  = "Bresenham";    // pixel-path algorithm to use (for "L" and "W2c")
+QString fname       = "";           // filename of the JSON file to store all settings
+QString stat        = "";           // name of the statistic: "S2", "C2", "L", "W2", "W2c"
+bool    periodic    = true;         // assume all images periodic or not
+bool    zeropad     = false;        // zero-pad all images (only for non-periodic analyses)
+bool    mask_weight = false;        // signal to mask weights (for "W2" and "W2c")
+QString pixel_path  = "Bresenham";  // pixel-path algorithm to use (for "L" and "W2c")
 // Fields (lists):
-std::vector<Plot>    plot;            // plot settings
-std::vector<size_t>  roi  = {0,0};    // shape of the output ROI
-std::vector<Set>     sets;            // sets of files (the order of files has to correspond)
-mat::matrix<double>  res;             // result, unnormalized                 (shape == "roi")
-mat::matrix<double>  resnorm;         // normalization to be applied to "res" (shape == "roi")
-double               mean;            // spatial average, unnormalized
-double               meannorm;        // normalization to be applied to "mean"
+std::vector<Plot>    plot;          // plot settings
+std::vector<size_t>  roi  = {1,1};  // shape of the output ROI
+std::vector<Set>     sets;          // sets of files (the order of files has to correspond)
+mat::matrix<double>  res;           // result, unnormalized                 (shape == "roi")
+mat::matrix<double>  resnorm;       // normalization to be applied to "res" (shape == "roi")
+double               mean;          // spatial average, unnormalized
+double               meannorm;      // normalization to be applied to "mean"
 // Methods:
-// imageRead: read one image file, convert to mat::matrix, apply defaults (if requested)
-// image: (read one image using "imageRead"), interpret to image by applied thresholds
-// newPath: change the path (changes or the files to a new relative path)
-// write: write all settings of this class to a JSON file
-// read: read settings (partly or all) from a JSON file (used to restore a previous state)
+// - imageRead: read one image file, convert to mat::matrix, apply defaults (if requested)
+// - image: (read one image using "imageRead"), interpret to image by applied thresholds
+// - newPath: change the path (changes or the files to a new relative path)
+// - write: write all settings of this class to a JSON file
+// - read: read settings (partly or all) from a JSON file (used to restore a previous state)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -424,10 +426,11 @@ QtImage image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
 
 QtImage image(size_t iset, size_t iimg, int crop=-2)
 {
+  // read image using method above
   QtImage out = imageRead(iset,iimg);
-
+  // interpret image using method above (updates "out")
   image(iset,iimg,out,crop);
-
+  // return result
   return out;
 };
 
@@ -435,27 +438,29 @@ QtImage image(size_t iset, size_t iimg, int crop=-2)
 
 void newPath(QDir new_path)
 {
+  // paths identical: do nothing
   if ( new_path==path )
     return;
 
+  // update all filenames
+  // - files (images) in all sets
   for ( auto &set : sets )
     for ( auto &file : set.files )
       file.name = new_path.relativeFilePath(path.filePath(file.name));
-
+  // - plots of the result (PDF)
   for ( auto &pl : plot )
     pl.name = new_path.relativeFilePath(path.filePath(pl.name));
-
+  // - settings file (JSON)
   fname = new_path.relativeFilePath(path.filePath(fname));
 
+  // store new path
   path = new_path;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void write() {
-
-  // default file-name (absolute path)
-  std::string outname = path.absoluteFilePath(fname).toStdString();
+void write()
+{
   // allocate
   json out;
   // variables that can be copied 'as is'
@@ -467,29 +472,37 @@ void write() {
   out["roi"        ] = roi;
   out["mean"       ] = mean;
   out["meannorm"   ] = meannorm;
-  // result
+  // result -> flatten to array, store
   if ( res.size()>0 ) {
     if ( roi[0]==res.shape()[0] && roi[1]==res.shape()[1] ) {
+      // - allocate flattened array
       std::vector<double> tmp;
+      // - fill from "mat::matrix"
       for ( size_t i=0; i<res.size(); ++i )
         tmp.push_back(res[i]);
+      // - store
       if ( tmp.size()>0 )
         out["res"] = tmp;
     }
   }
-  // result normalization
+  // result normalization -> flatten to array, store
   if ( resnorm.size()>0 ) {
     if ( roi[0]==resnorm.shape()[0] && roi[1]==resnorm.shape()[1] ) {
+      // - allocate flattened array
       std::vector<double> tmp;
+      // - fill from "mat::matrix"
       for ( size_t i=0; i<resnorm.size(); ++i )
         tmp.push_back(resnorm[i]);
+      // - store
       if ( tmp.size()>0 )
         out["resnorm"] = tmp;
     }
   }
   // output files
   if ( true ) {
+    // - define "keys" (names in the JSON file)
     std::vector<std::string> keys = {"plot0","plot1"};
+    // - store all plot settings
     for ( size_t i=0; i<keys.size(); ++i ) {
       out[keys[i]]["name"] = plot[i].name.toStdString();
       out[keys[i]]["cmap"] = plot[i].cmap.toStdString();
@@ -497,14 +510,14 @@ void write() {
     }
   }
   // write all files
-  // - construct filenames
+  // - construct "keys" (names in JSON file)
   size_t                   n     = 0;
   std::vector<std::string> sname = {"set0","set1"};
   std::vector<std::string> keys;
   // - maximum number of files
   if ( sets.size()>=1 ) n = std::max(n,sets[0].files.size());
   if ( sets.size()>=2 ) n = std::max(n,sets[1].files.size());
-  // - set file-index as string
+  // - set file-index as "key"
   for ( size_t i=0; i<n; ++i )
     keys.push_back(QString::number(i).toStdString());
   // - fill
@@ -517,59 +530,31 @@ void write() {
     // -- write images
     for ( size_t iimg=0; iimg<sets[iset].files.size(); ++iimg ) {
       // --- alias
-      File       *f = &sets[iset].files[iimg];
-      std::string k = keys [iimg];
+      File       *f   = &sets[iset].files[iimg];
+      std::string key = keys [iimg];
       // --- write filename
-      out[s]["files"][k]["name"] = f->name.toStdString();
-      // --- write phase threshold
-      if ( f->phase.active && f->phase.data.size()>0 ) {
-        std::vector<size_t> tmp;
-        for ( size_t i=0; i<f->phase.data.size(); i+=2 ) {
-          if ( f->phase.data[i]<f->phase.data[i+1] ) {
-            tmp.push_back(f->phase.data[i  ]);
-            tmp.push_back(f->phase.data[i+1]);
+      out[s]["files"][key]["name"] = f->name.toStdString();
+      // --- alias filters
+      std::vector<std::string> st  = {   "phase",   "mask",   "row",   "col"};
+      std::vector<Filter*>     val = {&f->phase ,&f->mask ,&f->row ,&f->col };
+      // --- loop over filters
+      for ( size_t k=0; k<st.size(); ++k ) {
+        if ( val[k]->active && val[k]->data.size()>0 ) {
+          std::vector<size_t> tmp;
+          for ( size_t i=0; i<val[k]->data.size(); i+=2 ) {
+            if ( val[k]->data[i]<val[k]->data[i+1] ) {
+              tmp.push_back(val[k]->data[i  ]);
+              tmp.push_back(val[k]->data[i+1]);
+            }
           }
+          out[s]["files"][key][st[k]] = tmp;
         }
-        out[s]["files"][k]["phase"] = tmp;
-      }
-      // --- write mask threshold
-      if ( f->mask.active && f->mask.data.size()>0 ) {
-        std::vector<size_t> tmp;
-        for ( size_t i=0; i<f->mask.data.size(); i+=2 ) {
-          if ( f->mask.data[i]<f->mask.data[i+1] ) {
-            tmp.push_back(f->mask.data[i  ]);
-            tmp.push_back(f->mask.data[i+1]);
-          }
-        }
-        out[s]["files"][k]["mask"] = tmp;
-      }
-      // --- write row threshold
-      if ( f->row.active && f->row.data.size()>0 ) {
-        std::vector<size_t> tmp;
-        for ( size_t i=0; i<f->row.data.size(); i+=2 ) {
-          if ( f->row.data[i]<f->row.data[i+1] ) {
-            tmp.push_back(f->row.data[i  ]);
-            tmp.push_back(f->row.data[i+1]);
-          }
-        }
-        out[s]["files"][k]["row"] = tmp;
-      }
-      // --- write col threshold
-      if ( f->col.active && f->col.data.size()>0 ) {
-        std::vector<size_t> tmp;
-        for ( size_t i=0; i<f->col.data.size(); i+=2 ) {
-          if ( f->col.data[i]<f->col.data[i+1] ) {
-            tmp.push_back(f->col.data[i  ]);
-            tmp.push_back(f->col.data[i+1]);
-          }
-        }
-        out[s]["files"][k]["col"] = tmp;
       }
     }
   }
 
   // write JSON
-  std::ofstream o(outname);
+  std::ofstream o(path.absoluteFilePath(fname).toStdString());
   o << std::setw(2) << out << std::endl;
 };
 
@@ -592,119 +577,102 @@ void read(QString iname)
   if ( inp.count("pixel_path" ) ) pixel_path  = QString::fromStdString(inp["pixel_path" ]);
   if ( inp.count("mean"       ) ) mean        =                        inp["mean"       ];
   if ( inp.count("meannorm"   ) ) meannorm    =                        inp["meannorm"   ];
-  // region of interest
+  // "roi"
   if ( inp.count("roi") ) {
     if ( inp["roi"].size()==2 ) {
       isroi = true;
       roi.resize(2);
-      for ( size_t i=0; i<2; ++i )
-        roi[i] = inp["roi"][i];
+      for ( size_t i=0; i<2; ++i ) roi[i] = inp["roi"][i];
     }
   }
-  // result
-  if ( inp.count("res") && isroi ) {
-    if ( inp["res"].size()==roi[0]*roi[1] ) {
-      res.resize(roi);
-      for ( size_t i=0; i<res.size(); ++i )
-        res[i] = inp["res"][i];
-    }
-    else {
-      isroi = false;
-    }
-  }
-  // result normalization
-  if ( inp.count("resnorm") && isroi ) {
-    if ( inp["resnorm"].size()==roi[0]*roi[1] ) {
-      resnorm.resize(roi);
-      for ( size_t i=0; i<resnorm.size(); ++i )
-        resnorm[i] = inp["resnorm"][i];
+  // "res" and "resnorm"
+  if ( isroi )
+  {
+    // - create pointers to loop over both fields
+    std::vector<std::string>          keys = {"res","resnorm"};
+    std::vector<mat::matrix<double>*> vals = {&res ,&resnorm };
+    // - loop over fields
+    for ( size_t k=0; k<keys.size(); ++k ) {
+      if ( inp[keys[k]].size()==roi[0]*roi[1] ) {
+        vals[k]->resize(roi);
+        for ( size_t i=0; i<vals[k]->size(); ++i ) (*vals[k])[i] = inp[keys[k]][i];
+      }
     }
   }
-  // output files
+  // "plot0" and "plot1"
+  // - field names
   std::vector<std::string> keys = {"plot0","plot1"};
+  // - allocate space
   if ( plot.size()<keys.size() )
     plot.resize(keys.size());
+  // - loop over fields
   for ( size_t i=0; i<keys.size(); ++i ) {
+    // -- check if field is present
     if ( !inp.count(keys[i]) )
-      break;
-    if ( inp[keys[i]].count("name") ) {
-      plot[i].name = QString::fromStdString(inp[keys[i]]["name"]);
-    }
-    if ( inp[keys[i]].count("cmap") ) {
-      plot[i].cmap = QString::fromStdString(inp[keys[i]]["cmap"]);
-    }
+      continue;
+    // -- extract "name" and "cmap"
+    if ( inp[keys[i]].count("name") ) plot[i].name = QString::fromStdString(inp[keys[i]]["name"]);
+    if ( inp[keys[i]].count("cmap") ) plot[i].cmap = QString::fromStdString(inp[keys[i]]["cmap"]);
+    // -- extract "lim"
     if ( inp[keys[i]].count("lim") ) {
       for ( size_t j=0; j<std::min(plot[i].lim.size(),inp[keys[i]]["lim"].size()); ++j )
         plot[i].lim[j] = inp[keys[i]]["lim"][j];
     }
   }
   // read files
-  // - construct filenames
+  // - names of sets
   std::vector<std::string> sname = {"set0","set1"};
-  // - read
+  // - read files in each set
   for ( size_t iset=0; iset<sname.size(); ++iset ) {
+    // -- check if present in JSON
     if ( !inp.count(sname[iset]) )
-      break;
-    if ( sets.size()<iset+1 )
-      sets.resize(iset+1);
+      continue;
+    // -- expand "sets" field
+    sets.resize(iset+1);
+    // -- clear all files that may be currently stored
     sets[iset].files.resize(0);
-
+    // -- extract meta-data
     if ( inp[sname[iset]].count("dtype") )
       sets[iset].dtype = QString::fromStdString(inp[sname[iset]]["dtype"]);
     if ( inp[sname[iset]].count("field") )
       sets[iset].field = QString::fromStdString(inp[sname[iset]]["field"]);
-
+    // -- loop over images found in JSON (assumed named "0","1","2",...)
     size_t iimg = 0;
     while ( true ) {
+      // --- convert "iimg" to string, for read
       std::string key = QString::number(iimg).toStdString();
+      // --- quit searching if the file is not found (numbering assumed sequential)
       if ( !inp[sname[iset]]["files"].count(key) )
         break;
+      // --- allocate data
       File i;
       bool setDefault = true;
-      if ( inp[sname[iset]]["files"][key].count("name") ) {
+      // --- extract the file-name, skip if no name is specified
+      if ( inp[sname[iset]]["files"][key].count("name") )
         i.name = QString::fromStdString(inp[sname[iset]]["files"][key]["name"]);
-      }
-      else {
+      else
         continue;
+      // --- specify Filters to extract
+      std::vector<std::string> names = {"phase" ,"mask" ,"row" ,"col" };
+      std::vector<Filter*>     vals  = {&i.phase,&i.mask,&i.row,&i.col};
+      // --- extract all filters
+      for ( size_t k=0; k<names.size(); ++k ) {
+        if ( inp[sname[iset]]["files"][key].count(names[k]) ) {
+          setDefault        = false;
+          vals[k]->active = true;
+          vals[k]->data.resize(inp[sname[iset]]["files"][key][names[k]].size());
+          for ( size_t j=0; j<vals[k]->data.size(); ++j )
+            vals[k]->data[j] = inp[sname[iset]]["files"][key][names[k]][j];
+        }
       }
-      if ( inp[sname[iset]]["files"][key].count("phase") ) {
-        setDefault = false;
-        i.phase.active = true;
-        i.phase.data.resize(inp[sname[iset]]["files"][key]["phase"].size());
-        for ( size_t j=0; j<i.phase.data.size(); ++j )
-          i.phase.data[j] = inp[sname[iset]]["files"][key]["phase"][j];
-      }
-      if ( inp[sname[iset]]["files"][key].count("mask") ) {
-        setDefault = false;
-        i.mask.active = true;
-        i.mask.data.resize(inp[sname[iset]]["files"][key]["mask"].size());
-        for ( size_t j=0; j<i.mask.data.size(); ++j )
-          i.mask.data[j] = inp[sname[iset]]["files"][key]["mask"][j];
-      }
-      if ( inp[sname[iset]]["files"][key].count("row") ) {
-        setDefault = false;
-        i.row.active = true;
-        i.row.data.resize(inp[sname[iset]]["files"][key]["row"].size());
-        for ( size_t j=0; j<i.row.data.size(); ++j )
-          i.row.data[j] = inp[sname[iset]]["files"][key]["row"][j];
-      }
-      if ( inp[sname[iset]]["files"][key].count("col") ) {
-        setDefault = false;
-        i.col.active = true;
-        i.col.data.resize(inp[sname[iset]]["files"][key]["col"].size());
-        for ( size_t j=0; j<i.col.data.size(); ++j )
-          i.col.data[j] = inp[sname[iset]]["files"][key]["col"][j];
-      }
+      // --- signal to set defaults, only if no filters were found for this file
       i.setDefault = setDefault;
+      // --- store file
       sets[iset].files.push_back(i);
+      // --- proceed to next image
       ++iimg;
-
     }
-
   }
-
-
-
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -798,6 +766,7 @@ private:
   std::vector<QSpinBox*>       roiSpin;    // T4: ROI shape
   std::vector<QDoubleSpinBox*> resSpin;    // T4: all color-scale ranges
   std::vector<QComboBox*>      resCombo;   // T4: all colormaps
+  std::vector<QCustomPlot*>    resPlot;    // T4: all plots
   std::vector<QButtonGroup*>   btnGroup;   // all groups of radioButtons
   // Support functions
   bool   promptQuestion(QString);        // prompt question to user (return response)
