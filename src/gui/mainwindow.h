@@ -16,6 +16,7 @@
 #include <QObject>
 #include <QScrollBar>
 #include <QComboBox>
+#include <QApplication>
 
 #include <iostream>
 #include <iomanip>

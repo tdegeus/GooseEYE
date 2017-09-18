@@ -688,8 +688,11 @@ void MainWindow::tab2_show()
         rows.push_back(fileLst[iset]->row(item));
     }
     // - empty file lists
-    while ( fileLst[iset]->count()>0 )
-      fileLst[iset]->takeItem(0);
+    while ( fileLst[iset]->count() > 0 )
+    {
+      QListWidgetItem *item = fileLst[iset]->takeItem(0);
+      delete item;
+    }
     // - if set enabled:
     if ( iset<data.sets.size() ) {
       // -- read files
@@ -1207,11 +1210,16 @@ void MainWindow::compute()
   ui->progressBarT4->setMaximum(100);
   double N = 100.0/static_cast<double>(data.sets[0].files.size());
 
+  // set progress as text
+  QString text;
+  text = QString("Computing, 0\% complete");
+  ui->statusBar->showMessage(text);
+  // refresh app
+  qApp->processEvents();
+
   // loop over images
   for ( size_t iimg=0; iimg<data.sets[0].files.size(); ++iimg )
   {
-    // - set progress
-    ui->progressBarT4->setValue(static_cast<int>(static_cast<double>(iimg)/N));
     // - compute statistic
     try {
       if      ( data.stat=="S2"  ) computeS2 (iimg);
@@ -1224,10 +1232,27 @@ void MainWindow::compute()
       promptWarning("Error in computation, see documentation of core functions");
       return;
     }
+    // - compute progress
+    int frac = static_cast<int>(static_cast<double>(iimg+1)*N);
+    // - set progress
+    ui->progressBarT4->setValue(frac);
+    // - set progress as text
+    text = QString("Computing, %1\% complete").arg(frac);
+    ui->statusBar->showMessage(text);
+    // - refresh app
+    qApp->processEvents();
   }
 
   // overwrite JSON file (now includes the result)
   data.write();
+
+  // set progress as text
+  size_t n = data.sets[0].files.size();
+  if ( n == 1) text = QString("Finished computing, based on 1 file");
+  else         text = QString("Finished computing, based on %1 files").arg(n);
+  ui->statusBar->showMessage(text);
+  // refresh app
+  qApp->processEvents();
 }
 
 // -------------------------------------------------------------------------------------------------
