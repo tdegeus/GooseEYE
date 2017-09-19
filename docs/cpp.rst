@@ -1,7 +1,8 @@
 :tocdepth: 3
 
+*************
 C++ interface
-=============
+*************
 
 .. contents::
   :local:

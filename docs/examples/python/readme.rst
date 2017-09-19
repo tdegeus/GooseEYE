@@ -1,11 +1,15 @@
 
 :tocdepth: 3
 
+************************
+Theory & Python examples
+************************
+
 2-point probability / auto-correlation
---------------------------------------
+======================================
 
 Theory
-""""""
+------
 
 The most basic statistic determines the typical distance over which two points (pixels, voxels, ...) are related to each other. This is best understood by considering a binary 2D-image, wherein each pixel is either black or white. This is described by the following indicator function, indicating the 'gray-scale' of a pixel at position :math:`\vec{x}_i`:
 
@@ -64,15 +68,15 @@ Along the same arguments, limit values can be obtained. In this case:
 where the brackets :math:`\langle \ldots \rangle` denotes the spatial average.
 
 Further reading
-"""""""""""""""
+---------------
 
 Textbooks
-:::::::::
+^^^^^^^^^
 
 * Torquato, S. (2002). Random Heterogeneous Materials (1st ed.). Springer, New York, NY. New York. `doi:10.1007/978-1-4757-6355-3 <http://doi.org/10.1007/978-1-4757-6355-3>`_
 
 Example
-"""""""
+-------
 
 This result is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The top row shows the image and the results for the binary image: from left to right: the image, the 2-point probability :math:`S_2` in two-dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis. The same image and results are shown on the bottom row for a gray scale image, for which noise is added and the background and the islands are made gray.
 
@@ -89,7 +93,7 @@ This example is based on the following code (the code used for the plotting is i
 [:download:`source: S2.py <image/S2.py>`]
 
 Masked correlation
-""""""""""""""""""
+------------------
 
 This function also has the possibility to mask certain pixels. The image's mask is a binary-matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalization is corrected for the reduced number of data-points, whereby the number of data-points is no longer constant over the region-of-interest.
 
@@ -108,10 +112,10 @@ This function also has the possibility to mask certain pixels. The image's mask 
 [:download:`source: S2_mask.py <image/S2_mask.py>`]
 
 2-point cluster function
-------------------------
+========================
 
 Theory
-""""""
+------
 
 If an image consists of isolated clusters, the 2-point cluster function can be used to quantify the probability that two points are in the same cluster. It is defined as follows:
 
@@ -123,15 +127,15 @@ If an image consists of isolated clusters, the 2-point cluster function can be u
 whereby :math:`\mathcal{C}` is an indicator with a unique non-zero index for each cluster.
 
 Further reading
-"""""""""""""""
+---------------
 
 Textbooks
-:::::::::
+^^^^^^^^^
 
 * Torquato, S. (2002). Random Heterogeneous Materials (1st ed.). Springer, New York, NY. New York. `doi:10.1007/978-1-4757-6355-3 <http://doi.org/10.1007/978-1-4757-6355-3>`_
 
 Example
-"""""""
+-------
 
 .. image:: image/S2_cluster.svg
   :width: 700px
@@ -146,10 +150,10 @@ The 2-point cluster function can be computed with the same machinery as the 2-po
 [:download:`source: S2_cluster.py <image/S2_cluster.py>`]
 
 Lineal path function
---------------------
+====================
 
 Theory
-""""""
+------
 
 The 2-point cluster function has a first order notion of connectedness. To quantify the true connectedness along a path, the lineal path function is used. The lineal path function quantifies the probability that an entire path of pixels connecting :math:`\vec{x}_i` and :math:`\vec{x}_i + \Delta x` is in the same phase:
 
@@ -185,7 +189,7 @@ An important ingredient of the computation of :math:`L` is thus the choice of th
 [:download:`source: pixel_path.py <image/pixel_path.py>`]
 
 Example
-"""""""
+-------
 
 .. image:: image/L.svg
   :width: 700px
@@ -198,10 +202,10 @@ Example
 [:download:`source: L.py <image/L.py>`]
 
 Weighted correlation
---------------------
+====================
 
 Theory
-""""""
+------
 
 The weighted correlation characterized the average indicator :math:`\mathcal{I}` around high weight factor :math:`\mathcal{W}`.
 
@@ -236,7 +240,7 @@ Additionally pixels can be masked, for instance to ignore :math:`\mathcal{I}` ev
 where all pixels where :math:`\mathcal{M}(\vec{x}_i) = 1` are ignored; all pixels for which :math:`\mathcal{M}(\vec{x}_i) = 0` are considered as normal.
 
 Example
-"""""""
+-------
 
 .. image:: image/W2.svg
   :width: 700px
@@ -249,7 +253,7 @@ Example
 [:download:`source: W2.py <image/W2.py>`]
 
 Collapse to single point
-""""""""""""""""""""""""
+------------------------
 
 To calculate the probability of the inclusion directly next to a weight site (i.e. the red circles in the example above and below) the 'collapsed correlation' is calculated. The distance to the edge of the site, :math:`\vec{\delta}_i` is therefore corrected for as follows:
 
@@ -281,7 +285,7 @@ Similarly to the above, a mask may be introduced as follows:
   }
 
 Example
-"""""""
+^^^^^^^
 
 .. image:: image/W2c.svg
   :width: 700px
@@ -294,10 +298,10 @@ Example
 [:download:`source: W2c.py <image/W2c.py>`]
 
 Obtain clusters
----------------
+===============
 
 Calculate clusters
-""""""""""""""""""
+------------------
 
 .. image:: image/clusters.svg
   :width: 700px
@@ -310,7 +314,7 @@ Calculate clusters
 [:download:`source: clusters.py <image/clusters.py>`]
 
 Dilate clusters (differently)
-"""""""""""""""""""""""""""""
+-----------------------------
 
 .. image:: image/clusters_dilate.svg
   :width: 700px

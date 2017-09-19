@@ -1,7 +1,7 @@
 
 # <snippet>
 
-import gooseeye.image as gimage
+import GooseEYE.image as gimage
 import numpy          as np
 
 # square grid of circles
@@ -31,7 +31,7 @@ clus,cntr = gimage.clusters(W)
 
 # weighted correlation: global, and collapsed to cluster centers
 WI ,_     = gimage.W2 (W,I,(101,101),mask=W)
-WIc,_     = gimage.W2c(I,clus,cntr,(101,101),mask=W)
+WIc,_     = gimage.W2c(clus,cntr,I,(101,101),mask=W)
 
 # </snippet>
 

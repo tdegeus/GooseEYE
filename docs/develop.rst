@@ -1,6 +1,14 @@
 :tocdepth: 3
 
-===================================
+****************
+Developers notes
+****************
+
+.. contents::
+  :local:
+  :depth: 2
+  :backlinks: top
+
 Graphical User Interface (GUI) - Qt
 ===================================
 
@@ -9,7 +17,6 @@ Graphical User Interface (GUI) - Qt
   :depth: 2
   :backlinks: top
 
-------------------
 Static compilation
 ------------------
 
@@ -28,7 +35,7 @@ Below the details of what I have used to statically compile the Qt application. 
   *   Wiki page of `WohlsSoft.ru <http://wohlsoft.ru/pgewiki/Building_static_Qt_5#Linux.2FMac_OS_X>`_.
 
 MacOS
------
+^^^^^
 
 1.  Download the entire source code: `version 5.9 <http://download.qt.io/official_releases/qt/5.9/5.9.0/single/qt-everywhere-opensource-src-5.9.0.tar.xz>`_, or use the `Qt open-source download page <https://www.qt.io/download-open-source/#section-5>`_.
 
@@ -69,7 +76,7 @@ MacOS
     If you want to plug static build of Qt into Qt Creator, just make a new toolchain with your default compiler (clang) and debugger, and with your static build of Qt (find QMake in the bin subdirectory of your static Qt build).
 
 Windows
--------
+^^^^^^^
 
 In principle static compilation of the GUI under Windows is a piece of cake. However, there are some things that have to be preprepared, and it can take quite some time if you are not pointed to the right direction.
 
@@ -182,3 +189,21 @@ I ended up using the blog-post of `Dimitris Apeiro <http://dimitris.apeiro.gr/20
           -   Under ``Qt Version``, select the newly created ``Qt 5.8.0 (Static)``.
 
       *   In the project, select this environment (and release), and compile. All done!
+
+New release
+===========
+
+1.  Update the version numbers as follows:
+
+    -   Modify ``__version__`` in ``setup.py``.
+
+2.  Upload the changes to GitHub and create a new release there (with the correct version number).
+
+3.  Upload the package to PyPi:
+
+    .. code-block:: bash
+
+      $ python3 setup.py bdist_wheel --universal
+      $ twine upload dist/*
+
+

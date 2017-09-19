@@ -1,7 +1,7 @@
 
 # <snippet>
 
-import gooseeye.image as gimage
+import GooseEYE.image as gimage
 import numpy          as np
 
 # binary image + correlation

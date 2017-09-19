@@ -1,7 +1,8 @@
 :tocdepth: 3
 
+****************
 Python interface
-================
+****************
 
 .. contents::
   :local:

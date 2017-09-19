@@ -1,104 +1,44 @@
+desc = '''
+GooseEYE is a C++ module, wrapped in Python, that is aimed at computing image based geometrical
+statistics in 1-, 2-, and 3-D.
+'''
+
 from setuptools import setup, Extension
-from setuptools.command.build_ext import build_ext
+
 import sys
 import setuptools
+import pybind11
+import cppmat
 
-__version__ = '0.1.1'
-
-
-class get_pybind_include(object):
-    """Helper class to determine the pybind11 include path
-    The purpose of this class is to postpone importing pybind11
-    until it is actually installed, so that the ``get_include()``
-    method can be invoked. """
-
-    def __init__(self, user=False):
-        self.user = user
-
-    def __str__(self):
-        import pybind11
-        return pybind11.get_include(self.user)
-
+__version__ = '0.1.2'
 
 ext_modules = [
-    Extension(
-        'gooseeye',
-        ['src/core/image.cpp','src/python/image.cpp'],
-        include_dirs=[
-            # Path to pybind11 headers
-            'src/core/cppmat',
-            get_pybind_include(),
-            get_pybind_include(user=True),
-        ],
-        language='c++'
-    ),
+  Extension(
+    'GooseEYE',
+    ['src/core/image.cpp','src/python/image.cpp'],
+    include_dirs=[
+      pybind11.get_include(False),
+      pybind11.get_include(True ),
+      cppmat  .get_include(False),
+      cppmat  .get_include(True )
+    ],
+    extra_compile_args = ["-DNDEBUG"], # switch off assertions
+    language='c++'
+  ),
 ]
 
-
-# As of Python 3.6, CCompiler has a `has_flag` method.
-# cf http://bugs.python.org/issue26689
-def has_flag(compiler, flagname):
-    """Return a boolean indicating whether a flag name is supported on
-    the specified compiler.
-    """
-    import tempfile
-    with tempfile.NamedTemporaryFile('w', suffix='.cpp') as f:
-        f.write('int main (int argc, char **argv) { return 0; }')
-        try:
-            compiler.compile([f.name], extra_postargs=[flagname])
-        except setuptools.distutils.errors.CompileError:
-            return False
-    return True
-
-
-def cpp_flag(compiler):
-    """Return the -std=c++[11/14] compiler flag.
-    The c++14 is prefered over c++11 (when it is available).
-    """
-    if has_flag(compiler, '-std=c++14'):
-        return '-std=c++14'
-    elif has_flag(compiler, '-std=c++11'):
-        return '-std=c++11'
-    else:
-        raise RuntimeError('Unsupported compiler -- at least C++11 support '
-                           'is needed!')
-
-
-class BuildExt(build_ext):
-    """A custom build extension for adding compiler-specific options."""
-    c_opts = {
-        'msvc': ['/EHsc'],
-        'unix': [],
-    }
-
-    if sys.platform == 'darwin':
-        c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
-
-    def build_extensions(self):
-        ct = self.compiler.compiler_type
-        opts = self.c_opts.get(ct, [])
-        if ct == 'unix':
-            opts.append('-DVERSION_INFO="%s"' % self.distribution.get_version())
-            opts.append(cpp_flag(self.compiler))
-            if has_flag(self.compiler, '-fvisibility=hidden'):
-                opts.append('-fvisibility=hidden')
-        elif ct == 'msvc':
-            opts.append('/DVERSION_INFO=\\"%s\\"' % self.distribution.get_version())
-        for ext in self.extensions:
-            ext.extra_compile_args = opts
-        build_ext.build_extensions(self)
-
 setup(
-    name='gooseeye',
-    version=__version__,
-    author='Tom de Geus',
-    author_email='tom@geus.me',
-    url='https://github.com/tdegeus/GooseEYE',
-    description='Geometrical statistics',
-    long_description='',
-    license='GPLv3',
-    ext_modules=ext_modules,
-    install_requires=['pybind11>=2.1.0'],
-    cmdclass={'build_ext': BuildExt},
-    zip_safe=False,
+  name               = 'GooseEYE',
+  description        = 'Image based geometrical statistics',
+  long_description   = desc,
+  keywords           = 'Statistics, GUI, C++, C++11, Python bindings, pybind11',
+  version            = __version__,
+  license            = 'GPLv3',
+  author             = 'Tom de Geus',
+  author_email       = 'tom@geus.me',
+  url                = 'https://github.com/tdegeus/GooseEYE',
+  ext_modules        = ext_modules,
+  install_requires   = ['pybind11>=2.1.0','cppmat>=0.2.8'],
+  cmdclass           = {'build_ext': cppmat.BuildExt},
+  zip_safe           = False,
 )

@@ -1,9 +1,10 @@
 
-GooseEYE Documentation
-======================
+********
+GooseEYE
+********
 
 Documentation
--------------
+=============
 
 .. toctree::
    :maxdepth: 1
@@ -13,27 +14,8 @@ Documentation
    cpp.rst
    python.rst
    gui.rst
-
-Python examples
----------------
-
-.. note::
-
-  A little bit of theory is included in each of the examples.
-
-.. toctree::
-   :maxdepth: 1
-
    examples/python/readme.rst
-
-
-Develop
--------
-
-.. toctree::
-   :maxdepth: 1
-
-   dev_qt.rst
+   develop.rst
 
 Indices and tables
 ==================

@@ -1,29 +1,38 @@
 
 #include "image.h"
 
-template class mat::matrix<unsigned char>;
-template class mat::matrix<int>;
-template class mat::matrix<double>;
+template class cppmat::matrix<int>;
+template class cppmat::matrix<double>;
 
+namespace GooseEYE {
 namespace Image {
+
+// abbreviate data types to enhance readability below
+template <class T> using Mat = cppmat::matrix<T>;
+using MatD = cppmat::matrix<double>;
+using MatI = cppmat::matrix<int>;
+using VecS = std::vector<size_t>;
+using VecI = std::vector<int>;
+using str  = std::string;
 
 // =================================================================================================
 // pixel/voxel path between two points "xa" and "xb"
 // =================================================================================================
 
-mat::matrix<int> path (
-  std::vector<int> xa, std::vector<int> xb, std::string mode )
+MatI path (
+  VecI xa, VecI xb, str mode )
 {
   int ndim = static_cast<int>(xa.size());
 
   if ( xa.size()!=xb.size() )
     throw std::length_error("'xa' and 'xb' must have the same dimension");
+
   if ( ndim<1 || ndim>3 )
     throw std::length_error("Only allowed in 1, 2, or 3 dimensions");
 
   std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
 
-  std::vector<int> ret;
+  VecI ret;
 
   if ( mode=="bresenham" )
   {
@@ -75,7 +84,7 @@ mat::matrix<int> path (
       nnz += 1;
       // check convergence
       if ( x[j]==xb[j] ) {
-        mat::matrix<int> retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
+        MatI retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
         return retmat;
       }
       // check increment in other directions
@@ -92,7 +101,7 @@ mat::matrix<int> path (
     }
   }
 
-  if ( mode=="actual" || mode=="full" )
+  if ( mode == "actual" || mode == "full" )
   {
     // position, slope, (length to) next intersection
     double x[3],v[3],t[3],next[3],sign[3];
@@ -178,7 +187,7 @@ mat::matrix<int> path (
 
     }
 
-    mat::matrix<int> retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
+    MatI retmat({(size_t)nnz,(size_t)ndim},&ret[0]);
     return retmat;
   }
 
@@ -189,13 +198,13 @@ mat::matrix<int> path (
 // list of end-points of ROI-stamp used in path-based correlations
 // =================================================================================================
 
-mat::matrix<int> stamp_points ( std::vector<size_t> N )
+MatI stamp_points ( VecS N )
 {
   if ( N.size()<1 || N.size()>3 )
     throw std::length_error("'shape' must be 1-, 2-, or 3-D");
 
-  for ( auto i : N )
-    if ( i%2==0 )
+  for ( auto &i : N )
+    if ( i%2 == 0 )
       throw std::length_error("'shape' must be odd shaped");
 
   int n,i,j,H,I,J,dH,dI,dJ;
@@ -211,7 +220,7 @@ mat::matrix<int> stamp_points ( std::vector<size_t> N )
   if ( nd==3 ) n = POS(J-2)*(2*H+2*POS(I-2))+2*H*I;
 
   // allocate
-  mat::matrix<int> ret({(size_t)n,(size_t)nd});
+  MatI ret({(size_t)n,(size_t)nd});
 
   // 1-D
   // ---
@@ -265,7 +274,7 @@ mat::matrix<int> stamp_points ( std::vector<size_t> N )
 // return vector as "(h,i,j)", using a default "value" if "shape.size()<3"
 // =================================================================================================
 
-std::tuple<int,int,int> unpack3d ( std::vector<size_t> shape, int value )
+std::tuple<int,int,int> unpack3d ( VecS shape, int value )
 {
   int h,i,j;
 
@@ -284,9 +293,9 @@ std::tuple<int,int,int> unpack3d ( std::vector<size_t> shape, int value )
 // compute midpoint from "shape"-vector
 // =================================================================================================
 
-std::vector<size_t> midpoint ( std::vector<size_t> shape )
+VecS midpoint ( VecS shape )
 {
-  std::vector<size_t> ret(shape.size());
+  VecS ret(shape.size());
 
   for ( auto i : shape )
     if ( !(i%2) )
@@ -304,15 +313,15 @@ std::vector<size_t> midpoint ( std::vector<size_t> shape )
 // =================================================================================================
 
 template <class T>
-mat::matrix<T> pad ( mat::matrix<T> &src, std::vector<size_t> pad_shape, T value )
+Mat<T> pad ( Mat<T> &src, VecS pad_shape, T value )
 {
-  std::vector<size_t> shape = src.shape();
+  VecS shape = src.shape();
 
   for ( size_t i=0 ; i<pad_shape.size() ; i++ )
     shape[i] += 2*pad_shape[i];
 
   // allocate to supplied value
-  mat::matrix<T> ret(shape);
+  Mat<T> ret(shape);
   ret.ones();
   ret *= value;
 
@@ -333,15 +342,15 @@ mat::matrix<T> pad ( mat::matrix<T> &src, std::vector<size_t> pad_shape, T value
   return ret;
 }
 
-template mat::matrix<int>    pad<int>    (mat::matrix<int>    &, std::vector<size_t>, int   );
-template mat::matrix<double> pad<double> (mat::matrix<double> &, std::vector<size_t>, double);
+template MatI pad<int>    (MatI &, VecS, int   );
+template MatD pad<double> (MatD &, VecS, double);
 
 // =================================================================================================
 // dilate image
 // =================================================================================================
 
-mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
-  std::vector<int> &iterations, bool periodic )
+MatI dilate ( MatI &src, MatI &kern,
+  VecI &iterations, bool periodic )
 {
   if ( (int)iterations.size()!=src.max()+1 )
     throw std::length_error("Iteration must be specified for each label");
@@ -349,7 +358,7 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,nlab,ilab,iter;
   int max_iter = 0;
 
-  mat::matrix<int> lab = src;
+  MatI lab = src;
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
@@ -410,11 +419,11 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kern,
 
 // =================================================================================================
 
-mat::matrix<int> dilate ( mat::matrix<int> &src, int iterations, bool periodic )
+MatI dilate ( MatI &src, int iterations, bool periodic )
 {
-  mat::matrix<int> kern = kernel(src.ndim());
+  MatI kern = kernel(src.ndim());
 
-  std::vector<int> iter(src.max()+1);
+  VecI iter(src.max()+1);
   for ( auto &i : iter )
     i = iterations;
 
@@ -423,10 +432,10 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, int iterations, bool periodic )
 
 // =================================================================================================
 
-mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kernel, int iterations,
+MatI dilate ( MatI &src, MatI &kernel, int iterations,
   bool periodic )
 {
-  std::vector<int> iter(src.max()+1);
+  VecI iter(src.max()+1);
   for ( auto &i : iter )
     i = iterations;
 
@@ -435,10 +444,10 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, mat::matrix<int> &kernel, int i
 
 // =================================================================================================
 
-mat::matrix<int> dilate ( mat::matrix<int> &src, std::vector<int> &iterations,
+MatI dilate ( MatI &src, VecI &iterations,
   bool periodic )
 {
-  mat::matrix<int> kern = kernel(src.ndim());
+  MatI kern = kernel(src.ndim());
   return dilate(src,kern,iterations,periodic);
 }
 
@@ -446,8 +455,8 @@ mat::matrix<int> dilate ( mat::matrix<int> &src, std::vector<int> &iterations,
 // create a dummy image with circles at position "row","col" with radius "r"
 // =================================================================================================
 
-mat::matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &row,
-  std::vector<int> &col, std::vector<int> &r, bool periodic )
+MatI dummy_circles ( VecS shape, VecI &row,
+  VecI &col, VecI &r, bool periodic )
 {
   if ( row.size()!=col.size() || row.size()!=r.size() )
     throw std::length_error("'row', 'col', and 'r' are inconsistent");
@@ -456,7 +465,7 @@ mat::matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &ro
 
   int    di,dj,I,J;
   size_t i;
-  mat::matrix<int> ret(shape); ret.zeros();
+  MatI ret(shape); ret.zeros();
 
   I = shape[0];
   J = shape[1];
@@ -476,7 +485,7 @@ mat::matrix<int> dummy_circles ( std::vector<size_t> shape, std::vector<int> &ro
 // at random positions and random radii
 // =================================================================================================
 
-mat::matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
+MatI dummy_circles ( VecS shape, bool periodic )
 {
   if ( shape.size()!=2 )
     throw std::length_error("Only allowed in 2 dimensions");
@@ -490,7 +499,7 @@ mat::matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
   int M = (int)(.05*(double)shape[1]);
   int R = (int)(pow((.3*(double)(shape[0]*shape[1]))/(PI*(double)(N*M)),.5));
 
-  std::vector<int> row(N*M),col(N*M),r(N*M);
+  VecI row(N*M),col(N*M),r(N*M);
 
   // define regular grid of circles
   for ( int i=0 ; i<N ; i++ ) {
@@ -520,7 +529,7 @@ mat::matrix<int> dummy_circles ( std::vector<size_t> shape, bool periodic )
 // create dummy image with default shape
 // =================================================================================================
 
-mat::matrix<int> dummy_circles ( bool periodic )
+MatI dummy_circles ( bool periodic )
 {
   return dummy_circles({100,100},periodic);
 }
@@ -529,17 +538,17 @@ mat::matrix<int> dummy_circles ( bool periodic )
 // define kernel
 // =================================================================================================
 
-mat::matrix<int> kernel ( int ndim , std::string mode )
+MatI kernel ( int ndim , str mode )
 {
   std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
 
   if ( mode=="default" )
   {
-    std::vector<size_t> shape(ndim);
+    VecS shape(ndim);
     for ( int i=0 ; i<ndim ; i++ )
       shape[i] = 3;
 
-    mat::matrix<int> kern(shape); kern.zeros();
+    MatI kern(shape); kern.zeros();
 
     if      ( ndim==1 ) {
       kern(0) = 1; kern(1) = 1; kern(2) = 1;
@@ -566,7 +575,7 @@ mat::matrix<int> kernel ( int ndim , std::string mode )
 // determine clusters in image
 // =================================================================================================
 
-void _link ( std::vector<int> &linked, int a, int b )
+void _link ( VecI &linked, int a, int b )
 {
 
   if ( a==b )
@@ -634,19 +643,19 @@ void _link ( std::vector<int> &linked, int a, int b )
 
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
-  mat::matrix<int> &f, mat::matrix<int> &kern, int min_size, bool periodic )
+std::tuple<MatI,MatI> clusters (
+  MatI &f, MatI &kern, int min_size, bool periodic )
 {
   int h,i,j,di,dj,dh,H,I,J,lH,lI,lJ,uH,uI,uJ,dI,dJ,dH,ii,jj,ilab,nlab;
   // cluster links (e.g. 4 coupled to 2: lnk[4]=2)
-  std::vector<int> lnk(f.size());
+  VecI lnk(f.size());
   // saved clusters: 1=saved, 0=not-saved
-  std::vector<int> inc(f.size());
+  VecI inc(f.size());
 
-  mat::matrix<int> l(f.shape()); l.zeros();
-  mat::matrix<int> c(f.shape()); c.zeros();
+  MatI l(f.shape()); l.zeros();
+  MatI c(f.shape()); c.zeros();
 
   std::tie( H, I, J) = unpack3d(f.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(midpoint(kern.shape()),0);
@@ -815,7 +824,7 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
 
     // allocate matrix to contain the average position and total size:
     // [ [ h,i,j , size_feature ] , ... ]
-    mat::matrix<int> x({(size_t)nlab,4}); x.zeros();
+    MatI x({(size_t)nlab,4}); x.zeros();
 
     // loop over the image to update the position and size of each label
     for ( h=0 ; h<H ; h++ ) {
@@ -860,7 +869,7 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
     int h,i,j,dh,di,dj,ilab,nlab,nlab_;
 
     // "l_": labels for the non-periodic version image "f"
-    mat::matrix<int> l_,c_;
+    MatI l_,c_;
     std::tie(l_,c_) = clusters(f,kern,min_size,false);
 
     l_.atleast_3d();
@@ -878,12 +887,12 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
 
     // matrix to contain the average position and total size:
     // [ [ h,i,j , size_feature ] , ... ]
-    mat::matrix<int>  x({(size_t)nlab ,4});  x.zeros();
+    MatI  x({(size_t)nlab ,4});  x.zeros();
     // if dx(ilab,ix)==1 than N[ix] is subtracted from the position in averaging
-    mat::matrix<int> dx({(size_t)nlab_,3}); dx.zeros();
+    MatI dx({(size_t)nlab_,3}); dx.zeros();
 
     // label dependency: which labels in "l_" correspond to which labels in "l"
-    std::vector<int> lnk(nlab_);
+    VecI lnk(nlab_);
 
     for ( size_t i=0 ; i<l.size() ; i++ )
       lnk[l_[i]] = l[i];
@@ -969,21 +978,23 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
   return std::make_tuple(l,c);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
-  mat::matrix<int> &f, int min_size, bool periodic )
+std::tuple<MatI,MatI> clusters (
+  MatI &f, int min_size, bool periodic )
 {
-  mat::matrix<int> kern = kernel(f.ndim());
+  MatI kern = kernel(f.ndim());
+
   return clusters(f,kern,min_size,periodic);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
-  mat::matrix<int> &f, bool periodic )
+std::tuple<MatI,MatI> clusters (
+  MatI &f, bool periodic )
 {
-  mat::matrix<int> kern = kernel(f.ndim());
+  MatI kern = kernel(f.ndim());
+
   return clusters(f,kern,0,periodic);
 }
 
@@ -992,15 +1003,15 @@ std::tuple<mat::matrix<int>,mat::matrix<int>> clusters (
 // =================================================================================================
 
 template <class T>
-std::tuple<double,double> mean ( mat::matrix<T> &src )
+std::tuple<double,double> mean ( Mat<T> &src )
 {
   return std::make_tuple(src.mean(),static_cast<double>(src.size()));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T>
-std::tuple<double,double> mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
+std::tuple<double,double> mean ( Mat<T> &src , MatI &mask )
 {
   T      out = static_cast<T>(0);
   size_t n   = 0;
@@ -1015,12 +1026,12 @@ std::tuple<double,double> mean ( mat::matrix<T> &src , mat::matrix<int> &mask )
   return std::make_tuple(static_cast<double>(out)/static_cast<double>(n),static_cast<double>(n));
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-template std::tuple<double,double> mean<int   >(mat::matrix<int   > &);
-template std::tuple<double,double> mean<double>(mat::matrix<double> &);
-template std::tuple<double,double> mean<int   >(mat::matrix<int   > &, mat::matrix<int> &);
-template std::tuple<double,double> mean<double>(mat::matrix<double> &, mat::matrix<int> &);
+template std::tuple<double,double> mean<int   >(MatI &);
+template std::tuple<double,double> mean<double>(MatD &);
+template std::tuple<double,double> mean<int   >(MatI &, MatI &);
+template std::tuple<double,double> mean<double>(MatD &, MatI &);
 
 // =================================================================================================
 // TODO include in header
@@ -1042,8 +1053,8 @@ inline double unity   ( double f           ) { return 1.             ; }
 // =================================================================================================
 
 template <class T, class U>
-std::tuple<mat::matrix<double>,double> S2_core (\
-  mat::matrix<T> &f, mat::matrix<U> &g, std::vector<size_t> roi,\
+std::tuple<MatD,double> S2_core (\
+  Mat<T> &f, Mat<U> &g, VecS roi,\
   double (*func)(U) )
 {
   if ( f.shape()!=g.shape() )
@@ -1055,9 +1066,9 @@ std::tuple<mat::matrix<double>,double> S2_core (\
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ;
 
-  mat::matrix<double> ret(roi); ret.zeros();
+  MatD ret(roi); ret.zeros();
 
-  std::vector<size_t> mid = midpoint(roi);
+  VecS mid = midpoint(roi);
 
   std::tie( H, I, J) = unpack3d(f.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid      ,0);
@@ -1085,12 +1096,12 @@ std::tuple<mat::matrix<double>,double> S2_core (\
   return std::make_tuple(ret/norm,norm);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T, class U>
-std::tuple<mat::matrix<double>,mat::matrix<double>> S2_core (\
-  mat::matrix<T> &f, mat::matrix<U> &g, std::vector<size_t> roi,\
-  mat::matrix<int> &fmsk, mat::matrix<int> &gmsk, bool zeropad, bool periodic,\
+std::tuple<MatD,MatD> S2_core (\
+  Mat<T> &f, Mat<U> &g, VecS roi,\
+  MatI &fmsk, MatI &gmsk, bool zeropad, bool periodic,\
   double (*func)(U) )
 {
   if ( f.shape()!=g.shape() )
@@ -1104,8 +1115,8 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> S2_core (\
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<double> norm(roi); norm.zeros();
+  MatD ret (roi); ret .zeros();
+  MatD norm(roi); norm.zeros();
 
   f   .atleast_3d();
   g   .atleast_3d();
@@ -1114,7 +1125,7 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> S2_core (\
   ret .atleast_3d();
   norm.atleast_3d();
 
-  std::vector<size_t> mid = midpoint(roi);
+  VecS mid = midpoint(roi);
 
   if ( zeropad ) {
     f    = pad(f   ,mid  );
@@ -1162,165 +1173,131 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> S2_core (\
 // =================================================================================================
 
 template <class T>
-std::tuple<mat::matrix<double>,double> S2 (\
-  mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi )
+std::tuple<MatD,double> S2 (\
+  Mat<T> &f, Mat<T> &g, VecS roi )
 {
   return S2_core(f,g,roi,&unity); // (norm == f.size())
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> S2 (\
-  mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi,\
-  mat::matrix<int> &fmsk, mat::matrix<int> &gmsk, bool zeropad, bool periodic )
+std::tuple<MatD,MatD> S2 (\
+  Mat<T> &f, Mat<T> &g, VecS roi,\
+  MatI &fmsk, MatI &gmsk, bool zeropad, bool periodic )
 {
   return S2_core(f,g,roi,fmsk,gmsk,zeropad,periodic,&unity);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> S2 (\
-  mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi,\
-  mat::matrix<int> &fmsk, bool zeropad, bool periodic )
+std::tuple<MatD,MatD> S2 (\
+  Mat<T> &f, Mat<T> &g, VecS roi,\
+  MatI &fmsk, bool zeropad, bool periodic )
 {
-  mat::matrix<int> gmsk(g.shape()); gmsk.zeros();
+  MatI gmsk(g.shape()); gmsk.zeros();
   return S2_core(f,g,roi,fmsk,gmsk,zeropad,periodic,&unity);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> S2 (\
-  mat::matrix<T> &f, mat::matrix<T> &g, std::vector<size_t> roi,\
+std::tuple<MatD,MatD> S2 (\
+  Mat<T> &f, Mat<T> &g, VecS roi,\
   bool zeropad, bool periodic )
 {
-  mat::matrix<int> fmsk(f.shape()); fmsk.zeros();
-  mat::matrix<int> gmsk(g.shape()); gmsk.zeros();
+  MatI fmsk(f.shape()); fmsk.zeros();
+  MatI gmsk(g.shape()); gmsk.zeros();
   return S2_core(f,g,roi,fmsk,gmsk,zeropad,periodic,&unity);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-template std::tuple<mat::matrix<double>,            double > S2<int   >(\
-  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>);
+template std::tuple<MatD,double> S2<int   >( MatI &, MatI &, VecS);
 
-template std::tuple<mat::matrix<double>,            double > S2<double>(\
-  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>);
+template std::tuple<MatD,double> S2<double>( MatD &, MatD &, VecS);
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<int   >(\
-  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
-  mat::matrix<int   > &, mat::matrix<int   > &, bool, bool );
+template std::tuple<MatD,MatD>   S2<int   >( MatI &, MatI &, VecS, MatI &, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<double>(\
-  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
-  mat::matrix<int   > &, mat::matrix<int   > &, bool, bool );
+template std::tuple<MatD,MatD>   S2<double>( MatD &, MatD &, VecS, MatI &, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<int   >(\
-  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
-  mat::matrix<int   > &,                        bool, bool );
+template std::tuple<MatD,MatD>   S2<int   >( MatI &, MatI &, VecS, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<double>(\
-  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
-  mat::matrix<int   > &,                        bool, bool );
+template std::tuple<MatD,MatD>   S2<double>( MatD &, MatD &, VecS, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<int   >(\
-  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
-                                                bool, bool );
+template std::tuple<MatD,MatD>   S2<int   >( MatI &, MatI &, VecS, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> S2<double>(\
-  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
-                                                bool, bool );
+template std::tuple<MatD,MatD>   S2<double>( MatD &, MatD &, VecS, bool, bool );
 
 // =================================================================================================
 // conditional 2-point probability
 // =================================================================================================
 
-template <class T, class U> std::tuple<mat::matrix<double>,double> W2 (\
-  mat::matrix<T> &W, mat::matrix<U> &I, std::vector<size_t> roi )
+template <class T, class U> std::tuple<MatD,double> W2 (\
+  Mat<T> &W, Mat<U> &I, VecS roi )
 {
   return S2_core(W,I,roi,&compare);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-template <class T, class U> std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<T> &W, mat::matrix<U> &I, std::vector<size_t> roi,\
-  mat::matrix<int> &mask, bool zeropad, bool periodic )
+template <class T, class U> std::tuple<MatD,MatD> W2 (\
+  Mat<T> &W, Mat<U> &I, VecS roi,\
+  MatI &mask, bool zeropad, bool periodic )
 {
-  mat::matrix<int> fmsk(I.shape()); fmsk.zeros();
+  MatI fmsk(I.shape()); fmsk.zeros();
   return S2_core(W,I,roi,fmsk,mask,zeropad,periodic,&compare);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-template <class T, class U> std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<T> &W, mat::matrix<U> &I, std::vector<size_t> roi,\
+template <class T, class U> std::tuple<MatD,MatD> W2 (\
+  Mat<T> &W, Mat<U> &I, VecS roi,\
   bool zeropad, bool periodic )
 {
-  mat::matrix<int> fmsk(I.shape()); fmsk.zeros();
-  mat::matrix<int> mask(I.shape()); mask.zeros();
+  MatI fmsk(I.shape()); fmsk.zeros();
+  MatI mask(I.shape()); mask.zeros();
   return S2_core(W,I,roi,fmsk,mask,zeropad,periodic,&compare);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-template std::tuple<mat::matrix<double>,            double > W2 (\
-  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t> );
+template std::tuple<MatD,double> W2 ( MatI &, MatI &, VecS );
 
-template std::tuple<mat::matrix<double>,            double > W2 (\
-  mat::matrix<int   > &, mat::matrix<double> &, std::vector<size_t> );
+template std::tuple<MatD,double> W2 ( MatI &, MatD &, VecS );
 
-template std::tuple<mat::matrix<double>,            double > W2 (\
-  mat::matrix<double> &, mat::matrix<int   > &, std::vector<size_t> );
+template std::tuple<MatD,double> W2 ( MatD &, MatI &, VecS );
 
-template std::tuple<mat::matrix<double>,            double > W2 (\
-  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t> );
+template std::tuple<MatD,double> W2 ( MatD &, MatD &, VecS );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
-  mat::matrix<int> &, bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatI &, MatI &, VecS, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<int   > &, mat::matrix<double> &, std::vector<size_t>,\
-  mat::matrix<int> &, bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatI &, MatD &, VecS, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<double> &, mat::matrix<int   > &, std::vector<size_t>,\
-  mat::matrix<int> &, bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatD &, MatI &, VecS, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
-  mat::matrix<int> &, bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatD &, MatD &, VecS, MatI &, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<int   > &, mat::matrix<int   > &, std::vector<size_t>,\
-                      bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatI &, MatI &, VecS, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<int   > &, mat::matrix<double> &, std::vector<size_t>,\
-                      bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatI &, MatD &, VecS, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<double> &, mat::matrix<int   > &, std::vector<size_t>,\
-                      bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatD &, MatI &, VecS, bool, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2 (\
-  mat::matrix<double> &, mat::matrix<double> &, std::vector<size_t>,\
-                      bool, bool );
+template std::tuple<MatD,MatD>   W2 ( MatD &, MatD &, VecS, bool, bool );
 
 // =================================================================================================
 // weighted 2-point correlation -> collapse to center
 // =================================================================================================
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
-  mat::matrix<int> &clusters, mat::matrix<int> &centers, mat::matrix<T> &src,
-  std::vector<size_t> roi, mat::matrix<int> &mask, std::string mode, bool periodic )
+std::tuple<MatD,MatD> W2c ( MatI &clus, MatI &cntr, Mat<T> &src, VecS roi,
+  MatI &mask, str mode, bool periodic )
 {
- if ( src.shape()!=clusters.shape() || src.shape()!=centers.shape() )
-    throw std::length_error("'I', 'clusters', and 'centers' are inconsistent");
+  if ( src.shape()!=clus.shape() || src.shape()!=cntr.shape() )
+    throw std::length_error("'I', 'clus', and 'cntr' are inconsistent");
+
   if ( src.shape()!=mask.shape() )
     throw std::length_error("'I' and 'mask' are inconsistent");
 
@@ -1331,50 +1308,49 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
   int jpix,label;
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<double> norm(roi); norm.zeros();
+  MatD ret (roi); ret .zeros();
+  MatD norm(roi); norm.zeros();
 
-  std::vector<int> begin(3),end(3);
+  VecI begin(3),end(3);
   for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
 
-  std::vector<size_t> mid = midpoint(roi);
+  VecS mid = midpoint(roi);
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
 
-  src     .atleast_3d();
-  clusters.atleast_3d();
-  centers .atleast_3d();
-  mask    .atleast_3d();
-  ret     .atleast_3d();
-  norm    .atleast_3d();
+  src .atleast_3d();
+  clus.atleast_3d();
+  cntr.atleast_3d();
+  mask.atleast_3d();
+  ret .atleast_3d();
+  norm.atleast_3d();
 
   // define boundary region to skip
-  if ( !periodic )
-    std::tie(bH,bI,bJ) = unpack3d(mid,0);
+  if ( !periodic ) std::tie(bH,bI,bJ) = unpack3d(mid,0);
 
   // define the "end"-point of each voxel path
-  mat::matrix<int> pnt = stamp_points(roi);
+  MatI pnt = stamp_points(roi);
 
   // loop over ROI
   for ( size_t ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
   {
     // copy end-point
-    for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
-      end[i] = pnt(ipnt,i);
+    for ( size_t i=0 ; i<pnt.shape()[1] ; i++ ) end[i] = pnt(ipnt,i);
+
     // voxel-path
-    mat::matrix<int> pix = path(begin,end,mode);
+    MatI pix = path(begin,end,mode);
 
     // loop over image
     for ( h=bH ; h<(H-bH) ; h++ ) {
       for ( i=bI ; i<(I-bI) ; i++ ) {
         for ( j=bJ ; j<(J-bJ) ; j++ ) {
-          if ( centers(h,i,j) )
+          if ( cntr(h,i,j) )
           {
             // store the label
-            label = centers(h,i,j);
+            label = cntr(h,i,j);
             // only proceed when the center is inside the cluster
-            if ( clusters(h,i,j)==label )
+            if ( clus(h,i,j) == label )
             {
               // initialize
               jpix = -1;
@@ -1385,13 +1361,12 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
                 di = pix(ipix,1);
                 dj = pix(ipix,2);
                 // loop through the voxel-path until the end of a cluster
-                if ( clusters(P(h+dh,H),P(i+di,I),P(j+dj,J))!=label && jpix<0 )
-                  jpix = 0;
+                if ( clus(P(h+dh,H),P(i+di,I),P(j+dj,J)) != label and jpix<0 ) jpix = 0;
                 // store: loop from the beginning of the path and store there
                 if ( jpix>=0 ) {
                   if ( !mask(P(h+dh,H),P(i+di,I),P(j+dj,J)) ) {
-                    norm(dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))+=1.;
-                    ret (dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2))+=\
+                    norm(dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2)) += 1.;
+                    ret (dH+pix(jpix,0),dI+pix(jpix,1),dJ+pix(jpix,2)) += \
                       compare(src(P(h+dh,H),P(i+di,I),P(j+dj,J)));
                   }
                 }
@@ -1413,86 +1388,70 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
 
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
-  mat::matrix<int> &clusters, mat::matrix<int> &centers, mat::matrix<T> &I,
-  std::vector<size_t> roi, std::string mode, bool periodic )
+std::tuple<MatD,MatD> W2c (
+  MatI &clus, MatI &cntr, Mat<T> &I,
+  VecS roi, str mode, bool periodic )
 {
-  mat::matrix<int> mask(I.shape()); mask.zeros();
-  return W2c(clusters,centers,I,roi,mask,mode,periodic);
+  MatI mask(I.shape()); mask.zeros();
+  return W2c(clus,cntr,I,roi,mask,mode,periodic);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
-  mat::matrix<int> &W, mat::matrix<T> &I, std::vector<size_t> roi, mat::matrix<int> &mask,
-  std::string mode, bool periodic )
+std::tuple<MatD,MatD> W2c (
+  MatI &W, Mat<T> &I, VecS roi, MatI &mask,
+  str mode, bool periodic )
 {
-  mat::matrix<int> clusters,centers;
+  MatI clus,cntr;
 
-  std::tie(clusters,centers) = Image::clusters(W,periodic);
+  std::tie(clus,cntr) = clusters(W,periodic);
 
-  return W2c(clusters,centers,I,roi,mask,mode,periodic);
+  return W2c(clus,cntr,I,roi,mask,mode,periodic);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template <class T>
-std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (
-  mat::matrix<int> &W, mat::matrix<T> &I, std::vector<size_t> roi,
-  std::string mode, bool periodic )
+std::tuple<MatD,MatD> W2c (
+  MatI &W, Mat<T> &I, VecS roi,
+  str mode, bool periodic )
 {
-  mat::matrix<int> clusters,centers;
-  mat::matrix<int> mask(I.shape()); mask.zeros();
+  MatI clus,cntr;
+  MatI mask(I.shape()); mask.zeros();
 
-  std::tie(clusters,centers) = Image::clusters(W,periodic);
+  std::tie(clus,cntr) = clusters(W,periodic);
 
-  return W2c(clusters,centers,I,roi,mask,mode,periodic);
+  return W2c(clus,cntr,I,roi,mask,mode,periodic);
 }
 
-// -----------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<double> &, \
-  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatI &, MatD &, VecS, MatI &, str, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<int   > &,\
-  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatI &, MatI &, VecS, MatI &, str, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<double> &,\
-  std::vector<size_t>  ,                        std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatI &, MatD &, VecS, str, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int   > &, mat::matrix<int   > &,\
-  std::vector<size_t>  ,                        std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatI &, MatI &, VecS, str, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<double> &,\
-  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatD &, VecS, MatI &, str, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int   > &,\
-  std::vector<size_t>  , mat::matrix<int   > &, std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatI &, VecS, MatI &, str, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<double> &,\
-  std::vector<size_t>  ,                        std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatD &, VecS, str, bool );
 
-template std::tuple<mat::matrix<double>,mat::matrix<double>> W2c (\
-  mat::matrix<int   > &, mat::matrix<int   > &,\
-  std::vector<size_t>  ,                        std::string, bool );
+template std::tuple<MatD,MatD> W2c ( MatI &, MatI &, VecS, str, bool );
 
 // =================================================================================================
 // lineal path function
 // =================================================================================================
 
-std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
-  std::vector<size_t> roi, std::string mode, bool periodic )
+std::tuple<MatD,MatD> L ( MatI &src,
+  VecS roi, str mode, bool periodic )
 {
   for ( auto i : roi )
     if ( i%2==0 )
@@ -1500,13 +1459,13 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
 
   int h,i,j,dh,di,dj,H,I,J,dH,dI,dJ,bH=0,bI=0,bJ=0;
 
-  mat::matrix<double> ret (roi); ret .zeros();
-  mat::matrix<double> norm(roi); norm.zeros();
+  MatD ret (roi); ret .zeros();
+  MatD norm(roi); norm.zeros();
 
-  std::vector<int> begin(3),end(3);
+  VecI begin(3),end(3);
   for ( size_t i=0 ; i<3 ; i++ ) { begin[i] = 0; end[i] = 0; }
 
-  std::vector<size_t> mid = midpoint(roi);
+  VecS mid = midpoint(roi);
 
   std::tie( H, I, J) = unpack3d(src.shape(),1);
   std::tie(dH,dI,dJ) = unpack3d(mid        ,0);
@@ -1520,7 +1479,7 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
     std::tie(bH,bI,bJ) = unpack3d(mid,0);
 
   // define the "end"-point of each voxel path
-  mat::matrix<int> pnt = stamp_points(roi);
+  MatI pnt = stamp_points(roi);
 
   // correlation
   for ( size_t ipnt=0 ; ipnt<pnt.shape()[0] ; ipnt++ )
@@ -1529,7 +1488,7 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
     for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
-    mat::matrix<int> pix = path(begin,end,mode);
+    MatI pix = path(begin,end,mode);
 
     // loop over image
     for ( h=bH ; h<(H-bH) ; h++ ) {
@@ -1558,7 +1517,7 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
     for ( size_t i=0 ; i<pnt.shape()[1] ; i++ )
       end[i] = pnt(ipnt,i);
     // voxel-path
-    mat::matrix<int> pix = path(begin,end,mode);
+    MatI pix = path(begin,end,mode);
 
     // loop over voxel-path
     for ( size_t ipix=0 ; ipix<pix.shape()[0] ; ipix++ )
@@ -1576,3 +1535,4 @@ std::tuple<mat::matrix<double>,mat::matrix<double>> L ( mat::matrix<int> &src,
 // =================================================================================================
 
 } // namespace Image
+} // namespace GooseEYE

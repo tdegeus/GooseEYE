@@ -1,7 +1,8 @@
 :tocdepth: 3
 
+******************
 Download & Install
-==================
+******************
 
 .. contents::
   :local:
