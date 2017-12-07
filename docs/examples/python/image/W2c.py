@@ -43,7 +43,7 @@ import matplotlib        as mpl
 import matplotlib.cm     as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-try   : plt.style.use('goose-latex')
+try   : plt.style.use(['goose','goose-latex'])
 except: pass
 
 cmap = mpl.colors.ListedColormap(np.array([

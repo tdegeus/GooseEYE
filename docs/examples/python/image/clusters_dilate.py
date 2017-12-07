@@ -40,7 +40,7 @@ cmap       = cm.jet(range(256))
 cmap[0,:3] = 1.
 cmap       = mpl.colors.ListedColormap(cmap)
 
-try   : plt.style.use('goose-latex')
+try   : plt.style.use(['goose','goose-latex'])
 except: pass
 
 fig  = plt.figure(figsize=(18,6))

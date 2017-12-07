@@ -3,7 +3,7 @@ import GooseEYE.image    as gimage
 import numpy             as np
 import matplotlib.pyplot as plt
 
-try   : plt.style.use('goose-latex')
+try   : plt.style.use(['goose','goose-latex'])
 except: pass
 
 # open new figure
@@ -48,3 +48,4 @@ for (subplot,mode) in enumerate(['bresenham','actual','full']):
 
 # save figure
 plt.savefig('pixel_path.svg')
+plt.show()

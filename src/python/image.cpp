@@ -4,20 +4,21 @@
 #include <pybind11/numpy.h>
 
 #include "../core/image.h"
-#include "../core/cppmat/include/cppmat/pybind11_matrix.h"
+#include "../core/cppmat/src/cppmat/pybind11_cppmat.h"
 
 // abbreviate data types to enhance readability
-using MatD = cppmat::matrix<double>;
-using MatI = cppmat::matrix<int>;
-using VecS = std::vector<size_t>;
-using VecI = std::vector<int>;
+using MatD = const cppmat::matrix<double>;
+using MatI = const cppmat::matrix<int>;
+using VecS = const std::vector<size_t>;
+using VecI = const std::vector<int>;
 using str  = std::string;
 
 // abbreviate namespace to enhance readability
 namespace py = pybind11;
 namespace gi = GooseEYE::Image;
 
-PYBIND11_MODULE(GooseEYE, m) {
+PYBIND11_MODULE(GooseEYE, m)
+{
 
 m.doc() = "Geometrical statistics";
 
@@ -30,7 +31,8 @@ py::module mi = m.def_submodule(
 // -------
 
 mi.def(
-  "path", &gi::path,
+  "path",
+  &gi::path,
   "Return voxel path between two points",
   py::arg( "xa"   ),
   py::arg( "xb"   ),
@@ -38,13 +40,15 @@ mi.def(
 );
 
 mi.def(
-  "stamp_points", &gi::stamp_points,
+  "stamp_points",
+  &gi::stamp_points,
   "Return all end-points of a voxel stamp for a certain shape",
   py::arg( "shape" )
 );
 
 mi.def(
-  "pad", py::overload_cast<MatD&,VecS,double>(&gi::pad<double>),
+  "pad",
+  py::overload_cast<MatD&,VecS&,double>(&gi::pad<double>),
   "(Zero) Pad image",
   py::arg( "im"        ).noconvert(),
   py::arg( "pad_shape" ),
@@ -52,7 +56,8 @@ mi.def(
 );
 
 mi.def(
-  "pad", py::overload_cast<MatI&,VecS,int>(&gi::pad<int>),
+  "pad",
+  py::overload_cast<MatI&,VecS&,int>(&gi::pad<int>),
   "(Zero) Pad image",
   py::arg( "im"        ),
   py::arg( "pad_shape" ),
@@ -60,7 +65,8 @@ mi.def(
 );
 
 mi.def(
-  "kernel",&gi::kernel,
+  "kernel",
+  &gi::kernel,
   "Define a kernel, for example to use in dilation",
   py::arg( "ndim" ),
   py::arg( "mode" ) = "default"
@@ -70,20 +76,16 @@ mi.def(
 // ------------------
 
 mi.def(
-  "dummy_circles", py::overload_cast<bool>(&gi::dummy_circles),
-  "Generate dummy black/white image with circles, of a fixed shape",
-  py::arg( "periodic" ) = true
-);
-
-mi.def(
-  "dummy_circles", py::overload_cast<VecS,bool>(&gi::dummy_circles),
+  "dummy_circles",
+  py::overload_cast<VecS&,bool>(&gi::dummy_circles),
   "Generate dummy black/white image with circles, with a specific shape",
   py::arg( "shape"    ),
   py::arg( "periodic" ) = true
 );
 
 mi.def(
-  "dummy_circles", py::overload_cast<VecS,VecI&,VecI&,VecI&,bool>(&gi::dummy_circles),
+  "dummy_circles",
+  py::overload_cast<VecS&,VecI&,VecI&,VecI&,bool>(&gi::dummy_circles),
   "Generate dummy black/white image with circles, with a specific shape and with specific circles",
   py::arg( "shape"    ),
   py::arg( "row"      ),
@@ -93,7 +95,8 @@ mi.def(
 );
 
 mi.def(
-  "clusters", py::overload_cast<MatI&,int,bool>(&gi::clusters),
+  "clusters",
+  py::overload_cast<MatI&,int,bool>(&gi::clusters),
   "Identify clusters (using the default kernel)",
   py::arg( "im"       ),
   py::arg( "min_size" ) = 0,
@@ -101,7 +104,8 @@ mi.def(
 );
 
 mi.def(
-  "clusters", py::overload_cast<MatI&,MatI&,int,bool>(&gi::clusters),
+  "clusters",
+  py::overload_cast<MatI&,MatI&,int,bool>(&gi::clusters),
   "Identify clusters using a specific kernel",
   py::arg( "im"       ),
   py::arg( "kernel"   ),
@@ -110,7 +114,8 @@ mi.def(
 );
 
 mi.def(
-  "dilate", py::overload_cast<MatI&,int,bool>(&gi::dilate),
+  "dilate",
+  py::overload_cast<MatI&,int,bool>(&gi::dilate),
   "Dilate image (using the default kernel)",
   py::arg( "im"         ),
   py::arg( "iterations" ) = 1,
@@ -118,7 +123,8 @@ mi.def(
 );
 
 mi.def(
-  "dilate", py::overload_cast<MatI&,VecI&,bool>(&gi::dilate),
+  "dilate",
+  py::overload_cast<MatI&,VecI&,bool>(&gi::dilate),
   "Dilate image (using the default kernel)",
   py::arg( "im"         ),
   py::arg( "iterations" ) ,
@@ -126,7 +132,8 @@ mi.def(
 );
 
 mi.def(
-  "dilate", py::overload_cast<MatI&,MatI&,int,bool>(&gi::dilate),
+  "dilate",
+  py::overload_cast<MatI&,MatI&,int,bool>(&gi::dilate),
   "Dilate image",
   py::arg( "im"         ),
   py::arg( "kernel"     ),
@@ -134,46 +141,52 @@ mi.def(
   py::arg( "periodic"   ) = true
 );
 
-mi.def(
-  "dilate", py::overload_cast<MatI&,MatI&,VecI&,bool>(&gi::dilate),
-  "Dilate image",
-  py::arg( "im"         ),
-  py::arg( "kernel"     ),
-  py::arg( "iterations" ),
-  py::arg( "periodic"   ) = true
-);
+// mi.def(
+//   "dilate",
+//   py::overload_cast<MatI&,MatI&,VecI&,bool>(&gi::dilate),
+//   "Dilate image",
+//   py::arg( "im"         ),
+//   py::arg( "kernel"     ),
+//   py::arg( "iterations" ),
+//   py::arg( "periodic"   ) = true
+// );
 
 // statistics
 // ----------
 
 mi.def(
-  "mean", py::overload_cast<MatI&>(&gi::mean<int>),
+  "mean",
+  py::overload_cast<MatI&>(&gi::mean<int>),
   "Spatial average",
   py::arg( "im" )
 );
 
 mi.def(
-  "mean", py::overload_cast<MatI&,MatI&>(&gi::mean<int>),
+  "mean",
+  py::overload_cast<MatI&,MatI&>(&gi::mean<int>),
   "Spatial average, accounting for mask",
   py::arg( "im"   ),
   py::arg( "mask" )
 );
 
 mi.def(
-  "mean", py::overload_cast<MatD&>(&gi::mean<double>),
+  "mean",
+  py::overload_cast<MatD&>(&gi::mean<double>),
   "Spatial average",
   py::arg( "im" )
 );
 
 mi.def(
-  "mean", py::overload_cast<MatD&,MatI&>(&gi::mean<double>),
+  "mean",
+  py::overload_cast<MatD&,MatI&>(&gi::mean<double>),
   "Spatial average, accounting for mask",
   py::arg( "im"   ),
   py::arg( "mask" )
 );
 
 mi.def(
-  "S2", py::overload_cast<MatI&,MatI&,VecS>(&gi::S2<int>),
+  "S2",
+  py::overload_cast<MatI&,MatI&,VecS&>(&gi::S2<int>),
   "2-point probability (periodic)",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -181,7 +194,8 @@ mi.def(
 );
 
 mi.def(
-  "S2", py::overload_cast<MatI&,MatI&,VecS,bool,bool>(&gi::S2<int>),
+  "S2",
+  py::overload_cast<MatI&,MatI&,VecS&,bool,bool>(&gi::S2<int>),
   "2-point probability",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -191,7 +205,8 @@ mi.def(
 );
 
 mi.def(
-  "S2", py::overload_cast<MatI&,MatI&,VecS,MatI&,bool,bool>(&gi::S2<int>),
+  "S2",
+  py::overload_cast<MatI&,MatI&,VecS&,MatI&,bool,bool>(&gi::S2<int>),
   "2-point probability (masked)",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -202,7 +217,8 @@ mi.def(
 );
 
 mi.def(
-  "S2", py::overload_cast<MatI&,MatI&,VecS,MatI&,MatI&,bool,bool>(&gi::S2<int>),
+  "S2",
+  py::overload_cast<MatI&,MatI&,VecS&,MatI&,MatI&,bool,bool>(&gi::S2<int>),
   "2-point probability (masked)",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -214,7 +230,8 @@ mi.def(
 );
 
 mi.def(
-  "S2", py::overload_cast<MatD&,MatD&,VecS>(&gi::S2<double>),
+  "S2",
+  py::overload_cast<MatD&,MatD&,VecS&>(&gi::S2<double>),
   "2-point correlation (periodic)",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -222,7 +239,8 @@ mi.def(
 );
 
 mi.def(
-  "S2", py::overload_cast<MatD&,MatD&,VecS,bool,bool>(&gi::S2<double>),
+  "S2",
+  py::overload_cast<MatD&,MatD&,VecS&,bool,bool>(&gi::S2<double>),
   "2-point correlation",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -232,7 +250,8 @@ mi.def(
 );
 
 mi.def(
-  "S2", py::overload_cast<MatD&,MatD&,VecS,MatI&,bool,bool>(&gi::S2<double>),
+  "S2",
+  py::overload_cast<MatD&,MatD&,VecS&,MatI&,bool,bool>(&gi::S2<double>),
   "2-point correlation (masked)",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -243,7 +262,8 @@ mi.def(
 );
 
 mi.def(
-  "S2", py::overload_cast<MatD&,MatD&,VecS,MatI&,MatI&,bool,bool>(&gi::S2<double>),
+  "S2",
+  py::overload_cast<MatD&,MatD&,VecS&,MatI&,MatI&,bool,bool>(&gi::S2<double>),
   "2-point correlation (masked)",
   py::arg( "f"        ),
   py::arg( "g"        ),
@@ -255,7 +275,8 @@ mi.def(
 );
 
 mi.def(
-  "W2", py::overload_cast<MatI&,MatI&,VecS>(&gi::W2<int,int>),
+  "W2",
+  py::overload_cast<MatI&,MatI&,VecS&>(&gi::W2<int,int>),
   "Conditional 2-point probability (periodic)",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -263,7 +284,8 @@ mi.def(
 );
 
 mi.def(
-  "W2", py::overload_cast<MatI&,MatI&,VecS,bool,bool>(&gi::W2<int,int>),
+  "W2",
+  py::overload_cast<MatI&,MatI&,VecS&,bool,bool>(&gi::W2<int,int>),
   "Conditional 2-point probability",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -272,19 +294,21 @@ mi.def(
   py::arg( "periodic" ) = true
 );
 
-mi.def(
-  "W2", py::overload_cast<MatI&,MatI&,VecS,MatI&,bool,bool>(&gi::W2<int,int>),
-  "Conditional 2-point probability (masked)",
-  py::arg( "W"        ),
-  py::arg( "I"        ),
-  py::arg( "roi"      ),
-  py::arg( "mask"     ),
-  py::arg( "zeropad"  ) = false,
-  py::arg( "periodic" ) = true
-);
+// mi.def(
+//   "W2",
+//   py::overload_cast<MatI&,MatI&,VecS&,MatI&,bool,bool>(&gi::W2<int,int>),
+//   "Conditional 2-point probability (masked)",
+//   py::arg( "W"        ),
+//   py::arg( "I"        ),
+//   py::arg( "roi"      ),
+//   py::arg( "mask"     ),
+//   py::arg( "zeropad"  ) = false,
+//   py::arg( "periodic" ) = true
+// );
 
 mi.def(
-  "W2", py::overload_cast<MatI&,MatD&,VecS>(&gi::W2<int,double>),
+  "W2",
+  py::overload_cast<MatI&,MatD&,VecS&>(&gi::W2<int,double>),
   "Conditional 2-point correlation (periodic)",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -292,7 +316,8 @@ mi.def(
 );
 
 mi.def(
-  "W2", py::overload_cast<MatI&,MatD&,VecS,bool,bool>(&gi::W2<int,double>),
+  "W2",
+  py::overload_cast<MatI&,MatD&,VecS&,bool,bool>(&gi::W2<int,double>),
   "Conditional 2-point correlation",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -301,19 +326,21 @@ mi.def(
   py::arg( "periodic" ) = true
 );
 
-mi.def(
-  "W2", py::overload_cast<MatI&,MatD&,VecS,MatI&,bool,bool>(&gi::W2<int,double>),
-  "Conditional 2-point correlation (masked)",
-  py::arg( "W"        ),
-  py::arg( "I"        ),
-  py::arg( "roi"      ),
-  py::arg( "mask"     ),
-  py::arg( "zeropad"  ) = false,
-  py::arg( "periodic" ) = true
-);
+// mi.def(
+//   "W2",
+//   py::overload_cast<MatI&,MatD&,VecS&,MatI&,bool,bool>(&gi::W2<int,double>),
+//   "Conditional 2-point correlation (masked)",
+//   py::arg( "W"        ),
+//   py::arg( "I"        ),
+//   py::arg( "roi"      ),
+//   py::arg( "mask"     ),
+//   py::arg( "zeropad"  ) = false,
+//   py::arg( "periodic" ) = true
+// );
 
 mi.def(
-  "W2", py::overload_cast<MatD&,MatI&,VecS>(&gi::W2<double,int>),
+  "W2",
+  py::overload_cast<MatD&,MatI&,VecS&>(&gi::W2<double,int>),
   "Weighted 2-point probability (periodic)",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -321,7 +348,8 @@ mi.def(
 );
 
 mi.def(
-  "W2", py::overload_cast<MatD&,MatI&,VecS,bool,bool>(&gi::W2<double,int>),
+  "W2",
+  py::overload_cast<MatD&,MatI&,VecS&,bool,bool>(&gi::W2<double,int>),
   "Weighted 2-point probability",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -330,19 +358,21 @@ mi.def(
   py::arg( "periodic" ) = true
 );
 
-mi.def(
-  "W2", py::overload_cast<MatD&,MatI&,VecS,MatI&,bool,bool>(&gi::W2<double,int>),
-  "Weighted 2-point probability (masked)",
-  py::arg( "W"        ),
-  py::arg( "I"        ),
-  py::arg( "roi"      ),
-  py::arg( "mask"     ),
-  py::arg( "zeropad"  ) = false,
-  py::arg( "periodic" ) = true
-);
+// mi.def(
+//   "W2",
+//   py::overload_cast<MatD&,MatI&,VecS&,MatI&,bool,bool>(&gi::W2<double,int>),
+//   "Weighted 2-point probability (masked)",
+//   py::arg( "W"        ),
+//   py::arg( "I"        ),
+//   py::arg( "roi"      ),
+//   py::arg( "mask"     ),
+//   py::arg( "zeropad"  ) = false,
+//   py::arg( "periodic" ) = true
+// );
 
 mi.def(
-  "W2", py::overload_cast<MatD&,MatD&,VecS>(&gi::W2<double,double>),
+  "W2",
+  py::overload_cast<MatD&,MatD&,VecS&>(&gi::W2<double,double>),
   "Weighted 2-point correlation (periodic)",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -350,7 +380,8 @@ mi.def(
 );
 
 mi.def(
-  "W2", py::overload_cast<MatD&,MatD&,VecS,bool,bool>(&gi::W2<double,double>),
+  "W2",
+  py::overload_cast<MatD&,MatD&,VecS&,bool,bool>(&gi::W2<double,double>),
   "Weighted 2-point correlation",
   py::arg( "W"        ),
   py::arg( "I"        ),
@@ -359,70 +390,96 @@ mi.def(
   py::arg( "periodic" ) = true
 );
 
-mi.def(
-  "W2", py::overload_cast<MatD&,MatD&,VecS,MatI&,bool,bool>(&gi::W2<double,double>),
-  "Weighted 2-point correlation (masked)",
-  py::arg( "W"        ),
-  py::arg( "I"        ),
-  py::arg( "roi"      ),
-  py::arg( "mask"     ),
-  py::arg( "zeropad"  ) = false,
-  py::arg( "periodic" ) = true
-);
+// mi.def(
+//   "W2",
+//   py::overload_cast<MatD&,MatD&,VecS&,MatI&,bool,bool>(&gi::W2<double,double>),
+//   "Weighted 2-point correlation (masked)",
+//   py::arg( "W"        ),
+//   py::arg( "I"        ),
+//   py::arg( "roi"      ),
+//   py::arg( "mask"     ),
+//   py::arg( "zeropad"  ) = false,
+//   py::arg( "periodic" ) = true
+// );
+
+// mi.def(
+//   "W2c",
+//   py::overload_cast<MatI&,MatI&,MatI&,VecS&,str>(&gi::W2c<int>),
+//   "Collapsed conditional 2-point probability",
+//   py::arg( "I"        ),
+//   py::arg( "clusters" ),
+//   py::arg( "centers"  ),
+//   py::arg( "roi"      ),
+//   py::arg( "mode"     ) = "Bresenham"
+// );
+
+// mi.def(
+//   "W2c",
+//   py::overload_cast<MatI&,MatI&,MatI&,VecS&,bool,str>(&gi::W2c<int>),
+//   "Collapsed conditional 2-point probability",
+//   py::arg( "I"        ),
+//   py::arg( "clusters" ),
+//   py::arg( "centers"  ),
+//   py::arg( "roi"      ),
+//   py::arg( "periodic" ) = true,
+//   py::arg( "mode"     ) = "Bresenham"
+// );
+
+// mi.def(
+//   "W2c",
+//   py::overload_cast<MatI&,MatI&,MatI&,VecS&,MatI&,bool,str>(&gi::W2c<int>),
+//   "Collapsed conditional 2-point probability",
+//   py::arg( "I"        ),
+//   py::arg( "clusters" ),
+//   py::arg( "centers"  ),
+//   py::arg( "roi"      ),
+//   py::arg( "mask"     ),
+//   py::arg( "periodic" ) = true,
+//   py::arg( "mode"     ) = "Bresenham"
+// );
+
+// mi.def(
+//   "W2c",
+//   py::overload_cast<MatI&,MatI&,MatD&,VecS&,bool,str>(&gi::W2c<double>),
+//   "Collapsed conditional 2-point correlation",
+//   py::arg( "I"        ),
+//   py::arg( "clusters" ),
+//   py::arg( "centers"  ),
+//   py::arg( "roi"      ),
+//   py::arg( "periodic" ) = true,
+//   py::arg( "mode"     ) = "Bresenham"
+// );
+
+// mi.def(
+//   "W2c",
+//   py::overload_cast<MatI&,MatI&,MatD&,VecS&,MatI&,bool,str>(&gi::W2c<double>),
+//   "Collapsed conditional 2-point correlation",
+//   py::arg( "I"        ),
+//   py::arg( "clusters" ),
+//   py::arg( "centers"  ),
+//   py::arg( "roi"      ),
+//   py::arg( "mask"     ),
+//   py::arg( "periodic" ) = true,
+//   py::arg( "mode"     ) = "Bresenham"
+// );
 
 mi.def(
-  "W2c", py::overload_cast<MatI&,MatI&,MatI&,VecS,str,bool>(&gi::W2c<int>),
-  "Collapsed conditional 2-point probability",
-  py::arg( "I"        ),
-  py::arg( "clusters" ),
-  py::arg( "centers"  ),
-  py::arg( "roi"      ),
-  py::arg( "mode"     ) = "Bresenham",
-  py::arg( "periodic" ) = true
-);
-
-mi.def(
-  "W2c", py::overload_cast<MatI&,MatI&,MatI&,VecS,MatI&,str,bool>(&gi::W2c<int>),
-  "Collapsed conditional 2-point probability",
-  py::arg( "I"        ),
-  py::arg( "clusters" ),
-  py::arg( "centers"  ),
-  py::arg( "roi"      ),
-  py::arg( "mask"     ),
-  py::arg( "mode"     ) = "Bresenham",
-  py::arg( "periodic" ) = true
-);
-
-mi.def(
-  "W2c", py::overload_cast<MatI&,MatI&,MatD&,VecS,str,bool>(&gi::W2c<double>),
-  "Collapsed conditional 2-point correlation",
-  py::arg( "I"        ),
-  py::arg( "clusters" ),
-  py::arg( "centers"  ),
-  py::arg( "roi"      ),
-  py::arg( "mode"     ) = "Bresenham",
-  py::arg( "periodic" ) = true
-);
-
-mi.def(
-  "W2c", py::overload_cast<MatI&,MatI&,MatD&,VecS,MatI&,str,bool>(&gi::W2c<double>),
-  "Collapsed conditional 2-point correlation",
-  py::arg( "I"        ),
-  py::arg( "clusters" ),
-  py::arg( "centers"  ),
-  py::arg( "roi"      ),
-  py::arg( "mask"     ),
-  py::arg( "mode"     ) = "Bresenham",
-  py::arg( "periodic" ) = true
-);
-
-mi.def(
-  "L" , &gi::L,
+  "L" ,
+  py::overload_cast<MatI&,VecS&,str>(&gi::L),
   "Lineal path function",
   py::arg( "im"       ),
   py::arg( "roi"      ),
-  py::arg( "mode"     ) = "Bresenham",
-  py::arg( "periodic" ) = true
+  py::arg( "mode"     ) = "Bresenham"
+);
+
+mi.def(
+  "L" ,
+  py::overload_cast<MatI&,VecS&,bool,str>(&gi::L),
+  "Lineal path function",
+  py::arg( "im"       ),
+  py::arg( "roi"      ),
+  py::arg( "periodic" ),
+  py::arg( "mode"     ) = "Bresenham"
 );
 
 } // PYBIND11_MODULE
