@@ -23,6 +23,11 @@
 
 // =================================================================================================
 
+#define SIGN(a)( (a<0) ? -1 : a>0 ? 1 : 0 )
+#define POS(a) ( (a<0) ?  0 : a           )
+
+// =================================================================================================
+
 #define GOOSEEYE_WORLD_VERSION 0
 #define GOOSEEYE_MAJOR_VERSION 2
 #define GOOSEEYE_MINOR_VERSION 0
@@ -47,8 +52,12 @@
 // alias types
 namespace GooseEYE
 {
-  typedef cppmat::array<double> ArrD;
-  typedef cppmat::array<size_t> ArrS;
+  typedef cppmat::array <double> ArrD;
+  typedef cppmat::array <int>    ArrI;
+  typedef cppmat::matrix<double> MatD;
+  typedef cppmat::matrix<int>    MatI;
+  typedef cppmat::vector<size_t> VecS;
+  typedef cppmat::vector<int>    VecI;
 }
 
 // =================================================================================================
@@ -61,13 +70,14 @@ class Ensemble
 {
 private:
 
-  static const size_t   MAX_DIM=3;
-  cppmat::array<double> mData;
-  cppmat::array<double> mNorm;
-  std::vector<int>      mMid;
-  std::vector<int>      mSkip;
-  std::vector<size_t>   mPad;
-  bool                  mPeriodic;
+  static const size_t MAX_DIM=3;
+  ArrD mData;
+  ArrD mNorm;
+  VecI mShape;
+  VecI mMid;
+  VecI mSkip;
+  VecS mPad;
+  bool mPeriodic;
 
 public:
 
@@ -75,21 +85,36 @@ public:
   Ensemble() = default;
 
   // constructor
-  Ensemble(const std::vector<size_t> roi, bool periodic=true, bool zero_pad=false);
+  explicit Ensemble(const VecS &roi, bool periodic=true, bool zero_pad=false);
 
-  // get result
-  cppmat::array<double> result() const;
+  // get ensemble averaged result
+  ArrD result() const;
 
   // 2-point correlation
-  void S2(const ArrS &f, const ArrS &g);
-  void S2(const ArrS &f, const ArrS &g, const ArrS &fmask, const ArrS &gmask);
+  void S2(const ArrI &f, const ArrI &g);
+  void S2(const ArrI &f, const ArrI &g, const ArrI &fmask, const ArrI &gmask);
+  void S2(const ArrD &f, const ArrD &g);
+  void S2(const ArrD &f, const ArrD &g, const ArrI &fmask, const ArrI &gmask);
 
-private:
+  // list of end-points of ROI-stamp used in path-based correlations
+  MatI stampPoints() const;
 
-  // get the shape of "A" in "MAX_DIM" dimensions (padded with ones)
-  template<class T>
-  std::vector<int> shape(const cppmat::array<T> &A, const std::string &name="A") const;
 };
+
+// -------------------------------------------------------------------------------------------------
+
+// pixel/voxel path between two points "xa" and "xb"
+// mode: "Bresenham", "actual", or "full"
+MatI path(const VecI &xa, const VecI &xb, const std::string &mode="Bresenham");
+
+// list of end-points of ROI-stamp used in path-based correlations
+MatI stampPoints(const VecS &shape);
+
+// 2-point corr`elation
+ArrD S2(const VecS &roi, const ArrI &f, const ArrI &g,                                       bool periodic=true, bool pad=false);
+ArrD S2(const VecS &roi, const ArrI &f, const ArrI &g, const ArrI &fmask, const ArrI &gmask, bool periodic=true, bool pad=false);
+ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g,                                       bool periodic=true, bool pad=false);
+ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g, const ArrI &fmask, const ArrI &gmask, bool periodic=true, bool pad=false);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -97,9 +122,11 @@ private:
 
 // =================================================================================================
 
-// #include "Ensemble.h"
+#include "GooseEYE.hpp"
+#include "path.hpp"
 #include "Ensemble.hpp"
 #include "Ensemble_S2.hpp"
+#include "Ensemble_stampPoints.hpp"
 
 // =================================================================================================
 
