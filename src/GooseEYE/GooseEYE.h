@@ -4,36 +4,28 @@
 
 ================================================================================================= */
 
-#ifndef GOOSEEYE_MACROS_H
-#define GOOSEEYE_MACROS_H
+#ifndef GOOSEEYE_H
+#define GOOSEEYE_H
 
 // =================================================================================================
 
-#define _USE_MATH_DEFINES // to use "M_PI" from "math.h"
-
-#include <math.h>
-#include <iostream>
+#include <assert.h>
 #include <cstdlib>
-#include <cmath>
 #include <vector>
 #include <string>
+#include <memory>
+#include <iostream>
+#include <iomanip>
+#include <numeric>
+#include <limits>
 #include <algorithm>
-#include <set>
-#include <tuple>
-#include <ctime>
-
-#include "cppmat/src/cppmat/cppmat.h"
-
-// =================================================================================================
-
-#define SIGN(a)  ( (a<0) ? -1 : a>0 ? 1 : 0 )
-#define POS(a)   ( (a<0) ?  0           : a )
+#include <cppmat/cppmat.h>
 
 // =================================================================================================
 
 #define GOOSEEYE_WORLD_VERSION 0
-#define GOOSEEYE_MAJOR_VERSION 1
-#define GOOSEEYE_MINOR_VERSION 1
+#define GOOSEEYE_MAJOR_VERSION 2
+#define GOOSEEYE_MINOR_VERSION 0
 
 #define GOOSEEYE_VERSION_AT_LEAST(x,y,z) \
   (GOOSEEYE_WORLD_VERSION>x || (GOOSEEYE_WORLD_VERSION>=x && \
@@ -44,6 +36,28 @@
   (GOOSEEYE_WORLD_VERSION==x && \
    GOOSEEYE_MAJOR_VERSION==y && \
    GOOSEEYE_MINOR_VERSION==z)
+
+// =================================================================================================
+
+// dummy operation that can be use to suppress the "unused parameter" warnings
+#define UNUSED(p) ( (void)(p) )
+
+// =================================================================================================
+
+// alias types
+namespace GooseEYE
+{
+  typedef cppmat::array<double> ArrD;
+  typedef cppmat::array<size_t> ArrS;
+}
+
+// =================================================================================================
+
+#include "Private.h"
+#include "Private.hpp"
+#include "Ensemble.h"
+#include "Ensemble.hpp"
+#include "Ensemble_S2.hpp"
 
 // =================================================================================================
 

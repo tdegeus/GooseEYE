@@ -4,6 +4,3 @@
 [submodule "src/gui/cppcolormap"]
 	path = src/gui/cppcolormap
 	url = https://github.com/tdegeus/cppcolormap.git
-[submodule "src/core/cppmat"]
-	path = src/core/cppmat
-	url = https://github.com/tdegeus/cppmat.git
