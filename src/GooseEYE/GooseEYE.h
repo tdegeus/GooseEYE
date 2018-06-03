@@ -53,8 +53,6 @@ namespace GooseEYE
 
 // =================================================================================================
 
-#include "Private.h"
-#include "Private.hpp"
 #include "Ensemble.h"
 #include "Ensemble.hpp"
 #include "Ensemble_S2.hpp"
