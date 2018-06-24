@@ -19,9 +19,7 @@ namespace GooseEYE {
 
 MatI stampPoints(const VecS &shape)
 {
-  Ensemble ensemble(shape);
-
-  return ensemble.stampPoints();
+  return Ensemble(shape).stampPoints();
 }
 
 // =================================================================================================

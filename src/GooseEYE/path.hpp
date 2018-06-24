@@ -17,11 +17,9 @@ namespace GooseEYE {
 
 // =================================================================================================
 
-MatI path(const VecI &xa, const VecI &xb, const std::string &mode)
+MatI path(const VecI &xa, const VecI &xb, std::string mode)
 {
-  std::string mode_lower = mode;
-
-  std::transform(mode.begin(), mode.end(), mode_lower.begin(), ::tolower);
+  std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
 
   int ndim = static_cast<int>(xa.size());
 
@@ -33,7 +31,7 @@ MatI path(const VecI &xa, const VecI &xb, const std::string &mode)
 
     std::vector<int> ret;
 
-  if ( mode_lower=="bresenham" )
+  if ( mode=="bresenham" )
   {
     // see http://www.luberth.com/plotter/line3d.c.txt.html
     int a[3],s[3],x[3],d[3],in[2],j,i,iin,nnz=0;
@@ -99,7 +97,7 @@ MatI path(const VecI &xa, const VecI &xb, const std::string &mode)
     }
   }
 
-  if ( mode_lower=="actual" || mode_lower=="full" )
+  if ( mode=="actual" || mode=="full" )
   {
     // position, slope, (length to) next intersection
     double x[3],v[3],t[3],next[3],sign[3];
@@ -157,8 +155,8 @@ MatI path(const VecI &xa, const VecI &xb, const std::string &mode)
         if ( fabs(t[iin]-t[imin])<1.e-6 ) {
           cindex[in[iin]] += isign[in[iin]];
           next[in[iin]]   += sign[in[iin]];
-          // store all the face crossings ("mode_lower")
-          if ( mode_lower=="full" ) {
+          // store all the face crossings ("mode")
+          if ( mode=="full" ) {
             for ( i=0 ; i<ndim ; i++ )
               ret.push_back(cindex[i]);
             nnz++;
@@ -166,7 +164,7 @@ MatI path(const VecI &xa, const VecI &xb, const std::string &mode)
         }
       }
       // store only the next voxel ("actual")
-      if ( mode_lower=="actual" ) {
+      if ( mode=="actual" ) {
         for ( i=0 ; i<ndim ; i++ )
           ret.push_back(cindex[i]);
         nnz++;
