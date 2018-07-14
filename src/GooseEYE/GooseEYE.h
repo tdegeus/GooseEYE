@@ -62,10 +62,10 @@ public:
   void W2(ArrD w, ArrD f, ArrI fmask);
 
   // collapsed weighted 2-point correlation
-  void W2c(ArrI clus, ArrI cent, ArrI f,             std::string mode="Bresenham");
-  void W2c(ArrI clus, ArrI cent, ArrI f, ArrI fmask, std::string mode="Bresenham");
-  void W2c(ArrI clus, ArrI cent, ArrD f,             std::string mode="Bresenham");
-  void W2c(ArrI clus, ArrI cent, ArrD f, ArrI fmask, std::string mode="Bresenham");
+  void W2c(ArrI clus, ArrI cntr, ArrI f,             std::string mode="Bresenham");
+  void W2c(ArrI clus, ArrI cntr, ArrI f, ArrI fmask, std::string mode="Bresenham");
+  void W2c(ArrI clus, ArrI cntr, ArrD f,             std::string mode="Bresenham");
+  void W2c(ArrI clus, ArrI cntr, ArrD f, ArrI fmask, std::string mode="Bresenham");
 
   // collapsed weighted 2-point correlation: automatically compute clusters and their centres
   void W2c_auto(ArrI w, ArrI f,             std::string mode="Bresenham");
@@ -121,6 +121,31 @@ ArrD S2(const VecS &roi, const ArrI &f, const ArrI &g,                          
 ArrD S2(const VecS &roi, const ArrI &f, const ArrI &g, const ArrI &fmask, const ArrI &gmask, bool periodic=true, bool pad=false);
 ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g,                                       bool periodic=true, bool pad=false);
 ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g, const ArrI &fmask, const ArrI &gmask, bool periodic=true, bool pad=false);
+
+// weighted 2-point correlation
+ArrD W2(const VecS &roi, const ArrI &w, const ArrI &f,                    bool periodic=true, bool pad=false);
+ArrD W2(const VecS &roi, const ArrI &w, const ArrI &f, const ArrI &fmask, bool periodic=true, bool pad=false);
+ArrD W2(const VecS &roi, const ArrI &w, const ArrD &f,                    bool periodic=true, bool pad=false);
+ArrD W2(const VecS &roi, const ArrI &w, const ArrD &f, const ArrI &fmask, bool periodic=true, bool pad=false);
+ArrD W2(const VecS &roi, const ArrD &w, const ArrI &f,                    bool periodic=true, bool pad=false);
+ArrD W2(const VecS &roi, const ArrD &w, const ArrI &f, const ArrI &fmask, bool periodic=true, bool pad=false);
+ArrD W2(const VecS &roi, const ArrD &w, const ArrD &f,                    bool periodic=true, bool pad=false);
+ArrD W2(const VecS &roi, const ArrD &w, const ArrD &f, const ArrI &fmask, bool periodic=true, bool pad=false);
+
+// collapsed weighted 2-point correlation
+ArrD W2c(const VecS &roi, const ArrI &clus, const ArrI &cntr, const ArrI &f,                    bool periodic=true, std::string mode="Bresenham");
+ArrD W2c(const VecS &roi, const ArrI &clus, const ArrI &cntr, const ArrI &f, const ArrI &fmask, bool periodic=true, std::string mode="Bresenham");
+ArrD W2c(const VecS &roi, const ArrI &clus, const ArrI &cntr, const ArrD &f,                    bool periodic=true, std::string mode="Bresenham");
+ArrD W2c(const VecS &roi, const ArrI &clus, const ArrI &cntr, const ArrD &f, const ArrI &fmask, bool periodic=true, std::string mode="Bresenham");
+
+// collapsed weighted 2-point correlation: automatically compute clusters and their centres
+ArrD W2c_auto(const VecS &roi, const ArrI &w, const ArrI &f,                    bool periodic=true, std::string mode="Bresenham");
+ArrD W2c_auto(const VecS &roi, const ArrI &w, const ArrI &f, const ArrI &fmask, bool periodic=true, std::string mode="Bresenham");
+ArrD W2c_auto(const VecS &roi, const ArrI &w, const ArrD &f,                    bool periodic=true, std::string mode="Bresenham");
+ArrD W2c_auto(const VecS &roi, const ArrI &w, const ArrD &f, const ArrI &fmask, bool periodic=true, std::string mode="Bresenham");
+
+// lineal path function (binary or int)
+ArrD L(const VecS &roi, const ArrI &f, bool periodic=true, std::string mode="Bresenham");
 
 // -------------------------------------------------------------------------------------------------
 
