@@ -156,7 +156,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
     lJ = -dJ; uJ = +dJ;
   }
 
-  // loop over voxels (in all directions)
+  // loop through voxels (in all directions)
   for ( h=0 ; h<H ; h++ ) {
     for ( i=0 ; i<I ; i++ ) {
       for ( j=0 ; j<J ; j++ ) {
@@ -221,7 +221,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
 
   nlab = 0;
 
-  // loop over assigned labels -> loop over all coupled links
+  // loop through assigned labels -> loop through all coupled links
   // lnk[i] will contain the new label number
   for ( i=0 ; i<=ilab ; i++ ) {
     if ( inc[i] ) {
@@ -295,7 +295,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
     // [ [ h,i,j , size_feature ] , ... ]
     MatI x = MatI::Zero((size_t)nlab, 4);
 
-    // loop over the image to update the position and size of each label
+    // loop through the image to update the position and size of each label
     for ( h=0 ; h<H ; h++ ) {
       for ( i=0 ; i<I ; i++ ) {
         for ( j=0 ; j<J ; j++ ) {
@@ -402,7 +402,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
     // calculate centres
     // -----------------
 
-    // loop over the image to update the position and size of each label
+    // loop through the image to update the position and size of each label
     for ( h=0 ; h<H ; h++ ) {
       for ( i=0 ; i<I ; i++ ) {
         for ( j=0 ; j<J ; j++ ) {

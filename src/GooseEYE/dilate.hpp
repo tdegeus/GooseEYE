@@ -45,10 +45,10 @@ ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
   int dI = mid[1];
   int dJ = mid[2];
 
-  // loop over iterations
+  // loop through iterations
   for ( size_t iter = 0 ; iter < iterations.max() ; ++iter )
   {
-    // loop over all voxel
+    // loop through all voxel
     for ( int h = 0 ; h < f.shape(0) ; ++h ) {
       for ( int i = 0 ; i < f.shape(1) ; ++i ) {
         for ( int j = 0 ; j < f.shape(2) ; ++j ) {
@@ -58,7 +58,7 @@ ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
           // - for non-zero label
           // - if the number of iterations for this label has not been exceeded
           if ( ilab>0 and iterations[ilab]>iter )
-            // loop over the kernel
+            // loop through the kernel
             for ( int dh = -dH ; dh <= dH ; ++dh )
               for ( int di = -dI ; di <= dI ; ++di )
                 for ( int dj = -dJ ; dj <= dJ ; ++dj )

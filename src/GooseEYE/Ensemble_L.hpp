@@ -55,7 +55,7 @@ void Ensemble::L(ArrI f, std::string mode)
     }
   }
 
-  // number data-points
+  // number of data-points
   double N = static_cast<double>((f.shape(0)-mSkip[0])*(f.shape(1)-mSkip[1])*(f.shape(2)-mSkip[2]));
 
   // normalization
