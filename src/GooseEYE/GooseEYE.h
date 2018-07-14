@@ -41,11 +41,22 @@ public:
   // get ensemble averaged result
   ArrD result() const;
 
-  // 2-point correlation
+  // 2-point probability (binary), 2-point cluster function (int), and 2-point correlation (double)
   void S2(ArrI f, ArrI g);
   void S2(ArrI f, ArrI g, ArrI fmask, ArrI gmask);
   void S2(ArrD f, ArrD g);
   void S2(ArrD f, ArrD g, ArrI fmask, ArrI gmask);
+
+  // weighted 2-point correlation
+  void W2(ArrD w, ArrD f);
+  void W2(ArrD w, ArrD f, ArrI fmask);
+
+  // // collapsed weighted 2-point correlation
+  void W2c(ArrI clus, ArrI cent, ArrD w, ArrD f,             std::string mode="Bresenham");
+  void W2c(ArrI clus, ArrI cent, ArrD w, ArrD f, ArrI fmask, std::string mode="Bresenham");
+
+  // lineal path function (binary or int)
+  void L(ArrI f, std::string mode="Bresenham");
 
   // list of end-points of ROI-stamp used in path-based correlations
   MatI stampPoints() const;
@@ -55,19 +66,27 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 // create a dummy image with circles at position "row","col" with radius "r"
-MatI dummy_circles(const VecS &shape);
-MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r);
+// (the image is always constructed periodic)
+MatI dummy_circles(const VecS &shape, bool periodic=true);
+MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r, bool periodic=true);
 
 // define kernel
 // mode: "default"
 ArrI kernel(size_t ndim, std::string mode="default");
 
-// determine clusters in image (for "min_size=0" the minimum size is ignored)
+// determine clusters of an image (for "min_size=0" the minimum size is ignored)
 ArrI clusters(const ArrI &f,                                   bool periodic=true);
 ArrI clusters(const ArrI &f,                   int min_size  , bool periodic=true);
 ArrI clusters(const ArrI &f, const ArrI &kern, int min_size=0, bool periodic=true);
 
-// determine clusters and centers of gravity in image (for "min_size=0" the minimum size is ignored)
+// dilate image (binary or int)
+// for 'int' image the number of iterations can be specified per label
+ArrI dilate(const ArrI &src                    , size_t      iterations=1, bool periodic=true);
+ArrI dilate(const ArrI &src                    , const VecS &iterations  , bool periodic=true);
+ArrI dilate(const ArrI &src, const ArrI &kernel, size_t      iterations=1, bool periodic=true);
+ArrI dilate(      ArrI  src,       ArrI  kernel, const VecS &iterations  , bool periodic=true);
+
+// determine clusters and centers of gravity of an image (for "min_size=0" the minimum size is ignored)
 std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f,                                   bool periodic=true);
 std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f,                   int min_size  , bool periodic=true);
 std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, const ArrI &kern, int min_size=0, bool periodic=true);
@@ -96,9 +115,11 @@ ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g, const ArrI &fmask, const 
 #include "path.hpp"
 #include "kernel.hpp"
 #include "clusters.hpp"
+#include "dilate.hpp"
 #include "Ensemble.hpp"
-#include "Ensemble_S2.hpp"
 #include "Ensemble_stampPoints.hpp"
+#include "Ensemble_S2.hpp"
+#include "Ensemble_W2.hpp"
 
 // =================================================================================================
 

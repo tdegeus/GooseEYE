@@ -19,7 +19,7 @@ namespace GooseEYE {
 // create a dummy image with circles at position "row","col" with radius "r"
 // =================================================================================================
 
-MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r)
+MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r, bool periodic)
 {
   if ( row.size() != col.size() or row.size() != r.size() )
     throw std::length_error("'row', 'col', and 'r' are inconsistent");
@@ -29,7 +29,7 @@ MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const Ve
 
   MatI out = MatI::Zero(shape[0], shape[1]);
 
-  out.setPeriodic(true);
+  out.setPeriodic(periodic);
 
   for ( size_t i = 0 ; i < row.size() ; ++i )
     for ( int di = -r[i] ; di <= r[i] ; ++di )
@@ -46,7 +46,7 @@ MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const Ve
 // at random positions and random radii
 // =================================================================================================
 
-MatI dummy_circles (const VecS &shape)
+MatI dummy_circles(const VecS &shape, bool periodic)
 {
   if ( shape.size() != 2 )
     throw std::length_error("Only allowed in 2 dimensions");
@@ -81,7 +81,7 @@ MatI dummy_circles (const VecS &shape)
   }
 
   // convert to image
-  return dummy_circles(shape,row,col,r);
+  return dummy_circles(shape,row,col,r,periodic);
 }
 
 // =================================================================================================
