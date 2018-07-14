@@ -278,6 +278,52 @@ void Ensemble::W2c(ArrI clus, ArrI cntr, ArrI f, std::string mode)
 }
 
 // =================================================================================================
+// wrapper functions
+// =================================================================================================
+
+void Ensemble::W2c_auto(ArrI w, ArrI f, std::string mode)
+{
+  ArrI clus, cntr;
+
+  std::tie(clus, cntr) = clusterCenters(w, mPeriodic);
+
+  W2c(clus, cntr, f, mode);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Ensemble::W2c_auto(ArrI w, ArrI f, ArrI fmask, std::string mode)
+{
+  ArrI clus, cntr;
+
+  std::tie(clus, cntr) = clusterCenters(w, mPeriodic);
+
+  W2c(clus, cntr, f, fmask, mode);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Ensemble::W2c_auto(ArrI w, ArrD f, std::string mode)
+{
+  ArrI clus, cntr;
+
+  std::tie(clus, cntr) = clusterCenters(w, mPeriodic);
+
+  W2c(clus, cntr, f, mode);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Ensemble::W2c_auto(ArrI w, ArrD f, ArrI fmask, std::string mode)
+{
+  ArrI clus, cntr;
+
+  std::tie(clus, cntr) = clusterCenters(w, mPeriodic);
+
+  W2c(clus, cntr, f, fmask, mode);
+}
+
+// =================================================================================================
 
 } // namespace ...
 

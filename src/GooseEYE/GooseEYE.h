@@ -41,6 +41,10 @@ public:
   // get ensemble averaged result
   ArrD result() const;
 
+  // mean
+  void mean(const ArrD &f);
+  void mean(const ArrD &f, const ArrI &fmask);
+
   // 2-point probability (binary), 2-point cluster function (int), and 2-point correlation (double)
   void S2(ArrI f, ArrI g);
   void S2(ArrI f, ArrI g, ArrI fmask, ArrI gmask);
@@ -48,6 +52,12 @@ public:
   void S2(ArrD f, ArrD g, ArrI fmask, ArrI gmask);
 
   // weighted 2-point correlation
+  void W2(ArrI w, ArrI f);
+  void W2(ArrI w, ArrI f, ArrI fmask);
+  void W2(ArrI w, ArrD f);
+  void W2(ArrI w, ArrD f, ArrI fmask);
+  void W2(ArrD w, ArrI f);
+  void W2(ArrD w, ArrI f, ArrI fmask);
   void W2(ArrD w, ArrD f);
   void W2(ArrD w, ArrD f, ArrI fmask);
 
@@ -56,6 +66,12 @@ public:
   void W2c(ArrI clus, ArrI cent, ArrI f, ArrI fmask, std::string mode="Bresenham");
   void W2c(ArrI clus, ArrI cent, ArrD f,             std::string mode="Bresenham");
   void W2c(ArrI clus, ArrI cent, ArrD f, ArrI fmask, std::string mode="Bresenham");
+
+  // collapsed weighted 2-point correlation: automatically compute clusters and their centres
+  void W2c_auto(ArrI w, ArrI f,             std::string mode="Bresenham");
+  void W2c_auto(ArrI w, ArrI f, ArrI fmask, std::string mode="Bresenham");
+  void W2c_auto(ArrI w, ArrD f,             std::string mode="Bresenham");
+  void W2c_auto(ArrI w, ArrD f, ArrI fmask, std::string mode="Bresenham");
 
   // lineal path function (binary or int)
   void L(ArrI f, std::string mode="Bresenham");
@@ -100,7 +116,7 @@ MatI path(const VecI &xa, const VecI &xb, std::string mode="Bresenham");
 // list of end-points of ROI-stamp used in path-based correlations
 MatI stampPoints(const VecS &shape);
 
-// 2-point corr`elation
+// 2-point correlation
 ArrD S2(const VecS &roi, const ArrI &f, const ArrI &g,                                       bool periodic=true, bool pad=false);
 ArrD S2(const VecS &roi, const ArrI &f, const ArrI &g, const ArrI &fmask, const ArrI &gmask, bool periodic=true, bool pad=false);
 ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g,                                       bool periodic=true, bool pad=false);
@@ -120,6 +136,7 @@ ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g, const ArrI &fmask, const 
 #include "dilate.hpp"
 #include "Ensemble.hpp"
 #include "Ensemble_stampPoints.hpp"
+#include "Ensemble_mean.hpp"
 #include "Ensemble_S2.hpp"
 #include "Ensemble_W2.hpp"
 #include "Ensemble_W2c.hpp"
