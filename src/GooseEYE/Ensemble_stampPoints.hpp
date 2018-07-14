@@ -16,6 +16,8 @@
 namespace GooseEYE {
 
 // =================================================================================================
+// list of end-points of ROI-stamp used in path-based correlations
+// =================================================================================================
 
 MatI Ensemble::stampPoints(size_t N) const
 {

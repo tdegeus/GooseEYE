@@ -16,6 +16,8 @@
 namespace GooseEYE {
 
 // =================================================================================================
+// pixel/voxel path between two points "xa" and "xb"
+// =================================================================================================
 
 MatI path(const VecI &xa, const VecI &xb, std::string mode)
 {
@@ -187,7 +189,6 @@ MatI path(const VecI &xa, const VecI &xb, std::string mode)
   }
 
   throw std::out_of_range("Unknown 'mode'");
-
 }
 
 // =================================================================================================

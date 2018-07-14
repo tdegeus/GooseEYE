@@ -16,6 +16,8 @@
 namespace GooseEYE {
 
 // =================================================================================================
+// core functions: called by wrappers below
+// =================================================================================================
 
 ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
 {
@@ -78,20 +80,23 @@ ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
 }
 
 // =================================================================================================
+// wrapper functions
+// =================================================================================================
+
 
 ArrI dilate(const ArrI &f, size_t iterations, bool periodic)
 {
   return dilate(f, GooseEYE::kernel(f.rank()), VecS::Constant(f.max()+1,iterations), periodic);
 }
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
 ArrI dilate(const ArrI &f, const ArrI &kernel, size_t iterations, bool periodic)
 {
   return dilate(f, kernel, VecS::Constant(f.max()+1,iterations), periodic);
 }
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
 ArrI dilate(const ArrI &f, const VecS &iterations, bool periodic)
 {

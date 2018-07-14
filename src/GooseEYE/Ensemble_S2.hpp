@@ -16,7 +16,7 @@
 namespace GooseEYE {
 
 // =================================================================================================
-// "master"
+// 2-point correlation -- "master"
 // =================================================================================================
 
 void Ensemble::S2(ArrD f, ArrD g, ArrI fmask, ArrI gmask)
@@ -68,7 +68,7 @@ void Ensemble::S2(ArrD f, ArrD g, ArrI fmask, ArrI gmask)
 }
 
 // =================================================================================================
-// "slave" - compare to "master"
+// 2-point correlation -- "slave": compare to "master"
 // =================================================================================================
 
 void Ensemble::S2(ArrI f, ArrI g)
@@ -103,7 +103,7 @@ void Ensemble::S2(ArrI f, ArrI g)
 }
 
 // =================================================================================================
-// "slave" - compare to "master"
+// 2-point correlation -- "slave": compare to "master"
 // =================================================================================================
 
 void Ensemble::S2(ArrI f, ArrI g, ArrI fmask, ArrI gmask)
@@ -155,7 +155,7 @@ void Ensemble::S2(ArrI f, ArrI g, ArrI fmask, ArrI gmask)
 }
 
 // =================================================================================================
-// "slave" - compare to "master"
+// 2-point correlation -- "slave": compare to "master"
 // =================================================================================================
 
 void Ensemble::S2(ArrD f, ArrD g)

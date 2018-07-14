@@ -16,12 +16,16 @@
 namespace GooseEYE {
 
 // =================================================================================================
+// wrapper function: list of end-points of ROI-stamp used in path-based correlations
+// =================================================================================================
 
 MatI stampPoints(const VecS &shape)
 {
   return Ensemble(shape).stampPoints();
 }
 
+// =================================================================================================
+// wrapper functions: 2-point correlation
 // =================================================================================================
 
 ArrD S2(const VecS &roi, const ArrI &f, const ArrI &g, bool periodic, bool pad)

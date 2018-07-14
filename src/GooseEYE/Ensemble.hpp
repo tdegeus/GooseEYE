@@ -16,6 +16,8 @@
 namespace GooseEYE {
 
 // =================================================================================================
+// constructor
+// =================================================================================================
 
 inline
 Ensemble::Ensemble(const VecS &roi, bool periodic, bool zero_pad) : mPeriodic(periodic)
@@ -54,6 +56,8 @@ Ensemble::Ensemble(const VecS &roi, bool periodic, bool zero_pad) : mPeriodic(pe
   mNorm = ArrD::Zero(roi);
 }
 
+// =================================================================================================
+// return normalised result
 // =================================================================================================
 
 inline

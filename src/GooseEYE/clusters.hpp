@@ -16,6 +16,8 @@
 namespace GooseEYE {
 
 // =================================================================================================
+// core functions: called by wrappers below
+// =================================================================================================
 
 namespace Private {
 
@@ -449,6 +451,8 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
 } // namespace Private
 
 // =================================================================================================
+// wrapper functions
+// =================================================================================================
 
 ArrI clusters(const ArrI &f, const ArrI &kern, int min_size, bool periodic)
 {
@@ -461,13 +465,6 @@ ArrI clusters(const ArrI &f, const ArrI &kern, int min_size, bool periodic)
 
 // -------------------------------------------------------------------------------------------------
 
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, const ArrI &kern, int min_size, bool periodic)
-{
-  return Private::clusters(f, kern, min_size, periodic);
-}
-
-// =================================================================================================
-
 ArrI clusters(const ArrI &f, int min_size, bool periodic)
 {
   ArrI clus, cent;
@@ -479,13 +476,6 @@ ArrI clusters(const ArrI &f, int min_size, bool periodic)
 
 // -------------------------------------------------------------------------------------------------
 
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, int min_size, bool periodic)
-{
-  return Private::clusters(f, kernel(f.rank()), min_size, periodic);
-}
-
-// =================================================================================================
-
 ArrI clusters(const ArrI &f, bool periodic)
 {
   ArrI clus, cent;
@@ -493,6 +483,20 @@ ArrI clusters(const ArrI &f, bool periodic)
   std::tie(clus, cent) = Private::clusters(f, kernel(f.rank()), 0, periodic);
 
   return clus;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, const ArrI &kern, int min_size, bool periodic)
+{
+  return Private::clusters(f, kern, min_size, periodic);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, int min_size, bool periodic)
+{
+  return Private::clusters(f, kernel(f.rank()), min_size, periodic);
 }
 
 // -------------------------------------------------------------------------------------------------

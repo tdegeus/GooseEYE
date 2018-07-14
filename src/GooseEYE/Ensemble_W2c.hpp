@@ -16,7 +16,7 @@
 namespace GooseEYE {
 
 // =================================================================================================
-// "master"
+// weighted 2-point correlation collapsed to cluster centres -- "master"
 // =================================================================================================
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, ArrI fmask, std::string mode)
@@ -83,7 +83,7 @@ void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, ArrI fmask, std::string mode)
 }
 
 // =================================================================================================
-// "slave" - compare to "master"
+// weighted 2-point correlation collapsed to cluster centres -- "slave": compare to "master"
 // =================================================================================================
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrI f, ArrI fmask, std::string mode)
@@ -151,7 +151,7 @@ void Ensemble::W2c(ArrI clus, ArrI cntr, ArrI f, ArrI fmask, std::string mode)
 }
 
 // =================================================================================================
-// "slave" - compare to "master"
+// weighted 2-point correlation collapsed to cluster centres -- "slave": compare to "master"
 // =================================================================================================
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, std::string mode)
@@ -214,7 +214,7 @@ void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, std::string mode)
 }
 
 // =================================================================================================
-// "slave" - compare to "master"
+// weighted 2-point correlation collapsed to cluster centres -- "slave": compare to "master"
 // =================================================================================================
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrI f, std::string mode)
