@@ -52,6 +52,8 @@ public:
   void W2(ArrD w, ArrD f, ArrI fmask);
 
   // collapsed weighted 2-point correlation
+  void W2c(ArrI clus, ArrI cent, ArrI f,             std::string mode="Bresenham");
+  void W2c(ArrI clus, ArrI cent, ArrI f, ArrI fmask, std::string mode="Bresenham");
   void W2c(ArrI clus, ArrI cent, ArrD f,             std::string mode="Bresenham");
   void W2c(ArrI clus, ArrI cent, ArrD f, ArrI fmask, std::string mode="Bresenham");
 
@@ -120,6 +122,7 @@ ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g, const ArrI &fmask, const 
 #include "Ensemble_stampPoints.hpp"
 #include "Ensemble_S2.hpp"
 #include "Ensemble_W2.hpp"
+#include "Ensemble_W2c.hpp"
 #include "Ensemble_L.hpp"
 
 // =================================================================================================

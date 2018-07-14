@@ -68,6 +68,7 @@ void Ensemble::L(ArrI f, std::string mode)
       mNorm(pix(ipix,0)+mMid[0],pix(ipix,1)+mMid[1],pix(ipix,2)+mMid[2]) += N;
   }
 }
+
 // =================================================================================================
 
 } // namespace ...
