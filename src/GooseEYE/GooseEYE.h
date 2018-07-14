@@ -59,7 +59,7 @@ public:
   void L(ArrI f, std::string mode="Bresenham");
 
   // list of end-points of ROI-stamp used in path-based correlations
-  MatI stampPoints() const;
+  MatI stampPoints(size_t nd=0) const; // (nd == 0 -> number of columns is automatic)
 
 };
 
@@ -120,6 +120,7 @@ ArrD S2(const VecS &roi, const ArrD &f, const ArrD &g, const ArrI &fmask, const 
 #include "Ensemble_stampPoints.hpp"
 #include "Ensemble_S2.hpp"
 #include "Ensemble_W2.hpp"
+#include "Ensemble_L.hpp"
 
 // =================================================================================================
 

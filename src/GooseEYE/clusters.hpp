@@ -134,9 +134,9 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
   dI = mid[1];
   dJ = mid[2];
 
-  // --------------
-  // basic labeling
-  // --------------
+  // ---------------
+  // basic labelling
+  // ---------------
 
   // current label
   ilab = 0;
@@ -175,7 +175,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
             if ( j >= J-dJ ) uI=0; else uI=+dJ;
           }
 
-          // cluster not yet labeled: try to couple to labeled neighbors
+          // cluster not yet labelled: try to couple to labelled neighbours
           if ( l(h,i,j)==0 ) {
             for ( dh=lH ; dh<=uH ; dh++ ) {
               for ( di=lI ; di<=uJ ; di++ ) {
@@ -188,16 +188,16 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
           }}}}}
           end: ;
 
-          // cluster not yet labeled: create new label
+          // cluster not yet labelled: create new label
           if ( l(h,i,j)==0 ) {
             ilab++;
             l(h,i,j)  = ilab;
             inc[ilab] = 1;
           }
 
-          // try to couple neighbors to current label
-          // - not yet labeled -> label neighbor
-          // - labeled         -> link labels
+          // try to couple neighbours to current label
+          // - not yet labelled -> label neighbour
+          // - labelled         -> link labels
           for ( dh=lH ; dh<=uH ; dh++ ) {
             for ( di=lI ; di<=uJ ; di++ ) {
               for ( dj=lJ ; dj<=uI ; dj++ ) {
@@ -283,7 +283,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
 
   }
 
-  // cluster centers: not periodic
+  // cluster centres: not periodic
   // -----------------------------
 
   if ( !periodic )
@@ -310,7 +310,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
       }
     }
 
-    // fill the centers of gravity
+    // fill the centres of gravity
     for ( ilab=1 ; ilab<nlab ; ilab++ ) {
       if ( x(ilab,3)>0 ) {
 
@@ -330,7 +330,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
     }
   }
 
-  // cluster centers: periodic
+  // cluster centres: periodic
   // -------------------------
 
   if ( periodic )
@@ -399,7 +399,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
                   if ( l(h,i,J-1)==l(h+dh,i+di,J-1+dj) )
                     dx(l_(h,i,J-1),2) = 1;
 
-    // calculate centers
+    // calculate centres
     // -----------------
 
     // loop over the image to update the position and size of each label
@@ -421,7 +421,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
       }
     }
 
-    // fill the centers of gravity
+    // fill the centres of gravity
     for ( ilab=1 ; ilab<nlab ; ilab++ ) {
       if ( x(ilab,3)>0 ) {
 

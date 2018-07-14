@@ -17,7 +17,7 @@ namespace GooseEYE {
 
 // =================================================================================================
 
-MatI Ensemble::stampPoints() const
+MatI Ensemble::stampPoints(size_t N) const
 {
   int n,i,j;
   int idx = 0;
@@ -35,7 +35,7 @@ MatI Ensemble::stampPoints() const
   if ( nd==3 ) n = POS(J-2)*(2*H+2*POS(I-2))+2*H*I;
 
   // allocate
-  MatI ret(static_cast<size_t>(n), static_cast<size_t>(nd));
+  MatI ret = MatI::Zero(static_cast<size_t>(n), std::max(N,static_cast<size_t>(nd)));
 
   // 1-D
   // ---

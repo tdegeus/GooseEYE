@@ -59,7 +59,9 @@ Ensemble::Ensemble(const VecS &roi, bool periodic, bool zero_pad) : mPeriodic(pe
 inline
 cppmat::array<double> Ensemble::result() const
 {
-  return mData / mNorm;
+  ArrD norm = cppmat::max( mNorm, ArrD::Ones(mNorm.shape()) );
+
+  return mData / norm;
 }
 
 // =================================================================================================
