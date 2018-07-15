@@ -85,7 +85,7 @@ public:
 
 // create a dummy image with circles at position "row","col" with radius "r"
 // (the image is always constructed periodic)
-MatI dummy_circles(const VecS &shape, bool periodic=true);
+MatI dummy_circles(const VecS &shape,                                                  bool periodic=true);
 MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r, bool periodic=true);
 
 // define kernel
@@ -99,10 +99,10 @@ ArrI clusters(const ArrI &f, const ArrI &kern, int min_size=0, bool periodic=tru
 
 // dilate image (binary or int)
 // for 'int' image the number of iterations can be specified per label
-ArrI dilate(const ArrI &src                    , size_t      iterations=1, bool periodic=true);
-ArrI dilate(const ArrI &src                    , const VecS &iterations  , bool periodic=true);
-ArrI dilate(const ArrI &src, const ArrI &kernel, size_t      iterations=1, bool periodic=true);
-ArrI dilate(      ArrI  src,       ArrI  kernel, const VecS &iterations  , bool periodic=true);
+ArrI dilate(const ArrI &f                    , size_t      iterations=1, bool periodic=true);
+ArrI dilate(const ArrI &f                    , const VecS &iterations  , bool periodic=true);
+ArrI dilate(const ArrI &f, const ArrI &kernel, size_t      iterations=1, bool periodic=true);
+ArrI dilate(      ArrI  f,       ArrI  kernel, const VecS &iterations  , bool periodic=true);
 
 // determine clusters and centers of gravity of an image (for "min_size=0" the minimum size is ignored)
 std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f,                                   bool periodic=true);
