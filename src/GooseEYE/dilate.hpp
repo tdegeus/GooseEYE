@@ -51,9 +51,9 @@ ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
   for ( size_t iter = 0 ; iter < iterations.max() ; ++iter )
   {
     // loop through all voxel
-    for ( int h = 0 ; h < f.shape(0) ; ++h ) {
-      for ( int i = 0 ; i < f.shape(1) ; ++i ) {
-        for ( int j = 0 ; j < f.shape(2) ; ++j ) {
+    for ( int h = 0 ; h < f.shape<int>(0) ; ++h ) {
+      for ( int i = 0 ; i < f.shape<int>(1) ; ++i ) {
+        for ( int j = 0 ; j < f.shape<int>(2) ; ++j ) {
           // label over the current voxel
           int ilab = out(h,i,j);
           // proceed:

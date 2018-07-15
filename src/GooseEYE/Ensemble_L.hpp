@@ -39,9 +39,9 @@ void Ensemble::L(ArrI f, std::string mode)
     // - voxel-path
     MatI pix = path({0,0,0}, {stamp(ipnt,0), stamp(ipnt,1), stamp(ipnt,2)}, mode);
     // - compute correlation
-    for ( int h = mSkip[0] ; h < f.shape(0)-mSkip[0] ; ++h ) {
-      for ( int i = mSkip[1] ; i < f.shape(1)-mSkip[1] ; ++i ) {
-        for ( int j = mSkip[2] ; j < f.shape(2)-mSkip[2] ; ++j ) {
+    for ( int h = mSkip[0] ; h < f.shape<int>(0)-mSkip[0] ; ++h ) {
+      for ( int i = mSkip[1] ; i < f.shape<int>(1)-mSkip[1] ; ++i ) {
+        for ( int j = mSkip[2] ; j < f.shape<int>(2)-mSkip[2] ; ++j ) {
           for ( size_t ipix = 0 ; ipix < pix.shape(0) ; ++ipix ) {
             // -- get current voxel
             int dh = pix(ipix,0);

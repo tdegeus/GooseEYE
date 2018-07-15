@@ -42,9 +42,9 @@ void Ensemble::W2(ArrD w, ArrD f, ArrI fmask)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -53,9 +53,9 @@ void Ensemble::W2(ArrD w, ArrD f, ArrI fmask)
                   mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += w(h,i,j) * f(h+dh,i+di,j+dj);
 
   // normalisation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -91,9 +91,9 @@ void Ensemble::W2(ArrI w, ArrD f, ArrI fmask)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -102,9 +102,9 @@ void Ensemble::W2(ArrI w, ArrD f, ArrI fmask)
                   mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += f(h+dh,i+di,j+dj);
 
   // normalisation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -140,9 +140,9 @@ void Ensemble::W2(ArrD w, ArrI f, ArrI fmask)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -151,9 +151,9 @@ void Ensemble::W2(ArrD w, ArrI f, ArrI fmask)
                   mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += w(h,i,j);
 
   // normalisation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -189,9 +189,9 @@ void Ensemble::W2(ArrI w, ArrI f, ArrI fmask)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -200,9 +200,9 @@ void Ensemble::W2(ArrI w, ArrI f, ArrI fmask)
                   mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += 1.;
 
   // normalisation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -232,9 +232,9 @@ void Ensemble::W2(ArrD w, ArrD f)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -266,9 +266,9 @@ void Ensemble::W2(ArrI w, ArrD f)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -302,9 +302,9 @@ void Ensemble::W2(ArrD w, ArrI f)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
@@ -337,9 +337,9 @@ void Ensemble::W2(ArrI w, ArrI f)
   w.chrank(3);
 
   // correlation
-  for ( int h = mSkip[0] ; h < w.shape(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < w.shape(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < w.shape(2)-mSkip[2] ; ++j )
+  for ( int h = mSkip[0] ; h < w.shape<int>(0)-mSkip[0] ; ++h )
+    for ( int i = mSkip[1] ; i < w.shape<int>(1)-mSkip[1] ; ++i )
+      for ( int j = mSkip[2] ; j < w.shape<int>(2)-mSkip[2] ; ++j )
         if ( w(h,i,j) )
           for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
             for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
