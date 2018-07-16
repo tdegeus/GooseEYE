@@ -97,17 +97,18 @@ ArrI clusters(const ArrI &f,                                   bool periodic=tru
 ArrI clusters(const ArrI &f,                   int min_size  , bool periodic=true);
 ArrI clusters(const ArrI &f, const ArrI &kern, int min_size=0, bool periodic=true);
 
+// determine clusters and centers of gravity of an image (for "min_size=0" the minimum size is ignored)
+std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f,                                   bool periodic=true);
+std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f,                   int min_size  , bool periodic=true);
+std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, const ArrI &kern, int min_size=0, bool periodic=true);
+
+
 // dilate image (binary or int)
 // for 'int' image the number of iterations can be specified per label
 ArrI dilate(const ArrI &f                    , size_t      iterations=1, bool periodic=true);
 ArrI dilate(const ArrI &f                    , const VecS &iterations  , bool periodic=true);
 ArrI dilate(const ArrI &f, const ArrI &kernel, size_t      iterations=1, bool periodic=true);
 ArrI dilate(      ArrI  f,       ArrI  kernel, const VecS &iterations  , bool periodic=true);
-
-// determine clusters and centers of gravity of an image (for "min_size=0" the minimum size is ignored)
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f,                                   bool periodic=true);
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f,                   int min_size  , bool periodic=true);
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, const ArrI &kern, int min_size=0, bool periodic=true);
 
 // pixel/voxel path between two points "xa" and "xb"
 // mode: "Bresenham", "actual", or "full"

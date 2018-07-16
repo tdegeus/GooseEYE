@@ -1,16 +1,16 @@
 
 # <snippet>
 
-import GooseEYE.image as gimage
-import numpy          as np
+import GooseEYE as eye
+import numpy    as np
 
 # generate image
-I = gimage.dummy_circles((500,500))
+I = eye.dummy_circles((500,500))
 
 # clusters, centers of gravity
 # (both accounting for the periodicity of the image and ignoring it)
-C ,ctr  = gimage.clusters(I,periodic=False)
-CP,ctrP = gimage.clusters(I,periodic=True )
+C ,ctr  = eye.clusterCenters(I,periodic=False)
+CP,ctrP = eye.clusterCenters(I,periodic=True )
 size    = np.bincount(C .ravel()).astype(np.float64)/float(C.size)
 sizeP   = np.bincount(CP.ravel()).astype(np.float64)/float(C.size)
 
@@ -33,52 +33,51 @@ cmap       = mpl.colors.ListedColormap(cmap)
 try   : plt.style.use(['goose','goose-latex'])
 except: pass
 
-fig  = plt.figure(figsize=(18,6))
-fig.set_tight_layout(True)
+fig, axes = plt.subplots(figsize=(18,6), nrows=1, ncols=3)
 
-ax   = fig.add_subplot(1,3,1)
-im   = ax.imshow(I,clim=(0,1),cmap=mpl.colors.ListedColormap(cm.gray([0,255])))
+ax = axes[0]
+im = ax.imshow(I,clim=(0,1),cmap=mpl.colors.ListedColormap(cm.gray([0,255])))
 ax.xaxis.set_ticks([0,500])
 ax.yaxis.set_ticks([0,500])
-plt.xlim  ([0,500])
-plt.ylim  ([0,500])
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title (r'image')
+ax.set_xlim([0,500])
+ax.set_ylim([0,500])
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_title (r'image')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
 cbar.set_ticks([0,1])
 
-ax   = fig.add_subplot(1,3,2)
-im   = ax.imshow(C,clim=(0,np.max(C)+1),cmap=cmap)
+ax = axes[1]
+im = ax.imshow(C,clim=(0,np.max(C)+1),cmap=cmap)
 idx,jdx = np.where(ctr>0)
 for i,j in zip(idx,jdx):
   ax.plot(j,i,color='k',marker='+',linestyle='none',markersize=2000.*size[ctr[i,j]])
 ax.xaxis.set_ticks([0,500])
 ax.yaxis.set_ticks([0,500])
-plt.xlim  ([0,500])
-plt.ylim  ([0,500])
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title (r'clusters + centers')
+ax.set_xlim([0,500])
+ax.set_ylim([0,500])
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_title (r'clusters + centers')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
 cbar.set_ticks([])
 
-ax   = fig.add_subplot(1,3,3)
-im   = ax.imshow(CP,clim=(0,np.max(C)+1),cmap=cmap)
+ax = axes[2]
+im = ax.imshow(CP,clim=(0,np.max(C)+1),cmap=cmap)
 idx,jdx = np.where(ctrP>0)
 for i,j in zip(idx,jdx):
   ax.plot(j,i,color='k',marker='+',linestyle='none',markersize=2000.*sizeP[ctrP[i,j]])
 ax.xaxis.set_ticks([0,500])
 ax.yaxis.set_ticks([0,500])
-plt.xlim  ([0,500])
-plt.ylim  ([0,500])
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title (r'clusters + centers (periodic)')
+ax.set_xlim([0,500])
+ax.set_ylim([0,500])
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_title (r'clusters + centers (periodic)')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)

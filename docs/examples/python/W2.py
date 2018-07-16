@@ -1,8 +1,8 @@
 
 # <snippet>
 
-import GooseEYE.image as gimage
-import numpy          as np
+import GooseEYE as eye
+import numpy    as np
 
 # image + "damage" + correlation
 # ------------------------------
@@ -21,17 +21,17 @@ row      += np.random.normal(0.0,float(M)/float(N),N*N)
 col      += np.random.normal(0.0,float(M)/float(N),N*N)
 r        *= np.random.random(N*N)*2.+0.1
 # generate image, store 'volume-fraction'
-I         = gimage.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
+I         = eye.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
 phi       = np.mean(I)
 
 # create 'damage' -> right of inclusion
 col      += 1.1*r
 r        *= 0.4
-W         = gimage.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
+W         = eye.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
 W[I==1]   = 0
 
 # weighted correlation
-WI,_      = gimage.W2(W,I,(101,101),mask=W)
+WI        = eye.W2((101,101),W,I,fmask=W)
 
 # gray-scale image + correlation
 # ------------------------------
@@ -44,7 +44,7 @@ Igr      /= 1.2
 Iav       = np.mean(Igr)
 
 # weighted correlation
-WIgr,_    = gimage.W2(W,Igr,(101,101),mask=W)
+WIgr      = eye.W2((101,101),W,Igr,fmask=W)
 
 
 # </snippet>
@@ -65,81 +65,80 @@ cmap = mpl.colors.ListedColormap(np.array([
   [1.,0.,0.,1.],
 ],dtype='float64'))
 
-fig  = plt.figure(figsize=(18,12))
-fig.set_tight_layout(True)
+fig, axes = plt.subplots(figsize=(18,12), nrows=2, ncols=3)
 
-ax   = fig.add_subplot(2,3,1)
-im   = ax.imshow(I,clim=(0,1),cmap=mpl.colors.ListedColormap(cm.gray([0,255])))
-D    = ax.imshow(W,clim=(0,1),cmap=cmap)
+ax = axes[0,0]
+im = ax.imshow(I,clim=(0,1),cmap=mpl.colors.ListedColormap(cm.gray([0,255])))
+D  = ax.imshow(W,clim=(0,1),cmap=cmap)
 ax.xaxis.set_ticks([0,500])
 ax.yaxis.set_ticks([0,500])
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title (r'$\mathcal{I}$ (black/white) + $\mathcal{W}$ (red)')
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_title (r'$\mathcal{I}$ (black/white) + $\mathcal{W}$ (red)')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
 cbar.set_ticks([0,1])
 
-ax   = fig.add_subplot(2,3,2)
-im   = ax.imshow(WI,clim=(0,1),cmap='jet',extent=(-50,50,-50,50))
+ax = axes[0,1]
+im = ax.imshow(WI,clim=(0,1),cmap='jet',extent=(-50,50,-50,50))
 ax.xaxis.set_ticks([-50,0,+50])
 ax.yaxis.set_ticks([-50,0,+50])
-plt.xlabel(r'$\Delta x$')
-plt.ylabel(r'$\Delta y$')
-plt.title (r'$W_2$')
+ax.set_xlabel(r'$\Delta x$')
+ax.set_ylabel(r'$\Delta y$')
+ax.set_title (r'$W_2$')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
 cbar.set_ticks     ([ 0 , 1 ])
 cbar.set_ticklabels(['0','1'])
 
-ax   = fig.add_subplot(2,3,3)
-im   = ax.imshow(WI-phi,clim=(-phi,+phi),cmap='RdBu_r',extent=(-50,50,-50,50))
+ax = axes[0,2]
+im = ax.imshow(WI-phi,clim=(-phi,+phi),cmap='RdBu_r',extent=(-50,50,-50,50))
 ax.xaxis.set_ticks([-50,0,+50])
 ax.yaxis.set_ticks([-50,0,+50])
-plt.xlabel(r'$\Delta x$')
-plt.ylabel(r'$\Delta y$')
-plt.title (r'$W_2 - \varphi$')
+ax.set_xlabel(r'$\Delta x$')
+ax.set_ylabel(r'$\Delta y$')
+ax.set_title (r'$W_2 - \varphi$')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
 cbar.set_ticks     ([       -phi  , 0 ,       +phi  ])
 cbar.set_ticklabels([r'$-\varphi$','0',r'$+\varphi$'])
 
-ax   = fig.add_subplot(2,3,4)
-im   = ax.imshow(Igr,clim=(0,1),cmap='gray')
-D    = ax.imshow(W  ,clim=(0,1),cmap=cmap)
+ax = axes[1,0]
+im = ax.imshow(Igr,clim=(0,1),cmap='gray')
+D  = ax.imshow(W  ,clim=(0,1),cmap=cmap)
 ax.xaxis.set_ticks([0,500])
 ax.yaxis.set_ticks([0,500])
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title (r'$\mathcal{I}$ (gray) + $\mathcal{W}$ (red)')
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_title (r'$\mathcal{I}$ (gray) + $\mathcal{W}$ (red)')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
 cbar.set_ticks([0,1])
 
-ax   = fig.add_subplot(2,3,5)
-im   = ax.imshow(WIgr,clim=(0,1),cmap='jet',extent=(-50,50,-50,50))
+ax = axes[1,1]
+im = ax.imshow(WIgr,clim=(0,1),cmap='jet',extent=(-50,50,-50,50))
 ax.xaxis.set_ticks([-50,0,+50])
 ax.yaxis.set_ticks([-50,0,+50])
-plt.xlabel(r'$\Delta x$')
-plt.ylabel(r'$\Delta y$')
-plt.title (r'$W_2$')
+ax.set_xlabel(r'$\Delta x$')
+ax.set_ylabel(r'$\Delta y$')
+ax.set_title (r'$W_2$')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)
 cbar.set_ticks([0,1])
 cbar.set_ticklabels(['0','1'])
 
-ax   = fig.add_subplot(2,3,6)
-im   = ax.imshow(WIgr-Iav,clim=(-Iav,+Iav),cmap='RdBu_r',extent=(-50,50,-50,50))
+ax = axes[1,2]
+im = ax.imshow(WIgr-Iav,clim=(-Iav,+Iav),cmap='RdBu_r',extent=(-50,50,-50,50))
 ax.xaxis.set_ticks([-50,0,+50])
 ax.yaxis.set_ticks([-50,0,+50])
-plt.xlabel(r'$\Delta x$')
-plt.ylabel(r'$\Delta y$')
-plt.title (r'$W_2 - \langle \mathcal{I} \rangle$')
+ax.set_xlabel(r'$\Delta x$')
+ax.set_ylabel(r'$\Delta y$')
+ax.set_title (r'$W_2 - \langle \mathcal{I} \rangle$')
 div  = make_axes_locatable(ax)
 cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im,cax=cax)

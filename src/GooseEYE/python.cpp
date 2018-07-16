@@ -94,6 +94,10 @@ m.def("clusters", py::overload_cast<cArrI &,               bool>(&M::clusters), 
 m.def("clusters", py::overload_cast<cArrI &,          int, bool>(&M::clusters), py::arg("f"),                  py::arg("min_size")  , py::arg("periodic")=true);
 m.def("clusters", py::overload_cast<cArrI &, cArrI &, int, bool>(&M::clusters), py::arg("f"), py::arg("kern"), py::arg("min_size")=0, py::arg("periodic")=true);
 // -
+m.def("clusterCenters", py::overload_cast<cArrI &,               bool>(&M::clusterCenters), py::arg("f"),                                         py::arg("periodic")=true);
+m.def("clusterCenters", py::overload_cast<cArrI &,          int, bool>(&M::clusterCenters), py::arg("f"),                  py::arg("min_size")  , py::arg("periodic")=true);
+m.def("clusterCenters", py::overload_cast<cArrI &, cArrI &, int, bool>(&M::clusterCenters), py::arg("f"), py::arg("kern"), py::arg("min_size")=0, py::arg("periodic")=true);
+// -
 m.def("dilate", py::overload_cast<cArrI &,          size_t , bool>(&M::dilate), py::arg("f"),                  py::arg("iterations")=1, py::arg("periodic")=true);
 m.def("dilate", py::overload_cast<cArrI &,          cVecS &, bool>(&M::dilate), py::arg("f"),                  py::arg("iterations")  , py::arg("periodic")=true);
 m.def("dilate", py::overload_cast<cArrI &, cArrI &, size_t , bool>(&M::dilate), py::arg("f"), py::arg("kern"), py::arg("iterations")=1, py::arg("periodic")=true);

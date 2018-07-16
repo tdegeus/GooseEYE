@@ -80,17 +80,17 @@ Example
 
 This result is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The top row shows the image and the results for the binary image: from left to right: the image, the 2-point probability :math:`S_2` in two-dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis. The same image and results are shown on the bottom row for a gray scale image, for which noise is added and the background and the islands are made gray.
 
-.. image:: image/S2.svg
+.. image:: S2.svg
   :width: 700px
 
 This example is based on the following code (the code used for the plotting is included in the download, whereby the matplotlib-style can be found on `GitHub <https://github.com/tdegeus/pyplot_ext>`_).
 
-.. literalinclude:: image/S2.py
+[:download:`source: S2.py <S2.py>`]
+
+.. literalinclude:: S2.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
-
-[:download:`source: S2.py <image/S2.py>`]
 
 Masked correlation
 ------------------
@@ -101,15 +101,15 @@ This function also has the possibility to mask certain pixels. The image's mask 
 
   For non-periodic images a mask in conjunction with padding of the image can be used to incorporate the full image in the statistic. Otherwise a boundary region is skipped, reducing the amount of information from the boundary region.
 
-.. image:: image/S2_mask.svg
+.. image:: S2_mask.svg
   :width: 700px
 
-.. literalinclude:: image/S2_mask.py
+.. literalinclude:: S2_mask.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: S2_mask.py <image/S2_mask.py>`]
+[:download:`source: S2_mask.py <S2_mask.py>`]
 
 2-point cluster function
 ========================
@@ -137,17 +137,17 @@ Textbooks
 Example
 -------
 
-.. image:: image/S2_cluster.svg
+.. image:: S2_cluster.svg
   :width: 700px
 
 The 2-point cluster function can be computed with the same machinery as the 2-point probability. The former uses an integer image, with a unique integer number to label each cluster. The latter simply uses binary values.
 
-.. literalinclude:: image/S2_cluster.py
+.. literalinclude:: S2_cluster.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: S2_cluster.py <image/S2_cluster.py>`]
+[:download:`source: S2_cluster.py <S2_cluster.py>`]
 
 Lineal path function
 ====================
@@ -183,23 +183,23 @@ Furthermore it is highly unlikely that a path can be found through the inclusion
 
 An important ingredient of the computation of :math:`L` is thus the choice of the pixel paths. In GooseEYE the paths are constructed between the center of the region of interest and each of the points on the end of the region of interest. The paths can be computed using different algorithms, illustrated below:
 
-.. image:: image/pixel_path.svg
+.. image:: pixel_path.svg
   :width: 700px
 
-[:download:`source: pixel_path.py <image/pixel_path.py>`]
+[:download:`source: pixel_path.py <pixel_path.py>`]
 
 Example
 -------
 
-.. image:: image/L.svg
+.. image:: L.svg
   :width: 700px
 
-.. literalinclude:: image/L.py
+.. literalinclude:: L.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: L.py <image/L.py>`]
+[:download:`source: L.py <L.py>`]
 
 Weighted correlation
 ====================
@@ -242,15 +242,15 @@ where all pixels where :math:`\mathcal{M}(\vec{x}_i) = 1` are ignored; all pixel
 Example
 -------
 
-.. image:: image/W2.svg
+.. image:: W2.svg
   :width: 700px
 
-.. literalinclude:: image/W2.py
+.. literalinclude:: W2.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: W2.py <image/W2.py>`]
+[:download:`source: W2.py <W2.py>`]
 
 Collapse to single point
 ------------------------
@@ -287,15 +287,15 @@ Similarly to the above, a mask may be introduced as follows:
 Example
 ^^^^^^^
 
-.. image:: image/W2c.svg
+.. image:: W2c.svg
   :width: 700px
 
-.. literalinclude:: image/W2c.py
+.. literalinclude:: W2c.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: W2c.py <image/W2c.py>`]
+[:download:`source: W2c.py <W2c.py>`]
 
 Obtain clusters
 ===============
@@ -303,25 +303,25 @@ Obtain clusters
 Calculate clusters
 ------------------
 
-.. image:: image/clusters.svg
+.. image:: clusters.svg
   :width: 700px
 
-.. literalinclude:: image/clusters.py
+.. literalinclude:: clusters.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: clusters.py <image/clusters.py>`]
+[:download:`source: clusters.py <clusters.py>`]
 
 Dilate clusters (differently)
 -----------------------------
 
-.. image:: image/clusters_dilate.svg
+.. image:: clusters_dilate.svg
   :width: 700px
 
-.. literalinclude:: image/clusters_dilate.py
+.. literalinclude:: clusters_dilate.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: clusters_dilate.py <image/clusters_dilate.py>`]
+[:download:`source: clusters_dilate.py <clusters_dilate.py>`]
