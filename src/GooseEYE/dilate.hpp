@@ -48,7 +48,7 @@ ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
   int dJ = mid[2];
 
   // loop through iterations
-  for ( size_t iter = 0 ; iter < iterations.max() ; ++iter )
+  for ( size_t iter = 0 ; iter < cppmat::max(iterations) ; ++iter )
   {
     // loop through all voxel
     for ( int h = 0 ; h < f.shape<int>(0) ; ++h ) {
@@ -86,14 +86,18 @@ ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
 
 ArrI dilate(const ArrI &f, size_t iterations, bool periodic)
 {
-  return dilate(f, GooseEYE::kernel(f.rank()), VecS::Constant(f.max()+1,iterations), periodic);
+  VecS iter(f.max()+1, iterations);
+
+  return dilate(f, GooseEYE::kernel(f.rank()), iter, periodic);
 }
 
 // -------------------------------------------------------------------------------------------------
 
 ArrI dilate(const ArrI &f, const ArrI &kernel, size_t iterations, bool periodic)
 {
-  return dilate(f, kernel, VecS::Constant(f.max()+1,iterations), periodic);
+  VecS iter(f.max()+1, iterations);
+
+  return dilate(f, kernel, iter, periodic);
 }
 
 // -------------------------------------------------------------------------------------------------

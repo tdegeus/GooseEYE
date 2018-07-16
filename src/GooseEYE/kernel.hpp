@@ -25,7 +25,7 @@ ArrI kernel(size_t ndim, std::string mode)
 
   if ( mode=="default" )
   {
-    VecS shape = VecS::Constant(ndim, 3);
+    VecS shape(ndim, 3);
 
     ArrI kern = ArrI::Zero(shape);
 

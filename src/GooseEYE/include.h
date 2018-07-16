@@ -59,8 +59,8 @@ namespace GooseEYE
   typedef cppmat::array <int>    ArrI;
   typedef cppmat::matrix<double> MatD;
   typedef cppmat::matrix<int>    MatI;
-  typedef cppmat::vector<size_t> VecS;
-  typedef cppmat::vector<int>    VecI;
+  typedef std::vector<size_t> VecS;
+  typedef std::vector<int>    VecI;
 }
 
 // =================================================================================================

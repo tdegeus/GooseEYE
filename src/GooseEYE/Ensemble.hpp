@@ -31,25 +31,30 @@ Ensemble::Ensemble(const VecS &roi, bool periodic, bool zero_pad) : mPeriodic(pe
     if ( i%2 == 0 )
       throw std::domain_error("'roi' must be odd shaped");
 
-  // initialize
-  mShape = roi;
-  mMid   = roi;
+  // shape of the region-of-interest
+  // - initialize
+  for ( size_t i = 0 ; i < MAX_DIM    ; ++i ) mShape[i] = 1;
+  // - copy from input
+  for ( size_t i = 0 ; i < roi.size() ; ++i ) mShape[i] = roi[i];
 
   // midpoint of ROI
-  for ( auto &i : mMid ) i = (i-1)/2;
+  for ( size_t i = 0 ; i < MAX_DIM ; ++i ) mMid[i] = (mShape[i]-1)/2;
 
   // pad with half the ROI size
-  if ( zero_pad ) mPad = mMid;
-
-  // pad to "MAX_DIM"
-  mShape.resize(MAX_DIM, 1);
-  mMid  .resize(MAX_DIM, 0);
+  if ( zero_pad )
+  {
+    // - allocate
+    mPad.resize(roi.size());
+    // - fill
+    for ( size_t i = 0 ; i < mPad.size() ; ++i ) mPad[i] = mMid[i];
+  }
 
   // set skip size
-  // - initialize
-  mSkip = mMid;
-  // - switch-off
-  if ( periodic or zero_pad ) mSkip *= 0;
+  for ( size_t i = 0 ; i < MAX_DIM ; ++i )
+  {
+    if ( periodic or zero_pad ) mSkip[i] = 0;
+    else                        mSkip[i] = mMid[i];
+  }
 
   // allocate average
   mData = ArrD::Zero(roi);

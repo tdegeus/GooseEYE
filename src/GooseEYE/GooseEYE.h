@@ -22,13 +22,13 @@ class Ensemble
 private:
 
   static const size_t MAX_DIM=3;
-  ArrD mData;
-  ArrD mNorm;
-  VecI mShape;
-  VecI mMid;
-  VecI mSkip;
-  VecS mPad;
-  bool mPeriodic;
+  ArrD   mData;
+  ArrD   mNorm;
+  int    mShape[MAX_DIM];
+  int    mMid[MAX_DIM];
+  int    mSkip[MAX_DIM];
+  VecS   mPad;
+  bool   mPeriodic;
 
 public:
 
