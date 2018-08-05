@@ -21,8 +21,12 @@ namespace GooseEYE {
 
 void Ensemble::mean(const ArrD &f)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::mean;
+
   // checks
-  if ( f.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::mean - rank inconsistent");
+  std::string name = "GooseEYE::Ensemble::mean - ";
+  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
 
   // loop over image
   for ( size_t i = 0 ; i < f.size() ; ++i ) {
@@ -37,9 +41,13 @@ void Ensemble::mean(const ArrD &f)
 
 void Ensemble::mean(const ArrD &f, const ArrI &fmask)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::mean;
+
   // checks
-  if ( f.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::mean - rank inconsistent");
-  if ( f.shape() != fmask.shape() ) throw std::length_error("GooseEYE::mean - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::mean - ";
+  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( f.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // loop over image
   for ( size_t i = 0 ; i < f.size() ; ++i ) {

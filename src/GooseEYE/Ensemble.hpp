@@ -24,12 +24,12 @@ Ensemble::Ensemble(const VecS &roi, bool periodic, bool zero_pad) : mPeriodic(pe
 {
   // check
   if ( roi.size() > MAX_DIM )
-    throw std::domain_error("Rank 'roi' too large");
+    throw std::runtime_error("Rank 'roi' too large");
 
   // check
   for ( auto &i : roi )
     if ( i%2 == 0 )
-      throw std::domain_error("'roi' must be odd shaped");
+      throw std::runtime_error("'roi' must be odd shaped");
 
   // shape of the region-of-interest
   // - initialize
@@ -62,15 +62,31 @@ Ensemble::Ensemble(const VecS &roi, bool periodic, bool zero_pad) : mPeriodic(pe
 }
 
 // =================================================================================================
-// return normalised result
+// return normalised result, or raw data
 // =================================================================================================
 
 inline
-cppmat::array<double> Ensemble::result() const
+ArrD Ensemble::result() const
 {
   ArrD norm = cppmat::max( mNorm, ArrD::Ones(mNorm.shape()) );
 
   return mData / norm;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline
+ArrD Ensemble::data() const
+{
+  return mData;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline
+ArrD Ensemble::norm() const
+{
+  return mNorm;
 }
 
 // =================================================================================================

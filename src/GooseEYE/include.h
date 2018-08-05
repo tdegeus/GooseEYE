@@ -59,9 +59,23 @@ namespace GooseEYE
   typedef cppmat::array <int>    ArrI;
   typedef cppmat::matrix<double> MatD;
   typedef cppmat::matrix<int>    MatI;
-  typedef std::vector<size_t> VecS;
-  typedef std::vector<int>    VecI;
+  typedef std::vector<size_t>    VecS;
+  typedef std::vector<int>       VecI;
 }
+
+// -------------------------------------------------------------------------------------------------
+
+// enumerate used in "Ensemble"
+struct Stat {
+  enum Value {
+    Unset,
+    mean,
+    S2,
+    W2,
+    W2c,
+    L,
+  };
+};
 
 // =================================================================================================
 

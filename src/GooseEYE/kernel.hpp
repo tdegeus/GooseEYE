@@ -54,7 +54,7 @@ ArrI kernel(size_t ndim, std::string mode)
     }
   }
 
-  throw std::length_error("Unknown ndim/mode");
+  throw std::runtime_error("Unknown ndim/mode");
 }
 
 // =================================================================================================

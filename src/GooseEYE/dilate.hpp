@@ -23,10 +23,10 @@ ArrI dilate(ArrI f, ArrI kern, const VecS &iterations, bool periodic)
 {
   // check input
   if ( static_cast<size_t>(f.max()+1) != iterations.size() )
-    throw std::length_error("Iteration must be specified for each label");
+    throw std::runtime_error("Iteration must be specified for each label");
 
   if ( f.min() < 0 )
-    throw std::length_error("Iteration must be specified for each label");
+    throw std::runtime_error("Iteration must be specified for each label");
 
   // apply periodicity
   f   .setPeriodic(periodic);

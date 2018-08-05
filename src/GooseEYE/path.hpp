@@ -26,10 +26,10 @@ MatI path(const VecI &xa, const VecI &xb, std::string mode)
   int ndim = static_cast<int>(xa.size());
 
   if ( xa.size() != xb.size() )
-    throw std::length_error("'xa' and 'xb' must have the same dimension");
+    throw std::runtime_error("'xa' and 'xb' must have the same dimension");
 
   if ( ndim < 1 or ndim > 3 )
-    throw std::length_error("Only allowed in 1, 2, or 3 dimensions");
+    throw std::runtime_error("Only allowed in 1, 2, or 3 dimensions");
 
     std::vector<int> ret;
 

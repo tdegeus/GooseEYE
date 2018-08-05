@@ -21,10 +21,14 @@ namespace GooseEYE {
 
 void Ensemble::W2(ArrD w, ArrD f, ArrI fmask)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // checks
-  if ( w.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != fmask.shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
-  if ( w.shape() != f    .shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( w.shape() != f    .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w    .setPeriodic(mPeriodic);
@@ -70,10 +74,14 @@ void Ensemble::W2(ArrD w, ArrD f, ArrI fmask)
 
 void Ensemble::W2(ArrI w, ArrD f, ArrI fmask)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // checks
-  if ( w.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != fmask.shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
-  if ( w.shape() != f    .shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( w.shape() != f    .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w    .setPeriodic(mPeriodic);
@@ -119,10 +127,14 @@ void Ensemble::W2(ArrI w, ArrD f, ArrI fmask)
 
 void Ensemble::W2(ArrD w, ArrI f, ArrI fmask)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // checks
-  if ( w.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != fmask.shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
-  if ( w.shape() != f    .shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( w.shape() != f    .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w    .setPeriodic(mPeriodic);
@@ -168,10 +180,14 @@ void Ensemble::W2(ArrD w, ArrI f, ArrI fmask)
 
 void Ensemble::W2(ArrI w, ArrI f, ArrI fmask)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // checks
-  if ( w.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != fmask.shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
-  if ( w.shape() != f    .shape() ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( w.shape() != f    .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w    .setPeriodic(mPeriodic);
@@ -217,12 +233,16 @@ void Ensemble::W2(ArrI w, ArrI f, ArrI fmask)
 
 void Ensemble::W2(ArrD w, ArrD f)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // optionally use masked implementation
   if ( mPad.size() > 0 ) return W2(w, f, ArrI::Zero(f.shape()));
 
   // checks
-  if ( w.rank()  != mData.rank() ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != f.shape()    ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank() ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != f.shape()    ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w.setPeriodic(mPeriodic);
@@ -251,12 +271,16 @@ void Ensemble::W2(ArrD w, ArrD f)
 
 void Ensemble::W2(ArrI w, ArrD f)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // optionally use masked implementation
   if ( mPad.size() > 0 ) return W2(w, f, ArrI::Zero(f.shape()));
 
   // checks
-  if ( w.rank()  != mData.rank() ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != f.shape()    ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank() ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != f.shape()    ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w.setPeriodic(mPeriodic);
@@ -287,12 +311,16 @@ void Ensemble::W2(ArrI w, ArrD f)
 
 void Ensemble::W2(ArrD w, ArrI f)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // optionally use masked implementation
   if ( mPad.size() > 0 ) return W2(w, f, ArrI::Zero(f.shape()));
 
   // checks
-  if ( w.rank()  != mData.rank() ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != f.shape()    ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank() ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != f.shape()    ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w.setPeriodic(mPeriodic);
@@ -322,12 +350,16 @@ void Ensemble::W2(ArrD w, ArrI f)
 
 void Ensemble::W2(ArrI w, ArrI f)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2;
+
   // optionally use masked implementation
   if ( mPad.size() > 0 ) return W2(w, f, ArrI::Zero(f.shape()));
 
   // checks
-  if ( w.rank()  != mData.rank() ) throw std::length_error("GooseEYE::W2 - rank inconsistent");
-  if ( w.shape() != f.shape()    ) throw std::length_error("GooseEYE::W2 - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2 - ";
+  if ( w.rank()  != mData.rank() ) throw std::runtime_error(name+"rank inconsistent");
+  if ( w.shape() != f.shape()    ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   w.setPeriodic(mPeriodic);

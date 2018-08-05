@@ -21,11 +21,15 @@ namespace GooseEYE {
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, ArrI fmask, std::string mode)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2c;
+
   // checks
-  if ( f.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2c - rank inconsistent");
-  if ( f.shape() != fmask.shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
-  if ( f.shape() != clus .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
-  if ( f.shape() != cntr .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2c - ";
+  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( f.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( f.shape() != clus .shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( f.shape() != cntr .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   clus .setPeriodic(mPeriodic);
@@ -88,11 +92,15 @@ void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, ArrI fmask, std::string mode)
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrI f, ArrI fmask, std::string mode)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2c;
+
   // checks
-  if ( f.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2c - rank inconsistent");
-  if ( f.shape() != fmask.shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
-  if ( f.shape() != clus .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
-  if ( f.shape() != cntr .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2c - ";
+  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( f.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( f.shape() != clus .shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( f.shape() != cntr .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   clus .setPeriodic(mPeriodic);
@@ -156,10 +164,14 @@ void Ensemble::W2c(ArrI clus, ArrI cntr, ArrI f, ArrI fmask, std::string mode)
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, std::string mode)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2c;
+
   // checks
-  if ( f.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2c - rank inconsistent");
-  if ( f.shape() != clus .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
-  if ( f.shape() != cntr .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2c - ";
+  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( f.shape() != clus .shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( f.shape() != cntr .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   clus .setPeriodic(mPeriodic);
@@ -219,10 +231,14 @@ void Ensemble::W2c(ArrI clus, ArrI cntr, ArrD f, std::string mode)
 
 void Ensemble::W2c(ArrI clus, ArrI cntr, ArrI f, std::string mode)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::W2c;
+
   // checks
-  if ( f.rank()  != mData.rank()  ) throw std::length_error("GooseEYE::W2c - rank inconsistent");
-  if ( f.shape() != clus .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
-  if ( f.shape() != cntr .shape() ) throw std::length_error("GooseEYE::W2c - shape inconsistent");
+  std::string name = "GooseEYE::Ensemble::W2c - ";
+  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  if ( f.shape() != clus .shape() ) throw std::runtime_error(name+"shape inconsistent");
+  if ( f.shape() != cntr .shape() ) throw std::runtime_error(name+"shape inconsistent");
 
   // switch off bound-checks based on periodicity settings
   clus .setPeriodic(mPeriodic);

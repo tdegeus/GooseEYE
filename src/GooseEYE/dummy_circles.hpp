@@ -22,10 +22,10 @@ namespace GooseEYE {
 MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r, bool periodic)
 {
   if ( row.size() != col.size() or row.size() != r.size() )
-    throw std::length_error("'row', 'col', and 'r' are inconsistent");
+    throw std::runtime_error("'row', 'col', and 'r' are inconsistent");
 
   if ( shape.size() != 2 )
-    throw std::length_error("Only allowed in 2 dimensions");
+    throw std::runtime_error("Only allowed in 2 dimensions");
 
   MatI out = MatI::Zero(shape[0], shape[1]);
 
@@ -49,7 +49,7 @@ MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const Ve
 MatI dummy_circles(const VecS &shape, bool periodic)
 {
   if ( shape.size() != 2 )
-    throw std::length_error("Only allowed in 2 dimensions");
+    throw std::runtime_error("Only allowed in 2 dimensions");
 
   std::srand(std::time(0));
 

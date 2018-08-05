@@ -21,8 +21,13 @@ namespace GooseEYE {
 
 void Ensemble::L(ArrI f, std::string mode)
 {
+  // lock measure
+  if ( mStat == Stat::Unset) mStat = Stat::L;
+
   // checks
-  if ( f.rank() != mData.rank() ) throw std::length_error("GooseEYE::L - rank inconsistent");
+  std::string name = "GooseEYE::Ensemble::L - ";
+  if ( f.rank() != mData.rank() ) throw std::runtime_error(name+"rank inconsistent");
+  if ( mStat    != Stat::L      ) throw std::runtime_error(name+"statistics cannot be mixed");
 
   // switch off bound-checks based on periodicity settings
   f.setPeriodic(mPeriodic);

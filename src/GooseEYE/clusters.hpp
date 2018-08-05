@@ -123,7 +123,7 @@ std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
   // check
   for ( auto &i : mid )
     if ( i%2 == 0 )
-      throw std::domain_error("'kernel' must be odd shaped");
+      throw std::runtime_error("'kernel' must be odd shaped");
 
   // midpoint
   for ( auto &i : mid ) i = (i-1)/2;
