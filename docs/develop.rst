@@ -1,21 +1,10 @@
-:tocdepth: 3
 
 ****************
 Developers notes
 ****************
 
-.. contents::
-  :local:
-  :depth: 2
-  :backlinks: top
-
 Graphical User Interface (GUI) - Qt
 ===================================
-
-.. contents::
-  :local:
-  :depth: 2
-  :backlinks: top
 
 Static compilation
 ------------------

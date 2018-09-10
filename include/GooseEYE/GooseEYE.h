@@ -135,14 +135,6 @@ ArrD L(const VecS &roi, const ArrI &f, bool periodic=true, std::string mode="Bre
 // miscellaneous functions
 // -------------------------------------------------------------------------------------------------
 
-// dummy image with circles at position "row","col" with radius "r" (may be automatic)
-MatI dummy_circles(const VecS &shape,                                                  bool periodic=true);
-MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r, bool periodic=true);
-
-// kernel
-// mode: "default"
-ArrI kernel(size_t ndim, std::string mode="default");
-
 // clusters of a binary image ("min_size=0": minimum size is ignored)
 ArrI clusters(const ArrI &f,                                   bool periodic=true);
 ArrI clusters(const ArrI &f,                   int min_size  , bool periodic=true);
@@ -160,12 +152,20 @@ ArrI dilate(const ArrI &f                    , const VecS &iterations  , bool pe
 ArrI dilate(const ArrI &f, const ArrI &kernel, size_t      iterations=1, bool periodic=true);
 ArrI dilate(      ArrI  f,       ArrI  kernel, const VecS &iterations  , bool periodic=true);
 
+// kernel
+// mode: "default"
+ArrI kernel(size_t ndim, std::string mode="default");
+
 // pixel/voxel path between two points "xa" and "xb"
 // mode: "Bresenham", "actual", or "full"
 MatI path(const VecI &xa, const VecI &xb, std::string mode="Bresenham");
 
 // list of end-points of ROI-stamp used in path-based correlations
 MatI stampPoints(const VecS &shape);
+
+// dummy image with circles at position "row","col" with radius "r" (may be automatic)
+MatI dummy_circles(const VecS &shape,                                                  bool periodic=true);
+MatI dummy_circles(const VecS &shape, const VecI &row, const VecI &col, const VecI &r, bool periodic=true);
 
 // -------------------------------------------------------------------------------------------------
 

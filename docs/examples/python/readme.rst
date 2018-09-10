@@ -1,9 +1,9 @@
 
-:tocdepth: 3
-
 ************************
 Theory & Python examples
 ************************
+
+.. _theory_S2:
 
 2-point probability / auto-correlation
 ======================================
@@ -11,7 +11,7 @@ Theory & Python examples
 Theory
 ------
 
-The most basic statistic determines the typical distance over which two points (pixels, voxels, ...) are related to each other. This is best understood by considering a binary 2D-image, wherein each pixel is either black or white. This is described by the following indicator function, indicating the 'gray-scale' of a pixel at position :math:`\vec{x}_i`:
+The most basic statistic determines the typical distance over which two points (pixels, voxels, ...) are related to each other. This is best understood by considering a binary 2D image, wherein each pixel is either black or white. This is described by the following indicator function, indicating the 'greyscale' of a pixel at position :math:`\vec{x}_i`:
 
 .. math::
 
@@ -48,7 +48,7 @@ If the two points are completely uncorrelated, when the points are far apart, ea
 
 In between these extremes, :math:`S_2` decays from :math:`\varphi` towards the asymptotic value of :math:`\varphi^2`.
 
-The gray-scale generalization is the auto-correlation corresponds to a local product:
+The greyscale generalisation is the auto-correlation corresponds to a local product:
 
 .. math::
 
@@ -78,14 +78,14 @@ Textbooks
 Example
 -------
 
-This result is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The top row shows the image and the results for the binary image: from left to right: the image, the 2-point probability :math:`S_2` in two-dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis. The same image and results are shown on the bottom row for a gray scale image, for which noise is added and the background and the islands are made gray.
+This result is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The top row shows the image and the results for the binary image: from left to right: the image, the 2-point probability :math:`S_2` in two dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis. The same image and results are shown on the bottom row for a greyscale image, for which noise is added and the background and the islands are made grey.
 
 .. image:: S2.svg
   :width: 700px
 
-This example is based on the following code (the code used for the plotting is included in the download, whereby the matplotlib-style can be found on `GitHub <https://github.com/tdegeus/pyplot_ext>`_).
+This example is based on the following code (the code used for the plotting is included in the download, whereby the matplotlib-style can be installed by installing `goosempl <http://goosempl.geus.me>`_ (for example using ``pip install goosempl``).
 
-[:download:`source: S2.py <S2.py>`]
+[:download:`S2.py <S2.py>`]
 
 .. literalinclude:: S2.py
    :language: python
@@ -95,7 +95,7 @@ This example is based on the following code (the code used for the plotting is i
 Masked correlation
 ------------------
 
-This function also has the possibility to mask certain pixels. The image's mask is a binary-matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalization is corrected for the reduced number of data-points, whereby the number of data-points is no longer constant over the region-of-interest.
+This function also has the possibility to mask certain pixels. The image's mask is a binary matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalisation is corrected for the reduced amount of data points, whereby the number of data points is no longer constant over the region-of-interest.
 
 .. note::
 
@@ -109,7 +109,7 @@ This function also has the possibility to mask certain pixels. The image's mask 
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: S2_mask.py <S2_mask.py>`]
+[:download:`S2_mask.py <S2_mask.py>`]
 
 2-point cluster function
 ========================
@@ -147,7 +147,9 @@ The 2-point cluster function can be computed with the same machinery as the 2-po
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: S2_cluster.py <S2_cluster.py>`]
+[:download:`S2_cluster.py <S2_cluster.py>`]
+
+.. _theory_L:
 
 Lineal path function
 ====================
@@ -167,7 +169,7 @@ The 2-point cluster function has a first order notion of connectedness. To quant
     \mathcal{I}( \vec{x}+\Delta\vec{x}   ) = 1
   \big\}
 
-In practice the probability is constructed by starting from each pixel :math:`\vec{x}_i` for which :math:`\mathcal{I} ( \vec{x}_i )=1` 'walking' along a pixel path until the edge of the inclusion is reached at :math:`\vec{x}_i + \delta x_j`. The value of :math:`L` is incremented for all the relative positions that have been passed along the path connecting :math:`\vec{0}` and :math:`\delta \vec{x}_j`. This is then repeated for all possible directions (with each their own path).
+In practice the probability is constructed by starting from each pixel :math:`\vec{x}_i` for which :math:`\mathcal{I} ( \vec{x}_i )=1` 'walking' along a pixel path until the edge of the inclusion is reached at :math:`\vec{x}_i + \delta x_j`. The value of :math:`L` is increased for all the relative positions that have been passed along the path connecting :math:`\vec{0}` and :math:`\delta \vec{x}_j`. This is then repeated for all possible directions (with each their own path).
 
 Two limit values can again be identified. At zero distance, the volume fraction is again found:
 
@@ -181,12 +183,12 @@ Furthermore it is highly unlikely that a path can be found through the inclusion
 
   L ( \Delta \vec{x} \rightarrow \infty ) = 0
 
-An important ingredient of the computation of :math:`L` is thus the choice of the pixel paths. In GooseEYE the paths are constructed between the center of the region of interest and each of the points on the end of the region of interest. The paths can be computed using different algorithms, illustrated below:
+An important ingredient of the computation of :math:`L` is thus the choice of the pixel paths. In GooseEYE the paths are constructed between the centre of the region of interest and each of the points on the end of the region of interest. The paths can be computed using different algorithms, illustrated below:
 
 .. image:: pixel_path.svg
   :width: 700px
 
-[:download:`source: pixel_path.py <pixel_path.py>`]
+[:download:`pixel_path.py <pixel_path.py>`]
 
 Example
 -------
@@ -199,7 +201,9 @@ Example
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: L.py <L.py>`]
+[:download:`L.py <L.py>`]
+
+.. _theory_W2:
 
 Weighted correlation
 ====================
@@ -207,7 +211,7 @@ Weighted correlation
 Theory
 ------
 
-The weighted correlation characterized the average indicator :math:`\mathcal{I}` around high weight factor :math:`\mathcal{W}`.
+The weighted correlation characterised the average indicator :math:`\mathcal{I}` around high weight factor :math:`\mathcal{W}`.
 
 Mathematically the weighted correlation reads
 
@@ -250,7 +254,7 @@ Example
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: W2.py <W2.py>`]
+[:download:`W2.py <W2.py>`]
 
 Collapse to single point
 ------------------------
@@ -295,7 +299,7 @@ Example
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: W2c.py <W2c.py>`]
+[:download:`W2c.py <W2c.py>`]
 
 Obtain clusters
 ===============
@@ -311,7 +315,7 @@ Calculate clusters
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: clusters.py <clusters.py>`]
+[:download:`clusters.py <clusters.py>`]
 
 Dilate clusters (differently)
 -----------------------------
@@ -324,4 +328,4 @@ Dilate clusters (differently)
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`source: clusters_dilate.py <clusters_dilate.py>`]
+[:download:`clusters_dilate.py <clusters_dilate.py>`]

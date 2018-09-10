@@ -28,9 +28,9 @@
 
 #include "qcustomplot.h"
 
-#include "../core/image.h"
-#include "cppcolormap/cppcolormap.h"
-#include "json/json.hpp"
+#include <GooseEYE/GooseEYE.h>
+#include <cppcolormap.h>
+#include <json.hpp>
 
 using json = nlohmann::json;
 

@@ -10,7 +10,7 @@ import setuptools
 import pybind11
 import cppmat
 
-header = open('src/GooseEYE/include.h','r').read()
+header = open('include/GooseEYE/include.h','r').read()
 world  = re.split(r'(.*)(\#define GOOSEEYE_WORLD_VERSION\ )([0-9]+)(.*)',header)[3]
 major  = re.split(r'(.*)(\#define GOOSEEYE_MAJOR_VERSION\ )([0-9]+)(.*)',header)[3]
 minor  = re.split(r'(.*)(\#define GOOSEEYE_MINOR_VERSION\ )([0-9]+)(.*)',header)[3]
@@ -20,7 +20,7 @@ __version__ = '.'.join([world,major,minor])
 ext_modules = [
   Extension(
     'GooseEYE',
-    ['src/GooseEYE/python.cpp'],
+    ['include/GooseEYE/python.cpp'],
     include_dirs=[
       pybind11.get_include(False),
       pybind11.get_include(True ),

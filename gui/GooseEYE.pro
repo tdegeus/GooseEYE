@@ -8,16 +8,16 @@ TEMPLATE  = app
 
 DEFINES  += QT_DEPRECATED_WARNINGS
 
-SOURCES  += ../core/image.cpp\
-            qcustomplot.cpp\
+SOURCES  += qcustomplot.cpp\
             main.cpp\
             mainwindow.cpp
 
-HEADERS  += ../core/image.h\
-            cppcolormap/cppcolormap.h\
-            qcustomplot.h\
+HEADERS  += qcustomplot.h\
             mainwindow.h
 
 FORMS    += mainwindow.ui
 
 CONFIG   += c++14
+
+INCLUDEPATH += "include"
+INCLUDEPATH += include
