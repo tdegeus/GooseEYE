@@ -994,26 +994,22 @@ void MainWindow::tab3_imag()
   if ( file->phase.active || file->mask.active || file->row.active || file->col.active )
   {
     // read colormap
-    // - allocate
-    std::vector<int> cols,tmp;
     // - read from library
-    cols = cppcolormap::colormap(ui->comboBoxT3_cmap->currentText().toStdString(),254);
+    xt::xtensor<int,2> cols = cppcolormap::colormap(ui->comboBoxT3_cmap->currentText().toStdString(),254);
     // - optionally set white background
-    if ( data.sets[iset].dtype=="int" )
-      for ( size_t i=0; i<3; ++i )
-        cols[0*3+i] = 255;
+    if ( data.sets[iset].dtype=="int" )    
+      for ( size_t j=0; j<3; ++j )
+        cols(0,j) = 255;
     // - excluded pixes -> white
-    for ( size_t i=0; i<3; ++i )
-      cols.push_back(255);
+    cols = xt::concatenate(xt::xtuple(cols, xt::xtensor<int,2>({{255,255,255}})));
     // - read mask color from library
-    tmp = cppcolormap::colormap(ui->comboBoxT3_cmapMask->currentText().toStdString(),1);
+    xt::xtensor<int,2> tmp = cppcolormap::colormap(ui->comboBoxT3_cmapMask->currentText().toStdString(),1);
     // - copy mask color to the colormap
-    for ( size_t i=0; i<3; ++i )
-      cols.push_back(tmp[i]);
+    cols = xt::concatenate(xt::xtuple(cols, tmp));
     // - convert to Qt format
     QVector<QRgb> cmap;
     for ( size_t i=0; i<256;++ i)
-      cmap.append(qRgb(cols[i*3+0],cols[i*3+1],cols[i*3+2]));
+      cmap.append(qRgb(cols(i,0),cols(i,1),cols(i,2)));
 
     // convert mat::matrix -> QImage
     QImage imQt(
@@ -1119,18 +1115,18 @@ void MainWindow::tab4_plot()
   ui->doubleSpinBox_mean->setValue(data.mean/data.meannorm);
 
   // extract data for further processing below: normalized result, shape of output, colormap
-  mat::matrix<double> D    = data.res/data.resnorm;
-  int                 nx   = static_cast<int>(data.roi[0]);
-  int                 ny   = static_cast<int>(data.roi[1]);
-  size_t              ncol = 256;
+  cppmat::array<double> D    = data.res/data.resnorm;
+  int                   nx   = static_cast<int>(data.roi[0]);
+  int                   ny   = static_cast<int>(data.roi[1]);
+  size_t                ncol = 256;
 
   // loop over plots
   for ( size_t iplt=0; iplt<data.plot.size(); ++iplt )
   {
     // read colormap
-    std::string         name = resCombo[iplt]->currentText().toStdString();
-    std::vector<int>    cmap = cppcolormap::colormap(name,ncol);
-    std::vector<float>  x    = cppcolormap::linspace(0.0,1.0,ncol);
+    std::string           name = resCombo[iplt]->currentText().toStdString();
+    xt::xtensor<int,2>    cmap = cppcolormap::colormap(name,ncol);
+    xt::xtensor<double,1> x    = xt::linspace<double>(0.0,1.0,ncol);
 
     // configure axis
     resPlot[iplt]->axisRect()->setupFullAxesBox(true);
@@ -1199,8 +1195,8 @@ void MainWindow::tab4_save()
 void MainWindow::compute()
 {
   // initialize result / average
-  data.res    .resize(data.roi); data.res    .zeros(); data.mean     *= 0.0;
-  data.resnorm.resize(data.roi); data.resnorm.zeros(); data.meannorm *= 0.0;
+  data.res    .resize(data.roi); data.res    .setZero(); data.mean     *= 0.0;
+  data.resnorm.resize(data.roi); data.resnorm.setZero(); data.meannorm *= 0.0;
 
   // save JSON file
   data.write();
@@ -1274,10 +1270,10 @@ void MainWindow::computeS2(size_t iimg)
   bool    per  = data.periodic;
 
   // allocate temporary variables
-  double              ns = 0.0;
-  mat::matrix<double> r;
-  mat::matrix<double> n   (data.roi); n   .zeros();
-  mat::matrix<double> ones(data.roi); ones.ones ();
+  double                ns = 0.0;
+  cppmat::array<double> r;
+  cppmat::array<double> n   (data.roi); n   .setZero();
+  cppmat::array<double> ones(data.roi); ones.setOnes();
 
   // compute the statistic
   if      ( flt && msk ) std::tie(r,n ) = Image::S2(f.imgFlt,g.imgFlt,data.roi,f.msk,g.msk,pad,per);

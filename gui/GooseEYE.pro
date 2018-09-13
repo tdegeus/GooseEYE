@@ -19,5 +19,5 @@ FORMS    += mainwindow.ui
 
 CONFIG   += c++14
 
-INCLUDEPATH += "include"
-INCLUDEPATH += include
+INCLUDEPATH += "../include"
+INCLUDEPATH += "/usr/local/include"

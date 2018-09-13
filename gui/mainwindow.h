@@ -28,9 +28,10 @@
 
 #include "qcustomplot.h"
 
+#include <cppmat/cppmat.h>
 #include <GooseEYE/GooseEYE.h>
 #include <cppcolormap.h>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -44,19 +45,19 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 // Fields:
-mat::matrix<int>           data        ; // raw image as 8-bit matrix ('gray'-values 0..255)
-QImage                     dataQt      ; // raw image as Qt-object
-mat::matrix<int>           imgBin      ; // interpreted image (0    |  1  )
-mat::matrix<double>        imgFlt      ; // interpreted image (0.0 ... 1.0), exists always
-mat::matrix<int>           clsInt      ; // clusters (0...), corresponding to "imgBin"
-mat::matrix<int>           cenInt      ; // center of the clusters in "clsInt"
-mat::matrix<int>           msk         ; // mask (binary: 0 | 1)
-mat::matrix<unsigned char> view        ; // image to view using Qt
-size_t                     nrow = 0    ; // number of rows
-size_t                     ncol = 0    ; // number of columns
-double                     N    = 0.0  ; // number of data-points (points that are not masked)
-double                     mean = 0.0  ; // spatial average of "imgFlt" (bin images eqv to "imgBin")
-double                     scale       ; // scale factor to be used in rendering (see "setScale")
+cppmat::array<int>           data        ; // raw image as 8-bit matrix ('gray'-values 0..255)
+QImage                       dataQt      ; // raw image as Qt-object
+cppmat::array<int>           imgBin      ; // interpreted image (0    |  1  )
+cppmat::array<double>        imgFlt      ; // interpreted image (0.0 ... 1.0), exists always
+cppmat::array<int>           clsInt      ; // clusters (0...), corresponding to "imgBin"
+cppmat::array<int>           cenInt      ; // center of the clusters in "clsInt"
+cppmat::array<int>           msk         ; // mask (binary: 0 | 1)
+cppmat::array<unsigned char> view        ; // image to view using Qt
+size_t                       nrow = 0    ; // number of rows
+size_t                       ncol = 0    ; // number of columns
+double                       N    = 0.0  ; // number of data-points (points that are not masked)
+double                       mean = 0.0  ; // spatial average of "imgFlt" (bin images eqv to "imgBin")
+double                       scale       ; // scale factor to be used in rendering (see "setScale")
 // Methods:
 // - setScale: compute "scale" from a widget's with/height and a zoom-factor
 
@@ -238,12 +239,12 @@ QString pixel_path  = "Bresenham";  // pixel-path algorithm to use (for "L" and 
 std::vector<Plot>    plot;          // plot settings
 std::vector<size_t>  roi  = {1,1};  // shape of the output ROI
 std::vector<Set>     sets;          // sets of files (the order of files has to correspond)
-mat::matrix<double>  res;           // result, unnormalized                 (shape == "roi")
-mat::matrix<double>  resnorm;       // normalization to be applied to "res" (shape == "roi")
+cppmat::array<double>  res;           // result, unnormalized                 (shape == "roi")
+cppmat::array<double>  resnorm;       // normalization to be applied to "res" (shape == "roi")
 double               mean;          // spatial average, unnormalized
 double               meannorm;      // normalization to be applied to "mean"
 // Methods:
-// - imageRead: read one image file, convert to mat::matrix, apply defaults (if requested)
+// - imageRead: read one image file, convert to cppmat::array, apply defaults (if requested)
 // - image: (read one image using "imageRead"), interpret to image by applied thresholds
 // - newPath: change the path (changes or the files to a new relative path)
 // - write: write all settings of this class to a JSON file
@@ -266,7 +267,7 @@ QtImage imageRead(size_t iset, size_t iimg)
   out.ncol = out.dataQt.width ();
   // allocate data
   out.data.resize({out.nrow,out.ncol});
-  // convert QImage -> mat::matrix
+  // convert QImage -> cppmat::array
   for ( size_t i=0; i<out.nrow; ++i )
     for ( size_t j=0; j<out.ncol; ++j )
       out.data(i,j) = qGray(out.dataQt.pixel(j,i));
@@ -332,11 +333,11 @@ QtImage image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
   }
 
   // allocate output
-  out.imgBin.resize({jrow-irow,jcol-icol}); out.imgBin.zeros();
-  out.imgFlt.resize({jrow-irow,jcol-icol}); out.imgFlt.zeros();
-  out.clsInt.resize({jrow-irow,jcol-icol}); out.clsInt.zeros();
-  out.cenInt.resize({jrow-irow,jcol-icol}); out.cenInt.zeros();
-  out.msk   .resize({jrow-irow,jcol-icol}); out.msk   .zeros();
+  out.imgBin.resize({jrow-irow,jcol-icol}); out.imgBin.setZero();
+  out.imgFlt.resize({jrow-irow,jcol-icol}); out.imgFlt.setZero();
+  out.clsInt.resize({jrow-irow,jcol-icol}); out.clsInt.setZero();
+  out.cenInt.resize({jrow-irow,jcol-icol}); out.cenInt.setZero();
+  out.msk   .resize({jrow-irow,jcol-icol}); out.msk   .setZero();
   out.view  .resize({jrow-irow,jcol-icol});
 
   // phase threshold
@@ -377,19 +378,20 @@ QtImage image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
     }
   }
 
-  // compute average
-  std::tie(out.mean,out.N) = Image::mean(out.imgFlt,out.msk);
+//TODO
+//  // compute average
+//  std::tie(out.mean,out.N) = Image::mean(out.imgFlt,out.msk);
 
-  // int: determine clusters from binary image
-  if ( sets[iset].dtype=="int" )
-  {
-    // - apply mask
-    for ( size_t i=0; i<out.imgBin.size(); ++i )
-      if ( out.msk[i] )
-        out.imgBin[i] = 0;
-    // - compute clusters and centers
-    std::tie(out.clsInt,out.cenInt) = Image::clusters(out.imgBin,periodic);
-  }
+//  // int: determine clusters from binary image
+//  if ( sets[iset].dtype=="int" )
+//  {
+//    // - apply mask
+//    for ( size_t i=0; i<out.imgBin.size(); ++i )
+//      if ( out.msk[i] )
+//        out.imgBin[i] = 0;
+//    // - compute clusters and centers
+//    std::tie(out.clsInt,out.cenInt) = Image::clusters(out.imgBin,periodic);
+//  }
 
   // keep cropped image -> quit here
   // otherwise          -> extend the image
@@ -397,18 +399,18 @@ QtImage image(size_t iset, size_t iimg, QtImage &out, int crop=-2)
   if ( crop<-1 )
     return out;
   // - copy to temporary variables
-  mat::matrix<double> imgFlt = out.imgFlt;
-  mat::matrix<int>    imgBin = out.imgBin;
-  mat::matrix<int>    clsInt = out.clsInt;
-  mat::matrix<int>    cenInt = out.cenInt;
-  mat::matrix<int>    msk    = out.msk   ;
+  cppmat::array<double> imgFlt = out.imgFlt;
+  cppmat::array<int>    imgBin = out.imgBin;
+  cppmat::array<int>    clsInt = out.clsInt;
+  cppmat::array<int>    cenInt = out.cenInt;
+  cppmat::array<int>    msk    = out.msk   ;
   // - allocate output: assign the value of "crop" to the entire image (the interior is overwritten)
   out.view  .resize(out.data.shape());
-  out.imgFlt.resize(out.data.shape()); out.imgFlt.ones (); out.imgFlt *= static_cast<double>(crop);
-  out.imgBin.resize(out.data.shape()); out.imgBin.ones (); out.imgBin *= crop;
-  out.clsInt.resize(out.data.shape()); out.clsInt.ones (); out.clsInt *= crop;
-  out.cenInt.resize(out.data.shape()); out.cenInt.ones (); out.cenInt *= crop;
-  out.msk   .resize(out.data.shape()); out.msk   .zeros();
+  out.imgFlt.resize(out.data.shape()); out.imgFlt.setOnes(); out.imgFlt *= static_cast<double>(crop);
+  out.imgBin.resize(out.data.shape()); out.imgBin.setOnes(); out.imgBin *= crop;
+  out.clsInt.resize(out.data.shape()); out.clsInt.setOnes(); out.clsInt *= crop;
+  out.cenInt.resize(out.data.shape()); out.cenInt.setOnes(); out.cenInt *= crop;
+  out.msk   .resize(out.data.shape()); out.msk   .setZero();
   // - copy interior
   for ( size_t i=0; i<imgBin.shape()[0]; ++i ) {
     for ( size_t j=0; j<imgBin.shape()[1]; ++j ) {
@@ -478,7 +480,7 @@ void write()
     if ( roi[0]==res.shape()[0] && roi[1]==res.shape()[1] ) {
       // - allocate flattened array
       std::vector<double> tmp;
-      // - fill from "mat::matrix"
+      // - fill from "cppmat::array"
       for ( size_t i=0; i<res.size(); ++i )
         tmp.push_back(res[i]);
       // - store
@@ -491,7 +493,7 @@ void write()
     if ( roi[0]==resnorm.shape()[0] && roi[1]==resnorm.shape()[1] ) {
       // - allocate flattened array
       std::vector<double> tmp;
-      // - fill from "mat::matrix"
+      // - fill from "cppmat::array"
       for ( size_t i=0; i<resnorm.size(); ++i )
         tmp.push_back(resnorm[i]);
       // - store
@@ -591,7 +593,7 @@ void read(QString iname)
   {
     // - create pointers to loop over both fields
     std::vector<std::string>          keys = {"res","resnorm"};
-    std::vector<mat::matrix<double>*> vals = {&res ,&resnorm };
+    std::vector<cppmat::array<double>*> vals = {&res ,&resnorm };
     // - loop over fields
     for ( size_t k=0; k<keys.size(); ++k ) {
       if ( inp[keys[k]].size()==roi[0]*roi[1] ) {
