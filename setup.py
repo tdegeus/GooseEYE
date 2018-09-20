@@ -42,7 +42,7 @@ setup(
   author_email     = 'tom@geus.me',
   url              = 'https://github.com/tdegeus/GooseEYE',
   ext_modules      = ext_modules,
-  install_requires = ['pybind11>=2.2.0','cppmat>=1.0.6'],
+  install_requires = ['pybind11>=2.2.0','cppmat>=1.0.8'],
   cmdclass         = {'build_ext': cppmat.BuildExt},
   zip_safe         = False,
 )
