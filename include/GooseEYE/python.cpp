@@ -64,6 +64,8 @@ py::class_<M::Ensemble>(m, "Ensemble")
   .def("W2"      , py::overload_cast<ArrD, ArrI, ArrI>(&M::Ensemble::W2), py::arg("w"), py::arg("f"), py::arg("fmask"))
   .def("W2"      , py::overload_cast<ArrI, ArrD      >(&M::Ensemble::W2), py::arg("w"), py::arg("f"))
   .def("W2"      , py::overload_cast<ArrI, ArrD, ArrI>(&M::Ensemble::W2), py::arg("w"), py::arg("f"), py::arg("fmask"))
+  .def("W2"      , py::overload_cast<ArrD, ArrD      >(&M::Ensemble::W2), py::arg("w"), py::arg("f"))
+  .def("W2"      , py::overload_cast<ArrD, ArrD, ArrI>(&M::Ensemble::W2), py::arg("w"), py::arg("f"), py::arg("fmask"))
   // -
   .def("W2c"     , py::overload_cast<ArrI, ArrI, ArrI,       std::string>(&M::Ensemble::W2c), py::arg("clus"), py::arg("cntr"), py::arg("f"),                   py::arg("mode")="Bresenham")
   .def("W2c"     , py::overload_cast<ArrI, ArrI, ArrI, ArrI, std::string>(&M::Ensemble::W2c), py::arg("clus"), py::arg("cntr"), py::arg("f"), py::arg("fmask"), py::arg("mode")="Bresenham")
