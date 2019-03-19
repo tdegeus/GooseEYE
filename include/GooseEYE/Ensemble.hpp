@@ -7,11 +7,7 @@
 #ifndef GOOSEEYE_ENSEMBLE_HPP
 #define GOOSEEYE_ENSEMBLE_HPP
 
-// =================================================================================================
-
 #include "GooseEYE.h"
-
-// =================================================================================================
 
 namespace GooseEYE {
 
@@ -19,80 +15,97 @@ namespace GooseEYE {
 // constructor
 // =================================================================================================
 
-inline
-Ensemble::Ensemble(const VecS &roi, bool periodic, bool zero_pad) : mPeriodic(periodic)
+inline Ensemble::Ensemble(const std::vector<size_t>& roi, bool periodic) :
+m_periodic(periodic), m_shape(roi)
 {
-  // check
-  if ( roi.size() > MAX_DIM )
-    throw std::runtime_error("Rank 'roi' too large");
+  GOOSEEYE_ASSERT(m_shape.size() <= MAX_DIM);
 
-  // check
-  for ( auto &i : roi )
-    if ( i%2 == 0 )
-      throw std::runtime_error("'roi' must be odd shaped");
+  m_pad = detail::pad_width(m_shape);
+  m_Shape = detail::as_dim(MAX_DIM, m_shape, 1);
+  m_Pad = detail::as_dim(MAX_DIM, m_pad, 0);
 
-  // shape of the region-of-interest
-  // - initialize
-  for ( size_t i = 0 ; i < MAX_DIM    ; ++i ) mShape[i] = 1;
-  // - copy from input
-  for ( size_t i = 0 ; i < roi.size() ; ++i ) mShape[i] = roi[i];
-
-  // midpoint of ROI
-  for ( size_t i = 0 ; i < MAX_DIM ; ++i ) mMid[i] = (mShape[i]-1)/2;
-
-  // pad with half the ROI size
-  if ( zero_pad )
-  {
-    // - allocate
-    mPad.resize(roi.size());
-    // - fill
-    for ( size_t i = 0 ; i < mPad.size() ; ++i ) mPad[i] = mMid[i];
-  }
-
-  // set skip size
-  for ( size_t i = 0 ; i < MAX_DIM ; ++i )
-  {
-    if ( periodic or zero_pad ) mSkip[i] = 0;
-    else                        mSkip[i] = mMid[i];
-  }
-
-  // allocate average
-  mData = ArrD::Zero(roi);
-  mNorm = ArrD::Zero(roi);
+  m_data = xt::zeros<double>(m_Shape);
+  m_norm = xt::zeros<double>(m_Shape);
 }
 
 // =================================================================================================
 // return normalised result, or raw data
 // =================================================================================================
 
-inline
-ArrD Ensemble::result() const
+inline xt::xarray<double> Ensemble::result() const
 {
-  ArrD norm = cppmat::max( mNorm, ArrD::Ones(mNorm.shape()) );
-
-  return mData / norm;
+  xt::xarray<double> I = xt::ones<double>(m_norm.shape());
+  xt::xarray<double> norm = xt::where(m_norm <= 0., I, m_norm);
+  xt::xarray<double> out = m_data / norm;
+  out.reshape(m_shape);
+  return out;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-inline
-ArrD Ensemble::data() const
+inline xt::xarray<double> Ensemble::data() const
 {
-  return mData;
+  xt::xarray<double> out = m_data;
+  out.reshape(m_shape);
+  return out;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-inline
-ArrD Ensemble::norm() const
+inline xt::xarray<double> Ensemble::norm() const
 {
-  return mNorm;
+  xt::xarray<double> out = m_norm;
+  out.reshape(m_shape);
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<double> Ensemble::distance(size_t dim) const
+{
+  GOOSEEYE_ASSERT(dim < m_shape.size());
+
+  dim += MAX_DIM - m_shape.size();
+
+  xt::xarray<double> out = xt::empty<double>(m_Shape);
+
+  double start = -1 * static_cast<double>(m_Pad[dim][0]);
+  double stop  =      static_cast<double>(m_Pad[dim][1]);
+
+  xt::xarray<double> D = xt::linspace<double>(start, stop, m_Shape[dim]);
+
+  for (size_t h = 0; h < m_Shape[0]; ++h) {
+    for (size_t i = 0; i < m_Shape[1]; ++i) {
+      for (size_t j = 0; j < m_Shape[2]; ++j) {
+        if (dim == 0)
+          out(h,i,j) = D(h);
+        else if (dim == 1)
+          out(h,i,j) = D(i);
+        else if (dim == 2)
+          out(h,i,j) = D(j);
+      }
+    }
+  }
+
+  out.reshape(m_shape);
+
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<double> Ensemble::distance() const
+{
+  xt::xarray<double> out = xt::zeros<double>(m_shape);
+
+  for (size_t i = 0; i < m_shape.size(); ++i)
+    out += xt::pow(distance(i), 2.);
+
+  return xt::pow(out, .5);
 }
 
 // =================================================================================================
 
 } // namespace ...
-
-// =================================================================================================
 
 #endif

@@ -7,60 +7,40 @@
 #ifndef GOOSEEYE_KERNEL_HPP
 #define GOOSEEYE_KERNEL_HPP
 
-// =================================================================================================
-
 #include "GooseEYE.h"
 
-// =================================================================================================
-
 namespace GooseEYE {
+namespace kernel {
 
-// =================================================================================================
-// define kernel
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
-ArrI kernel(size_t ndim, std::string mode)
+xt::xarray<int> nearest(size_t ndim)
 {
-  std::transform(mode.begin(), mode.end(), mode.begin(), ::tolower);
+  GOOSEEYE_ASSERT(ndim > 0 && ndim <= 3);
 
-  if ( mode=="default" )
-  {
-    VecS shape(ndim, 3);
+  std::vector<size_t> shape(ndim, 3);
 
-    ArrI kern = ArrI::Zero(shape);
+  xt::xarray<int> kern = xt::zeros<int>(shape);
 
-    if ( ndim == 1 )
-    {
-      kern(0) = 1; kern(1) = 1; kern(2) = 1;
-
-      return kern;
-    }
-
-    if ( ndim == 2 )
-    {
-      kern(1,0) = 1; kern(1,1) = 1; kern(1,2) = 1;
-      kern(0,1) = 1; kern(2,1) = 1;
-
-      return kern;
-    }
-
-    if ( ndim == 3 )
-    {
-      kern(1,1,0) = 1; kern(1,1,1) = 1; kern(1,1,2) = 1;
-      kern(1,0,1) = 1; kern(1,2,1) = 1;
-      kern(0,1,1) = 1; kern(2,1,1) = 1;
-
-      return kern;
-    }
+  if (ndim == 1) {
+    xt::view(kern, xt::all()) = 1;
+    return kern;
   }
 
-  throw std::runtime_error("Unknown ndim/mode");
+  if (ndim == 2) {
+    xt::view(kern, xt::keep(1), xt::all()) = 1;
+    xt::view(kern, xt::all(), xt::keep(1)) = 1;
+    return kern;
+  }
+
+  xt::view(kern, xt::keep(1), xt::all(), xt::all()) = 1;
+  xt::view(kern, xt::all(), xt::keep(1), xt::all()) = 1;
+  xt::view(kern, xt::all(), xt::all(), xt::keep(1)) = 1;
+  return kern;
 }
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
-} // namespace ...
-
-// =================================================================================================
+}} // namespace ...
 
 #endif

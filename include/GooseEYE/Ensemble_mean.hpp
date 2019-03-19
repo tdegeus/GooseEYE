@@ -7,61 +7,42 @@
 #ifndef GOOSEEYE_ENSEMBLE_MEAN_HPP
 #define GOOSEEYE_ENSEMBLE_MEAN_HPP
 
-// =================================================================================================
-
 #include "GooseEYE.h"
-
-// =================================================================================================
 
 namespace GooseEYE {
 
-// =================================================================================================
-// mean
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
-void Ensemble::mean(const ArrD &f)
+template <class T>
+void Ensemble::mean(const xt::xarray<T>& f)
 {
-  // lock measure
-  if ( mStat == Stat::Unset) mStat = Stat::mean;
+  GOOSEEYE_ASSERT(m_Shape == std::vector<size_t>(MAX_DIM,1));
+  GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
 
-  // checks
-  std::string name = "GooseEYE::Ensemble::mean - ";
-  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
+  m_stat = Type::mean;
 
-  // loop over image
-  for ( size_t i = 0 ; i < f.size() ; ++i ) {
-    mData[i] += f[i];
-    mNorm[i] += 1.;
-  }
+  m_data(0) += static_cast<double>(xt::sum(f)[0]);
+  m_norm(0) += static_cast<double>(f.size());
 }
 
-// =================================================================================================
-// mean
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
-void Ensemble::mean(const ArrD &f, const ArrI &fmask)
+template <class T>
+void Ensemble::mean(const xt::xarray<T>& f, const xt::xarray<int>& fmask)
 {
-  // lock measure
-  if ( mStat == Stat::Unset) mStat = Stat::mean;
+  GOOSEEYE_ASSERT(f.shape() == fmask.shape());
+  GOOSEEYE_ASSERT(xt::all(xt::equal(fmask,0) || xt::equal(fmask,1)));
+  GOOSEEYE_ASSERT(m_Shape == std::vector<size_t>(MAX_DIM,1));
+  GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
 
-  // checks
-  std::string name = "GooseEYE::Ensemble::mean - ";
-  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
-  if ( f.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
+  m_stat = Type::mean;
 
-  // loop over image
-  for ( size_t i = 0 ; i < f.size() ; ++i ) {
-    if ( ! fmask[i] ) {
-      mData[i] += f[i];
-      mNorm[i] += 1.;
-    }
-  }
+  m_data(0) += static_cast<double>(xt::sum(xt::where(xt::equal(fmask, 0), f, 0.))[0]);
+  m_norm(0) += static_cast<double>(xt::sum(1 - fmask)[0]);
 }
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
 } // namespace ...
-
-// =================================================================================================
 
 #endif

@@ -31,21 +31,20 @@ W         = eye.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.asty
 W[I==1]   = 0
 
 # weighted correlation
-WI        = eye.W2((101,101),W,I,fmask=W)
+WI = eye.W2((101,101), W, I, fmask=W)
 
 # gray-scale image + correlation
 # ------------------------------
 
 # convert to gray-scale image and introduce noise
-Igr       = np.array(I,copy=True).astype(np.float)
-Igr      += 0.1*(2.0*np.random.random(Igr.size)-1.0).reshape(Igr.shape)+0.1
-Igr      /= 1.2
+Igr  = np.array(I, copy=True).astype(np.float)
+Igr += 0.1*(2.0*np.random.random(Igr.size)-1.0).reshape(Igr.shape)+0.1
+Igr /= 1.2
 # mean intensity (for bounds)
-Iav       = np.mean(Igr)
+Iav = np.mean(Igr)
 
 # weighted correlation
-WIgr      = eye.W2((101,101),W,Igr,fmask=W)
-
+WIgr = eye.W2((101,101), W, Igr, fmask=W)
 
 # </snippet>
 
