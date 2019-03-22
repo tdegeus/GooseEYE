@@ -7,509 +7,193 @@
 #ifndef GOOSEEYE_CLUSTERS_HPP
 #define GOOSEEYE_CLUSTERS_HPP
 
-// =================================================================================================
-
 #include "GooseEYE.h"
-
-// =================================================================================================
 
 namespace GooseEYE {
 
-// =================================================================================================
-// core functions: called by wrappers below
-// =================================================================================================
-
-namespace Private {
-
 // -------------------------------------------------------------------------------------------------
 
-void _link ( std::vector<int> &linked, int a, int b )
+inline Clusters::Clusters(
+  const xt::xarray<int>& f,
+  const xt::xarray<int>& kernel,
+  bool periodic) :
+  m_kernel(kernel),
+  m_periodic(periodic),
+  m_l(f)
 {
+  GOOSEEYE_ASSERT(xt::all(xt::equal(f,0) || xt::equal(f,1)));
+  GOOSEEYE_ASSERT(xt::all(xt::equal(kernel,0) || xt::equal(kernel,1)));
+  GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
 
-  if ( a==b )
-    return;
+  // extract from input
 
-  int i,c;
+  m_shape = std::vector<size_t>(f.shape().cbegin(), f.shape().cend());
+  m_shape_kernel = std::vector<size_t>(m_kernel.shape().cbegin(), m_kernel.shape().cend());
+  m_pad = detail::pad_width(m_kernel);
+  m_Shape = detail::as_dim(MAX_DIM, m_shape, 1);
+  m_Shape_kernel = detail::as_dim(MAX_DIM, m_shape_kernel, 1);
+  m_Pad = detail::as_dim(MAX_DIM, m_pad, 0);
 
-  if ( a>b ) {
-    c = a;
-    a = b;
-    b = c;
-  }
+  // make input pseudo 3-d and pad it (to make things a lot simpler)
+  // ---------------------------------------------------------------
 
-  // both unlinked
-  // -------------
+  // make pseudo 3-d
+  m_l.reshape(m_Shape);
+  m_kernel.reshape(m_Shape_kernel);
 
-  if ( linked[a]==a && linked[b]==b ) {
-    linked[a] = b;
-    linked[b] = a;
-    return;
-  }
+  // padding default not periodic: mask padded items
+  xt::pad_mode pad_mode = xt::pad_mode::constant;
+  int pad_value = 0;
 
-  // a linked / b unlinked
-  // ---------------------
+  // padding optionally periodic
+  if (periodic)
+    pad_mode = xt::pad_mode::periodic;
 
-  if ( linked[a]!=a && linked[b]==b ) {
-    linked[b] = linked[a];
-    linked[a] = b;
-    return;
-  }
+  // apply padding
+  // note that "m_l" are also the initialised labels whereby:
+  // "0" = background, "1" = unlabelled
+  m_l = xt::pad(m_l, m_Pad, pad_mode, pad_value);
 
-  // a unlinked / b linked
-  // ---------------------
+  // basic clustering
+  // ----------------
 
-  if ( linked[a]==a && linked[b]!=b ) {
-    linked[a] = linked[b];
-    linked[b] = a;
-    return;
-  }
+  // first new label (start at "2" to distinguish: "0" = background, "1" = unlabelled)
+  int ilab = 2;
 
-  // both linked -> to each other
-  // ----------------------------
+  // list to renumber: used to link clusters to each other
+  xt::xtensor<int,1> renum = xt::arange<int>(m_l.size());
 
-  i = a;
-  while ( 1 ) {
-    if ( linked[i]==b ) { return; }
-    i = linked[i];
-    if ( i==a ) { break; }
-  }
-
-  // both linked -> to different groups
-  // ----------------------------------
-
-  c = linked[a];
-  linked[a] = b;
-
-  i = a;
-  while ( 1 ) {
-    i = linked[i];
-    if ( linked[i]==b ) { break; }
-  }
-  linked[i] = c;
-
-  return;
-
-}
-
-// -------------------------------------------------------------------------------------------------
-
-std::tuple<ArrI,ArrI> clusters(ArrI f, ArrI kern, int min_size, bool periodic)
-{
-  int h,i,j,di,dj,dh,H,I,J,lH,lI,lJ,uH,uI,uJ,dI,dJ,dH,ii,jj,ilab,nlab;
-
-  // cluster links (e.g. 4 coupled to 2: lnk[4]=2)
-  std::vector<int> lnk(f.size());
-
-  // saved clusters: 1=saved, 0=not-saved
-  std::vector<int> inc(f.size());
-
-  // zero-initialize result
-  ArrI l = ArrI::Zero(f.shape());
-  ArrI c = ArrI::Zero(f.shape());
-
-  // apply periodicity
-  f   .setPeriodic(periodic);
-  l   .setPeriodic(periodic);
-  c   .setPeriodic(periodic);
-  kern.setPeriodic(periodic);
-
-  // change rank to 3 (to simplify implementation)
-  f   .chrank(3);
-  kern.chrank(3);
-
-  // get half shape of the kernel
-  VecS mid = kern.shape();
-
-  // check
-  for ( auto &i : mid )
-    if ( i%2 == 0 )
-      throw std::runtime_error("'kernel' must be odd shaped");
-
-  // midpoint
-  for ( auto &i : mid ) i = (i-1)/2;
-
-  // get shape
-  H  = f.shape(0);
-  I  = f.shape(1);
-  J  = f.shape(2);
-  dH = mid[0];
-  dI = mid[1];
-  dJ = mid[2];
-
-  // ---------------
-  // basic labelling
-  // ---------------
-
-  // current label
-  ilab = 0;
-
-  // initialize cluster-links (only coupled to self)
-  for ( i=0 ; i<(int)f.size() ; i++ )
-    lnk[i] = i;
-  // initialize: no saved clusters, except background (inc[0]=1)
-  inc[0] = 1;
-  for ( size_t i=1 ; i<f.size() ; i++ )
-    inc[i] = 0;
-
-  // periodic: lower/upper bound of the kernel always == (shape[i]-1)/2
-  if ( periodic ) {
-    lH = -dH; uH = +dH;
-    lI = -dI; uI = +dI;
-    lJ = -dJ; uJ = +dJ;
-  }
-
-  // loop through voxels (in all directions)
-  for ( h=0 ; h<H ; h++ ) {
-    for ( i=0 ; i<I ; i++ ) {
-      for ( j=0 ; j<J ; j++ ) {
-
-        // only continue for non-zero voxels
-        if ( f(h,i,j) ) {
-
-          // set lower/upper bound of the kernel near edges
-          // -> avoids reading out-of-bounds
-          if ( !periodic ) {
-            if ( h <    dH ) lH=0; else lH=-dH;
-            if ( i <    dI ) lI=0; else lI=-dI;
-            if ( j <    dJ ) lJ=0; else lJ=-dJ;
-            if ( h >= H-dH ) uH=0; else uH=+dH;
-            if ( i >= I-dI ) uJ=0; else uJ=+dI;
-            if ( j >= J-dJ ) uI=0; else uI=+dJ;
-          }
-
-          // cluster not yet labelled: try to couple to labelled neighbours
-          if ( l(h,i,j)==0 ) {
-            for ( dh=lH ; dh<=uH ; dh++ ) {
-              for ( di=lI ; di<=uJ ; di++ ) {
-                for ( dj=lJ ; dj<=uI ; dj++ ) {
-                  if ( kern(dh+dH,di+dI,dj+dJ) ) {
-                    if ( l(h+dh,i+di,j+dj) ) {
-                      l(h,i,j) = l(h+dh,i+di,j+dj);
-                      goto end;
-                    }
-          }}}}}
-          end: ;
-
-          // cluster not yet labelled: create new label
-          if ( l(h,i,j)==0 ) {
-            ilab++;
-            l(h,i,j)  = ilab;
-            inc[ilab] = 1;
-          }
-
-          // try to couple neighbours to current label
-          // - not yet labelled -> label neighbour
-          // - labelled         -> link labels
-          for ( dh=lH ; dh<=uH ; dh++ ) {
-            for ( di=lI ; di<=uJ ; di++ ) {
-              for ( dj=lJ ; dj<=uI ; dj++ ) {
-                if ( kern(dh+dH,di+dI,dj+dJ) ) {
-                  if ( f(h+dh,i+di,j+dj) ) {
-                    if ( l(h+dh,i+di,j+dj)==0 )
-                     l(h+dh,i+di,j+dj) = l(h,i,j);
-                    else
-                     _link(lnk,l(h,i,j),l(h+dh,i+di,j+dj));
-          }}}}}
-
+  // loop over the image
+  for (size_t h = m_Pad[0][0]; h < m_l.shape(0)-m_Pad[0][1]; ++h) {
+    for (size_t i = m_Pad[1][0]; i < m_l.shape(1)-m_Pad[1][1]; ++i) {
+      for (size_t j = m_Pad[2][0]; j < m_l.shape(2)-m_Pad[2][1]; ++j) {
+        // - skip background voxels
+        if (!m_l(h,i,j))
+          continue;
+        // - get current labels in the ROI
+        auto Li = xt::view(m_l,
+          xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
+          xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
+          xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
+        // - apply kernel to the labels in the ROI
+        auto Ni = Li * m_kernel;
+        // - extract label to apply
+        int l = xt::amax(Ni)[0];
+        // - draw a new label, only if needed (if there were not other entries that "0"/"1")
+        if (l == 1) {
+          l = ilab;
+          ++ilab;
         }
-
+        // - apply label to all unlabelled voxels that are unlabelled within the m_kernel
+        Li = xt::where(xt::equal(Ni, 1), l, Li);
+        // - check if clusters have to be merged, if not: continue to the next voxel
+        if (xt::all(xt::equal(Li, l) || xt::equal(Li, 0) || xt::equal(Li, 1)))
+          continue;
+        // - get the labels to be merged (discard "0"/"1" by settings them to "l" is this copy)
+        xt::xarray<int> merge = xt::where(xt::less_equal(Li, 1), l, Li);
+        merge = xt::unique(merge);
+        // - merge labels (apply merge to other labels in cluster)
+        int linkto = xt::amin(xt::view(renum, xt::keep(merge)))[0];
+        for (auto& a: merge)
+          renum = xt::where(xt::equal(renum, renum(a)), linkto, renum);
       }
     }
   }
 
-  // ---------------------------------------
-  // renumber labels: all links to one label
-  // ---------------------------------------
-
-  nlab = 0;
-
-  // loop through assigned labels -> loop through all coupled links
-  // lnk[i] will contain the new label number
-  for ( i=0 ; i<=ilab ; i++ ) {
-    if ( inc[i] ) {
-      ii = i;
-      while ( 1 ) {
-        jj      = lnk[ii];
-        lnk[ii] = nlab;
-        inc[ii] = 0;
-        if ( jj==i ) { break; }
-        ii      = jj;
-      }
-      nlab++;
-    }
-  }
-  // apply renumbering
-  for ( size_t i=0 ; i<f.size() ; i++ )
-    l[i] = lnk[l[i]];
-
-  // --------------------------
-  // threshold for cluster size
-  // --------------------------
-
-  if ( min_size>0 ) {
-
-    // find the size of all clusters
-    for ( i=0 ; i<nlab ; i++ ) {
-      lnk[i] = 0;    // now: size of the cluster with the label
-      inc[i] = 0;    // now: included label (true/false)
-    }
-    for ( size_t i=0 ; i<l.size() ; i++ ) {
-      lnk[l[i]]++;
-      inc[l[i]] = 1;
-    }
-    // remove clusters with too small size
-    for ( i=0 ; i<nlab ; i++ )
-      if ( lnk[i]<min_size )
-        inc[i] = 0;
-
-    // remove clusters with too small size
-    for ( size_t i=0 ; i<l.size() ; i++ )
-      if ( !inc[l[i]] )
-        l[i] = 0;
-
-    // new numbering for the included labels
-    // inc[i] will contain the new cluster numbers,
-    // j-1 will be the number of clusters
-    j = 0;
-    for ( i=0 ; i<nlab ; i++ ) {
-      if ( inc[i] ) {
-        inc[i] = j;
-        j++;
-      }
-    }
-    nlab = j;
-
-    // renumber the labels
-    for ( size_t i=0 ; i<l.size() ; i++ )
-      l[i] = inc[l[i]];
-
-  }
-
-  // cluster centres: not periodic
-  // -----------------------------
-
-  if ( !periodic )
-  {
-    // number of labels
-    nlab = l.max()+1;
-
-    // allocate matrix to contain the average position and total size:
-    // [ [ h,i,j , size_feature ] , ... ]
-    MatI x = MatI::Zero((size_t)nlab, 4);
-
-    // loop through the image to update the position and size of each label
-    for ( h=0 ; h<H ; h++ ) {
-      for ( i=0 ; i<I ; i++ ) {
-        for ( j=0 ; j<J ; j++ ) {
-          ilab = l(h,i,j);
-          if ( ilab>0 ) {
-            x(ilab,0) += h;
-            x(ilab,1) += i;
-            x(ilab,2) += j;
-            x(ilab,3) += 1;
-          }
-        }
-      }
-    }
-
-    // fill the centres of gravity
-    for ( ilab=1 ; ilab<nlab ; ilab++ ) {
-      if ( x(ilab,3)>0 ) {
-
-        h = (int)round( (float)x(ilab,0) / (float)x(ilab,3) );
-        i = (int)round( (float)x(ilab,1) / (float)x(ilab,3) );
-        j = (int)round( (float)x(ilab,2) / (float)x(ilab,3) );
-
-        if ( h <  0 ) { h = 0; }
-        if ( i <  0 ) { i = 0; }
-        if ( j <  0 ) { j = 0; }
-        if ( h >= H ) { h = H; }
-        if ( i >= I ) { i = I; }
-        if ( j >= J ) { j = J; }
-
-        c(h,i,j) = ilab;
-      }
-    }
-  }
-
-  // cluster centres: periodic
+  // remove padding & renumber
   // -------------------------
 
-  if ( periodic )
+  // remove padding
+  m_l = xt::view(m_l,
+    xt::range(m_Pad[0][0], m_l.shape(0)-m_Pad[0][1]),
+    xt::range(m_Pad[1][0], m_l.shape(1)-m_Pad[1][1]),
+    xt::range(m_Pad[2][0], m_l.shape(2)-m_Pad[2][1]));
+
+  // apply renumbering: merges clusters
+  for (auto& i: m_l)
+    i = renum[i];
+
+  // rename labels to lowest possible label (starting from "1" this time)
+  xt::xtensor<int, 1> labels = xt::unique(m_l);
+  xt::view(renum, xt::keep(labels)) = xt::arange<int>(labels.size());
+  for (auto& i: m_l)
+    i = renum[i];
+
+
+  // make periodic
+  // -------------
+
+  // apply periodicity
+  if (m_periodic)
   {
-    int h,i,j,dh,di,dj,ilab,nlab,nlab_;
+    // pad image
+    m_l = xt::pad(m_l, m_Pad, pad_mode, pad_value);
 
-    // "l_": labels for the non-periodic version image "f"
-    ArrI l_,c_;
-    std::tie(l_,c_) = clusters(f,kern,min_size,false);
+    // list to renumber: used to link clusters to each other
+    renum = xt::arange<int>(m_l.size());
 
-    // delete clusters that are also not present in "l"
-    for ( size_t i=0 ; i<f.size() ; i++ )
-      if ( f[i] )
-        if ( !l[i] )
-          l_[i] = 0;
-
-    // number of labels
-    nlab  = l .max()+1;
-    nlab_ = l_.max()+1;
-
-    // matrix to contain the average position and total size:
-    // [ [ h,i,j , size_feature ] , ... ]
-    MatI  x = MatI::Zero((size_t)nlab ,4);
-    // if dx(ilab,ix)==1 than N[ix] is subtracted from the position in averaging
-    MatI dx = MatI::Zero((size_t)nlab_,3);
-
-    // label dependency: which labels in "l_" correspond to which labels in "l"
-    std::vector<int> lnk(nlab_);
-
-    for ( size_t i=0 ; i<l.size() ; i++ )
-      lnk[l_[i]] = l[i];
-
-    // check periodicity: to which sides the clusters are connected
-    // ------------------------------------------------------------
-
-    // i-j plane
-    for ( i=0 ; i<I ; i++ )
-      for ( j=0 ; j<J ; j++ )
-        for ( dh=1 ; dh<=dH ; dh++ )
-          for ( di=0 ; di<=dI ; di++ )
-            for ( dj=0 ; dj<=dJ ; dj++ )
-              if ( i+di<I && j+dj<J )
-                if ( l_(H-1,i,j) )
-                  if ( l(H-1,i,j)==l(H-1+dh,i+di,j+dj) )
-                    dx(l_(H-1,i,j),0) = 1;
-
-    // h-j plane
-    for ( h=0 ; h<H ; h++ )
-      for ( j=0 ; j<J ; j++ )
-        for ( dh=0 ; dh<=dH ; dh++ )
-          for ( di=1 ; di<=dI ; di++ )
-            for ( dj=0 ; dj<=dJ ; dj++ )
-              if ( h+dh<H && j+dj<J )
-                if ( l_(h,I-1,j) )
-                  if ( l(h,I-1,j)==l(h+dh,I-1+di,j+dj) )
-                    dx(l_(h,I-1,j),1) = 1;
-
-    // h-i plane
-    for ( h=0 ; h<H ; h++ )
-      for ( i=0 ; j<I ; j++ )
-        for ( dh=0 ; dh<=dH ; dh++ )
-          for ( di=0 ; di<=dI ; di++ )
-            for ( dj=1 ; dj<=dJ ; dj++ )
-              if ( h+dh<H && i+di<I )
-                if ( l_(h,i,J-1) )
-                  if ( l(h,i,J-1)==l(h+dh,i+di,J-1+dj) )
-                    dx(l_(h,i,J-1),2) = 1;
-
-    // calculate centres
-    // -----------------
-
-    // loop through the image to update the position and size of each label
-    for ( h=0 ; h<H ; h++ ) {
-      for ( i=0 ; i<I ; i++ ) {
-        for ( j=0 ; j<J ; j++ ) {
-          ilab = l_(h,i,j);
-          if ( ilab>0 ) {
-            if ( dx(ilab,0) ) dh = -H; else dh = 0;
-            if ( dx(ilab,1) ) di = -I; else di = 0;
-            if ( dx(ilab,2) ) dj = -J; else dj = 0;
-
-            x(lnk[ilab],0) += h+dh;
-            x(lnk[ilab],1) += i+di;
-            x(lnk[ilab],2) += j+dj;
-            x(lnk[ilab],3) += 1;
-          }
+    // loop over the image
+    for (size_t h = m_Pad[0][0]; h < m_l.shape(0)-m_Pad[0][1]; ++h) {
+      for (size_t i = m_Pad[1][0]; i < m_l.shape(1)-m_Pad[1][1]; ++i) {
+        for (size_t j = m_Pad[2][0]; j < m_l.shape(2)-m_Pad[2][1]; ++j) {
+          // - skip background voxels
+          if (!m_l(h,i,j))
+            continue;
+          // - get current labels in the ROI
+          auto Li = xt::view(m_l,
+            xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
+            xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
+            xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
+          // - apply kernel to the labels in the ROI
+          auto Ni = Li * m_kernel;
+          // - extract one label
+          int l = xt::amax(Ni)[0];
+          // - check if clusters have to be merged, if not: continue to the next voxel
+          if (xt::all(xt::equal(Li, l) || xt::equal(Li, 0)))
+            continue;
+          // - get the labels to be merged (discard "0" background)
+          xt::xarray<int> merge = xt::where(xt::equal(Li, 0), l, Li);
+          merge = xt::unique(merge);
+          // - merge labels (apply merge to other labels in cluster)
+          int linkto = xt::amin(xt::view(renum, xt::keep(merge)))[0];
+          for (auto& a: merge)
+            renum = xt::where(xt::equal(renum, renum(a)), linkto, renum);
         }
       }
     }
 
-    // fill the centres of gravity
-    for ( ilab=1 ; ilab<nlab ; ilab++ ) {
-      if ( x(ilab,3)>0 ) {
+    // remove padding
+    m_l = xt::view(m_l,
+      xt::range(m_Pad[0][0], m_l.shape(0)-m_Pad[0][1]),
+      xt::range(m_Pad[1][0], m_l.shape(1)-m_Pad[1][1]),
+      xt::range(m_Pad[2][0], m_l.shape(2)-m_Pad[2][1]));
 
-        h = (int)round( (float)x(ilab,0) / (float)x(ilab,3) );
-        i = (int)round( (float)x(ilab,1) / (float)x(ilab,3) );
-        j = (int)round( (float)x(ilab,2) / (float)x(ilab,3) );
-
-        while ( h <  0 ) { h += H; }
-        while ( i <  0 ) { i += I; }
-        while ( j <  0 ) { j += J; }
-        while ( h >= H ) { h -= H; }
-        while ( i >= I ) { i -= I; }
-        while ( j >= J ) { j -= J; }
-
-        c(h,i,j) = ilab;
-      }
-    }
+    // apply renumbering: merges clusters
+    for (auto& i: m_l)
+      i = renum[i];
   }
 
-  return std::make_tuple(l,c);
+  // reset to original dimension
+  m_l.reshape(m_shape);
+  m_kernel.reshape(m_shape_kernel);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace Private
-
-// =================================================================================================
-// wrapper functions
-// =================================================================================================
-
-ArrI clusters(const ArrI &f, const ArrI &kern, int min_size, bool periodic)
+inline xt::xarray<int> Clusters::get() const
 {
-  ArrI clus, cent;
-
-  std::tie(clus, cent) = Private::clusters(f, kern, min_size, periodic);
-
-  return clus;
+  return m_l;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-ArrI clusters(const ArrI &f, int min_size, bool periodic)
+inline xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic)
 {
-  ArrI clus, cent;
-
-  std::tie(clus, cent) = Private::clusters(f, kernel(f.rank()), min_size, periodic);
-
-  return clus;
+  return Clusters(f, GooseEYE::kernel::nearest(f.dimension()), periodic).get();
 }
 
 // -------------------------------------------------------------------------------------------------
-
-ArrI clusters(const ArrI &f, bool periodic)
-{
-  ArrI clus, cent;
-
-  std::tie(clus, cent) = Private::clusters(f, kernel(f.rank()), 0, periodic);
-
-  return clus;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, const ArrI &kern, int min_size, bool periodic)
-{
-  return Private::clusters(f, kern, min_size, periodic);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, int min_size, bool periodic)
-{
-  return Private::clusters(f, kernel(f.rank()), min_size, periodic);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-std::tuple<ArrI,ArrI> clusterCenters(const ArrI &f, bool periodic)
-{
-  return Private::clusters(f, kernel(f.rank()), 0, periodic);
-}
-
-// =================================================================================================
 
 } // namespace ...
-
-// =================================================================================================
 
 #endif

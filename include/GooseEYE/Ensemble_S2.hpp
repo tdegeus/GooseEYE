@@ -7,207 +7,101 @@
 #ifndef GOOSEEYE_ENSEMBLE_S2_HPP
 #define GOOSEEYE_ENSEMBLE_S2_HPP
 
-// =================================================================================================
-
 #include "GooseEYE.h"
-
-// =================================================================================================
 
 namespace GooseEYE {
 
-// =================================================================================================
-// 2-point correlation -- "master"
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
-void Ensemble::S2(ArrD f, ArrD g, ArrI fmask, ArrI gmask)
+template <class T>
+inline void Ensemble::S2(
+  const xt::xarray<T>& f,
+  const xt::xarray<T>& g,
+  const xt::xarray<int>& fmask,
+  const xt::xarray<int>& gmask)
 {
-  // lock measure
-  if ( mStat == Stat::Unset) mStat = Stat::S2;
+  GOOSEEYE_ASSERT(f.shape() == g.shape());
+  GOOSEEYE_ASSERT(f.shape() == fmask.shape());
+  GOOSEEYE_ASSERT(f.shape() == gmask.shape());
+  GOOSEEYE_ASSERT(f.dimension() == m_shape.size());
+  GOOSEEYE_ASSERT(xt::all(xt::equal(fmask,0) || xt::equal(fmask,1)));
+  GOOSEEYE_ASSERT(xt::all(xt::equal(gmask,0) || xt::equal(gmask,1)));
+  GOOSEEYE_ASSERT(m_stat == Type::S2 || m_stat == Type::Unset);
 
-  // checks
-  std::string name = "GooseEYE::Ensemble::S2 - ";
-  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
-  if ( f.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
-  if ( f.shape() != gmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
-  if ( f.shape() != g    .shape() ) throw std::runtime_error(name+"shape inconsistent");
+  // lock statistic
+  m_stat = Type::S2;
 
-  // switch off bound-checks based on periodicity settings
-  f    .setPeriodic(mPeriodic);
-  g    .setPeriodic(mPeriodic);
-  fmask.setPeriodic(mPeriodic);
-  gmask.setPeriodic(mPeriodic);
+  // padding default not periodic: mask padded items
+  xt::pad_mode pad_mode = xt::pad_mode::constant;
+  int mask_value = 1;
 
-  // zero-pad images
-  if ( mPad.size() > 0 ) {
-    f     = f    .pad(mPad, 0);
-    g     = g    .pad(mPad, 0);
-    fmask = fmask.pad(mPad, 1);
-    gmask = gmask.pad(mPad, 1);
+  // padding optionally periodic: unmask padded items
+  if (m_periodic) {
+    pad_mode = xt::pad_mode::periodic;
+    mask_value = 0;
   }
 
-  // change rank (to avoid failing assertions)
-  f.chrank(3);
+  // apply padding
+  xt::xarray<T>   F = xt::pad(f, m_pad, pad_mode);
+  xt::xarray<T>   G = xt::pad(g, m_pad, pad_mode);
+  xt::xarray<int> Fmask = xt::pad(fmask, m_pad, xt::pad_mode::constant, mask_value);
+  xt::xarray<T>   Gmask = xt::pad(gmask, m_pad, xt::pad_mode::constant, mask_value);
 
-  // correlation
-  for ( int h = mSkip[0] ; h < f.shape<int>(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < f.shape<int>(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < f.shape<int>(2)-mSkip[2] ; ++j )
-        if ( f(h,i,j) and !fmask(h,i,j) )
-          for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
-            for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
-              for ( int dj = -mMid[2] ; dj <= mMid[2] ; ++dj )
-                if ( !gmask(h+dh,i+di,j+dj) )
-                  mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += f(h,i,j) * g(h+dh,i+di,j+dj);
+  // make matrices virtually 3-d matrices
+  std::vector<size_t> shape = detail::shape_as_dim(MAX_DIM, F, 1);
+  F.reshape(shape);
+  G.reshape(shape);
+  Fmask.reshape(shape);
+  Gmask.reshape(shape);
 
-  // normalisation
-  for ( int h = mSkip[0] ; h < f.shape<int>(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < f.shape<int>(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < f.shape<int>(2)-mSkip[2] ; ++j )
-        if ( !fmask(h,i,j) )
-          for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
-            for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
-              for ( int dj = -mMid[2] ; dj <= mMid[2] ; ++dj )
-                if ( !gmask(h+dh,i+di,j+dj) )
-                  mNorm(dh+mMid[0], di+mMid[1], dj+mMid[2]) += 1.;
-}
+  // local output and normalisation
+  xt::xarray<T> data = xt::zeros<T>(m_Shape);
+  xt::xarray<T> norm = xt::zeros<T>(m_Shape);
 
-// =================================================================================================
-// 2-point correlation -- "slave": compare to "master"
-// =================================================================================================
-
-void Ensemble::S2(ArrI f, ArrI g)
-{
-  // lock measure
-  if ( mStat == Stat::Unset) mStat = Stat::S2;
-
-  // optionally use masked implementation
-  if ( mPad.size() > 0 ) return S2(f, g, ArrI::Zero(f.shape()), ArrI::Zero(g.shape()));
-
-  // checks
-  std::string name = "GooseEYE::Ensemble::S2 - ";
-  if ( f.rank()  != mData.rank() ) throw std::runtime_error(name+"rank inconsistent");
-  if ( f.shape() != g.shape()    ) throw std::runtime_error(name+"shape inconsistent");
-
-  // switch off bound-checks based on periodicity settings
-  f.setPeriodic(mPeriodic);
-  g.setPeriodic(mPeriodic);
-
-  // change rank (to avoid failing assertions)
-  f.chrank(3);
-
-  // correlation
-  for ( int h = mSkip[0] ; h < f.shape<int>(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < f.shape<int>(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < f.shape<int>(2)-mSkip[2] ; ++j )
-        if ( f(h,i,j) )
-          for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
-            for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
-              for ( int dj = -mMid[2] ; dj <= mMid[2] ; ++dj )
-                if ( g(h+dh,i+di,j+dj) == f(h,i,j) )
-                  mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += 1.;
-
-  // normalisation
-  mNorm += static_cast<double>(f.size());
-}
-
-// =================================================================================================
-// 2-point correlation -- "slave": compare to "master"
-// =================================================================================================
-
-void Ensemble::S2(ArrI f, ArrI g, ArrI fmask, ArrI gmask)
-{
-  // lock measure
-  if ( mStat == Stat::Unset) mStat = Stat::S2;
-
-  // checks
-  std::string name = "GooseEYE::Ensemble::S2 - ";
-  if ( f.rank()  != mData.rank()  ) throw std::runtime_error(name+"rank inconsistent");
-  if ( f.shape() != fmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
-  if ( f.shape() != gmask.shape() ) throw std::runtime_error(name+"shape inconsistent");
-  if ( f.shape() != g    .shape() ) throw std::runtime_error(name+"shape inconsistent");
-
-  // switch off bound-checks based on periodicity settings
-  f    .setPeriodic(mPeriodic);
-  g    .setPeriodic(mPeriodic);
-  fmask.setPeriodic(mPeriodic);
-  gmask.setPeriodic(mPeriodic);
-
-  // zero-pad images
-  if ( mPad.size() > 0 ) {
-    f     = f    .pad(mPad, 0);
-    g     = g    .pad(mPad, 0);
-    fmask = fmask.pad(mPad, 1);
-    gmask = gmask.pad(mPad, 1);
+  // compute correlation
+  for (size_t h = m_Pad[0][0]; h < shape[0]-m_Pad[0][1]; ++h) {
+    for (size_t i = m_Pad[1][0]; i < shape[1]-m_Pad[1][1]; ++i) {
+      for (size_t j = m_Pad[2][0]; j < shape[2]-m_Pad[2][1]; ++j) {
+        // - skip masked
+        if (Fmask(h,i,j))
+          continue;
+        // - get comparison sub-matrix
+        auto Gi = xt::view(G,
+          xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
+          xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
+          xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
+        // - get inverse of comparison mask
+        auto Gmii = T(1) - xt::view(Gmask,
+          xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
+          xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
+          xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
+        // - correlation (account for mask)
+        if (F(h,i,j) != 0)
+          data += F(h,i,j) * Gi * Gmii;
+        // - normalisation
+        norm += Gmii;
+      }
+    }
   }
 
-  // change rank (to avoid failing assertions)
-  f.chrank(3);
-
-  // correlation
-  for ( int h = mSkip[0] ; h < f.shape<int>(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < f.shape<int>(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < f.shape<int>(2)-mSkip[2] ; ++j )
-        if ( f(h,i,j) and !fmask(h,i,j) )
-          for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
-            for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
-              for ( int dj = -mMid[2] ; dj <= mMid[2] ; ++dj )
-                if ( g(h+dh,i+di,j+dj) == f(h,i,j) and !gmask(h+dh,i+di,j+dj) )
-                  mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += 1.;
-
-  // normalisation
-  for ( int h = mSkip[0] ; h < f.shape<int>(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < f.shape<int>(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < f.shape<int>(2)-mSkip[2] ; ++j )
-        if ( !fmask(h,i,j) )
-          for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
-            for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
-              for ( int dj = -mMid[2] ; dj <= mMid[2] ; ++dj )
-                if ( !gmask(h+dh,i+di,j+dj) )
-                  mNorm(dh+mMid[0], di+mMid[1], dj+mMid[2]) += 1.;
+  // add to ensemble average
+  m_data += data;
+  m_norm += norm;
 }
 
-// =================================================================================================
-// 2-point correlation -- "slave": compare to "master"
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
-void Ensemble::S2(ArrD f, ArrD g)
+template <class T>
+inline void Ensemble::S2(
+  const xt::xarray<T>& f,
+  const xt::xarray<T>& g)
 {
-  // lock measure
-  if ( mStat == Stat::Unset) mStat = Stat::S2;
-
-  // optionally use masked implementation
-  if ( mPad.size() > 0 ) return S2(f, g, ArrI::Zero(f.shape()), ArrI::Zero(g.shape()));
-
-  // checks
-  std::string name = "GooseEYE::Ensemble::S2 - ";
-  if ( f.rank()  != mData.rank() ) throw std::runtime_error(name+"rank inconsistent");
-  if ( f.shape() != g.shape()    ) throw std::runtime_error(name+"shape inconsistent");
-
-  // switch off bound-checks based on periodicity settings
-  f.setPeriodic(mPeriodic);
-  g.setPeriodic(mPeriodic);
-
-  // change rank (to avoid failing assertions)
-  f.chrank(3);
-
-  // correlation
-  for ( int h = mSkip[0] ; h < f.shape<int>(0)-mSkip[0] ; ++h )
-    for ( int i = mSkip[1] ; i < f.shape<int>(1)-mSkip[1] ; ++i )
-      for ( int j = mSkip[2] ; j < f.shape<int>(2)-mSkip[2] ; ++j )
-        if ( f(h,i,j) )
-          for ( int dh = -mMid[0] ; dh <= mMid[0] ; ++dh )
-            for ( int di = -mMid[1] ; di <= mMid[1] ; ++di )
-              for ( int dj = -mMid[2] ; dj <= mMid[2] ; ++dj )
-                mData(dh+mMid[0], di+mMid[1], dj+mMid[2]) += f(h,i,j) * g(h+dh,i+di,j+dj);
-
-  // normalisation
-  mNorm += static_cast<double>(f.size());
+  xt::xarray<int> mask = xt::zeros<int>(f.shape());
+  S2(f, g, mask, mask);
 }
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
 } // namespace ...
-
-// =================================================================================================
 
 #endif

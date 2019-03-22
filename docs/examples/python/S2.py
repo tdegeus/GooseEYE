@@ -12,7 +12,7 @@ I   = eye.dummy_circles((500,500))
 phi = np.mean(I)
 
 # 2-point probability
-S2  = eye.S2((101,101),I,I)
+S2 = eye.S2((101,101),I,I)
 
 # gray image + correlation
 # ------------------------
