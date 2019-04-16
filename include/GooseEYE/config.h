@@ -35,10 +35,10 @@
 
 #ifdef GOOSEEYE_ENABLE_ASSERT
 #define GOOSEEYE_ASSERT(expr) GOOSEEYE_ASSERT_IMPL(expr, __FILE__, __LINE__)
-#define GOOSEEYE_ASSERT_IMPL(expr, file, line)                                                                                   \
-    if (!(expr))                                                                                                                 \
-    {                                                                                                                            \
-        throw std::runtime_error(std::string(file) + ':' + std::to_string(line) + ": assertion failed (" #expr ") \n\t");        \
+#define GOOSEEYE_ASSERT_IMPL(expr, file, line)                                                                            \
+    if (!(expr))                                                                                                          \
+    {                                                                                                                     \
+        throw std::runtime_error(std::string(file) + ':' + std::to_string(line) + ": assertion failed (" #expr ") \n\t"); \
     }
 #else
 #define GOOSEEYE_ASSERT(expr)

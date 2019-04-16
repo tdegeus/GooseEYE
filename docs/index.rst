@@ -3,17 +3,31 @@
 GooseEYE
 ********
 
-Documentation
-=============
-
 .. toctree::
+   :caption: QUICKSTART
    :maxdepth: 1
 
    quickstart.rst
+
+.. toctree::
+   :caption: CODE REFERENCE
+   :maxdepth: 1
+
    cpp.rst
    python.rst
    gui.rst
+
+.. toctree::
+   :caption: EXAMPLES
+   :maxdepth: 1
+
    examples/python/readme.rst
+   examples/methods/readme.rst
+
+.. toctree::
+   :caption: CONTRIBUTE
+   :maxdepth: 1
+
    develop.rst
 
 Indices and tables
