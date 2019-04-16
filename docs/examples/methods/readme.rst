@@ -21,5 +21,12 @@ Ostu's method
 
 [:download:`source: otsu.py <otsu.py>`]
 
-.. literalinclude:: otsu.py
-   :language: python
+This example uses Otsu's method to combine two sources (two different images of the same object) to get an optimal threshold. The idea is to get a weighted average of two images as follows
+
+.. math::
+
+  \mathcal{I}
+  =
+  (1 - \alpha) \mathcal{I}_a + \alpha \mathcal{I}_b
+
+whereby :math:`\alpha` is chosen such that the separability, defined by Otsu is maximised.
