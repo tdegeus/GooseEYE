@@ -38,6 +38,10 @@ inline xt::xarray<double> Ensemble::result() const
   xt::xarray<double> norm = xt::where(m_norm <= 0., I, m_norm);
   xt::xarray<double> out = m_data / norm;
   out.reshape(m_shape);
+
+  if (m_stat == Type::roughness)
+    out = xt::pow(out, 0.5);
+
   return out;
 }
 

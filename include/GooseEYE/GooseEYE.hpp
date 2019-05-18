@@ -25,6 +25,24 @@ namespace GooseEYE {
 // }
 
 // =================================================================================================
+// wrapper functions: distance
+// =================================================================================================
+
+xt::xarray<double> distance(const std::vector<size_t>& roi)
+{
+  Ensemble ensemble(roi);
+  return ensemble.distance();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim)
+{
+  Ensemble ensemble(roi, dim);
+  return ensemble.distance(dim);
+}
+
+// =================================================================================================
 // wrapper functions: 2-point correlation
 // =================================================================================================
 
@@ -114,6 +132,35 @@ xt::xarray<double> W2(
 {
   Ensemble ensemble(roi, periodic);
   ensemble.W2(w, f, fmask);
+  return ensemble.result();
+}
+
+// =================================================================================================
+// wrapper functions: roughness
+// =================================================================================================
+
+template <class T>
+xt::xarray<double> roughness(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  bool periodic)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.roughness(f);
+  return ensemble.result();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <class T>
+xt::xarray<double> roughness(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& fmask,
+  bool periodic)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.roughness(f, fmask );
   return ensemble.result();
 }
 

@@ -139,7 +139,6 @@ public:
   template <class T>
   void mean(const xt::xarray<T>& f, const xt::xarray<int>& fmask);
 
-
   // 2-point correlation
 
   template <class T>
@@ -179,6 +178,17 @@ public:
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
+  // roughness
+
+  template <class T>
+  void roughness(
+    const xt::xarray<T>& f);
+
+  template <class T>
+  void roughness(
+    const xt::xarray<T>& f,
+    const xt::xarray<int>& fmask);
+
 private:
 
   // Type: used to lock the ensemble to a certain measure
@@ -190,7 +200,8 @@ private:
       C2 = 0x03u,
       W2 = 0x04u,
       W2c = 0x05u,
-      L = 0x06u
+      L = 0x06u,
+      roughness = 0x07u,
   };};
 
   // Initialize class as unlocked
@@ -219,6 +230,12 @@ private:
 // -------------------------------------------------------------------------------------------------
 // font-end functions to compute the statistics for one image
 // -------------------------------------------------------------------------------------------------
+
+// Distance
+
+xt::xarray<double> distance(const std::vector<size_t>& roi);
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim);
 
 // 2-point correlation
 
@@ -271,6 +288,21 @@ xt::xarray<double> W2(
   const xt::xarray<int>& fmask,
   bool periodic=true);
 
+// roughness
+
+template <class T>
+xt::xarray<double> roughness(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  bool periodic=true);
+
+template <class T>
+xt::xarray<double> roughness(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& fmask,
+  bool periodic=true);
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ...
@@ -288,5 +320,6 @@ xt::xarray<double> W2(
 #include "Ensemble_S2.hpp"
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
+#include "Ensemble_roughness.hpp"
 
 #endif

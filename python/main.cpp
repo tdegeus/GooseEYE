@@ -126,6 +126,18 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     py::arg("fmask"),
     py::arg("gmask"))
 
+  // roughness
+
+  .def("roughness", py::overload_cast<
+      const xt::xarray<double>&>(&GooseEYE::Ensemble::roughness<double>),
+    py::arg("f"))
+
+  .def("roughness", py::overload_cast<
+      const xt::xarray<double>&,
+      const xt::xarray<int>&>(&GooseEYE::Ensemble::roughness<double>),
+    py::arg("f"),
+    py::arg("fmask"))
+
   // 2-point cluster
 
   .def("C2", py::overload_cast<
@@ -171,6 +183,18 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
   );
 
 // -------------------------------------------------------------------------------------------------
+
+// distance
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&>(&GooseEYE::distance),
+  py::arg("roi"));
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&,
+    size_t>(&GooseEYE::distance),
+  py::arg("roi"),
+  py::arg("dim"));
 
 // 2-point correlation
 
@@ -265,6 +289,26 @@ m.def("W2", py::overload_cast<
     bool>(&GooseEYE::W2<double>),
   py::arg("roi"),
   py::arg("w"),
+  py::arg("f"),
+  py::arg("fmask"),
+  py::arg("periodic")=true);
+
+// roughness
+
+m.def("roughness", py::overload_cast<
+    const std::vector<size_t>&,
+    const xt::xarray<double>&,
+    bool>(&GooseEYE::roughness<double>),
+  py::arg("roi"),
+  py::arg("f"),
+  py::arg("periodic")=true);
+
+m.def("roughness", py::overload_cast<
+    const std::vector<size_t>&,
+    const xt::xarray<double>&,
+    const xt::xarray<int>&,
+    bool>(&GooseEYE::roughness<double>),
+  py::arg("roi"),
   py::arg("f"),
   py::arg("fmask"),
   py::arg("periodic")=true);
