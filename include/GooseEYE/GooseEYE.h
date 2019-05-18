@@ -228,6 +228,77 @@ private:
 };
 
 // -------------------------------------------------------------------------------------------------
+// Class to compute ensemble averaged statistics together with the variance.
+// -------------------------------------------------------------------------------------------------
+
+class EnsembleVariance
+{
+public:
+
+  // Constructors
+
+  EnsembleVariance() = default;
+
+  EnsembleVariance(const std::vector<size_t>& roi, bool periodic=true);
+
+  // Get ensemble averaged result or raw data, and distance
+
+  xt::xarray<double> result() const;
+  xt::xarray<double> variance() const;
+  xt::xarray<double> distance() const;
+  xt::xarray<double> distance(size_t dim) const;
+
+  // roughness
+
+  template <class T>
+  void roughness(
+    const xt::xarray<T>& f);
+
+  template <class T>
+  void roughness(
+    const xt::xarray<T>& f,
+    const xt::xarray<int>& fmask);
+
+private:
+
+  // Type: used to lock the ensemble to a certain measure
+  struct Type {
+    enum : unsigned {
+      Unset = 0x00u,
+      mean = 0x01u,
+      S2 = 0x02u,
+      C2 = 0x03u,
+      W2 = 0x04u,
+      W2c = 0x05u,
+      L = 0x06u,
+      roughness = 0x07u,
+  };};
+
+  // Initialize class as unlocked
+  unsigned m_stat=Type::Unset;
+
+  // Maximum number of dimensions
+  static const size_t MAX_DIM=3;
+
+  // Periodicity settings used for the entire cluster
+  bool m_periodic;
+
+  // Raw (not normalized) result, and normalization
+  xt::xarray<double> m_first;
+  xt::xarray<double> m_second;
+  xt::xarray<double> m_norm;
+
+  // Shape of the ROI (of "m_data" and "m_norm")
+  std::vector<size_t> m_shape;
+  std::vector<size_t> m_Shape; // pseudo 3-d equivalent
+
+  // Padding size
+  std::vector<std::vector<size_t>> m_pad;
+  std::vector<std::vector<size_t>> m_Pad;
+
+};
+
+// -------------------------------------------------------------------------------------------------
 // font-end functions to compute the statistics for one image
 // -------------------------------------------------------------------------------------------------
 
@@ -321,5 +392,7 @@ xt::xarray<double> roughness(
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
 #include "Ensemble_roughness.hpp"
+#include "EnsembleVariance.hpp"
+#include "EnsembleVariance_roughness.hpp"
 
 #endif
