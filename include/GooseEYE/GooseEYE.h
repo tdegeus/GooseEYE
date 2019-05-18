@@ -121,12 +121,14 @@ public:
 
   Ensemble() = default;
 
-  Ensemble(const std::vector<size_t>& roi, bool periodic=true);
+  Ensemble(const std::vector<size_t>& roi, bool periodic=true, bool variance=true);
 
   // Get ensemble averaged result or raw data, and distance
 
   xt::xarray<double> result() const;
-  xt::xarray<double> data() const;
+  xt::xarray<double> variance() const;
+  xt::xarray<double> data_first() const; // sum of the first moment: x_1 + x_2 + ...
+  xt::xarray<double> data_second() const; // sum of the second moment: x_1^2 + x_2^2 + ...
   xt::xarray<double> norm() const;
   xt::xarray<double> distance() const;
   xt::xarray<double> distance(size_t dim) const;
@@ -213,79 +215,12 @@ private:
   // Periodicity settings used for the entire cluster
   bool m_periodic;
 
-  // Raw (not normalized) result, and normalization
-  xt::xarray<double> m_data;
-  xt::xarray<double> m_norm;
-
-  // Shape of the ROI (of "m_data" and "m_norm")
-  std::vector<size_t> m_shape;
-  std::vector<size_t> m_Shape; // pseudo 3-d equivalent
-
-  // Padding size
-  std::vector<std::vector<size_t>> m_pad;
-  std::vector<std::vector<size_t>> m_Pad;
-
-};
-
-// -------------------------------------------------------------------------------------------------
-// Class to compute ensemble averaged statistics together with the variance.
-// -------------------------------------------------------------------------------------------------
-
-class EnsembleVariance
-{
-public:
-
-  // Constructors
-
-  EnsembleVariance() = default;
-
-  EnsembleVariance(const std::vector<size_t>& roi, bool periodic=true);
-
-  // Get ensemble averaged result or raw data, and distance
-
-  xt::xarray<double> result() const;
-  xt::xarray<double> variance() const;
-  xt::xarray<double> distance() const;
-  xt::xarray<double> distance(size_t dim) const;
-
-  // roughness
-
-  template <class T>
-  void roughness(
-    const xt::xarray<T>& f);
-
-  template <class T>
-  void roughness(
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask);
-
-private:
-
-  // Type: used to lock the ensemble to a certain measure
-  struct Type {
-    enum : unsigned {
-      Unset = 0x00u,
-      mean = 0x01u,
-      S2 = 0x02u,
-      C2 = 0x03u,
-      W2 = 0x04u,
-      W2c = 0x05u,
-      L = 0x06u,
-      roughness = 0x07u,
-  };};
-
-  // Initialize class as unlocked
-  unsigned m_stat=Type::Unset;
-
-  // Maximum number of dimensions
-  static const size_t MAX_DIM=3;
-
-  // Periodicity settings used for the entire cluster
-  bool m_periodic;
+  // Signal to compute the variance
+  bool m_variance;
 
   // Raw (not normalized) result, and normalization
-  xt::xarray<double> m_first;
-  xt::xarray<double> m_second;
+  xt::xarray<double> m_first; // sum of the first moment: x_1 + x_2 + ...
+  xt::xarray<double> m_second; // sum of the second moment: x_1^2 + x_2^2 + ...
   xt::xarray<double> m_norm;
 
   // Shape of the ROI (of "m_data" and "m_norm")
@@ -392,7 +327,5 @@ xt::xarray<double> roughness(
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
 #include "Ensemble_roughness.hpp"
-#include "EnsembleVariance.hpp"
-#include "EnsembleVariance_roughness.hpp"
 
 #endif

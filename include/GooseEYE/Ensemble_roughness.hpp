@@ -46,7 +46,8 @@ inline void Ensemble::roughness(
   Fmask.reshape(shape);
 
   // local output and normalisation
-  xt::xarray<T> data = xt::zeros<T>(m_Shape);
+  xt::xarray<T> first = xt::zeros<T>(m_Shape);
+  xt::xarray<T> second = xt::zeros<T>(m_Shape);
   xt::xarray<T> norm = xt::zeros<T>(m_Shape);
 
   // compute correlation
@@ -66,8 +67,11 @@ inline void Ensemble::roughness(
           xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
           xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
           xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
-        // - correlation (account for mask)
-        data += xt::pow(Fi - F(h,i,j), 2.0) * Fmii;
+        // - update sum of the first moment
+        first += xt::pow(Fi - F(h,i,j), 2.0) * Fmii;
+        // - update sum of the second moment
+        if (m_variance)
+          second += xt::pow(Fi - F(h,i,j), 4.0) * Fmii;
         // - normalisation
         norm += Fmii;
       }
@@ -75,7 +79,8 @@ inline void Ensemble::roughness(
   }
 
   // add to ensemble average
-  m_data += data;
+  m_first += first;
+  m_second += second;
   m_norm += norm;
 }
 

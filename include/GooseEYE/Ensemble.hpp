@@ -15,8 +15,8 @@ namespace GooseEYE {
 // constructor
 // =================================================================================================
 
-inline Ensemble::Ensemble(const std::vector<size_t>& roi, bool periodic) :
-m_periodic(periodic), m_shape(roi)
+inline Ensemble::Ensemble(const std::vector<size_t>& roi, bool periodic, bool variance) :
+m_periodic(periodic), m_variance(variance), m_shape(roi)
 {
   GOOSEEYE_ASSERT(m_shape.size() <= MAX_DIM);
 
@@ -24,7 +24,8 @@ m_periodic(periodic), m_shape(roi)
   m_Shape = detail::as_dim(MAX_DIM, m_shape, 1);
   m_Pad = detail::as_dim(MAX_DIM, m_pad, 0);
 
-  m_data = xt::zeros<double>(m_Shape);
+  m_first = xt::zeros<double>(m_Shape);
+  m_second = xt::zeros<double>(m_Shape);
   m_norm = xt::zeros<double>(m_Shape);
 }
 
@@ -36,7 +37,7 @@ inline xt::xarray<double> Ensemble::result() const
 {
   xt::xarray<double> I = xt::ones<double>(m_norm.shape());
   xt::xarray<double> norm = xt::where(m_norm <= 0., I, m_norm);
-  xt::xarray<double> out = m_data / norm;
+  xt::xarray<double> out = m_first / norm;
   out.reshape(m_shape);
 
   if (m_stat == Type::roughness)
@@ -47,9 +48,35 @@ inline xt::xarray<double> Ensemble::result() const
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xarray<double> Ensemble::data() const
+inline xt::xarray<double> Ensemble::variance() const
 {
-  xt::xarray<double> out = m_data;
+  xt::xarray<double> I = xt::ones<double>(m_norm.shape());
+  xt::xarray<double> norm = xt::where(m_norm <= 0., I, m_norm);
+  xt::xarray<double> out = (m_second / norm - xt::pow(m_first / norm, 2.0)) * norm / (norm - 1);
+  out.reshape(m_shape);
+
+  if (m_stat == Type::roughness)
+    out = xt::pow(out, 0.5);
+  else if (m_stat != Type::mean)
+    throw std::runtime_error("Not yet implemented");
+
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<double> Ensemble::data_first() const
+{
+  xt::xarray<double> out = m_first;
+  out.reshape(m_shape);
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<double> Ensemble::data_second() const
+{
+  xt::xarray<double> out = m_second;
   out.reshape(m_shape);
   return out;
 }

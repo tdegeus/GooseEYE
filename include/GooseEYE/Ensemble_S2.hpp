@@ -55,7 +55,7 @@ inline void Ensemble::S2(
   Gmask.reshape(shape);
 
   // local output and normalisation
-  xt::xarray<T> data = xt::zeros<T>(m_Shape);
+  xt::xarray<T> first = xt::zeros<T>(m_Shape);
   xt::xarray<T> norm = xt::zeros<T>(m_Shape);
 
   // compute correlation
@@ -77,7 +77,7 @@ inline void Ensemble::S2(
           xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
         // - correlation (account for mask)
         if (F(h,i,j) != 0)
-          data += F(h,i,j) * Gi * Gmii;
+          first += F(h,i,j) * Gi * Gmii;
         // - normalisation
         norm += Gmii;
       }
@@ -85,7 +85,7 @@ inline void Ensemble::S2(
   }
 
   // add to ensemble average
-  m_data += data;
+  m_first += first;
   m_norm += norm;
 }
 

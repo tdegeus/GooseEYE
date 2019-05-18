@@ -73,16 +73,21 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
   // Constructors
 
-  .def(py::init<std::vector<size_t>&, bool>(),
+  .def(py::init<std::vector<size_t>&, bool, bool>(),
     "Ensemble",
     py::arg("roi"),
-    py::arg("periodic")=true)
+    py::arg("periodic")=true,
+    py::arg("variance")=false)
 
   // Get ensemble averaged result or raw data, and distance
 
   .def("result", &GooseEYE::Ensemble::result)
 
-  .def("data", &GooseEYE::Ensemble::data)
+  .def("variance", &GooseEYE::Ensemble::variance)
+
+  .def("data_first", &GooseEYE::Ensemble::data_first)
+
+  .def("data_second", &GooseEYE::Ensemble::data_second)
 
   .def("norm", &GooseEYE::Ensemble::norm)
 
