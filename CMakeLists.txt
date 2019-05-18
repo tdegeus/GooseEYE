@@ -35,8 +35,6 @@ set(headers
   include/GooseEYE/Ensemble_W2.hpp
   include/GooseEYE/Ensemble_mean.hpp
   include/GooseEYE/Ensemble_roughness.hpp
-  include/GooseEYE/EnsembleVariance.hpp
-  include/GooseEYE/EnsembleVariance_roughness.hpp
   include/GooseEYE/GooseEYE.h
   include/GooseEYE/GooseEYE.hpp
   include/GooseEYE/clusters.hpp
