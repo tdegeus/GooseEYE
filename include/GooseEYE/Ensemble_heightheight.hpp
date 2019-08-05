@@ -14,17 +14,17 @@ namespace GooseEYE {
 // -------------------------------------------------------------------------------------------------
 
 template <class T>
-inline void Ensemble::roughness(
+inline void Ensemble::heightheight(
   const xt::xarray<T>& f,
   const xt::xarray<int>& fmask)
 {
   GOOSEEYE_ASSERT(f.shape() == fmask.shape());
   GOOSEEYE_ASSERT(f.dimension() == m_shape.size());
   GOOSEEYE_ASSERT(xt::all(xt::equal(fmask,0) || xt::equal(fmask,1)));
-  GOOSEEYE_ASSERT(m_stat == Type::roughness || m_stat == Type::Unset);
+  GOOSEEYE_ASSERT(m_stat == Type::heightheight || m_stat == Type::Unset);
 
   // lock statistic
-  m_stat = Type::roughness;
+  m_stat = Type::heightheight;
 
   // padding default not periodic: mask padded items
   xt::pad_mode pad_mode = xt::pad_mode::constant;
@@ -87,11 +87,11 @@ inline void Ensemble::roughness(
 // -------------------------------------------------------------------------------------------------
 
 template <class T>
-inline void Ensemble::roughness(
+inline void Ensemble::heightheight(
   const xt::xarray<T>& f)
 {
   xt::xarray<int> mask = xt::zeros<int>(f.shape());
-  roughness(f, mask);
+  heightheight(f, mask);
 }
 
 // -------------------------------------------------------------------------------------------------

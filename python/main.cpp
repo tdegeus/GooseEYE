@@ -131,15 +131,15 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     py::arg("fmask"),
     py::arg("gmask"))
 
-  // roughness
+  // Height-Height Correlation Function
 
-  .def("roughness", py::overload_cast<
-      const xt::xarray<double>&>(&GooseEYE::Ensemble::roughness<double>),
+  .def("heightheight", py::overload_cast<
+      const xt::xarray<double>&>(&GooseEYE::Ensemble::heightheight<double>),
     py::arg("f"))
 
-  .def("roughness", py::overload_cast<
+  .def("heightheight", py::overload_cast<
       const xt::xarray<double>&,
-      const xt::xarray<int>&>(&GooseEYE::Ensemble::roughness<double>),
+      const xt::xarray<int>&>(&GooseEYE::Ensemble::heightheight<double>),
     py::arg("f"),
     py::arg("fmask"))
 
@@ -298,21 +298,21 @@ m.def("W2", py::overload_cast<
   py::arg("fmask"),
   py::arg("periodic")=true);
 
-// roughness
+// Height-Height Correlation Function
 
-m.def("roughness", py::overload_cast<
+m.def("heightheight", py::overload_cast<
     const std::vector<size_t>&,
     const xt::xarray<double>&,
-    bool>(&GooseEYE::roughness<double>),
+    bool>(&GooseEYE::heightheight<double>),
   py::arg("roi"),
   py::arg("f"),
   py::arg("periodic")=true);
 
-m.def("roughness", py::overload_cast<
+m.def("heightheight", py::overload_cast<
     const std::vector<size_t>&,
     const xt::xarray<double>&,
     const xt::xarray<int>&,
-    bool>(&GooseEYE::roughness<double>),
+    bool>(&GooseEYE::heightheight<double>),
   py::arg("roi"),
   py::arg("f"),
   py::arg("fmask"),

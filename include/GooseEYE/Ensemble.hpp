@@ -40,7 +40,7 @@ inline xt::xarray<double> Ensemble::result() const
   xt::xarray<double> out = m_first / norm;
   out.reshape(m_shape);
 
-  if (m_stat == Type::roughness)
+  if (m_stat == Type::heightheight)
     out = xt::pow(out, 0.5);
 
   return out;
@@ -55,10 +55,10 @@ inline xt::xarray<double> Ensemble::variance() const
   xt::xarray<double> out = (m_second / norm - xt::pow(m_first / norm, 2.0)) * norm / (norm - 1);
   out.reshape(m_shape);
 
-  if (m_stat == Type::roughness)
+  if (m_stat == Type::heightheight)
     out = xt::pow(out, 0.5);
   else if (m_stat != Type::mean)
-    throw std::runtime_error("Not yet implemented");
+    throw std::runtime_error("Not implemented");
 
   return out;
 }

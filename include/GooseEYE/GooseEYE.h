@@ -180,14 +180,14 @@ public:
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
-  // roughness
+  // Height-Height Correlation function
 
   template <class T>
-  void roughness(
+  void heightheight(
     const xt::xarray<T>& f);
 
   template <class T>
-  void roughness(
+  void heightheight(
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
@@ -203,7 +203,7 @@ private:
       W2 = 0x04u,
       W2c = 0x05u,
       L = 0x06u,
-      roughness = 0x07u,
+      heightheight = 0x07u,
   };};
 
   // Initialize class as unlocked
@@ -294,16 +294,16 @@ xt::xarray<double> W2(
   const xt::xarray<int>& fmask,
   bool periodic=true);
 
-// roughness
+// Height-Height Correlation Function
 
 template <class T>
-xt::xarray<double> roughness(
+xt::xarray<double> heightheight(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
   bool periodic=true);
 
 template <class T>
-xt::xarray<double> roughness(
+xt::xarray<double> heightheight(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
   const xt::xarray<int>& fmask,
@@ -326,6 +326,6 @@ xt::xarray<double> roughness(
 #include "Ensemble_S2.hpp"
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
-#include "Ensemble_roughness.hpp"
+#include "Ensemble_heightheight.hpp"
 
 #endif

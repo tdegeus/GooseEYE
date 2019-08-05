@@ -8,8 +8,8 @@ x = np.linspace(0, 2.0 * np.pi, 1000)
 y1 = np.sin(x)
 y2 = np.sin(2. * x)
 
-roughness1 = eye.roughness(roi=[200], f=y1, periodic=True)
-roughness2 = eye.roughness(roi=[200], f=y2, periodic=True)
+hh1 = eye.heightheight(roi=[200], f=y1, periodic=True)
+hh2 = eye.heightheight(roi=[200], f=y2, periodic=True)
 dx = eye.distance(roi=[200], dim=0)
 
 # </snippet>
@@ -31,7 +31,7 @@ ax.plot(x, y2)
 
 ax = axes[1]
 
-ax.plot(dx, roughness1)
-ax.plot(dx, roughness2)
+ax.plot(dx, hh1)
+ax.plot(dx, hh2)
 
 plt.show()

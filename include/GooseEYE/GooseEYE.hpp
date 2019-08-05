@@ -136,31 +136,31 @@ xt::xarray<double> W2(
 }
 
 // =================================================================================================
-// wrapper functions: roughness
+// wrapper functions: heightheight
 // =================================================================================================
 
 template <class T>
-xt::xarray<double> roughness(
+xt::xarray<double> heightheight(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
   bool periodic)
 {
   Ensemble ensemble(roi, periodic);
-  ensemble.roughness(f);
+  ensemble.heightheight(f);
   return ensemble.result();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 template <class T>
-xt::xarray<double> roughness(
+xt::xarray<double> heightheight(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
   const xt::xarray<int>& fmask,
   bool periodic)
 {
   Ensemble ensemble(roi, periodic);
-  ensemble.roughness(f, fmask );
+  ensemble.heightheight(f, fmask );
   return ensemble.result();
 }
 
