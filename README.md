@@ -1,8 +1,8 @@
 # GooseEYE
 
-Library to evaluate several geometrical statistical measures on 'images' (i.e. 1-D, 2-D, or 3-D matrices). These measures are explained based on examples in the [documentation](http://gooseeye.geus.me). 
+Library to evaluate several geometrical statistical measures on (ensembles of) 'images' (i.e. 1-D, 2-D, or 3-D matrices). These measures are explained based on examples in the [documentation](https://gooseeye.readthedocs.io). 
 
-The core of the implementation is a C++ library. For user convenience two interfaces are provided: (i) a graphical-user-interface (GUI) to perform most computations on a click-and-play basis, and (ii) a Python interface to perform more customized or automated computations.
+The core of the implementation is a C++ library. For user convenience a Python interface is provided to perform more customised or automated computations.
 
 # Credit / copyright
 
@@ -10,6 +10,8 @@ The core of the implementation is a C++ library. For user convenience two interf
 
 This software has been developed with the support of:
 
+*   [École Polytechnique Fédérale de Lausanne](http://www.epfl.ch)
 *   [Eindhoven University of Technology](http://www.tue.nl)
+*   [Dutch Research Council (NWO](http://www.nwo.nl)
 *   [Materials Innovation Institute (M2i)](http://www.m2i.nl)
 *   [TATA Steel Europe, IJmuiden](http://www.tatasteel.com)
