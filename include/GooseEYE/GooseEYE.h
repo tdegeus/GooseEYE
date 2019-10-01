@@ -139,7 +139,7 @@ public:
 
   xt::xarray<double> data_second() const;
 
-  // Get normalisation (number of measurement) per 'pixel' of the ROI
+  // Get normalisation (number of measurements) per 'pixel' of the ROI
 
   xt::xarray<double> norm() const;
 
