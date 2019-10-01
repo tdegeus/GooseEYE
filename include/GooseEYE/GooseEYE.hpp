@@ -38,8 +38,24 @@ xt::xarray<double> distance(const std::vector<size_t>& roi)
 
 xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim)
 {
-  Ensemble ensemble(roi, dim);
+  Ensemble ensemble(roi);
   return ensemble.distance(dim);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h)
+{
+  Ensemble ensemble(roi);
+  return ensemble.distance(h);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t dim)
+{
+  Ensemble ensemble(roi);
+  return ensemble.distance(h, dim);
 }
 
 // =================================================================================================

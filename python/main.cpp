@@ -95,6 +95,10 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
   .def("distance", py::overload_cast<size_t>(&GooseEYE::Ensemble::distance, py::const_))
 
+  .def("distance", py::overload_cast<const std::vector<double>&>(&GooseEYE::Ensemble::distance, py::const_))
+
+  .def("distance", py::overload_cast<const std::vector<double>&, size_t>(&GooseEYE::Ensemble::distance, py::const_))
+
   // Mean
 
   .def("mean", py::overload_cast<
@@ -199,6 +203,20 @@ m.def("distance", py::overload_cast<
     const std::vector<size_t>&,
     size_t>(&GooseEYE::distance),
   py::arg("roi"),
+  py::arg("dim"));
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&,
+    const std::vector<double>&>(&GooseEYE::distance),
+  py::arg("roi"),
+  py::arg("h"));
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&,
+    const std::vector<double>&,
+    size_t>(&GooseEYE::distance),
+  py::arg("roi"),
+  py::arg("h"),
   py::arg("dim"));
 
 // 2-point correlation

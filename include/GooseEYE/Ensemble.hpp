@@ -130,9 +130,32 @@ inline xt::xarray<double> Ensemble::distance() const
   xt::xarray<double> out = xt::zeros<double>(m_shape);
 
   for (size_t i = 0; i < m_shape.size(); ++i)
-    out += xt::pow(distance(i), 2.);
+    out += xt::pow(this->distance(i), 2.);
 
   return xt::pow(out, .5);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h) const
+{
+  GOOSEEYE_ASSERT(m_shape.size() == h.size());
+
+  xt::xarray<double> out = xt::zeros<double>(m_shape);
+
+  for (size_t i = 0; i < m_shape.size(); ++i)
+    out += xt::pow(this->distance(i) * h[i], 2.);
+
+  return xt::pow(out, .5);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h, size_t dim) const
+{
+  GOOSEEYE_ASSERT(m_shape.size() == h.size());
+
+  return this->distance(dim) * h[dim];
 }
 
 // =================================================================================================

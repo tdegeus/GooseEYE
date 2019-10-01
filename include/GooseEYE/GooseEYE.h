@@ -13,7 +13,7 @@
 namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
-// Kernel
+// Return different standard kernels
 // -------------------------------------------------------------------------------------------------
 
 namespace kernel {
@@ -123,15 +123,45 @@ public:
 
   Ensemble(const std::vector<size_t>& roi, bool periodic=true, bool variance=true);
 
-  // Get ensemble averaged result or raw data, and distance
+  // Get ensemble averaged result
 
   xt::xarray<double> result() const;
+
+  // Get ensemble variance of ensemble average
+
   xt::xarray<double> variance() const;
-  xt::xarray<double> data_first() const; // sum of the first moment: x_1 + x_2 + ...
-  xt::xarray<double> data_second() const; // sum of the second moment: x_1^2 + x_2^2 + ...
+
+  // Get ensemble sum of the first moment: x_1 + x_2 + ...
+
+  xt::xarray<double> data_first() const;
+
+  // Get ensemble sum of the second moment: x_1^2 + x_2^2 + ...
+
+  xt::xarray<double> data_second() const;
+
+  // Get normalisation (number of measurement) per 'pixel' of the ROI
+
   xt::xarray<double> norm() const;
+
+  // Get the relative distance of each pixel of the ROI
+
   xt::xarray<double> distance() const;
+
+  // Get the relative distance of each pixel of the ROI:
+  // - along a dimension -> can be positive and negative
+
   xt::xarray<double> distance(size_t dim) const;
+
+  // Get the relative distance of each pixel of the ROI:
+  // - normalised by the pixel-size along each axis
+
+  xt::xarray<double> distance(const std::vector<double>& h) const;
+
+  // Get the relative distance of each pixel of the ROI:
+  // - along a dimension -> can be positive and negative
+  // - normalised by the pixel-size along the relevant axis
+
+  xt::xarray<double> distance(const std::vector<double>& h, size_t dim) const;
 
   // Mean
 
@@ -221,7 +251,7 @@ private:
   // Raw (not normalized) result, and normalization
   xt::xarray<double> m_first; // sum of the first moment: x_1 + x_2 + ...
   xt::xarray<double> m_second; // sum of the second moment: x_1^2 + x_2^2 + ...
-  xt::xarray<double> m_norm;
+  xt::xarray<double> m_norm; // number of measurements per pixel
 
   // Shape of the ROI (of "m_data" and "m_norm")
   std::vector<size_t> m_shape;
@@ -229,7 +259,7 @@ private:
 
   // Padding size
   std::vector<std::vector<size_t>> m_pad;
-  std::vector<std::vector<size_t>> m_Pad;
+  std::vector<std::vector<size_t>> m_Pad; // pseudo 3-d equivalent
 
 };
 
@@ -237,11 +267,15 @@ private:
 // font-end functions to compute the statistics for one image
 // -------------------------------------------------------------------------------------------------
 
-// Distance
+// Distance (see "Ensemble::distance")
 
 xt::xarray<double> distance(const std::vector<size_t>& roi);
 
 xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim);
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h);
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t dim);
 
 // 2-point correlation
 
