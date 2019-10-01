@@ -4,8 +4,8 @@
 
 ================================================================================================= */
 
-#ifndef GOOSEEYE_ENSEMBLE_ROUGHNESS_HPP
-#define GOOSEEYE_ENSEMBLE_ROUGHNESS_HPP
+#ifndef GOOSEEYE_ENSEMBLE_HEIGHTHEIGHT_HPP
+#define GOOSEEYE_ENSEMBLE_HEIGHTHEIGHT_HPP
 
 #include "GooseEYE.h"
 
