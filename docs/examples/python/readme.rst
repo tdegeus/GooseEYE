@@ -301,6 +301,32 @@ Example
 
 [:download:`W2c.py <W2c.py>`]
 
+Height-height correlation
+=========================
+
+The height-height correlation corresponds to the following:
+
+.. math::
+
+  \mathcal{P} (\Delta \vec{x}) =
+  \sqrt{ \sum_{i} \; \left(
+    z (\vec{x}_i + \Delta \vec{x}) -
+    z (\vec{x}_i)
+  \right)^2 }
+
+Example
+-------
+
+.. image:: heightheight.svg
+  :width: 700px
+
+.. literalinclude:: heightheight.py
+   :language: python
+   :start-after: <snippet>
+   :end-before: </snippet>
+
+[:download:`heightheight.py <heightheight.py>`]
+
 Obtain clusters
 ===============
 

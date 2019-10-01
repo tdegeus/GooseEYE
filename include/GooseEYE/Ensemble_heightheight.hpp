@@ -4,8 +4,8 @@
 
 ================================================================================================= */
 
-#ifndef GOOSEEYE_ENSEMBLE_S2_HPP
-#define GOOSEEYE_ENSEMBLE_S2_HPP
+#ifndef GOOSEEYE_ENSEMBLE_HEIGHTHEIGHT_HPP
+#define GOOSEEYE_ENSEMBLE_HEIGHTHEIGHT_HPP
 
 #include "GooseEYE.h"
 
@@ -14,22 +14,17 @@ namespace GooseEYE {
 // -------------------------------------------------------------------------------------------------
 
 template <class T>
-inline void Ensemble::S2(
+inline void Ensemble::heightheight(
   const xt::xarray<T>& f,
-  const xt::xarray<T>& g,
-  const xt::xarray<int>& fmask,
-  const xt::xarray<int>& gmask)
+  const xt::xarray<int>& fmask)
 {
-  GOOSEEYE_ASSERT(f.shape() == g.shape());
   GOOSEEYE_ASSERT(f.shape() == fmask.shape());
-  GOOSEEYE_ASSERT(f.shape() == gmask.shape());
   GOOSEEYE_ASSERT(f.dimension() == m_shape.size());
   GOOSEEYE_ASSERT(xt::all(xt::equal(fmask,0) || xt::equal(fmask,1)));
-  GOOSEEYE_ASSERT(xt::all(xt::equal(gmask,0) || xt::equal(gmask,1)));
-  GOOSEEYE_ASSERT(m_stat == Type::S2 || m_stat == Type::Unset);
+  GOOSEEYE_ASSERT(m_stat == Type::heightheight || m_stat == Type::Unset);
 
   // lock statistic
-  m_stat = Type::S2;
+  m_stat = Type::heightheight;
 
   // padding default not periodic: mask padded items
   xt::pad_mode pad_mode = xt::pad_mode::constant;
@@ -43,19 +38,16 @@ inline void Ensemble::S2(
 
   // apply padding
   xt::xarray<T>   F = xt::pad(f, m_pad, pad_mode);
-  xt::xarray<T>   G = xt::pad(g, m_pad, pad_mode);
   xt::xarray<int> Fmask = xt::pad(fmask, m_pad, xt::pad_mode::constant, mask_value);
-  xt::xarray<T>   Gmask = xt::pad(gmask, m_pad, xt::pad_mode::constant, mask_value);
 
   // make matrices virtually 3-d matrices
   std::vector<size_t> shape = detail::shape_as_dim(MAX_DIM, F, 1);
   F.reshape(shape);
-  G.reshape(shape);
   Fmask.reshape(shape);
-  Gmask.reshape(shape);
 
   // local output and normalisation
   xt::xarray<T> first = xt::zeros<T>(m_Shape);
+  xt::xarray<T> second = xt::zeros<T>(m_Shape);
   xt::xarray<T> norm = xt::zeros<T>(m_Shape);
 
   // compute correlation
@@ -66,38 +58,40 @@ inline void Ensemble::S2(
         if (Fmask(h,i,j))
           continue;
         // - get comparison sub-matrix
-        auto Gi = xt::view(G,
+        auto Fi = xt::view(F,
           xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
           xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
           xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
         // - get inverse of comparison mask
-        auto Gmii = T(1) - xt::view(Gmask,
+        auto Fmii = T(1) - xt::view(Fmask,
           xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
           xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
           xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
-        // - correlation (account for mask)
-        if (F(h,i,j) != 0)
-          first += F(h,i,j) * Gi * Gmii;
+        // - update sum of the first moment
+        first += xt::pow(Fi - F(h,i,j), 2.0) * Fmii;
+        // - update sum of the second moment
+        if (m_variance)
+          second += xt::pow(Fi - F(h,i,j), 4.0) * Fmii;
         // - normalisation
-        norm += Gmii;
+        norm += Fmii;
       }
     }
   }
 
   // add to ensemble average
   m_first += first;
+  m_second += second;
   m_norm += norm;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 template <class T>
-inline void Ensemble::S2(
-  const xt::xarray<T>& f,
-  const xt::xarray<T>& g)
+inline void Ensemble::heightheight(
+  const xt::xarray<T>& f)
 {
   xt::xarray<int> mask = xt::zeros<int>(f.shape());
-  S2(f, g, mask, mask);
+  heightheight(f, mask);
 }
 
 // -------------------------------------------------------------------------------------------------

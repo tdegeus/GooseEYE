@@ -1,0 +1,9 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+
+Name: GooseEYE
+Description: Statistics
+Requires:
+Version: @GOOSEEYE_VERSION@
+Libs:
+Cflags: -I${prefix}/@GOOSEEYE_INCLUDE_DIR@

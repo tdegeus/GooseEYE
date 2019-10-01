@@ -45,7 +45,19 @@ The actual computation is contained in the computation of the ensemble, around w
 
         cppmat::array<double> result = ensemble.result();
 
-    The separate raw result and normalization are also available.
+    .. note::
+
+        The variance around the average can be obtained using ``ensemble.variance()``
+
+    .. note::
+
+        To obtain the raw result and normalisation use:
+
+        .. code-block:: cpp
+
+            ensemble.data_first();  // first moment: x_1 + x_2 + ...
+            ensemble.data_second(); // second moment: x_1^2 + x_2^2 + ...
+            ensemble.norm();        // normalisation (number of measurements)
 
 Using the individual images wrapper all these steps are combined in a single function call with almost the same arguments as the underlying ``GooseEYE::Ensemle`` functions. The only limitation is the the raw data and normalization cannot be accessed.
 

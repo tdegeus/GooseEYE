@@ -73,22 +73,31 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
   // Constructors
 
-  .def(py::init<std::vector<size_t>&, bool>(),
+  .def(py::init<std::vector<size_t>&, bool, bool>(),
     "Ensemble",
     py::arg("roi"),
-    py::arg("periodic")=true)
+    py::arg("periodic")=true,
+    py::arg("variance")=false)
 
   // Get ensemble averaged result or raw data, and distance
 
   .def("result", &GooseEYE::Ensemble::result)
 
-  .def("data", &GooseEYE::Ensemble::data)
+  .def("variance", &GooseEYE::Ensemble::variance)
+
+  .def("data_first", &GooseEYE::Ensemble::data_first)
+
+  .def("data_second", &GooseEYE::Ensemble::data_second)
 
   .def("norm", &GooseEYE::Ensemble::norm)
 
   .def("distance", py::overload_cast<>(&GooseEYE::Ensemble::distance, py::const_))
 
   .def("distance", py::overload_cast<size_t>(&GooseEYE::Ensemble::distance, py::const_))
+
+  .def("distance", py::overload_cast<const std::vector<double>&>(&GooseEYE::Ensemble::distance, py::const_))
+
+  .def("distance", py::overload_cast<const std::vector<double>&, size_t>(&GooseEYE::Ensemble::distance, py::const_))
 
   // Mean
 
@@ -125,6 +134,18 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     py::arg("g"),
     py::arg("fmask"),
     py::arg("gmask"))
+
+  // Height-Height Correlation Function
+
+  .def("heightheight", py::overload_cast<
+      const xt::xarray<double>&>(&GooseEYE::Ensemble::heightheight<double>),
+    py::arg("f"))
+
+  .def("heightheight", py::overload_cast<
+      const xt::xarray<double>&,
+      const xt::xarray<int>&>(&GooseEYE::Ensemble::heightheight<double>),
+    py::arg("f"),
+    py::arg("fmask"))
 
   // 2-point cluster
 
@@ -171,6 +192,32 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
   );
 
 // -------------------------------------------------------------------------------------------------
+
+// distance
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&>(&GooseEYE::distance),
+  py::arg("roi"));
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&,
+    size_t>(&GooseEYE::distance),
+  py::arg("roi"),
+  py::arg("dim"));
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&,
+    const std::vector<double>&>(&GooseEYE::distance),
+  py::arg("roi"),
+  py::arg("h"));
+
+m.def("distance", py::overload_cast<
+    const std::vector<size_t>&,
+    const std::vector<double>&,
+    size_t>(&GooseEYE::distance),
+  py::arg("roi"),
+  py::arg("h"),
+  py::arg("dim"));
 
 // 2-point correlation
 
@@ -265,6 +312,26 @@ m.def("W2", py::overload_cast<
     bool>(&GooseEYE::W2<double>),
   py::arg("roi"),
   py::arg("w"),
+  py::arg("f"),
+  py::arg("fmask"),
+  py::arg("periodic")=true);
+
+// Height-Height Correlation Function
+
+m.def("heightheight", py::overload_cast<
+    const std::vector<size_t>&,
+    const xt::xarray<double>&,
+    bool>(&GooseEYE::heightheight<double>),
+  py::arg("roi"),
+  py::arg("f"),
+  py::arg("periodic")=true);
+
+m.def("heightheight", py::overload_cast<
+    const std::vector<size_t>&,
+    const xt::xarray<double>&,
+    const xt::xarray<int>&,
+    bool>(&GooseEYE::heightheight<double>),
+  py::arg("roi"),
   py::arg("f"),
   py::arg("fmask"),
   py::arg("periodic")=true);

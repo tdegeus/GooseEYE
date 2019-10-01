@@ -25,6 +25,40 @@ namespace GooseEYE {
 // }
 
 // =================================================================================================
+// wrapper functions: distance
+// =================================================================================================
+
+xt::xarray<double> distance(const std::vector<size_t>& roi)
+{
+  Ensemble ensemble(roi);
+  return ensemble.distance();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim)
+{
+  Ensemble ensemble(roi);
+  return ensemble.distance(dim);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h)
+{
+  Ensemble ensemble(roi);
+  return ensemble.distance(h);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t dim)
+{
+  Ensemble ensemble(roi);
+  return ensemble.distance(h, dim);
+}
+
+// =================================================================================================
 // wrapper functions: 2-point correlation
 // =================================================================================================
 
@@ -114,6 +148,35 @@ xt::xarray<double> W2(
 {
   Ensemble ensemble(roi, periodic);
   ensemble.W2(w, f, fmask);
+  return ensemble.result();
+}
+
+// =================================================================================================
+// wrapper functions: heightheight
+// =================================================================================================
+
+template <class T>
+xt::xarray<double> heightheight(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  bool periodic)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.heightheight(f);
+  return ensemble.result();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <class T>
+xt::xarray<double> heightheight(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& fmask,
+  bool periodic)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.heightheight(f, fmask );
   return ensemble.result();
 }
 
