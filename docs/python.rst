@@ -3,6 +3,10 @@
 Python interface
 ****************
 
+.. todo::
+
+    The Python interface is generated using `pybind11 <http://pybind11.readthedocs.io/en/master/>`_. This project is particularly worth mentioning as it is extremely easy to use, and requires almost no code.
+
 Introduction
 ============
 

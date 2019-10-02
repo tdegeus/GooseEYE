@@ -8,7 +8,7 @@ C++ interface
 Introduction
 ============
 
-The C++ code is best explored by simply inspecting [:download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`] here you can find some comments to get you going. To include use
+The C++ code is best explored by simply inspecting :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>` here you can find some comments to get you going. To include use
 
 .. code-block:: cpp
 
@@ -16,23 +16,35 @@ The C++ code is best explored by simply inspecting [:download:`GooseEYE.h <../in
 
 Everything is contained in the namespace ``GooseEYE``.
 
+Compiling
+---------
+
+.. todo::
+
+    Write.
+
+.. todo::
+
+    `xtensor <https://github.com/QuantStack/xtensor>`_
+
 Ensemble or individual image
 ============================
 
-There are two modes of using the code. One can compute the statistics based on:
+There are two modes of using the code, using:
 
-*   An individual image.
-*   An ensemble of images.
+*   An individual image, using individual functions (e.g. ``GooseFEM::S2(...)``, ``GooseFEM::W2(...)``, etc.)
 
-The actual computation is contained in the computation of the ensemble, around which a wrapper is provided to evaluate an individual image. The computation of the ensemble proceeds in three steps:
+*   An ensemble of images, using the ``GooseFEM::Ensemble`` class.
+
+Thereby the individual functions are simply a wrapper around the ``GooseFEM::Ensemble`` class. The general structure for an ensemble of images is as follows:
 
 1.   Initialize the ensemble, defining some settings of which the shape of the region-of-interest is mandatory. For example:
 
      .. code-block:: cpp
 
-        GooseEYE::Ensemble ensemble({51,51});
+        GooseEYE::Ensemble ensemble({51, 51});
 
-2.  Add the statistics by evaluating the different images in the ensemble. For example:
+2.  Compute the statistics by evaluating a sequence of images in the ensemble. For example:
 
     .. code-block:: cpp
 
@@ -59,7 +71,7 @@ The actual computation is contained in the computation of the ensemble, around w
             ensemble.data_second(); // second moment: x_1^2 + x_2^2 + ...
             ensemble.norm();        // normalisation (number of measurements)
 
-Using the individual images wrapper all these steps are combined in a single function call with almost the same arguments as the underlying ``GooseEYE::Ensemle`` functions. The only limitation is the the raw data and normalization cannot be accessed.
+Using the individual images wrapper all these steps are combined in a single function call with almost the same arguments. The only limitation is the the raw data and normalization cannot be accessed.
 
 Statistics
 ==========
@@ -68,30 +80,54 @@ Statistics
 
   The functions are available directly in the ``GooseEYE`` namespace for individual images, and as member functions of the ``Ensemble``-class.
 
-mean
-----
+GooseEYE::Ensemble::mean
+------------------------
 
-The arithmetic mean. An overload is available to mask certain voxels.
+The arithmetic mean.
 
-S2
---
+* An overload is available to mask certain voxels
+* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+* :download:`Ensemble_mean.hpp <../include/GooseEYE/Ensemble_mean.hpp>`
 
-:ref:`theory_S2`. Overloads are available for ``cppmat::array<int>`` (binary and integer) images and ``cppmat::array<double>`` images, and for masked images.
+GooseEYE::Ensemble::S2
+----------------------
 
-W2
---
+2-point correlation.
 
-:ref:`theory_W2`. Overloads are available for different combinations of ``cppmat::array<int>`` (binary and integer) images and ``cppmat::array<double>`` images, and for masked images.
+* An overload is available to mask certain voxels.
+* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+* :download:`Ensemble_S2.hpp <../include/GooseEYE/Ensemble_S2.hpp>`
+* :ref:`Theory & Python example <theory_S2>`.
 
-W2c
----
+GooseEYE::Ensemble::C2
+----------------------
 
-Collapsed weighted correlation (see: :ref:`theory_W2`). Overloads are available for ``cppmat::array<int>`` (binary and integer) images and ``cppmat::array<double>`` images, and for masked images. To automatically compute the clusters and their centres use ``W2c_auto``.
+2-point cluster function.
 
-L
--
+* An overload is available to mask certain voxels.
+* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+* :download:`Ensemble_C2.hpp <../include/GooseEYE/Ensemble_C2.hpp>`
+* :ref:`Theory & Python example <theory_C2>`.
 
-:ref:`theory_L`.
+GooseEYE::Ensemble::W2
+----------------------
+
+Weighted 2-point correlation.
+
+* An overload is available to mask certain voxels.
+* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+* :download:`Ensemble_W2.hpp <../include/GooseEYE/Ensemble_W2.hpp>`
+* :ref:`Theory & Python example <theory_W2>`.
+
+GooseEYE::Ensemble::heightheight
+--------------------------------
+
+Height-height correlation.
+
+* An overload is available to mask certain voxels.
+* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+* :download:`Ensemble_heightheight.hpp <../include/GooseEYE/Ensemble_heightheight.hpp>`
+* :ref:`Theory & Python example <theory_heightheight>`.
 
 Miscellaneous functions
 =======================

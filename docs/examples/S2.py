@@ -8,26 +8,28 @@ import numpy    as np
 # --------------------------
 
 # generate image, store 'volume-fraction'
-I   = eye.dummy_circles((500,500))
+I = eye.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # 2-point probability
-S2 = eye.S2((101,101),I,I)
+S2 = eye.S2((101, 101), I, I)
 
-# gray image + correlation
+# grey image + correlation
 # ------------------------
 
-# convert to gray-scale image and introduce noise
-Igr  = np.array(I,copy=True).astype(np.float)
-Igr += 0.1*(2.0*np.random.random(Igr.size)-1.0).reshape(Igr.shape)+0.1
-Igr /= 1.2
+# noise
+noise = 0.1 * (2.0 * np.random.random(I.shape) - 1.0)
+
+# grey-scale image
+Igr = np.array(I, copy=True).astype(np.float)
+Igr = (Igr + 0.1) / 1.2 + noise
 
 # 2-point correlation ('auto-correlation')
-S2gr = eye.S2((101,101),Igr,Igr)
+S2gr = eye.S2((101, 101), Igr, Igr)
 
 # correlation bounds: mean intensity squared and mean of the intensity squared
-Iav_sq = np.mean(Igr)**2.
-Isq_av = np.mean(Igr**2.)
+Iav_sq = np.mean(Igr)**2.0
+Isq_av = np.mean(Igr**2.0)
 
 # </snippet>
 
