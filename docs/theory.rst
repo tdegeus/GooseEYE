@@ -161,17 +161,26 @@ Textbooks
 Example
 -------
 
-.. image:: examples/S2_cluster.svg
+.. image:: examples/C2.svg
   :width: 700px
 
-The 2-point cluster function can be computed with the same machinery as the 2-point probability. The former uses an integer image, with a unique integer number to label each cluster. The latter simply uses binary values.
+Python
+^^^^^^
 
-.. literalinclude:: examples/S2_cluster.py
+:download:`C2.py <examples/C2.py>`
+
+.. literalinclude:: examples/C2.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`S2_cluster.py <examples/S2_cluster.py>`]
+C++
+^^^
+
+:download:`C2.cpp <examples/C2.cpp>`
+
+.. literalinclude:: examples/C2.cpp
+   :language: cpp
 
 .. _theory_L:
 
@@ -209,10 +218,10 @@ Furthermore it is highly unlikely that a path can be found through the inclusion
 
 An important ingredient of the computation of :math:`L` is thus the choice of the pixel paths. In GooseEYE the paths are constructed between the centre of the region of interest and each of the points on the end of the region of interest. The paths can be computed using different algorithms, illustrated below:
 
+:download:`pixel_path.py <examples/pixel_path.py>`
+
 .. image:: examples/pixel_path.svg
   :width: 700px
-
-[:download:`pixel_path.py <examples/pixel_path.py>`]
 
 Example
 -------
@@ -220,12 +229,26 @@ Example
 .. image:: examples/L.svg
   :width: 700px
 
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`L.py <examples/L.py>`
+
 .. literalinclude:: examples/L.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`L.py <examples/L.py>`]
+C++
+^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
 
 .. _theory_W2:
 
@@ -273,12 +296,22 @@ Example
 .. image:: examples/W2.svg
   :width: 700px
 
+Python
+^^^^^^
+
+:download:`W2.py <examples/W2.py>`
+
 .. literalinclude:: examples/W2.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`W2.py <examples/W2.py>`]
+C++
+^^^
+
+.. todo::
+
+  C++ example.
 
 Collapse to single point
 ------------------------
