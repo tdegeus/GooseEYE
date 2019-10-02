@@ -112,19 +112,26 @@ Masked correlation
 
 This function also has the possibility to mask certain pixels. The image's mask is a binary matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalisation is corrected for the reduced amount of data points, whereby the number of data points is no longer constant over the region-of-interest.
 
-.. note::
-
-  For non-periodic images a mask in conjunction with padding of the image can be used to incorporate the full image in the statistic. Otherwise a boundary region is skipped, reducing the amount of information from the boundary region.
-
 .. image:: examples/S2_mask.svg
   :width: 700px
+
+Python
+^^^^^^
+
+:download:`S2_mask.py <examples/S2_mask.py>`
 
 .. literalinclude:: examples/S2_mask.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`S2_mask.py <examples/S2_mask.py>`]
+C++
+^^^
+
+:download:`S2_mask.cpp <examples/S2_mask.cpp>`
+
+.. literalinclude:: examples/S2_mask.cpp
+   :language: cpp
 
 .. _theory_C2:
 

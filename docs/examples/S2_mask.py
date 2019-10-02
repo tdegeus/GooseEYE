@@ -8,26 +8,26 @@ import numpy    as np
 # --------------------------
 
 # generate image, store 'volume-fraction'
-I   = eye.dummy_circles((500,500))
+I = eye.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # 2-point probability
-S2  = eye.S2((101,101),I,I)
+S2 = eye.S2((101, 101), I, I)
 
 # artefact + (masked) correlation
 # -------------------------------
 
 # define image with artefact and the corresponding mask
-mask            = np.zeros(I.shape,dtype='bool')
-Ierr            = np.array(I      ,copy=True   )
+mask = np.zeros(I.shape, dtype='bool')
+Ierr = np.array(I, copy=True)
 mask[:150,:150] = 1
 Ierr[:150,:150] = 1
 
 # 2-point correlation on image with artefact (no mask)
-S2err  = eye.S2((101,101),Ierr,Ierr)
+S2err = eye.S2((101, 101), Ierr, Ierr)
 
 # 2-point correlation on image with artefact, with artefact masked
-S2mask = eye.S2((101,101),Ierr,Ierr,fmask=mask,gmask=mask)
+S2mask = eye.S2((101, 101), Ierr, Ierr, fmask=mask, gmask=mask)
 
 # </snippet>
 
