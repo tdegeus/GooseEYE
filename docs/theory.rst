@@ -248,7 +248,7 @@ C++
 
 .. todo::
 
-  Check after xtensor conversion is done.
+  Create after xtensor conversion is done.
 
 .. _theory_W2:
 
@@ -311,7 +311,7 @@ C++
 
 .. todo::
 
-  C++ example.
+  Create.
 
 Collapse to single point
 ------------------------
@@ -351,12 +351,26 @@ Example
 .. image:: examples/W2c.svg
   :width: 700px
 
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`W2c.py <examples/W2c.py>`
+
 .. literalinclude:: examples/W2c.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`W2c.py <examples/W2c.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.
 
 .. _theory_heightheight:
 
@@ -379,12 +393,23 @@ Example
 .. image:: examples/heightheight.svg
   :width: 700px
 
+Python
+^^^^^^
+
+:download:`heightheight.py <examples/heightheight.py>`
+
 .. literalinclude:: examples/heightheight.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`heightheight.py <examples/heightheight.py>`]
+C++
+^^^
+
+:download:`heightheight.cpp <examples/heightheight.cpp>`
+
+.. literalinclude:: examples/heightheight.cpp
+   :language: cpp
 
 Obtain clusters
 ===============
@@ -395,12 +420,26 @@ Calculate clusters
 .. image:: examples/clusters.svg
   :width: 700px
 
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`clusters.py <examples/clusters.py>`
+
 .. literalinclude:: examples/clusters.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`clusters.py <examples/clusters.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.
 
 Dilate clusters (differently)
 -----------------------------
@@ -408,9 +447,23 @@ Dilate clusters (differently)
 .. image:: examples/clusters_dilate.svg
   :width: 700px
 
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`clusters_dilate.py <examples/clusters_dilate.py>`
+
 .. literalinclude:: examples/clusters_dilate.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`clusters_dilate.py <examples/clusters_dilate.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.
