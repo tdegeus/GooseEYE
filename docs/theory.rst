@@ -8,6 +8,10 @@ Theory & Examples
 2-point probability / auto-correlation
 ======================================
 
+.. todo::
+
+  Split 2-point probability and auto-correlation, to not mix introducing ensemble averages and masked correlation. Also, try to work more with differences.
+
 Theory
 ------
 
@@ -107,6 +111,8 @@ C++
 .. literalinclude:: examples/S2.cpp
    :language: cpp
 
+.. _theory_S2_masked:
+
 Masked correlation
 ------------------
 
@@ -132,6 +138,29 @@ C++
 
 .. literalinclude:: examples/S2_mask.cpp
    :language: cpp
+
+.. _theory_S2_ensemble:
+
+Ensemble average
+----------------
+
+.. todo::
+
+  Description.
+
+Python
+^^^^^^
+
+.. todo::
+
+  Create.
+
+C++
+^^^
+
+.. todo::
+
+  Create.
 
 .. _theory_C2:
 
@@ -163,6 +192,10 @@ Example
 
 .. image:: examples/C2.svg
   :width: 700px
+
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
 
 Python
 ^^^^^^
@@ -228,6 +261,14 @@ Example
 
 .. image:: examples/L.svg
   :width: 700px
+
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
+  .. todo::
+
+    Check statement on mask.
 
 Python
 ^^^^^^
@@ -296,6 +337,10 @@ Example
 .. image:: examples/W2.svg
   :width: 700px
 
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
 Python
 ^^^^^^
 
@@ -351,6 +396,14 @@ Example
 .. image:: examples/W2c.svg
   :width: 700px
 
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
+  .. todo::
+
+    Check statement on mask.
+
 Python
 ^^^^^^
 
@@ -392,6 +445,10 @@ Example
 
 .. image:: examples/heightheight.svg
   :width: 700px
+
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
 
 Python
 ^^^^^^

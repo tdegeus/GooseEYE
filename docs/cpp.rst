@@ -8,24 +8,17 @@ C++ interface
 Introduction
 ============
 
-The C++ code is best explored by simply inspecting :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>` here you can find some comments to get you going. To include use
+.. note::
+
+  GooseEYE is a research code. The best reference is the code itself: this reader just gives an overview and points in the right directions.
+
+To use,
 
 .. code-block:: cpp
 
     #include <GooseEYE/GooseEYE.h>
 
 Everything is contained in the namespace ``GooseEYE``.
-
-Compiling
----------
-
-.. todo::
-
-    Write.
-
-.. todo::
-
-    `xtensor <https://github.com/QuantStack/xtensor>`_
 
 Ensemble or individual image
 ============================
@@ -36,7 +29,11 @@ There are two modes of using the code, using:
 
 *   An ensemble of images, using the ``GooseFEM::Ensemble`` class.
 
-Thereby the individual functions are simply a wrapper around the ``GooseFEM::Ensemble`` class. The general structure for an ensemble of images is as follows:
+.. todo::
+
+  Reference the right example.
+
+The individual functions are simply a wrapper around the ``GooseFEM::Ensemble`` class. The general structure for an ensemble of images is as follows:
 
 1.   Initialize the ensemble, defining some settings of which the shape of the region-of-interest is mandatory. For example:
 
@@ -67,11 +64,11 @@ Thereby the individual functions are simply a wrapper around the ``GooseFEM::Ens
 
         .. code-block:: cpp
 
-            ensemble.data_first();  // first moment: x_1 + x_2 + ...
+            ensemble.data_first();  // first moment : x_1   + x_2   + ...
             ensemble.data_second(); // second moment: x_1^2 + x_2^2 + ...
             ensemble.norm();        // normalisation (number of measurements)
 
-Using the individual images wrapper all these steps are combined in a single function call with almost the same arguments. The only limitation is the the raw data and normalization cannot be accessed.
+Using the individual images wrapper, all these steps are combined in a single function call with almost the same arguments. The only limitation is the the raw data and normalization cannot be accessed.
 
 Statistics
 ==========
@@ -80,92 +77,114 @@ Statistics
 
   The functions are available directly in the ``GooseEYE`` namespace for individual images, and as member functions of the ``Ensemble``-class.
 
-GooseEYE::Ensemble::mean
-------------------------
+GooseEYE::mean
+--------------
 
 The arithmetic mean.
 
-* An overload is available to mask certain voxels
-* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
-* :download:`Ensemble_mean.hpp <../include/GooseEYE/Ensemble_mean.hpp>`
+.. note::
 
-GooseEYE::Ensemble::S2
-----------------------
+  An overload is available to mask certain voxels
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_mean.hpp <../include/GooseEYE/Ensemble_mean.hpp>`
+
+GooseEYE::S2
+------------
 
 2-point correlation.
 
-* An overload is available to mask certain voxels.
-* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
-* :download:`Ensemble_S2.hpp <../include/GooseEYE/Ensemble_S2.hpp>`
-* :ref:`Theory & Python example <theory_S2>`.
+.. note::
 
-GooseEYE::Ensemble::C2
-----------------------
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_S2.hpp <../include/GooseEYE/Ensemble_S2.hpp>`
+  * :ref:`Theory & Example <theory_S2>`.
+
+GooseEYE::C2
+------------
 
 2-point cluster function.
 
-* An overload is available to mask certain voxels.
-* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
-* :download:`Ensemble_C2.hpp <../include/GooseEYE/Ensemble_C2.hpp>`
-* :ref:`Theory & Python example <theory_C2>`.
+.. note::
 
-GooseEYE::Ensemble::W2
-----------------------
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_C2.hpp <../include/GooseEYE/Ensemble_C2.hpp>`
+  * :ref:`Theory & Example <theory_C2>`.
+
+GooseEYE::W2
+------------
 
 Weighted 2-point correlation.
 
-* An overload is available to mask certain voxels.
-* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
-* :download:`Ensemble_W2.hpp <../include/GooseEYE/Ensemble_W2.hpp>`
-* :ref:`Theory & Python example <theory_W2>`.
+.. note::
 
-GooseEYE::Ensemble::heightheight
---------------------------------
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_W2.hpp <../include/GooseEYE/Ensemble_W2.hpp>`
+  * :ref:`Theory & Example <theory_W2>`.
+
+GooseEYE::heightheight
+----------------------
 
 Height-height correlation.
 
-* An overload is available to mask certain voxels.
-* :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
-* :download:`Ensemble_heightheight.hpp <../include/GooseEYE/Ensemble_heightheight.hpp>`
-* :ref:`Theory & Python example <theory_heightheight>`.
+.. note::
+
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_heightheight.hpp <../include/GooseEYE/Ensemble_heightheight.hpp>`
+  * :ref:`Theory & Example <theory_heightheight>`.
+
+Information
+===========
+
+GooseEYE::distance
+------------------
+
+The relative distance of each pixel of the ROI.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`GooseEYE.hpp <../include/GooseEYE/GooseEYE.hpp>`
+  * :ref:`Example <theory_heightheight>`.
+
+Generate shape
+==============
+
+GooseEYE::dummy_circles
+-----------------------
+
+Create a dummy binary images of circles.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`dummy_circles.hpp <../include/GooseEYE/dummy_circles.hpp>`
+  * :ref:`Example <theory_S2>`.
 
 Miscellaneous functions
 =======================
 
-clusters
---------
+.. todo::
 
-Identify the clusters in a binary images.
-
-clusterCenters
---------------
-
-Identify the clusters and their centres in a binary images.
-
-dilate
-------
-
-Dilate a binary or integer image.
-
-kernel
-------
-
-Define a kernel.
-
-path
-----
-
-Define a path between two voxels.
-
-stampPoints
------------
-
-Return the voxel-paths use in the computation of the lineal path function and collapsed weighted correlation.
-
-dummy_circles
--------------
-
-Create a dummy binary images of circles.
+  Describe all other functions here.
 
 Compiling
 =========
@@ -173,9 +192,11 @@ Compiling
 Introduction
 ------------
 
-This module is header only. So one just has to ``#include <GooseEYE/GooseEYE.h>``. somewhere in the source code, and to tell the compiler where the header-files are. For the latter, several ways are described below.
+This module is header only. So one just has to ``#include <GooseEYE/GooseEYE.h>``. somewhere in the source code, and to tell the compiler where the header-files are. For the latter, several ways are described below. Note that GooseEYE uses `xtensor <https://github.com/QuantStack/xtensor>`_ in virtually all functions, so you have to tell your compiler also where to find `xtensor <https://github.com/QuantStack/xtensor>`_.
 
-Before proceeding, a words about optimization. Of course one should use optimization when compiling the release of the code (``-O2`` or ``-O3``). But it is also a good idea to switch off the assertions in the code (mostly checks on size) that facilitate easy debugging, but do cost time. Therefore, include the flag ``-DNDEBUG``. Note that this is all C++ standard. I.e. it should be no surprise, and it always a good idea to do.
+.. tip::
+
+  Optimisation of crucial importance if you do not want to wait forever. Please `use the strategies provided by xtensor <https://xtensor.readthedocs.io/en/latest/build-options.html>`_. In particular, it is highly advice to use `xsimd <https://github.com/QuantStack/xsimd>`_ in addition to the usual optimisation flags.
 
 Manual compiler flags
 ---------------------
@@ -183,11 +204,11 @@ Manual compiler flags
 GNU / Clang
 ^^^^^^^^^^^
 
-Add the following compiler's arguments:
+Add the following compiler's arguments (in addition to the arguments to include `xtensor <https://github.com/QuantStack/xtensor>`_):
 
 .. code-block:: bash
 
-  -I${PATH_TO_GOOSEEYE}/src -std=c++14
+  -I${PATH_TO_GOOSEEYE}/include
 
 .. note:: **(Not recommended)**
 
@@ -195,7 +216,7 @@ Add the following compiler's arguments:
 
   1.  Include this module as a submodule using ``git submodule add https://github.com/tdegeus/GooseEYE.git``.
 
-  2.  Replace the first line of this example by ``#include "GooseEYE/src/GooseEYE/GooseEYE.h"``.
+  2.  Replace the first line of this example by ``#include "GooseEYE/include/GooseEYE/GooseEYE.h"``.
 
       *If you decide to manually copy the header file, you might need to modify this relative path to your liking.*
 
@@ -218,7 +239,7 @@ Install system-wide (root)
 
     .. code-block:: bash
 
-      $ cd /path/to/GooseEYE/src/build
+      $ cd /path/to/GooseEYE/include/build
 
 2.  'Build' ``GooseEYE``
 
@@ -227,7 +248,7 @@ Install system-wide (root)
       $ cmake ..
       $ make install
 
-    (If you've used another build directory, change the first command to ``$ cmake /path/to/GooseEYE/src``)
+    (If you've used another build directory, change the first command to ``$ cmake /path/to/GooseEYE``)
 
 Install in custom location (user)
 :::::::::::::::::::::::::::::::::
@@ -236,7 +257,7 @@ Install in custom location (user)
 
     .. code-block:: bash
 
-      $ cd /path/to/GooseEYE/src/build
+      $ cd /path/to/GooseEYE/include/build
 
 2.  'Build' ``GooseEYE`` to install it in a custom location
 
@@ -246,7 +267,7 @@ Install in custom location (user)
       $ cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/custom/install/path
       $ make install
 
-    (If you've used another build directory, change the first command to ``$ cmake /path/to/GooseEYE/src``)
+    (If you've used another build directory, change the first command to ``$ cmake /path/to/GooseEYE``)
 
 3.  Add the following path to your ``~/.bashrc`` (or ``~/.zshrc``):
 
@@ -262,7 +283,7 @@ Install in custom location (user)
 
   2.  Modify the line ``prefix=@CMAKE_INSTALL_PREFIX@`` to ``prefix=/path/to/GooseEYE``.
 
-  3.  Modify the line ``Cflags: -I${prefix}/@INCLUDE_INSTALL_DIR@`` to ``Cflags: -I${prefix}/src``.
+  3.  Modify the line ``Cflags: -I${prefix}/@INCLUDE_INSTALL_DIR@`` to ``Cflags: -I${prefix}/include``.
 
   4.  Modify the line ``Version: @GOOSEEYE_VERSION_NUMBER@`` to reflect the correct release version.
 
