@@ -8,10 +8,10 @@ The core of the implementation is a C++ library. For user convenience a Python i
 
 (c) T.W.J. de Geus | [www.geus.me](http://www.geus.me) | [tom@geus.me](mailto:tom@geus.me)
 
-This software has been developed with the support of:
+Tom de Geus was financially supported by:
 
-*   [École Polytechnique Fédérale de Lausanne](http://www.epfl.ch)
-*   [Eindhoven University of Technology](http://www.tue.nl)
-*   [Dutch Research Council (NWO](http://www.nwo.nl)
+*   [École Polytechnique Fédérale de Lausanne (EPFL)](http://www.epfl.ch)
+*   [Eindhoven University of Technology (TU/e)](http://www.tue.nl)
+*   [Dutch Research Council (NWO)](http://www.nwo.nl)
 *   [Materials Innovation Institute (M2i)](http://www.m2i.nl)
 *   [TATA Steel Europe, IJmuiden](http://www.tatasteel.com)

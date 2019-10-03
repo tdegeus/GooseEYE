@@ -1,17 +1,21 @@
 
-************************
-Theory & Python examples
-************************
+*****************
+Theory & Examples
+*****************
 
 .. _theory_S2:
 
 2-point probability / auto-correlation
 ======================================
 
+.. todo::
+
+  Split 2-point probability and auto-correlation, to not mix introducing ensemble averages and masked correlation. Also, try to work more with differences.
+
 Theory
 ------
 
-The most basic statistic determines the typical distance over which two points (pixels, voxels, ...) are related to each other. This is best understood by considering a binary 2D image, wherein each pixel is either black or white. This is described by the following indicator function, indicating the 'greyscale' of a pixel at position :math:`\vec{x}_i`:
+This measure determines the typical distance over which two points (pixels, voxels, ...) are related to each other. This is best understood by considering a binary 2D image, wherein each pixel is either black or white. This is described by the following indicator function, indicating the 'greyscale' of a pixel at position :math:`\vec{x}_i`:
 
 .. math::
 
@@ -80,36 +84,85 @@ Example
 
 This result is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The top row shows the image and the results for the binary image: from left to right: the image, the 2-point probability :math:`S_2` in two dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis. The same image and results are shown on the bottom row for a greyscale image, for which noise is added and the background and the islands are made grey.
 
-.. image:: S2.svg
+.. image:: examples/S2.svg
   :width: 700px
 
-This example is based on the following code (the code used for the plotting is included in the download, whereby the matplotlib-style can be installed by installing `goosempl <http://goosempl.geus.me>`_ (for example using ``pip install goosempl``).
+This example is based on the following code.
 
-[:download:`S2.py <S2.py>`]
+.. note::
 
-.. literalinclude:: S2.py
+    The Python-code can used for the plotting: The complete code is included in the download. Note that to obtain the same plot one should download and install the matplotlib-styles available in `GooseMPL <https://www.github.com/tdegeus/GooseMPL>`_.
+
+Python
+^^^^^^
+
+:download:`S2.py <examples/S2.py>`
+
+.. literalinclude:: examples/S2.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
+
+C++
+^^^
+
+:download:`S2.cpp <examples/S2.cpp>`
+
+.. literalinclude:: examples/S2.cpp
+   :language: cpp
+
+.. _theory_S2_masked:
 
 Masked correlation
 ------------------
 
 This function also has the possibility to mask certain pixels. The image's mask is a binary matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalisation is corrected for the reduced amount of data points, whereby the number of data points is no longer constant over the region-of-interest.
 
-.. note::
-
-  For non-periodic images a mask in conjunction with padding of the image can be used to incorporate the full image in the statistic. Otherwise a boundary region is skipped, reducing the amount of information from the boundary region.
-
-.. image:: S2_mask.svg
+.. image:: examples/S2_mask.svg
   :width: 700px
 
-.. literalinclude:: S2_mask.py
+Python
+^^^^^^
+
+:download:`S2_mask.py <examples/S2_mask.py>`
+
+.. literalinclude:: examples/S2_mask.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`S2_mask.py <S2_mask.py>`]
+C++
+^^^
+
+:download:`S2_mask.cpp <examples/S2_mask.cpp>`
+
+.. literalinclude:: examples/S2_mask.cpp
+   :language: cpp
+
+.. _theory_S2_ensemble:
+
+Ensemble average
+----------------
+
+.. todo::
+
+  Description.
+
+Python
+^^^^^^
+
+.. todo::
+
+  Create.
+
+C++
+^^^
+
+.. todo::
+
+  Create.
+
+.. _theory_C2:
 
 2-point cluster function
 ========================
@@ -137,17 +190,30 @@ Textbooks
 Example
 -------
 
-.. image:: S2_cluster.svg
+.. image:: examples/C2.svg
   :width: 700px
 
-The 2-point cluster function can be computed with the same machinery as the 2-point probability. The former uses an integer image, with a unique integer number to label each cluster. The latter simply uses binary values.
+.. note::
 
-.. literalinclude:: S2_cluster.py
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
+Python
+^^^^^^
+
+:download:`C2.py <examples/C2.py>`
+
+.. literalinclude:: examples/C2.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`S2_cluster.py <S2_cluster.py>`]
+C++
+^^^
+
+:download:`C2.cpp <examples/C2.cpp>`
+
+.. literalinclude:: examples/C2.cpp
+   :language: cpp
 
 .. _theory_L:
 
@@ -185,23 +251,45 @@ Furthermore it is highly unlikely that a path can be found through the inclusion
 
 An important ingredient of the computation of :math:`L` is thus the choice of the pixel paths. In GooseEYE the paths are constructed between the centre of the region of interest and each of the points on the end of the region of interest. The paths can be computed using different algorithms, illustrated below:
 
-.. image:: pixel_path.svg
-  :width: 700px
+:download:`pixel_path.py <examples/pixel_path.py>`
 
-[:download:`pixel_path.py <pixel_path.py>`]
+.. image:: examples/pixel_path.svg
+  :width: 700px
 
 Example
 -------
 
-.. image:: L.svg
+.. image:: examples/L.svg
   :width: 700px
 
-.. literalinclude:: L.py
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
+  .. todo::
+
+    Check statement on mask.
+
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`L.py <examples/L.py>`
+
+.. literalinclude:: examples/L.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`L.py <L.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.
 
 .. _theory_W2:
 
@@ -246,15 +334,29 @@ where all pixels where :math:`\mathcal{M}(\vec{x}_i) = 1` are ignored; all pixel
 Example
 -------
 
-.. image:: W2.svg
+.. image:: examples/W2.svg
   :width: 700px
 
-.. literalinclude:: W2.py
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
+Python
+^^^^^^
+
+:download:`W2.py <examples/W2.py>`
+
+.. literalinclude:: examples/W2.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`W2.py <W2.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create.
 
 Collapse to single point
 ------------------------
@@ -291,15 +393,39 @@ Similarly to the above, a mask may be introduced as follows:
 Example
 ^^^^^^^
 
-.. image:: W2c.svg
+.. image:: examples/W2c.svg
   :width: 700px
 
-.. literalinclude:: W2c.py
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
+  .. todo::
+
+    Check statement on mask.
+
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`W2c.py <examples/W2c.py>`
+
+.. literalinclude:: examples/W2c.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`W2c.py <W2c.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.
+
+.. _theory_heightheight:
 
 Height-height correlation
 =========================
@@ -317,15 +443,30 @@ The height-height correlation corresponds to the following:
 Example
 -------
 
-.. image:: heightheight.svg
+.. image:: examples/heightheight.svg
   :width: 700px
 
-.. literalinclude:: heightheight.py
+.. note::
+
+  Like for the :ref:`2-point correlation <theory_S2>`, a :ref:`mask <theory_S2_masked>` can be used. Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>` of images.
+
+Python
+^^^^^^
+
+:download:`heightheight.py <examples/heightheight.py>`
+
+.. literalinclude:: examples/heightheight.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`heightheight.py <heightheight.py>`]
+C++
+^^^
+
+:download:`heightheight.cpp <examples/heightheight.cpp>`
+
+.. literalinclude:: examples/heightheight.cpp
+   :language: cpp
 
 Obtain clusters
 ===============
@@ -333,25 +474,53 @@ Obtain clusters
 Calculate clusters
 ------------------
 
-.. image:: clusters.svg
+.. image:: examples/clusters.svg
   :width: 700px
 
-.. literalinclude:: clusters.py
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`clusters.py <examples/clusters.py>`
+
+.. literalinclude:: examples/clusters.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`clusters.py <clusters.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.
 
 Dilate clusters (differently)
 -----------------------------
 
-.. image:: clusters_dilate.svg
+.. image:: examples/clusters_dilate.svg
   :width: 700px
 
-.. literalinclude:: clusters_dilate.py
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+:download:`clusters_dilate.py <examples/clusters_dilate.py>`
+
+.. literalinclude:: examples/clusters_dilate.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
 
-[:download:`clusters_dilate.py <clusters_dilate.py>`]
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.

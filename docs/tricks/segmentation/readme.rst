@@ -15,11 +15,11 @@ Ostu's method
   *   `Scikit's skimage.filters.threshold_otsu <https://github.com/scikit-image/scikit-image/blob/master/skimage/filters/thresholding.py#L230>`_
   *   `Scikit's Otsu's thresholding <https://scipy-lectures.org/packages/scikit-image/auto_examples/plot_threshold.html>`_
 
+:download:`source: otsu.py <otsu.py>`
+
 .. image:: otsu.svg
   :width: 800px
   :align: center
-
-[:download:`source: otsu.py <otsu.py>`]
 
 This example uses Otsu's method to combine two sources (two different images of the same object) to get an optimal threshold. The idea is to get a weighted average of two images as follows
 

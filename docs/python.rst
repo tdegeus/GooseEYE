@@ -1,4 +1,6 @@
 
+.. _python:
+
 ****************
 Python interface
 ****************
@@ -6,7 +8,7 @@ Python interface
 Introduction
 ============
 
-The interface is the same as the :ref:`cpp`, and details of the interface can be explored in [:download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`] here you can find some comments to get you going. Start by
+The interface is the same as the :ref:`cpp`, here you merely find some comments to get you going. Start by
 
 .. code-block:: python
 
@@ -15,20 +17,25 @@ The interface is the same as the :ref:`cpp`, and details of the interface can be
 Ensemble or individual image
 ============================
 
-There are two modes of using the code. One can compute the statistics based on:
+There are two modes of using the code, using:
 
-*   An individual image.
-*   An ensemble of images.
+*   An individual image, using individual functions (e.g. ``GooseFEM.S2(...)``, ``GooseFEM.W2(...)``, etc.)
 
-The actual computation is contained in the computation of the ensemble, around which a wrapper is provided to evaluate an individual image. The computation of the ensemble proceeds in three steps:
+*   An ensemble of images, using the ``GooseFEM.Ensemble`` class.
+
+.. todo::
+
+  Reference the right example.
+
+The individual functions are simply a wrapper around the ``GooseFEM.Ensemble`` class. The general structure for an ensemble of images is as follows:
 
 1.   Initialize the ensemble, defining some settings of which the shape of the region-of-interest is mandatory. For example:
 
      .. code-block:: python
 
-        ensemble = GooseEYE.Ensemble((51,51))
+        ensemble = GooseEYE.Ensemble((51, 51))
 
-2.  Add the statistics by evaluating the different images in the ensemble. For example:
+2.  Compute the statistics by evaluating a sequence of images in the ensemble. For example:
 
     .. code-block:: python
 
@@ -41,9 +48,21 @@ The actual computation is contained in the computation of the ensemble, around w
 
         result = ensemble.result();
 
-    The separate raw result and normalization are also available.
+    .. note::
 
-Using the individual images wrapper all these steps are combined in a single function call with almost the same arguments as the underlying ``GooseEYE.Ensemle`` functions. The only limitation is the the raw data and normalization cannot be accessed.
+        The variance around the average can be obtained using ``ensemble.variance()``
+
+    .. note::
+
+        To obtain the raw result and normalisation use:
+
+        .. code-block:: python
+
+            ensemble.data_first();  # first moment : x_1   + x_2   + ...
+            ensemble.data_second(); # second moment: x_1^2 + x_2^2 + ...
+            ensemble.norm();        # normalisation (number of measurements)
+
+Using the individual images wrapper, all these steps are combined in a single function call with almost the same arguments. The only limitation is the the raw data and normalization cannot be accessed.
 
 Statistics
 ==========
@@ -52,71 +71,121 @@ Statistics
 
   The functions are available directly in the ``GooseEYE`` namespace for individual images, and as member functions of the ``Ensemble``-class.
 
-mean
-----
+GooseEYE.mean
+-------------
 
-The arithmetic mean. An overload is available to mask certain voxels.
+The arithmetic mean.
 
-S2
---
+.. note::
 
-:ref:`theory_S2`. Overloads are available for ``np.int`` (binary and integer) images and ``np.flat`` images, and for masked images.
+  An overload is available to mask certain voxels
 
-W2
---
+.. seealso::
 
-:ref:`theory_W2`. Overloads are available for different combinations of ``np.int`` (binary and integer) images and ``np.float`` images, and for masked images.
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_mean.hpp <../include/GooseEYE/Ensemble_mean.hpp>`
 
-W2c
----
+GooseEYE.S2
+-----------
 
-Collapsed weighted correlation (see: :ref:`theory_W2`). Overloads are available for ``np.int`` (binary and integer) images and ``np.float`` images, and for masked images. To automatically compute the clusters and their centres use ``W2c_auto``.
+2-point correlation.
 
-L
--
+.. note::
 
-:ref:`theory_L`.
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_S2.hpp <../include/GooseEYE/Ensemble_S2.hpp>`
+  * :ref:`Theory & Example <theory_S2>`.
+
+GooseEYE.C2
+-----------
+
+2-point cluster function.
+
+.. note::
+
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_C2.hpp <../include/GooseEYE/Ensemble_C2.hpp>`
+  * :ref:`Theory & Example <theory_C2>`.
+
+GooseEYE.W2
+-----------
+
+Weighted 2-point correlation.
+
+.. note::
+
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_W2.hpp <../include/GooseEYE/Ensemble_W2.hpp>`
+  * :ref:`Theory & Example <theory_W2>`.
+
+GooseEYE.heightheight
+---------------------
+
+Height-height correlation.
+
+.. note::
+
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_heightheight.hpp <../include/GooseEYE/Ensemble_heightheight.hpp>`
+  * :ref:`Theory & Example <theory_heightheight>`.
+
+Information
+===========
+
+GooseEYE.distance
+-----------------
+
+The relative distance of each pixel of the ROI.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`GooseEYE.hpp <../include/GooseEYE/GooseEYE.hpp>`
+  * :ref:`Example <theory_heightheight>`.
+
+Generate shape
+==============
+
+GooseEYE.dummy_circles
+----------------------
+
+Create a dummy binary images of circles.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`dummy_circles.hpp <../include/GooseEYE/dummy_circles.hpp>`
+  * :ref:`Example <theory_S2>`.
 
 Miscellaneous functions
 =======================
 
-clusters
---------
+.. todo::
 
-Identify the clusters in a binary images.
-
-clusterCenters
---------------
-
-Identify the clusters and their centres in a binary images.
-
-dilate
-------
-
-Dilate a binary or integer image.
-
-kernel
-------
-
-Define a kernel.
-
-path
-----
-
-Define a path between two voxels.
-
-stampPoints
------------
-
-Return the voxel-paths use in the computation of the lineal path function and collapsed weighted correlation.
-
-dummy_circles
--------------
-
-Create a dummy binary images of circles.
+  Describe all other functions here.
 
 Installation
 ============
+
+.. todo::
+
+  Describe how obtains and uses xtensor.
 
 To compile and install one can use
 
@@ -125,5 +194,5 @@ To compile and install one can use
     python setup.py build
     python setup.py install
 
-whereby ``python`` has to be replaced with your favourite Python executable. The prerequisites can be installed using ``pip install cppmat pybind11`` (again replace ``pip`` with your favourite Python executable).
+whereby ``python`` has to be replaced with your favourite Python executable. The prerequisites can be installed using ``pip install pyxtensor pybind11`` (again replace ``pip`` with your favourite Python executable).
 
