@@ -25,10 +25,11 @@ inline Clusters::Clusters(
   GOOSEEYE_ASSERT(xt::all(xt::equal(kernel,0) || xt::equal(kernel,1)));
   GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
 
-  // extract from input
+  // extract shape from input
+  // ------------------------
 
-  m_shape = std::vector<size_t>(f.shape().cbegin(), f.shape().cend());
-  m_shape_kernel = std::vector<size_t>(m_kernel.shape().cbegin(), m_kernel.shape().cend());
+  m_shape = detail::shape(f);
+  m_shape_kernel = detail::shape(m_kernel);
   m_pad = detail::pad_width(m_kernel);
   m_Shape = detail::as_dim(MAX_DIM, m_shape, 1);
   m_Shape_kernel = detail::as_dim(MAX_DIM, m_shape_kernel, 1);
@@ -61,6 +62,9 @@ inline Clusters::Clusters(
   int ilab = 2;
 
   // list to renumber: used to link clusters to each other
+  // N.B. By default the algorithm simply loops over the image, consequently it will miss that
+  // clusters may touch further down in the image, labelling one cluster with several labels.
+  // Using "renum" these touching clusters will glued and assigned one single label.
   xt::xtensor<int,1> renum = xt::arange<int>(m_l.size());
 
   // loop over the image
@@ -79,7 +83,7 @@ inline Clusters::Clusters(
         auto Ni = Li * m_kernel;
         // - extract label to apply
         int l = xt::amax(Ni)[0];
-        // - draw a new label, only if needed (if there were not other entries that "0"/"1")
+        // - draw a new label, only if needed (if there were no other entries than 0 and 1)
         if (l == 1) {
           l = ilab;
           ++ilab;
@@ -89,7 +93,7 @@ inline Clusters::Clusters(
         // - check if clusters have to be merged, if not: continue to the next voxel
         if (xt::all(xt::equal(Li, l) || xt::equal(Li, 0) || xt::equal(Li, 1)))
           continue;
-        // - get the labels to be merged (discard "0"/"1" by settings them to "l" is this copy)
+        // - get the labels to be merged (discard 0 and 1 by settings them to "l" in this copy)
         xt::xarray<int> merge = xt::where(xt::less_equal(Li, 1), l, Li);
         merge = xt::unique(merge);
         // - merge labels (apply merge to other labels in cluster)
@@ -113,12 +117,11 @@ inline Clusters::Clusters(
   for (auto& i: m_l)
     i = renum[i];
 
-  // rename labels to lowest possible label (starting from "1" this time)
-  xt::xtensor<int, 1> labels = xt::unique(m_l);
+  // rename labels to lowest possible label starting from 1)
+  xt::xtensor<int,1> labels = xt::unique(m_l);
   xt::view(renum, xt::keep(labels)) = xt::arange<int>(labels.size());
   for (auto& i: m_l)
     i = renum[i];
-
 
   // make periodic
   // -------------
@@ -151,7 +154,7 @@ inline Clusters::Clusters(
           // - check if clusters have to be merged, if not: continue to the next voxel
           if (xt::all(xt::equal(Li, l) || xt::equal(Li, 0)))
             continue;
-          // - get the labels to be merged (discard "0" background)
+          // - get the labels to be merged (discard 0 background)
           xt::xarray<int> merge = xt::where(xt::equal(Li, 0), l, Li);
           merge = xt::unique(merge);
           // - merge labels (apply merge to other labels in cluster)

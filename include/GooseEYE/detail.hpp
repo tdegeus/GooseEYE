@@ -67,6 +67,14 @@ inline std::vector<size_t> shape_as_dim(
 
 // -------------------------------------------------------------------------------------------------
 
+template <class T>
+inline std::vector<size_t> shape(const xt::xarray<T>& f)
+{
+  return std::vector<size_t>(f.shape().cbegin(), f.shape().cend());
+}
+
+// -------------------------------------------------------------------------------------------------
+
 inline std::vector<std::vector<size_t>> pad_width(const std::vector<size_t>& shape)
 {
   std::vector<std::vector<size_t>> pad(shape.size(), std::vector<size_t>(2));

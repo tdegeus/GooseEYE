@@ -98,7 +98,7 @@ private:
 
   // Labels
   bool m_periodic;
-  xt::xarray<int> m_l;
+  xt::xarray<int> m_l; // labels
 
 };
 
