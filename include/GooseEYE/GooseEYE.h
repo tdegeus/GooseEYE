@@ -45,7 +45,7 @@ xt::xarray<int> path(
 // Dummy image
 // -------------------------------------------------------------------------------------------------
 
-// Dummy image with circles at position "row","col" with radius "r" (may be automatic)
+// Dummy image with circles at position ("row", "col") with radius "r" (can be randomly generated)
 
 xt::xarray<int> dummy_circles(
   const std::vector<size_t>& shape,
@@ -72,9 +72,9 @@ public:
 
   Clusters(const xt::xarray<int>& f, const xt::xarray<int>& kernel, bool periodic);
 
-  // Return result
+  // Return labels (cluster index): 1..n
 
-  xt::xarray<int> get() const;
+  xt::xarray<int> labels() const;
 
 private:
 
@@ -101,15 +101,16 @@ private:
 
   // Labels
   bool m_periodic;
-  xt::xarray<int> m_l; // labels
+  xt::xarray<int> m_l; // labels (>= 1, 0 = background), 3-d
 
 };
 
-// front-end
+// Wrapper function
+
 xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic=true);
 
 // -------------------------------------------------------------------------------------------------
-// Class to compute ensemble averaged statistics. Simple front-end functions are provided to compute
+// Class to compute ensemble averaged statistics. Simple wrapper functions are provided to compute
 // the statistics on one image.
 //
 // The raw-data and normalization are separately stored as class member variables. The normalized
@@ -267,7 +268,7 @@ private:
 };
 
 // -------------------------------------------------------------------------------------------------
-// font-end functions to compute the statistics for one image
+// Wrapper functions to compute the statistics for one image
 // -------------------------------------------------------------------------------------------------
 
 // Distance (see "Ensemble::distance")

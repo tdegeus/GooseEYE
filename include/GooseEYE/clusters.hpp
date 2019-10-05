@@ -25,6 +25,7 @@ inline Clusters::Clusters(
   GOOSEEYE_ASSERT(xt::all(xt::equal(kernel,0) || xt::equal(kernel,1)));
   GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
 
+  // read/convert input
   m_shape = detail::shape(f);
   m_shape_kernel = detail::shape(m_kernel);
   m_pad = detail::pad_width(m_kernel);
@@ -39,12 +40,12 @@ inline Clusters::Clusters(
   // compute clusters (labels >= 2)
   this->compute();
 
-  // connect label periodically
+  // connect labels periodically
   if (m_periodic) {
     this->compute();
   }
 
-  // rename labels to lowest possible label starting from 1)
+  // rename labels to lowest possible label starting from 1
   xt::xtensor<int,1> labels = xt::unique(m_l);
   xt::xtensor<int,1> renum = xt::empty<int>({m_l.size()});
   xt::view(renum, xt::keep(labels)) = xt::arange<int>(labels.size());
@@ -129,7 +130,7 @@ inline void Clusters::compute()
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xarray<int> Clusters::get() const
+inline xt::xarray<int> Clusters::labels() const
 {
   auto out = m_l;
   out.reshape(m_shape);
@@ -140,7 +141,7 @@ inline xt::xarray<int> Clusters::get() const
 
 inline xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic)
 {
-  return Clusters(f, GooseEYE::kernel::nearest(f.dimension()), periodic).get();
+  return Clusters(f, GooseEYE::kernel::nearest(f.dimension()), periodic).labels();
 }
 
 // -------------------------------------------------------------------------------------------------
