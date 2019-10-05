@@ -5,12 +5,8 @@ Theory & Examples
 
 .. _theory_S2:
 
-2-point probability / auto-correlation
-======================================
-
-.. todo::
-
-  Split 2-point probability and auto-correlation, to not mix introducing ensemble averages and masked correlation. Also, try to work more with differences.
+2-point probability
+===================
 
 Theory
 ------
@@ -52,46 +48,26 @@ If the two points are completely uncorrelated, when the points are far apart, ea
 
 In between these extremes, :math:`S_2` decays from :math:`\varphi` towards the asymptotic value of :math:`\varphi^2`.
 
-The greyscale generalisation is the auto-correlation corresponds to a local product:
-
-.. math::
-
-  S_2 ( \Delta \vec{x} )
-  =
-  \frac{1}{N} \sum\limits_{i=1}^N \mathcal{I} ( \vec{x}_i ) \,
-  \mathcal{I} ( \vec{x}_i + \Delta \vec{x} )
-  \equiv \mathcal{I} ( \vec{x} ) \star \mathcal{I} ( \vec{x} )
-
-Along the same arguments, limit values can be obtained. In this case:
-
-.. math::
-
-  S_2( \Delta \vec{x} = 0 )                &= \langle \mathcal{I}^2 \rangle   \\
-  S_2( \Delta \vec{x} \rightarrow \infty ) &= \langle \mathcal{I}   \rangle^2
-
-where the brackets :math:`\langle \ldots \rangle` denotes the spatial average.
-
 Further reading
 ---------------
 
-Textbooks
-^^^^^^^^^
-
-* Torquato, S. (2002). Random Heterogeneous Materials (1st ed.). Springer, New York, NY. New York. `doi:10.1007/978-1-4757-6355-3 <http://doi.org/10.1007/978-1-4757-6355-3>`_
+* S. Torquato (2002). Random Heterogeneous Materials (1st ed.). Springer, New York, NY. New York. `doi:10.1007/978-1-4757-6355-3 <http://doi.org/10.1007/978-1-4757-6355-3>`_
 
 Example
 -------
 
-This result is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The top row shows the image and the results for the binary image: from left to right: the image, the 2-point probability :math:`S_2` in two dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis. The same image and results are shown on the bottom row for a greyscale image, for which noise is added and the background and the islands are made grey.
+This result is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The figure shows from left to right: the image, the 2-point probability :math:`S_2` in two dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis.
 
 .. image:: examples/S2.svg
   :width: 700px
 
-This example is based on the following code.
-
 .. note::
 
     The Python-code can used for the plotting: The complete code is included in the download. Note that to obtain the same plot one should download and install the matplotlib-styles available in `GooseMPL <https://www.github.com/tdegeus/GooseMPL>`_.
+
+.. note::
+
+  All functions make the assumption of the images being periodic. If this assumption is not reasonable be sure to specify the `periodic` option (that defaults True).
 
 Python
 ^^^^^^
@@ -118,15 +94,25 @@ Masked correlation
 
 This function also has the possibility to mask certain pixels. The image's mask is a binary matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalisation is corrected for the reduced amount of data points, whereby the number of data points is no longer constant over the region-of-interest.
 
+:download:`S2_mask.py <examples/S2_mask.py>`,
+:download:`S2_mask.cpp <examples/S2_mask.cpp>`
+
 .. image:: examples/S2_mask.svg
   :width: 700px
+
+.. _theory_S2_ensemble:
+
+Ensemble average
+----------------
+
+To compute the ensemble average of a statistic one constructs an ``Ensemble`` with a certain shape for the region-of-interest, and then adds the result per image to it. Consider the following example.
 
 Python
 ^^^^^^
 
-:download:`S2_mask.py <examples/S2_mask.py>`
+:download:`S2_ensemble.py <examples/S2_ensemble.py>`
 
-.. literalinclude:: examples/S2_mask.py
+.. literalinclude:: examples/S2_ensemble.py
    :language: python
    :start-after: <snippet>
    :end-before: </snippet>
@@ -134,33 +120,51 @@ Python
 C++
 ^^^
 
-:download:`S2_mask.cpp <examples/S2_mask.cpp>`
+:download:`S2_ensemble.cpp <examples/S2_ensemble.cpp>`
 
-.. literalinclude:: examples/S2_mask.cpp
+.. literalinclude:: examples/S2_ensemble.cpp
    :language: cpp
 
-.. _theory_S2_ensemble:
+Auto-correlation
+================
 
-Ensemble average
-----------------
+Theory
+------
 
-.. todo::
+The the greyscale generalisation of the :ref:`theory_S2` (for floating-point images (with :math:`0 \leq \mathcal{I}(\vec{x}_i) \leq 1`) corresponds to:
 
-  Description.
+.. math::
 
-Python
-^^^^^^
+  S_2 ( \Delta \vec{x} )
+  =
+  \frac{1}{N} \sum\limits_{i=1}^N \mathcal{I} ( \vec{x}_i ) \,
+  \mathcal{I} ( \vec{x}_i + \Delta \vec{x} )
+  \equiv \mathcal{I} ( \vec{x} ) \star \mathcal{I} ( \vec{x} )
 
-.. todo::
+Along the same arguments as for the :ref:`theory_S2`, limit values can be obtained. In this case:
 
-  Create.
+.. math::
 
-C++
-^^^
+  S_2( \Delta \vec{x} = 0 )                &= \langle \mathcal{I}^2 \rangle   \\
+  S_2( \Delta \vec{x} \rightarrow \infty ) &= \langle \mathcal{I}   \rangle^2
 
-.. todo::
+where the brackets :math:`\langle \ldots \rangle` denotes the spatial average.
 
-  Create.
+Further reading
+---------------
+
+* S. Torquato (2002). Random Heterogeneous Materials (1st ed.). Springer, New York, NY. New York. `doi:10.1007/978-1-4757-6355-3 <http://doi.org/10.1007/978-1-4757-6355-3>`_
+
+Example
+-------
+
+This example adds to the example of the :ref:`theory_S2` the same image (with noise) and results, shown on the bottom row.
+
+:download:`S2_autocorrelation.py <examples/S2_autocorrelation.py>`,
+:download:`S2_autocorrelation.cpp <examples/S2_autocorrelation.cpp>`
+
+.. image:: examples/S2_autocorrelation.svg
+  :width: 700px
 
 .. _theory_C2:
 
@@ -182,10 +186,7 @@ whereby :math:`\mathcal{C}` is an indicator with a unique non-zero index for eac
 Further reading
 ---------------
 
-Textbooks
-^^^^^^^^^
-
-* Torquato, S. (2002). Random Heterogeneous Materials (1st ed.). Springer, New York, NY. New York. `doi:10.1007/978-1-4757-6355-3 <http://doi.org/10.1007/978-1-4757-6355-3>`_
+* S. Torquato (2002). Random Heterogeneous Materials (1st ed.). Springer, New York, NY. New York. `doi:10.1007/978-1-4757-6355-3 <http://doi.org/10.1007/978-1-4757-6355-3>`_
 
 Example
 -------
@@ -331,6 +332,11 @@ Additionally pixels can be masked, for instance to ignore :math:`\mathcal{I}` ev
 
 where all pixels where :math:`\mathcal{M}(\vec{x}_i) = 1` are ignored; all pixels for which :math:`\mathcal{M}(\vec{x}_i) = 0` are considered as normal.
 
+Further reading
+---------------
+
+* T.W.J. de Geus, R.H.J. Peerlings, M.G.D. Geers (2015). *Microstructural topology effects on the onset of ductile failure in multi-phase materials – A systematic computational approach.* International Journal of Solids and Structures, 67–68, 326–339. doi: `10.1016/j.ijsolstr.2015.04.035 <https://doi.org/10.1016/j.ijsolstr.2015.04.035>`_, arXiv: `1604.02858 <http://arxiv.org/abs/1604.02858>`_
+
 Example
 -------
 
@@ -389,6 +395,11 @@ Similarly to the above, a mask may be introduced as follows:
     \mathcal{W} (\vec{x}_i) \;
     (1-\mathcal{M})\, (\vec{x}_i + \Delta \vec{x} + \vec{\delta}_i) \;
   }
+
+Further reading
+---------------
+
+* T.W.J. de Geus, C. Du, J.P.M. Hoefnagels, R.H.J. Peerlings, M.G.D. Geers (2016). *Systematic and objective identification of the microstructure around damage directly from images.* Scripta Materialia, 113, 101–105. doi: `10.1016/j.scriptamat.2015.10.007 <https://doi.org/10.1016/j.scriptamat.2015.10.007>`_, arXiv: `1604.03814 <http://arxiv.org/abs/1604.03814>`_
 
 Example
 ^^^^^^^
