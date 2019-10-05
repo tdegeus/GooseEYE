@@ -78,6 +78,9 @@ public:
 
 private:
 
+  // Compute clusters
+  void compute();
+
   // Maximum number of dimensions
   static const size_t MAX_DIM=3;
 
