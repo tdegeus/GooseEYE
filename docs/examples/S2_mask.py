@@ -4,18 +4,12 @@
 import GooseEYE as eye
 import numpy    as np
 
-# binary image + correlation
-# --------------------------
-
 # generate image, store 'volume-fraction'
 I = eye.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # 2-point probability
 S2 = eye.S2((101, 101), I, I)
-
-# artefact + (masked) correlation
-# -------------------------------
 
 # define image with artefact and the corresponding mask
 mask = np.zeros(I.shape, dtype='bool')
