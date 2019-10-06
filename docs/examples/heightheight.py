@@ -1,8 +1,6 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 L = 2.0 * np.pi
 N = 1000
@@ -11,10 +9,9 @@ x = np.linspace(0, L, N)
 y1 = np.sin(x)
 y2 = np.sin(2. * x)
 
-hh1 = eye.heightheight(roi=[200], f=y1, periodic=True)
-hh2 = eye.heightheight(roi=[200], f=y2, periodic=True)
-dx = eye.distance(roi=[200], h=[h], dim=0)
-
+hh1 = GooseEYE.heightheight(roi=[200], f=y1, periodic=True)
+hh2 = GooseEYE.heightheight(roi=[200], f=y2, periodic=True)
+dx = GooseEYE.distance(roi=[200], h=[h], dim=0)
 # </snippet>
 
 # plot

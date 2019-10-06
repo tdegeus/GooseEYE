@@ -1,8 +1,6 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # generate image
 I        = np.zeros((21,21),dtype='bool')
@@ -14,7 +12,7 @@ I[15,14] = True
 I[15,16] = True
 
 # clusters
-C   = eye.clusters(I,periodic=True)
+C   = GooseEYE.clusters(I,periodic=True)
 
 # dilation settings:
 # cluster 1 -> 1 iteration
@@ -22,8 +20,7 @@ C   = eye.clusters(I,periodic=True)
 itr = np.arange(np.max(C)+1,dtype='int32')
 
 # dilate
-CD  = eye.dilate(C,iterations=itr,periodic=True)
-
+CD  = GooseEYE.dilate(C,iterations=itr,periodic=True)
 # </snippet>
 
 # plot

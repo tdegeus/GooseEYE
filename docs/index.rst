@@ -3,21 +3,40 @@
 GooseEYE
 ********
 
-GooseEYE can be used from C++ or as a Python module. To start using either, please consider the theory and examples below that describe briefly the different measurements and their interpretation, accompanied by a C++ and a Python example. For questions beyond the examples the readers for either the C++ or the Python interface can be consulted. Since this is a research code, the code itself is the best reference. To two readers therefore mostly point to the code itself.
+GooseEYE can be used from C++ or as a Python module. Please consider the theory and examples below that describe briefly the different measurements and their interpretation, accompanied by a C++ and a Python example. Since this is a research code, the code itself is the best reference.
 
 .. toctree::
-   :caption: USER GUIDE
+   :caption: THEORY & EXAMPLES
    :maxdepth: 1
 
-   theory.rst
-   cpp.rst
-   python.rst
+   theory_S2.rst
+   theory_C2.rst
+   theory_L.rst
+   theory_W2.rst
+   theory_heightheight.rst
+   theory_clusters.rst
 
 .. toctree::
    :caption: TIPS & TRICKS
    :maxdepth: 1
 
    tricks/segmentation/readme.rst
+
+.. toctree::
+   :caption: C++ INTERFACE
+   :maxdepth: 1
+
+   cpp_intro.rst
+   cpp_functions.rst
+   cpp_install.rst
+
+.. toctree::
+   :caption: PYTHON INTERFACE
+   :maxdepth: 1
+
+   python_intro.rst
+   python_functions.rst
+   python_install.rst
 
 .. toctree::
    :caption: CONTRIBUTE

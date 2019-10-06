@@ -1,16 +1,13 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # generate image, store 'volume-fraction'
-I = eye.dummy_circles((500, 500))
+I = GooseEYE.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # 2-point probability
-S2 = eye.S2((101, 101), I, I)
-
+S2 = GooseEYE.S2((101, 101), I, I)
 # </snippet>
 
 # plot

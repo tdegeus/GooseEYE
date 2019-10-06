@@ -1,8 +1,6 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # square grid of circles
 N         = 15
@@ -18,21 +16,20 @@ row      += np.random.normal(0.0,float(M)/float(N),N*N)
 col      += np.random.normal(0.0,float(M)/float(N),N*N)
 r        *= np.random.random(N*N)*2.+0.1
 # generate image, store 'volume-fraction'
-I         = eye.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
+I         = GooseEYE.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
 phi       = np.mean(I)
 
 # create 'damage' -> right of inclusion
 col      += 1.1*r
 r        *= 0.4
-W         = eye.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
+W         = GooseEYE.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
 W[I==1]   = 0
 # identify 'damage' clusters, and identify their centers
-clus,cntr = eye.clusterCenters(W)
+clus,cntr = GooseEYE.clusterCenters(W)
 
 # weighted correlation: global, and collapsed to cluster centers
-WI        = eye.W2 ((101,101),W        ,I,mask=W)
-WIc       = eye.W2c((101,101),clus,cntr,I,mask=W)
-
+WI        = GooseEYE.W2 ((101,101),W        ,I,mask=W)
+WIc       = GooseEYE.W2c((101,101),clus,cntr,I,mask=W)
 # </snippet>
 
 # plot

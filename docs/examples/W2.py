@@ -1,8 +1,6 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # image + "damage" + correlation
 # ------------------------------
@@ -21,17 +19,17 @@ row      += np.random.normal(0.0,float(M)/float(N),N*N)
 col      += np.random.normal(0.0,float(M)/float(N),N*N)
 r        *= np.random.random(N*N)*2.+0.1
 # generate image, store 'volume-fraction'
-I         = eye.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
+I         = GooseEYE.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
 phi       = np.mean(I)
 
 # create 'damage' -> right of inclusion
 col      += 1.1*r
 r        *= 0.4
-W         = eye.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
+W         = GooseEYE.dummy_circles((M,M),row.astype(np.int),col.astype(np.int),r.astype(np.int))
 W[I==1]   = 0
 
 # weighted correlation
-WI = eye.W2((101,101), W, I, fmask=W)
+WI = GooseEYE.W2((101,101), W, I, fmask=W)
 
 # gray-scale image + correlation
 # ------------------------------
@@ -44,8 +42,7 @@ Igr /= 1.2
 Iav = np.mean(Igr)
 
 # weighted correlation
-WIgr = eye.W2((101,101), W, Igr, fmask=W)
-
+WIgr = GooseEYE.W2((101,101), W, Igr, fmask=W)
 # </snippet>
 
 # plot

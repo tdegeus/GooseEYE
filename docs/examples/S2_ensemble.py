@@ -1,17 +1,14 @@
-
 # <snippet>
+import numpy as np
+import GooseEYE
 
-import GooseEYE as eye
-import numpy    as np
-
-ensemble = eye.Ensemble((101, 101))
+ensemble = GooseEYE.Ensemble((101, 101))
 
 for i in range(5):
-  I = eye.dummy_circles((200, 200))
+  I = GooseEYE.dummy_circles((200, 200))
   ensemble.S2(I, I)
 
 S2 = ensemble.result()
-
 # </snippet>
 
 # plot
