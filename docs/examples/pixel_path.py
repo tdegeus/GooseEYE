@@ -1,7 +1,6 @@
-
-import GooseEYE
-import numpy             as np
+import numpy as np
 import matplotlib.pyplot as plt
+import GooseEYE
 
 try   : plt.style.use(['goose', 'goose-latex'])
 except: pass

@@ -1,22 +1,19 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # generate image, store 'volume-fraction'
-I = eye.dummy_circles((500, 500))
+I = GooseEYE.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # 2-point probability
-S2 = eye.S2((101, 101), I, I)
+S2 = GooseEYE.S2((101, 101), I, I)
 
 # determine clusters, based on the binary image
-C = eye.clusters(I)
+C = GooseEYE.clusters(I)
 
 # 2-point cluster function
-C2 = eye.C2((101, 101), C, C)
-
+C2 = GooseEYE.C2((101, 101), C, C)
 # </snippet>
 
 # plot

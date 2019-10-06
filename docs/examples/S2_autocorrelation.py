@@ -1,18 +1,16 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # binary image + correlation
 # --------------------------
 
 # generate image, store 'volume-fraction'
-I = eye.dummy_circles((500, 500))
+I = GooseEYE.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # 2-point probability
-S2 = eye.S2((101, 101), I, I)
+S2 = GooseEYE.S2((101, 101), I, I)
 
 # grey image + correlation
 # ------------------------
@@ -25,12 +23,11 @@ Igr = np.array(I, copy=True).astype(np.float)
 Igr = (Igr + 0.1) / 1.2 + noise
 
 # 2-point correlation ('auto-correlation')
-S2gr = eye.S2((101, 101), Igr, Igr)
+S2gr = GooseEYE.S2((101, 101), Igr, Igr)
 
 # correlation bounds: mean intensity squared and mean of the intensity squared
 Iav_sq = np.mean(Igr)**2.0
 Isq_av = np.mean(Igr**2.0)
-
 # </snippet>
 
 # plot

@@ -1,15 +1,13 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # generate image, store 'volume-fraction'
-I = eye.dummy_circles((500, 500))
+I = GooseEYE.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # 2-point probability
-S2 = eye.S2((101, 101), I, I)
+S2 = GooseEYE.S2((101, 101), I, I)
 
 # define image with artefact and the corresponding mask
 mask = np.zeros(I.shape, dtype='bool')
@@ -18,11 +16,10 @@ mask[:150,:150] = 1
 Ierr[:150,:150] = 1
 
 # 2-point correlation on image with artefact (no mask)
-S2err = eye.S2((101, 101), Ierr, Ierr)
+S2err = GooseEYE.S2((101, 101), Ierr, Ierr)
 
 # 2-point correlation on image with artefact, with artefact masked
-S2mask = eye.S2((101, 101), Ierr, Ierr, fmask=mask, gmask=mask)
-
+S2mask = GooseEYE.S2((101, 101), Ierr, Ierr, fmask=mask, gmask=mask)
 # </snippet>
 
 # plot

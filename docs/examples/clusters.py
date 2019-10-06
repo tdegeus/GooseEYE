@@ -1,18 +1,15 @@
-
 # <snippet>
-
-import GooseEYE as eye
-import numpy    as np
+import numpy as np
+import GooseEYE
 
 # generate image
-I = eye.dummy_circles((500, 500))
+I = GooseEYE.dummy_circles((500, 500))
 
 # clusters
-clusters = eye.clusters(I, periodic=False)
+clusters = GooseEYE.clusters(I, periodic=False)
 
 # clusters, if the image is periodic
-clusters_periodic = eye.clusters(I, periodic=True)
-
+clusters_periodic = GooseEYE.clusters(I, periodic=True)
 # </snippet>
 
 # plot
