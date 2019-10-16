@@ -42,6 +42,7 @@ inline Clusters::Clusters(
 
   // connect labels periodically
   if (m_periodic) {
+    m_l_np = m_l;
     this->compute();
   }
 
@@ -126,6 +127,69 @@ inline void Clusters::compute()
   // apply renumbering: merges clusters
   for (auto& i: m_l)
     i = renum[i];
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<int> Clusters::centers_periodic() const
+{
+  // allocate centers of gravity
+  xt::xarray<int> c = xt::zeros<int>(m_l.shape());
+
+  // number of labels, and aliases
+  size_t n = xt::amax(m_l)(0) + 1;
+
+
+
+  return c;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<int> Clusters::centers() const
+{
+  // return centers for a periodic image
+  if (m_periodic) {
+    return centers_periodic();
+  }
+
+  // allocate centers of gravity
+  xt::xarray<int> c = xt::zeros<int>(m_l.shape());
+
+  // number of labels
+  size_t n = xt::amax(m_l)(0) + 1;
+
+  // allocate position average
+  xt::xarray<size_t> x = xt::zeros<size_t>({n, (size_t)4});
+
+  // loop over the image
+  for (size_t h = 0; h < m_l.shape(0); ++h) {
+    for (size_t i = 0; i < m_l.shape(1); ++i) {
+      for (size_t j = 0; j < m_l.shape(2); ++j) {
+        // get label
+        int l = m_l(h,i,j);
+        // update average position
+        if (l) {
+          x(l,0) += h;
+          x(l,1) += i;
+          x(l,2) += j;
+          x(l,3) += 1;
+        }
+      }
+    }
+  }
+
+  // fill the centers of gravity
+  for (size_t l = 1; l < n; ++l) {
+    if (x(l,3) > 0) {
+      size_t h = (size_t)round((double)x(l,0) / (double)x(l,3));
+      size_t i = (size_t)round((double)x(l,1) / (double)x(l,3));
+      size_t j = (size_t)round((double)x(l,2) / (double)x(l,3));
+      c(h,i,j) = l;
+    }
+  }
+
+  return c;
 }
 
 // -------------------------------------------------------------------------------------------------

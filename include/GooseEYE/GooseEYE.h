@@ -72,14 +72,18 @@ public:
 
   Clusters(const xt::xarray<int>& f, const xt::xarray<int>& kernel, bool periodic);
 
-  // Return labels (cluster index): 1..n
+  // Return labels or their centers (cluster index): 1..n
 
   xt::xarray<int> labels() const;
+  xt::xarray<int> centers() const; // label only in the center of gravity
 
 private:
 
   // Compute clusters
   void compute();
+
+  // Compute cluster centers
+  xt::xarray<int> centers_periodic() const;
 
   // Maximum number of dimensions
   static const size_t MAX_DIM=3;
@@ -102,6 +106,7 @@ private:
   // Labels
   bool m_periodic;
   xt::xarray<int> m_l; // labels (>= 1, 0 = background), 3-d
+  xt::xarray<int> m_l_np; // labels before applying periodicity
 
 };
 
