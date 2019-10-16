@@ -82,7 +82,11 @@ private:
   // Compute clusters
   void compute();
 
+  // Check relabel
+  xt::xtensor<size_t,1> relabel(const xt::xarray<int>& a, const xt::xarray<int>& b) const;
+
   // Compute cluster centers
+  xt::xarray<size_t> average_position(const xt::xarray<int>& lab) const;
   xt::xarray<int> centers_periodic() const;
 
   // Maximum number of dimensions

@@ -131,15 +131,138 @@ inline void Clusters::compute()
 
 // -------------------------------------------------------------------------------------------------
 
+inline xt::xtensor<size_t,1> Clusters::relabel(
+  const xt::xarray<int>& a,
+  const xt::xarray<int>& b) const
+{
+  size_t nb = xt::amax(b)[0] + 1;
+
+  xt::xtensor<size_t,1> out = xt::zeros<size_t>({nb});
+
+  for (size_t h = 0; h < a.shape(0); ++h) {
+    for (size_t i = 0; i < a.shape(1); ++i) {
+      for (size_t j = 0; j < a.shape(2); ++j) {
+        out(b(h, i, j)) = a(h, i, j);
+      }
+    }
+  }
+
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xarray<size_t> Clusters::average_position(const xt::xarray<int>& lab) const
+{
+  // number of labels
+  size_t n = xt::amax(lab)(0) + 1;
+
+  // allocate position average
+  xt::xarray<size_t> x = xt::zeros<size_t>({n, (size_t)4});
+
+  // loop over the image
+  for (size_t h = 0; h < lab.shape(0); ++h) {
+    for (size_t i = 0; i < lab.shape(1); ++i) {
+      for (size_t j = 0; j < lab.shape(2); ++j) {
+        // get label
+        int l = lab(h, i, j);
+        // update average position
+        if (l) {
+          x(l, 0) += h;
+          x(l, 1) += i;
+          x(l, 2) += j;
+          x(l, 3) += 1;
+        }
+      }
+    }
+  }
+
+  // average position
+  xt::xarray<size_t> xbar = xt::zeros<size_t>({n, (size_t)3});
+
+  // fill the centers of gravity
+  for (size_t i = 0; i < x.shape(0); ++i) {
+    if (x(i,3) > 0) {
+      for (size_t j = 0; j < 3; ++j) {
+        xbar(i, j) = (size_t)round((double)x(i, j) / (double)x(i, 3));
+      }
+    }
+  }
+
+  return xbar;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 inline xt::xarray<int> Clusters::centers_periodic() const
 {
+  // get relabelling "m_l_np" -> "m_l"
+  auto relabel = this->relabel(m_l, m_l_np);
+
+  // compute position average for the non-periodic labels
+  xt::xarray<size_t> x_np = this->average_position(m_l_np);
+
+  // get half size
+  std::vector<size_t> mid = detail::half_shape(m_Shape);
+
+  // set shift to apply
+  xt::xarray<int> shift = xt::zeros<int>({x_np.shape(0), (size_t)3});
+
+  // apply shift if needed
+  for (size_t i = 0; i < shift.shape(0); ++i) {
+    for (size_t j = 0; j < shift.shape(1); ++j) {
+      if (x_np(i, j) > mid[j]) {
+        shift(i, j) = - m_Shape[j];
+      }
+    }
+  }
+
+  // number of labels
+  size_t n = xt::amax(m_l)(0) + 1;
+
+  // allocate position average
+  xt::xarray<int> x = xt::zeros<int>({n, (size_t)4});
+
+  // loop over the image
+  for (size_t h = 0; h < m_l.shape(0); ++h) {
+    for (size_t i = 0; i < m_l.shape(1); ++i) {
+      for (size_t j = 0; j < m_l.shape(2); ++j) {
+        // get label
+        int l = m_l_np(h, i, j);
+        // update average position
+        if (l) {
+          x(relabel(l), 0) += h + shift(l, 0);
+          x(relabel(l), 1) += i + shift(l, 1);
+          x(relabel(l), 2) += j + shift(l, 2);
+          x(relabel(l), 3) += 1;
+        }
+      }
+    }
+  }
+
+  // average position
+  xt::xarray<int> xbar = xt::zeros<int>({n, (size_t)3});
+
+  // fill the centers of gravity
+  for (size_t i = 0; i < x.shape(0); ++i) {
+    if (x(i,3) > 0) {
+      for (size_t j = 0; j < 3; ++j) {
+        int xi = (int)round((double)x(i, j) / (double)x(i, 3));
+        if (xi < 0) {
+          xi += m_Shape[j];
+        }
+        xbar(i, j) = xi;
+      }
+    }
+  }
+
   // allocate centers of gravity
   xt::xarray<int> c = xt::zeros<int>(m_l.shape());
 
-  // number of labels, and aliases
-  size_t n = xt::amax(m_l)(0) + 1;
-
-
+  // fill the centers of gravity
+  for (size_t l = 1; l < x.shape(0); ++l) {
+    c(xbar(l,0), xbar(l,1), xbar(l,2)) = l;
+  }
 
   return c;
 }
@@ -153,40 +276,15 @@ inline xt::xarray<int> Clusters::centers() const
     return centers_periodic();
   }
 
+  // compute position average
+  xt::xarray<size_t> x = this->average_position(m_l);
+
   // allocate centers of gravity
   xt::xarray<int> c = xt::zeros<int>(m_l.shape());
 
-  // number of labels
-  size_t n = xt::amax(m_l)(0) + 1;
-
-  // allocate position average
-  xt::xarray<size_t> x = xt::zeros<size_t>({n, (size_t)4});
-
-  // loop over the image
-  for (size_t h = 0; h < m_l.shape(0); ++h) {
-    for (size_t i = 0; i < m_l.shape(1); ++i) {
-      for (size_t j = 0; j < m_l.shape(2); ++j) {
-        // get label
-        int l = m_l(h,i,j);
-        // update average position
-        if (l) {
-          x(l,0) += h;
-          x(l,1) += i;
-          x(l,2) += j;
-          x(l,3) += 1;
-        }
-      }
-    }
-  }
-
   // fill the centers of gravity
-  for (size_t l = 1; l < n; ++l) {
-    if (x(l,3) > 0) {
-      size_t h = (size_t)round((double)x(l,0) / (double)x(l,3));
-      size_t i = (size_t)round((double)x(l,1) / (double)x(l,3));
-      size_t j = (size_t)round((double)x(l,2) / (double)x(l,3));
-      c(h,i,j) = l;
-    }
+  for (size_t l = 1; l < x.shape(0); ++l) {
+    c(x(l,0), x(l,1), x(l,2)) = l;
   }
 
   return c;
