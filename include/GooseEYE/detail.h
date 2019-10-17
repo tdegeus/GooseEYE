@@ -37,7 +37,7 @@ inline std::vector<size_t> shape_as_dim(
 template <class T>
 inline std::vector<size_t> shape(const xt::xarray<T>& f);
 
-// - half of shape
+// - get "shape[i] / 2"
 
 inline std::vector<size_t> half_shape(const std::vector<size_t>& shape);
 
