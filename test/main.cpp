@@ -50,7 +50,7 @@ SECTION("centers")
   C(0, 4) = 1;
   C(3, 4) = 2;
 
-  GooseEYE::Clusters clusters(I, GooseEYE::kernel::nearest(I.dimension()), true);
+  GooseEYE::Clusters clusters(I, true);
 
   auto c = clusters.centers();
 

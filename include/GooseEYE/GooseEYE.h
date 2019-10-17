@@ -70,7 +70,14 @@ public:
 
   Clusters() = default;
 
-  Clusters(const xt::xarray<int>& f, const xt::xarray<int>& kernel, bool periodic);
+  Clusters(
+    const xt::xarray<int>& f,
+    bool periodic=true);
+
+  Clusters(
+    const xt::xarray<int>& f,
+    const xt::xarray<int>& kernel,
+    bool periodic=true);
 
   // Return labels or their centers (cluster index): 1..n
 
@@ -82,7 +89,7 @@ private:
   // Compute clusters
   void compute();
 
-  // Compute cluster centers
+  // Compute position of the cluster centers
   xt::xtensor<size_t,2> average_position(const xt::xarray<int>& lab) const;
   xt::xtensor<size_t,2> average_position_periodic() const;
 

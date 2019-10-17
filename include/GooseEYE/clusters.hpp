@@ -15,6 +15,15 @@ namespace GooseEYE {
 
 inline Clusters::Clusters(
   const xt::xarray<int>& f,
+  bool periodic) :
+  Clusters(f, kernel::nearest(f.dimension()), periodic)
+{
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline Clusters::Clusters(
+  const xt::xarray<int>& f,
   const xt::xarray<int>& kernel,
   bool periodic) :
   m_kernel(kernel),
@@ -272,7 +281,7 @@ inline xt::xarray<int> Clusters::labels() const
 
 inline xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic)
 {
-  return Clusters(f, GooseEYE::kernel::nearest(f.dimension()), periodic).labels();
+  return Clusters(f, kernel::nearest(f.dimension()), periodic).labels();
 }
 
 // -------------------------------------------------------------------------------------------------
