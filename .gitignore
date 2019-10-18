@@ -2,7 +2,6 @@
 # custom variables
 .qmake*
 Makefile*
-test*
 build*
 *.pro.user
 docs/_build

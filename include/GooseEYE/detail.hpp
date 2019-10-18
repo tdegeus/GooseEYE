@@ -75,6 +75,24 @@ inline std::vector<size_t> shape(const xt::xarray<T>& f)
 
 // -------------------------------------------------------------------------------------------------
 
+inline std::vector<size_t> half_shape(const std::vector<size_t>& shape)
+{
+  std::vector<size_t> out = shape;
+
+  for (size_t i = 0; i < out.size(); ++i) {
+    if (out[i] % 2 == 0) {
+      out[i] = out[i] / 2;
+    }
+    else {
+      out[i] = (out[i] - 1) / 2;
+    }
+  }
+
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 inline std::vector<std::vector<size_t>> pad_width(const std::vector<size_t>& shape)
 {
   std::vector<std::vector<size_t>> pad(shape.size(), std::vector<size_t>(2));

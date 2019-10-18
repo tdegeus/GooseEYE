@@ -67,19 +67,34 @@ class Clusters
 public:
 
   // Constructors
-
   Clusters() = default;
 
-  Clusters(const xt::xarray<int>& f, const xt::xarray<int>& kernel, bool periodic);
+  Clusters(
+    const xt::xarray<int>& f,
+    bool periodic=true);
 
-  // Return labels (cluster index): 1..n
+  Clusters(
+    const xt::xarray<int>& f,
+    const xt::xarray<int>& kernel,
+    bool periodic=true);
 
+  // Return labels (1..n)
   xt::xarray<int> labels() const;
+
+  // Return label only in the center of gravity
+  xt::xarray<int> centers() const;
+
+  // Return positions of the centers of gravity (as 3-d, or in original rank)
+  xt::xtensor<double,2> center_positions(bool orig_rank=true) const;
 
 private:
 
   // Compute clusters
   void compute();
+
+  // Compute position of the cluster centers
+  xt::xtensor<double,2> average_position(const xt::xarray<int>& lab) const;
+  xt::xtensor<double,2> average_position_periodic() const;
 
   // Maximum number of dimensions
   static const size_t MAX_DIM=3;
@@ -102,12 +117,17 @@ private:
   // Labels
   bool m_periodic;
   xt::xarray<int> m_l; // labels (>= 1, 0 = background), 3-d
+  xt::xarray<int> m_l_np; // labels before applying periodicity
 
 };
 
 // Wrapper function
 
 xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic=true);
+
+// Find map to relabel
+
+xt::xtensor<size_t,1> relabel_map(const xt::xarray<int>& src, const xt::xarray<int>& dest);
 
 // -------------------------------------------------------------------------------------------------
 // Class to compute ensemble averaged statistics. Simple wrapper functions are provided to compute
