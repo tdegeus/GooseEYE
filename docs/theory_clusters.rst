@@ -28,6 +28,34 @@ C++
 
   Create after xtensor conversion is done.
 
+
+Calculate clusters and centers
+------------------------------
+
+:download:`clusters_centers.py <examples/clusters_centers.py>`
+
+.. image:: examples/clusters_centers.svg
+  :width: 700px
+
+Python
+^^^^^^
+
+.. todo::
+
+  Check after xtensor conversion is done.
+
+.. literalinclude:: examples/clusters_centers.py
+   :language: python
+   :start-after: <snippet>
+   :end-before: </snippet>
+
+C++
+^^^
+
+.. todo::
+
+  Create after xtensor conversion is done.
+
 Dilate clusters (differently)
 -----------------------------
 
