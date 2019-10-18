@@ -245,6 +245,22 @@ public:
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
+  // Stamp points
+
+  xt::xarray<int> stampPoints(
+    size_t nd=0) const;
+
+  // Lineal-path function
+
+  template <class T>
+  void L(
+    const xt::xarray<T>& f);
+
+  template <class T>
+  void L(
+    const xt::xarray<T>& f,
+    const xt::xarray<int>& fmask);
+
 private:
 
   // Type: used to lock the ensemble to a certain measure
@@ -367,6 +383,21 @@ xt::xarray<double> heightheight(
   const xt::xarray<int>& fmask,
   bool periodic=true);
 
+// Lineal-path function
+
+template <class T>
+xt::xarray<double> L(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  bool periodic=true);
+
+template <class T>
+xt::xarray<double> L(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& fmask,
+  bool periodic=true);
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ...
@@ -385,5 +416,7 @@ xt::xarray<double> heightheight(
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
 #include "Ensemble_heightheight.hpp"
+#include "Ensemble_stampPoints.hpp"
+#include "Ensemble_L.hpp"
 
 #endif

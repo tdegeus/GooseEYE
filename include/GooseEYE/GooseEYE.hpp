@@ -180,6 +180,36 @@ xt::xarray<double> heightheight(
   return ensemble.result();
 }
 
+// =================================================================================================
+// wrapper functions: lineal-path
+// =================================================================================================
+
+template <class T>
+xt::xarray<double> L(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  bool periodic)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.L(f);
+  return ensemble.result();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <class T>
+xt::xarray<double> L(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& fmask,
+  bool periodic
+)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.L(f, fmask);
+  return ensemble.result();
+}
+
 // // =================================================================================================
 // // wrapper functions: weighted 2-point correlation
 // // =================================================================================================

@@ -175,6 +175,66 @@ xt::xarray<int> path(const std::vector<int> &xa, const std::vector<int> &xb, pat
 
 // -------------------------------------------------------------------------------------------------
 
+// https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
+template<class T>
+void bressenham(
+  xt::xarray<T>& l,
+  const xt::xarray<T>& f,
+  std::array<int,3> x0,
+  const std::array<int,3>& x1
+)
+{
+  size_t axis;
+  std::array<int,3> dx, s, p;
+
+  dx[0] = std::abs( x1[0] - x0[0] );
+  dx[1] = std::abs( x1[1] - x0[1] );
+  dx[2] = std::abs( x1[2] - x0[2] );
+
+  // Determine driving axis
+  if( dx[0] >= dx[1] && dx[0] >= dx[2] )
+    axis = 0;
+  else if ( dx[1] >= dx[0] && dx[1] >= dx[2] )
+    axis = 1;
+  else
+    axis = 2;
+
+  // Slopes
+  s[0] = x1[0] > x0[0] ? 1 : -1;
+  s[1] = x1[1] > x0[1] ? 1 : -1;
+  s[2] = x1[2] > x0[2] ? 1 : -1;
+
+  // Slope errors
+  p[0] = 2 * dx[0] - dx[axis];
+  p[1] = 2 * dx[1] - dx[axis];
+  p[2] = 2 * dx[2] - dx[axis];
+
+  // Loop until end of line
+  while( x0[axis] != x1[axis] )
+  {
+    x0[axis] += s[axis];
+
+    for( size_t i = 0; i < 3; ++i )
+    {
+      if( i != axis && p[i] >= 0 )
+      {
+        x0[i] += s[i];
+        p[i] -= 2 * dx[axis];
+      }
+
+      p[i] += 2 * dx[i];
+    }
+
+    if( f(x0[0],x0[1],x0[2]) != f(x1[0],x1[1],x1[2]) )
+      return;
+
+    l(x0[0],x0[1],x0[2]) = 1;
+
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 } // namespace ...
 
 #endif
