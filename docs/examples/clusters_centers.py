@@ -6,14 +6,24 @@ import GooseEYE
 I = GooseEYE.dummy_circles((500, 500), periodic=True)
 
 # clusters
-clusters = GooseEYE.clusters(I, periodic=False)
+clusters = GooseEYE.Clusters(I, periodic=False)
+labels = clusters.labels()
+centers = clusters.center_positions()
 
 # clusters, if the image is periodic
-clusters_periodic = GooseEYE.clusters(I, periodic=True)
+clusters_periodic = GooseEYE.Clusters(I, periodic=True)
+labels_periodic = clusters_periodic.labels()
+centers_periodic = clusters_periodic.center_positions()
 # </snippet>
 
 # plot
 # ----
+
+# get the labels
+l = np.sort(np.unique(labels))[1:]
+lp = np.sort(np.unique(labels_periodic))[1:]
+centers = centers[l, :]
+centers_periodic = centers_periodic[lp, :]
 
 import matplotlib.pyplot as plt
 import matplotlib        as mpl
@@ -46,7 +56,8 @@ cbar = plt.colorbar(im, cax=cax)
 cbar.set_ticks([0,1])
 
 ax = axes[1]
-im = ax.imshow(clusters, clim=(0, np.max(clusters)+1), cmap=cmap)
+im = ax.imshow(labels, clim=(0, np.max(labels)+1), cmap=cmap)
+ax.plot(centers[:,1], centers[:,0], ls='none', marker='o', color='r')
 ax.xaxis.set_ticks([0, 500])
 ax.yaxis.set_ticks([0, 500])
 ax.set_xlim([0, 500])
@@ -60,7 +71,8 @@ cbar = plt.colorbar(im, cax=cax)
 cbar.set_ticks([])
 
 ax = axes[2]
-im = ax.imshow(clusters_periodic, clim=(0, np.max(clusters)+1), cmap=cmap)
+im = ax.imshow(labels_periodic, clim=(0, np.max(labels)+1), cmap=cmap)
+ax.plot(centers_periodic[:,1], centers_periodic[:,0], ls='none', marker='o', color='r')
 ax.xaxis.set_ticks([0, 500])
 ax.yaxis.set_ticks([0, 500])
 ax.set_xlim([0, 500])
@@ -73,4 +85,4 @@ cax  = div.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im, cax=cax)
 cbar.set_ticks([])
 
-plt.savefig('clusters.svg')
+plt.savefig('clusters_centers.svg')

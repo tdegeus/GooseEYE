@@ -140,14 +140,14 @@ inline void Clusters::compute()
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xtensor<size_t,2> Clusters::average_position(const xt::xarray<int>& lab) const
+inline xt::xtensor<double,2> Clusters::average_position(const xt::xarray<int>& lab) const
 {
   // number of labels
   size_t N = xt::amax(lab)(0) + 1;
 
   // allocate average position
-  xt::xtensor<size_t,2> x = xt::zeros<size_t>({N, (size_t)3});
-  xt::xtensor<size_t,1> n = xt::zeros<size_t>({N});
+  xt::xtensor<double,2> x = xt::zeros<double>({N, (size_t)3});
+  xt::xtensor<double,1> n = xt::zeros<double>({N});
 
   // loop over the image
   for (size_t h = 0; h < lab.shape(0); ++h) {
@@ -157,22 +157,22 @@ inline xt::xtensor<size_t,2> Clusters::average_position(const xt::xarray<int>& l
         int l = lab(h, i, j);
         // update average position
         if (l) {
-          x(l, 0) += h;
-          x(l, 1) += i;
-          x(l, 2) += j;
-          n(l) += 1;
+          x(l, 0) += (double)h;
+          x(l, 1) += (double)i;
+          x(l, 2) += (double)j;
+          n(l) += 1.0;
         }
       }
     }
   }
 
-  // fill the centers of gravity
-  for (size_t i = 0; i < N; ++i) {
-    if (n(i) > 0) {
-      for (size_t j = 0; j < 3; ++j) {
-        x(i, j) = (size_t)round((double)x(i, j) / (double)n(i));
-      }
-    }
+  // avoid zero division
+  n = xt::where(xt::equal(n, 0), 1, n);
+
+  // normalise
+  for (size_t i = 0; i < x.shape(1); ++i) {
+    auto xi = xt::view(x, xt::all(), i);
+    xi = xi / n;
   }
 
   return x;
@@ -180,7 +180,7 @@ inline xt::xtensor<size_t,2> Clusters::average_position(const xt::xarray<int>& l
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xtensor<size_t,2> Clusters::average_position_periodic() const
+inline xt::xtensor<double,2> Clusters::average_position_periodic() const
 {
   // get relabelling "m_l_np" -> "m_l"
   auto relabel = relabel_map(m_l_np, m_l);
@@ -192,13 +192,13 @@ inline xt::xtensor<size_t,2> Clusters::average_position_periodic() const
   auto mid = detail::half_shape(m_Shape);
 
   // initialise shift to apply
-  xt::xtensor<int,2> shift = xt::zeros<int>({x_np.shape(0), (size_t)3});
+  xt::xtensor<double,2> shift = xt::zeros<double>({x_np.shape(0), (size_t)3});
 
   // check to apply shift
   for (size_t i = 0; i < shift.shape(0); ++i) {
     for (size_t j = 0; j < shift.shape(1); ++j) {
       if (x_np(i, j) > mid[j]) {
-        shift(i, j) = - m_Shape[j];
+        shift(i, j) = - (double)m_Shape[j];
       }
     }
   }
@@ -207,8 +207,8 @@ inline xt::xtensor<size_t,2> Clusters::average_position_periodic() const
   size_t N = xt::amax(m_l)(0) + 1;
 
   // allocate average position
-  xt::xtensor<int,2> x = xt::zeros<int>({N, (size_t)3});
-  xt::xtensor<int,1> n = xt::zeros<int>({N});
+  xt::xtensor<double,2> x = xt::zeros<double>({N, (size_t)3});
+  xt::xtensor<double,1> n = xt::zeros<double>({N});
 
   // loop over the image
   for (size_t h = 0; h < m_l.shape(0); ++h) {
@@ -218,26 +218,43 @@ inline xt::xtensor<size_t,2> Clusters::average_position_periodic() const
         int l = m_l_np(h, i, j);
         // update average position
         if (l) {
-          x(relabel(l), 0) += h + shift(l, 0);
-          x(relabel(l), 1) += i + shift(l, 1);
-          x(relabel(l), 2) += j + shift(l, 2);
-          n(relabel(l)) += 1;
+          x(relabel(l), 0) += (double)h + shift(l, 0);
+          x(relabel(l), 1) += (double)i + shift(l, 1);
+          x(relabel(l), 2) += (double)j + shift(l, 2);
+          n(relabel(l)) += 1.0;
         }
       }
     }
   }
 
-  // fill the centers of gravity
-  for (size_t i = 0; i < N; ++i) {
-    if (n(i) > 0) {
-      for (size_t j = 0; j < 3; ++j) {
-        int xi = (int)round((double)x(i, j) / (double)n(i));
-        if (xi < 0) {
-          xi += m_Shape[j];
-        }
-        x(i, j) = xi;
-      }
-    }
+  // avoid zero division
+  n = xt::where(xt::equal(n, 0), 1, n);
+
+  // normalise
+  for (size_t i = 0; i < x.shape(1); ++i) {
+    auto xi = xt::view(x, xt::all(), i);
+    xi = xi / n;
+    xi = xt::where(xi < 0, xi + m_Shape[i], xi);
+  }
+
+  return x;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xtensor<double,2> Clusters::center_positions(bool orig_rank) const
+{
+  xt::xtensor<double,2> x;
+
+  if (m_periodic) {
+    x = this->average_position_periodic();
+  }
+  else {
+    x = this->average_position(m_l);
+  }
+
+  if (orig_rank) {
+    return xt::view(x, xt::all(), xt::range(3 - m_shape.size(), 3));
   }
 
   return x;
@@ -247,15 +264,8 @@ inline xt::xtensor<size_t,2> Clusters::average_position_periodic() const
 
 inline xt::xarray<int> Clusters::centers() const
 {
-  xt::xtensor<size_t,2> x;
-
-  // return centers for a periodic image
-  if (m_periodic) {
-    x = this->average_position_periodic();
-  }
-  else {
-    x = this->average_position(m_l);
-  }
+  // get positions of the centers
+  xt::xtensor<size_t,2> x = xt::floor(this->center_positions(false));
 
   // allocate centers of gravity
   xt::xarray<int> c = xt::zeros<int>(m_l.shape());
@@ -265,6 +275,8 @@ inline xt::xarray<int> Clusters::centers() const
     c(x(l,0), x(l,1), x(l,2)) = l;
   }
 
+  // return using the original rank
+  c.reshape(m_shape);
   return c;
 }
 

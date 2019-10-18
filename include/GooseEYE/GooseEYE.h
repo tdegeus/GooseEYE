@@ -67,7 +67,6 @@ class Clusters
 public:
 
   // Constructors
-
   Clusters() = default;
 
   Clusters(
@@ -79,10 +78,14 @@ public:
     const xt::xarray<int>& kernel,
     bool periodic=true);
 
-  // Return labels or their centers (cluster index): 1..n
-
+  // Return labels (1..n)
   xt::xarray<int> labels() const;
-  xt::xarray<int> centers() const; // label only in the center of gravity
+
+  // Return label only in the center of gravity
+  xt::xarray<int> centers() const;
+
+  // Return positions of the centers of gravity (as 3-d, or in original rank)
+  xt::xtensor<double,2> center_positions(bool orig_rank=true) const;
 
 private:
 
@@ -90,8 +93,8 @@ private:
   void compute();
 
   // Compute position of the cluster centers
-  xt::xtensor<size_t,2> average_position(const xt::xarray<int>& lab) const;
-  xt::xtensor<size_t,2> average_position_periodic() const;
+  xt::xtensor<double,2> average_position(const xt::xarray<int>& lab) const;
+  xt::xtensor<double,2> average_position_periodic() const;
 
   // Maximum number of dimensions
   static const size_t MAX_DIM=3;
