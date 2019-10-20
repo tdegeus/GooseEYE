@@ -90,13 +90,6 @@ install:
     - sudo make install
     - cmake .. -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
     - make
-    # make examples
-    - g++ -std=c++14 docs/examples/S2.cpp -o docs/examples/S2
-    - g++ -std=c++14 docs/examples/S2_autocorrelation.cpp -o docs/examples/S2_autocorrelation
-    - g++ -std=c++14 docs/examples/S2_ensemble.cpp -o docs/examples/S2_ensemble
-    - g++ -std=c++14 docs/examples/S2_mask.cpp -o docs/examples/S2_mask
-    - g++ -std=c++14 docs/examples/C2.cpp -o docs/examples/C2
-    - g++ -std=c++14 docs/examples/heightheight.cpp -o docs/examples/heightheight
 script:
     # run tests
     - cd "${build_dir}/test"
