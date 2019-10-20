@@ -16,7 +16,8 @@ include(GNUInstallDirs)
 
 # options
 option(PKGCONFIG "Build pkg-config" ON)
-option(BUILD_TESTS "${PROJECT_NAME} test suite" OFF)
+option(BUILD_TESTS "${PROJECT_NAME} tests" OFF)
+option(BUILD_EXAMPLES "${PROJECT_NAME} examples" OFF)
 
 # project settings
 # ----------------
@@ -89,6 +90,10 @@ if(BUILD_TESTS)
   add_subdirectory(test)
 endif()
 
+if(BUILD_EXAMPLES)
+  add_subdirectory(docs/examples)
+endif()
+
 # disable pkg-config for native Windows builds
 if(WIN32 OR CMAKE_HOST_SYSTEM_NAME MATCHES Windows)
   option(PKGCONFIG "Build pkg-config ${fpkg} file" OFF)
@@ -114,10 +119,6 @@ message(STATUS "+---------------------------------------------------------------
 message(STATUS "|")
 message(STATUS "| Use 'make install' to install in")
 message(STATUS "|   ${CMAKE_INSTALL_PREFIX}")
-if(BUILD_TESTS)
-  message(STATUS "|")
-  message(STATUS "| Use 'make' and './test/test' to run the tests")
-endif()
 message(STATUS "|")
 message(STATUS "| To specify a custom directory call")
 message(STATUS "|   cmake /path/to/${PROJECT_NAME} -DCMAKE_INSTALL_PREFIX=yourprefix")

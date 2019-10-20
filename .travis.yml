@@ -87,7 +87,7 @@ install:
     - export INCLUDE_PATH="${PWD}"/opt/include:"${INCLUDE_PATH}"
     # make test-cases
     - cd "${build_dir}"
-    - cmake .. -DBUILD_TESTS=ON
+    - cmake .. -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
     - make
     - sudo make install
     # make examples
@@ -102,10 +102,19 @@ script:
     - cd "${build_dir}/test"
     - ./test
     # run examples
+    - cd "${build_dir}/docs/examples"
+    - ./S2
+    - ./S2_autocorrelation
+    - ./S2_mask
+    - ./S2_ensemble
+    - ./C2
+    - ./heightheight
+    # run examples
+    - cd "${root_dir}"
     - python docs/examples/S2.py
     - python docs/examples/S2_autocorrelation.py
-    - python docs/examples/S2_ensemble.py
     - python docs/examples/S2_mask.py
+    - python docs/examples/S2_ensemble.py
     - python docs/examples/C2.py
     - python docs/examples/W2.py
 #     - python docs/examples/L.py
@@ -116,9 +125,3 @@ script:
     - python docs/examples/heightheight.py
     - python docs/examples/mean.py
 #     - python docs/examples/pixel_path.py
-    - ./docs/examples/S2
-    - ./docs/examples/S2_autocorrelation
-    - ./docs/examples/S2_ensemble
-    - ./docs/examples/S2_mask
-    - ./docs/examples/C2
-    - ./docs/examples/heightheight
