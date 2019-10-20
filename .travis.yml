@@ -70,7 +70,7 @@ install:
     - conda install xtl -c conda-forge
     - conda install xsimd -c conda-forge
     - conda install xtensor -c conda-forge
-    - pip install numpy matplotlib GooseMPL
+    - pip install numpy matplotlib GooseMPL pybind11 pyxtensor
     - export MPLBACKEND=Agg
     - python -c "import GooseMPL; GooseMPL.copy_style()"
     # store relevant
