@@ -89,7 +89,7 @@ install:
     - cd "${build_dir}"
     - cmake .. -DBUILD_TESTS=ON
     - make
-    - make install
+    - sudo make install
     # make examples
     - g++ -std=c++14 docs/examples/S2.cpp -o docs/examples/S2
     - g++ -std=c++14 docs/examples/S2_autocorrelation.cpp -o docs/examples/S2_autocorrelation
@@ -116,3 +116,9 @@ script:
     - python docs/examples/heightheight.py
     - python docs/examples/mean.py
 #     - python docs/examples/pixel_path.py
+    - ./docs/examples/S2
+    - ./docs/examples/S2_autocorrelation
+    - ./docs/examples/S2_ensemble
+    - ./docs/examples/S2_mask
+    - ./docs/examples/C2
+    - ./docs/examples/heightheight
