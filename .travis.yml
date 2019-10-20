@@ -82,14 +82,14 @@ install:
     - mkdir build
     - cd build
     - mkdir opt
-    - cmake .. -DCATCH_BUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX:PATH="${PWD}"/opt
-    - make install
-    - export INCLUDE_PATH="${PWD}"/opt/include:"${INCLUDE_PATH}"
+    - cmake .. -DCATCH_BUILD_TESTING=OFF
+    - sudo make install
     # make test-cases
     - cd "${build_dir}"
+    - cmake ..
+    - sudo make install
     - cmake .. -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
     - make
-    - sudo make install
     # make examples
     - g++ -std=c++14 docs/examples/S2.cpp -o docs/examples/S2
     - g++ -std=c++14 docs/examples/S2_autocorrelation.cpp -o docs/examples/S2_autocorrelation
