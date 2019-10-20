@@ -10,15 +10,6 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.9
-            - python3
-      env: COMPILER=gcc GCC=4.9
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
             - g++-5
             - python3
       env: COMPILER=gcc GCC=5
@@ -82,6 +73,7 @@ install:
     - python3 setup.py install
     # build path
     - cd "${root_dir}"
+    - rm -r "${build_dir}"
     - mkdir "${build_dir}"
     - cd "${build_dir}"
     # install catch
