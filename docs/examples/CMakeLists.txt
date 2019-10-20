@@ -17,6 +17,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTENSOR_USE_XSIMD=ON")
 
+find_package(xtl REQUIRED)
+find_package(xtensor REQUIRED)
+find_package(GooseEYE REQUIRED)
+
+include_directories(${GOOSEEYE_INCLUDE_DIR})
+
 # assertions
 if(NOT ASSERT)
   add_definitions(-DNDEBUG)
