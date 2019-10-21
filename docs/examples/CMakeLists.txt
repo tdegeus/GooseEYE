@@ -19,9 +19,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTENSOR_USE_XSIMD=ON")
 
 find_package(xtl REQUIRED)
 find_package(xtensor REQUIRED)
-find_package(GooseEYE REQUIRED)
 
-include_directories(${GOOSEEYE_INCLUDE_DIR})
+# add current library
+string(CONCAT GooseEYE "${CMAKE_CURRENT_SOURCE_DIR}" "/../../include/")
+include_directories("${GooseEYE}")
 
 # assertions
 if(NOT ASSERT)
@@ -40,7 +41,5 @@ file(GLOB APP_SOURCES *.cpp)
 foreach(testsourcefile ${APP_SOURCES})
     string(REPLACE ".cpp" "" testname ${testsourcefile})
     get_filename_component(testname ${testname} NAME)
-    message(STATUS ${testname})
-    message(STATUS ${testsourcefile})
     add_executable(${testname} ${testsourcefile})
 endforeach()

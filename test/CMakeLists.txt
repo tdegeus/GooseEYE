@@ -31,6 +31,10 @@ endif()
 # load packages
 # -------------
 
+# add current library
+string(CONCAT GooseEYE "${CMAKE_CURRENT_SOURCE_DIR}" "/../include/")
+include_directories("${GooseEYE}")
+
 # add custom paths
 if(NOT "$ENV{INCLUDE_PATH}" STREQUAL "")
   string(REPLACE ":" ";" INCLUDE_LIST "$ENV{INCLUDE_PATH}")

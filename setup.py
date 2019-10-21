@@ -22,6 +22,7 @@ ext_modules = [
     'GooseEYE',
     ['python/main.cpp'],
     include_dirs=[
+      'include/',
       pybind11 .get_include(False),
       pybind11 .get_include(True ),
       pyxtensor.get_include(False),
