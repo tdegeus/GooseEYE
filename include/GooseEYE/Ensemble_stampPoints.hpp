@@ -13,46 +13,36 @@ namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xtensor<int,2> Ensemble::stampPoints(
+inline xt::xtensor<size_t,2> Ensemble::stampPoints(
   size_t nd
 ) const
 {
-  xt::xtensor<int,2> points;
+  xt::xtensor<size_t,2> points;
   bool xdir=false, ydir=false, zdir=false;
-  int xm=0, ym=0, zm=0;
   size_t n, idx;
 
-  if( nd >= 1 ) {
+  if( nd >= 1 )
     xdir = m_Shape[0] > 1;
-    xm = m_Shape[0] / 2;
-  }
-  if( nd >= 2 ) {
+  if( nd >= 2 )
     ydir = m_Shape[1] > 1;
-    ym = m_Shape[1] / 2;
-  }
-  if( nd >= 3 ) {
+  if( nd >= 3 )
     zdir = m_Shape[2] > 1;
-    zm = m_Shape[2] / 2;
-  }
 
 
   if( xdir && !ydir && !zdir ) {
     n = 2;
     points = xt::zeros<int>( {n,nd} );
-    points(0,0) = -xm;
-    points(1,0) = xm;
+    points(1,0) = m_Shape[0] - 1;
   }
   else if( !xdir && ydir && !zdir ) {
     n = 2;
     points = xt::zeros<int>( {n,nd} );
-    points(0,1) = -ym;
-    points(1,1) = ym;
+    points(1,1) = m_Shape[1] - 1;
   }
   else if( !xdir && !ydir && zdir ) {
     n = 2;
     points = xt::zeros<int>( {n,nd} );
-    points(0,2) = -zm;
-    points(1,2) = -zm;
+    points(1,2) = m_Shape[2] - 1;
   }
   else if( xdir && ydir && !zdir ) {
     n = 2*m_Shape[0] + 2*m_Shape[1] - 4;
@@ -60,16 +50,16 @@ inline xt::xtensor<int,2> Ensemble::stampPoints(
 
     idx = 0;
     for( size_t i = 0; i < m_Shape[0]; ++i ) {
-      points(idx,0) = i - xm;
-      points(idx++,1) = -ym;
-      points(idx,0) = i - xm;
-      points(idx++,1) = ym;
+      points(idx,0) = i;
+      points(idx++,1) = 0;
+      points(idx,0) = i;
+      points(idx++,1) = m_shape[1] - 1;
     }
     for( size_t i = 1; i < m_Shape[1]-1; ++i ) {
-      points(idx,0) = -xm;
-      points(idx++,1) = i - ym;
-      points(idx,0) = xm;
-      points(idx++,1) = i - ym;
+      points(idx,0) = 0;
+      points(idx++,1) = i;
+      points(idx,0) = m_Shape[0] - 1;
+      points(idx++,1) = i;
     }
   }
   else if( xdir && !ydir && zdir ) {
@@ -78,16 +68,16 @@ inline xt::xtensor<int,2> Ensemble::stampPoints(
 
     idx = 0;
     for( size_t i = 0; i < m_Shape[0]; ++i ) {
-      points(idx,0) = i - xm;
-      points(idx++,2) = -zm;
-      points(idx,0) = i - xm;
-      points(idx++,2) = zm;
+      points(idx,0) = i;
+      points(idx++,2) = 0;
+      points(idx,0) = i;
+      points(idx++,2) = m_Shape[2] - 1;
     }
     for( size_t i = 1; i < m_Shape[2]-1; ++i ) {
-      points(idx,0) = -xm;
-      points(idx++,2) = i - zm;
-      points(idx,0) = xm;
-      points(idx++,2) = i - zm;
+      points(idx,0) = 0;
+      points(idx++,2) = i;
+      points(idx,0) = m_Shape[0] - 1;
+      points(idx++,2) = i;
     }
   }
   else if( !xdir && ydir && zdir ) {
@@ -96,16 +86,16 @@ inline xt::xtensor<int,2> Ensemble::stampPoints(
 
     idx = 0;
     for( size_t i = 0; i < m_Shape[1]; ++i ) {
-      points(idx,1) = i - ym;
-      points(idx++,2) = -zm;
-      points(idx,1) = i - ym;
-      points(idx++,2) = zm;
+      points(idx,1) = i;
+      points(idx++,2) = 0;
+      points(idx,1) = i;
+      points(idx++,2) = m_Shape[2] - 1;
     }
     for( size_t i = 1; i < m_Shape[2]-1; ++i ) {
-      points(idx,1) = -ym;
-      points(idx++,2) = i - zm;
-      points(idx,1) = ym;
-      points(idx++,2) = i - zm;
+      points(idx,1) = 0;
+      points(idx++,2) = i;
+      points(idx,1) = m_Shape[1] - 1;
+      points(idx++,2) = i;
     }
   }
   else if( xdir && ydir && zdir ) {
@@ -116,32 +106,32 @@ inline xt::xtensor<int,2> Ensemble::stampPoints(
     idx = 0;
     for( size_t i = 0; i < m_Shape[0]; ++i ) {
       for( size_t j = 0; j < m_Shape[1]; ++j ) {
-        points(idx,0) = i - xm;
-        points(idx,1) = j - ym;
-        points(idx++,2) = -zm;
-        points(idx,0) = i - xm;
-        points(idx,1) = j - ym;
-        points(idx++,2) = zm;
+        points(idx,0) = i;
+        points(idx,1) = j;
+        points(idx++,2) = 0;
+        points(idx,0) = i;
+        points(idx,1) = j;
+        points(idx++,2) = m_Shape[2] - 1;
       }
     }
     for( size_t i = 0; i < m_Shape[0]; ++i ) {
       for( size_t j = 1; j < m_Shape[2]-1; ++j ) {
-        points(idx,0) = i - xm;
-        points(idx,1) = -ym;
-        points(idx++,2) = j - zm;
-        points(idx,0) = i - xm;
-        points(idx,1) = ym;
-        points(idx++,2) = j - zm;
+        points(idx,0) = i;
+        points(idx,1) = 0;
+        points(idx++,2) = j;
+        points(idx,0) = i;
+        points(idx,1) = m_Shape[1] - 1;
+        points(idx++,2) = j;
       }
     }
     for( size_t i = 1; i < m_Shape[1]-1; ++i ) {
       for( size_t j = 1; j < m_Shape[2]-1; ++j ) {
-        points(idx,0) = -xm;
-        points(idx,1) = i - ym;
-        points(idx++,2) = j - zm;
-        points(idx,0) = xm;
-        points(idx,1) = i - ym;
-        points(idx++,2) = j - zm;
+        points(idx,0) = 0;
+        points(idx,1) = i;
+        points(idx++,2) = j;
+        points(idx,0) = m_Shape[0] - 1;
+        points(idx,1) = i;
+        points(idx++,2) = j;
       }
     }
   }
