@@ -39,6 +39,20 @@ m.def("path",
     py::arg("xb"),
     py::arg("mode")=GooseEYE::path_mode::Bresenham);
 
+/*
+m.def("bressenham",
+    py::overload_cast<
+        xt::xarray<double>& l,
+        const xt::xarray<double>& f,
+        const xt::xtensor_fixed<int, xt::xshape<3>>& x0,
+        const xt::xtensor_fixed<int, xt::xshape<3>>& x1>(&GooseEYE::bressenham<double>),
+    py::arg("l"),
+    py::arg("f"),
+    py::arg("x0"),
+    py::arg("x1")
+  );
+*/
+
 // -------------------------------------------------------------------------------------------------
 
 m.def("dummy_circles",
@@ -235,7 +249,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
         py::arg("nd")=0)
 
     // Lineal-path function
-
+/*
     .def("L", py::overload_cast<
             const xt::xarray<double>&>(&GooseEYE::Ensemble::L<double>),
         py::arg("f"))
@@ -245,7 +259,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
             const xt::xarray<int>&>(&GooseEYE::Ensemble::L<double>),
         py::arg("f"),
         py::arg("fmask"))
-
+*/
     .def("__repr__",
         [](const GooseEYE::Ensemble &){ return "<GooseEYE.Ensemble>"; }
     );
@@ -396,7 +410,7 @@ m.def("heightheight", py::overload_cast<
     py::arg("periodic")=true);
 
 // Stamp points: returns outer pixel coordinates of roi
-
+/*
 m.def("L", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<double>&,
@@ -414,7 +428,7 @@ m.def("L", py::overload_cast<
     py::arg("f"),
     py::arg("fmask"),
     py::arg("periodic")=true);
-
+*/
 // -------------------------------------------------------------------------------------------------
 
 }

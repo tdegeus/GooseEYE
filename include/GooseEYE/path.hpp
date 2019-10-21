@@ -180,13 +180,14 @@ template<class T>
 void bressenham(
   xt::xarray<T>& l,
   const xt::xarray<T>& f,
-  xt::xtensor_fixed<int, xt::xshape<3>> x0,
+  const xt::xtensor_fixed<int, xt::xshape<3>>& x0,
   const xt::xtensor_fixed<int, xt::xshape<3>>& x1
 )
 {
   size_t axis;
-  xt::xtensor_fixed<int, xt::xshape<3>> dx, s, p;
+  xt::xtensor_fixed<int, xt::xshape<3>> x, dx, s, p;
 
+  x = x0;
   dx = xt::abs( x1 - x0 );
 
   // Determine driving axis
@@ -208,23 +209,23 @@ void bressenham(
   // Loop until end of line
   while( x0[axis] != x1[axis] )
   {
-    x0[axis] += s[axis];
+    x[axis] += s[axis];
 
     for( size_t i = 0; i < 3; ++i )
     {
       if( i != axis && p[i] >= 0 )
       {
-        x0[i] += s[i];
+        x[i] += s[i];
         p[i] -= 2 * dx[axis];
       }
 
       p[i] += 2 * dx[i];
     }
-    
-    if( f(x0[0],x0[1],x0[2]) != (T) 1 )
+
+    if( f(x[0],x[1],x[2]) != (T) 1 )
       return;
 
-    l(x0[0],x0[1],x0[2]) = (T) 1;
+    l(x[0],x[1],x[2]) = (T) 1;
 
   }
 }
