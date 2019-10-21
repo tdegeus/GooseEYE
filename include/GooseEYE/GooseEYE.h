@@ -245,9 +245,9 @@ public:
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
-  // Stamp points
+  // Stamp points: returns outer pixel coordinates of roi
 
-  xt::xarray<int> stampPoints(
+  xt::xtensor<size_t,2> stampPoints(
     size_t nd=0) const;
 
   // Lineal-path function

@@ -39,7 +39,7 @@ inline void Ensemble::L(
   }
 
   // apply padding
-  xt::xarray<T>   F = xt::pad(f, m_pad, pad_mode);
+  xt::xarray<T> F = xt::pad(f, m_pad, pad_mode);
   xt::xarray<int> Fmask = xt::pad(fmask, m_pad, xt::pad_mode::constant, mask_value);
 
   // make matrices virtually 3-d matrices
@@ -56,15 +56,15 @@ inline void Ensemble::L(
   xt::xarray<int> Li = xt::empty<T>(m_Shape);
 
   // roi stamp
-  xt::xarray<int> stamp = stampPoints( 3 );
-  size_t nstamp = stamp.shape()[0];
+  xt::xtensor<size_t,2> stamp = stampPoints( 3 );
+  size_t nstamp = stamp.shape(0);
 
   // Position vectors
-  std::array<int,3> x0, x1;
+  xt::xtensor_fixed<size_t, xt::xshape<3>> x0, x1;
 
-  x0[0] = (int) m_Shape[0] / 2;
-  x0[1] = (int) m_Shape[1] / 2;
-  x0[2] = (int) m_Shape[2] / 2;
+  x0[0] = m_Shape[0] / 2;
+  x0[1] = m_Shape[1] / 2;
+  x0[2] = m_Shape[2] / 2;
 
   // compute correlation
   for (size_t h = m_Pad[0][0]; h < shape[0]-m_Pad[0][1]; ++h) {
@@ -72,7 +72,7 @@ inline void Ensemble::L(
       for (size_t j = m_Pad[2][0]; j < shape[2]-m_Pad[2][1]; ++j) {
         // - skip masked
 
-        if (Fmask(h,i,j))
+        if (F(h,i,j) != (T) 1 || Fmask(h,i,j))
           continue;
 
         // Get comparison sub-matrix
@@ -85,13 +85,11 @@ inline void Ensemble::L(
         Li(x0[0],x0[1],x0[2]) = 1;
 
         for( size_t istamp = 0; istamp < nstamp; ++istamp ) {
-          x1[0] = x0[0] + stamp(istamp,0);
-          x1[1] = x0[1] + stamp(istamp,1);
-          x1[2] = x0[2] + stamp(istamp,2);
+          x1 = x0 + xt::view(stamp, istamp, xt::xrange(0,3));
 
+          // TODO: implement other pixel-path algorithms
           bressenham( Li, Fi, x0, x1 );
         }
-
 
         first += F(h,i,j) * Li;
         //norm += xt::ones<T>(m_Shape);

@@ -180,16 +180,14 @@ template<class T>
 void bressenham(
   xt::xarray<T>& l,
   const xt::xarray<T>& f,
-  std::array<int,3> x0,
-  const std::array<int,3>& x1
+  xt::xtensor_fixed<int, xt::xshape<3>> x0,
+  const xt::xtensor_fixed<int, xt::xshape<3>>& x1
 )
 {
   size_t axis;
-  std::array<int,3> dx, s, p;
+  xt::xtensor_fixed<int, xt::xshape<3>> dx, s, p;
 
-  dx[0] = std::abs( x1[0] - x0[0] );
-  dx[1] = std::abs( x1[1] - x0[1] );
-  dx[2] = std::abs( x1[2] - x0[2] );
+  dx = xt::abs( x1 - x0 );
 
   // Determine driving axis
   if( dx[0] >= dx[1] && dx[0] >= dx[2] )
@@ -205,9 +203,7 @@ void bressenham(
   s[2] = x1[2] > x0[2] ? 1 : -1;
 
   // Slope errors
-  p[0] = 2 * dx[0] - dx[axis];
-  p[1] = 2 * dx[1] - dx[axis];
-  p[2] = 2 * dx[2] - dx[axis];
+  p = 2 * dx - dx[axis];
 
   // Loop until end of line
   while( x0[axis] != x1[axis] )
@@ -224,11 +220,11 @@ void bressenham(
 
       p[i] += 2 * dx[i];
     }
-
-    if( f(x0[0],x0[1],x0[2]) != f(x1[0],x1[1],x1[2]) )
+    
+    if( f(x0[0],x0[1],x0[2]) != (T) 1 )
       return;
 
-    l(x0[0],x0[1],x0[2]) = 1;
+    l(x0[0],x0[1],x0[2]) = (T) 1;
 
   }
 }
