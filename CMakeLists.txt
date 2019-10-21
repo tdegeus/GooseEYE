@@ -16,8 +16,8 @@ include(GNUInstallDirs)
 
 # options
 option(PKGCONFIG "Build pkg-config" ON)
-option(BUILD_TESTS "${PROJECT_NAME} tests" OFF)
-option(BUILD_EXAMPLES "${PROJECT_NAME} examples" OFF)
+option(BUILD_TESTS "${PROJECT_NAME} Build tests" OFF)
+option(BUILD_EXAMPLES "${PROJECT_NAME} Build examples" OFF)
 
 # project settings
 # ----------------
