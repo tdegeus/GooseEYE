@@ -397,7 +397,23 @@ m.def("heightheight", py::overload_cast<
 
 // Stamp points: returns outer pixel coordinates of roi
 
-m.def("stampPoints", py::overload_cast<)
+m.def("L", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<double>&,
+        bool>(&GooseEYE::L<double>),
+    py::arg("roi"),
+    py::arg("f"),
+    py::arg("periodic")=true)
+
+m.def("L", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<double>&,
+        const xt::xarray<int>&,
+        bool>(&GooseEYE::L<double>),
+    py::arg("roi"),
+    py::arg("f"),
+    py::arg("fmask"),
+    py::arg("periodic")=true)
 
 // -------------------------------------------------------------------------------------------------
 
