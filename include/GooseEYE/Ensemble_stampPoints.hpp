@@ -13,11 +13,11 @@ namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xtensor<size_t,2> Ensemble::stampPoints(
+inline xt::xtensor<int,2> Ensemble::stampPoints(
   size_t nd
 ) const
 {
-  xt::xtensor<size_t,2> points;
+  xt::xtensor<int,2> points;
   bool xdir=false, ydir=false, zdir=false;
   int xm=0, ym=0, zm=0;
   size_t n, idx;
@@ -38,25 +38,25 @@ inline xt::xtensor<size_t,2> Ensemble::stampPoints(
 
   if( xdir && !ydir && !zdir ) {
     n = 2;
-    points = xt::zeros<size_t>( {n,nd} );
+    points = xt::zeros<int>( {n,nd} );
     points(0,0) = -xm;
     points(1,0) = xm;
   }
   else if( !xdir && ydir && !zdir ) {
     n = 2;
-    points = xt::zeros<size_t>( {n,nd} );
+    points = xt::zeros<int>( {n,nd} );
     points(0,1) = -ym;
     points(1,1) = ym;
   }
   else if( !xdir && !ydir && zdir ) {
     n = 2;
-    points = xt::zeros<size_t>( {n,nd} );
+    points = xt::zeros<int>( {n,nd} );
     points(0,2) = -zm;
     points(1,2) = -zm;
   }
   else if( xdir && ydir && !zdir ) {
     n = 2*m_Shape[0] + 2*m_Shape[1] - 4;
-    points = xt::zeros<size_t>( {n,nd} );
+    points = xt::zeros<int>( {n,nd} );
 
     idx = 0;
     for( size_t i = 0; i < m_Shape[0]; ++i ) {
@@ -74,7 +74,7 @@ inline xt::xtensor<size_t,2> Ensemble::stampPoints(
   }
   else if( xdir && !ydir && zdir ) {
     n = 2*m_Shape[0] + 2*m_Shape[2] - 4;
-    points = xt::zeros<size_t>( {n,nd} );
+    points = xt::zeros<int>( {n,nd} );
 
     idx = 0;
     for( size_t i = 0; i < m_Shape[0]; ++i ) {
@@ -92,7 +92,7 @@ inline xt::xtensor<size_t,2> Ensemble::stampPoints(
   }
   else if( !xdir && ydir && zdir ) {
     n = 2*m_Shape[1] + 2*m_Shape[2] - 4;
-    points = xt::zeros<size_t>( {n,nd} );
+    points = xt::zeros<int>( {n,nd} );
 
     idx = 0;
     for( size_t i = 0; i < m_Shape[1]; ++i ) {
@@ -111,7 +111,7 @@ inline xt::xtensor<size_t,2> Ensemble::stampPoints(
   else if( xdir && ydir && zdir ) {
     n = 2*m_Shape[0]*m_Shape[1] + 2*m_Shape[0]*(m_Shape[2]-2) \
       + 2*(m_Shape[1]-2)*(m_Shape[2]-2);
-    points = xt::zeros<size_t>( {n,nd} );
+    points = xt::zeros<int>( {n,nd} );
 
     idx = 0;
     for( size_t i = 0; i < m_Shape[0]; ++i ) {
