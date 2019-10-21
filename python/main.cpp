@@ -10,7 +10,7 @@
 #include <pyxtensor/pyxtensor.hpp>
 
 #define GOOSEEYE_ENABLE_ASSERT
-#include "../include/GooseEYE/GooseEYE.h"
+#include <GooseEYE/GooseEYE.h>
 
 namespace py = pybind11;
 

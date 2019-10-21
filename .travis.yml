@@ -10,17 +10,8 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.9
-            - libeigen3-dev
-      env: COMPILER=gcc GCC=4.9
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
             - g++-5
-            - libeigen3-dev
+            - python3
       env: COMPILER=gcc GCC=5
     - os: linux
       addons:
@@ -29,7 +20,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-            - libeigen3-dev
+            - python3
       env: COMPILER=gcc GCC=6
 env:
   global:
@@ -37,6 +28,9 @@ env:
     - MINCONDA_LINUX="Linux-x86_64"
     - MINCONDA_OSX="MacOSX-x86_64"
 before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra
+    - sudo apt-get install dvipng
     - |
       # Configure build variables
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -67,9 +61,19 @@ install:
     - conda install xtl -c conda-forge
     - conda install xsimd -c conda-forge
     - conda install xtensor -c conda-forge
+    - pip install numpy matplotlib GooseMPL pybind11 pyxtensor
+    - export MPLBACKEND=Agg
+    - python -c "import GooseMPL; GooseMPL.copy_style()"
     # store relevant
+    - root_dir="${PWD}"
     - build_dir="${PWD}/build"
+    # make Python library
+    - cd "${root_dir}"
+    - python3 setup.py build
+    - python3 setup.py install
     # build path
+    - cd "${root_dir}"
+    - rm -r "${build_dir}"
     - mkdir "${build_dir}"
     - cd "${build_dir}"
     # install catch
@@ -78,14 +82,33 @@ install:
     - mkdir build
     - cd build
     - mkdir opt
-    - cmake .. -DCATCH_BUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX:PATH="${PWD}"/opt
-    - make install
-    - export INCLUDE_PATH="${PWD}"/opt/include:"${INCLUDE_PATH}"
+    - cmake .. -DCATCH_BUILD_TESTING=OFF
+    - sudo make install
     # make test-cases
     - cd "${build_dir}"
-    - cmake .. -DBUILD_TESTS=ON
+    - cmake .. -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
     - make
 script:
     # run tests
     - cd "${build_dir}/test"
     - ./test
+    # run C++ examples
+    - cd "${build_dir}/docs/examples"
+    - ./S2
+    - ./S2_autocorrelation
+    - ./S2_mask
+    - ./S2_ensemble
+    - ./C2
+    - ./heightheight
+    # run Python examples
+    - cd "${root_dir}"
+    - python docs/examples/S2.py
+    - python docs/examples/S2_autocorrelation.py
+    - python docs/examples/S2_mask.py
+    - python docs/examples/S2_ensemble.py
+    - python docs/examples/C2.py
+    - python docs/examples/W2.py
+    - python docs/examples/clusters.py
+    - python docs/examples/clusters_centers.py
+    - python docs/examples/heightheight.py
+    - python docs/examples/mean.py
