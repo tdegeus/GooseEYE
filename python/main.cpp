@@ -231,8 +231,8 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     // Stamp points: returns outer pixel coordinates of roi
 
     .def("stampPoints", py::overload_cast<
-            size_t>(&GooseEYE::Ensemble::stampPoints),
-        py::arg("nd"))
+            size_t>(&GooseEYE::Ensemble::stampPoints, py::const_),
+        py::arg("nd")=0)
 
     // Lineal-path function
 
@@ -403,7 +403,7 @@ m.def("L", py::overload_cast<
         bool>(&GooseEYE::L<double>),
     py::arg("roi"),
     py::arg("f"),
-    py::arg("periodic")=true)
+    py::arg("periodic")=true);
 
 m.def("L", py::overload_cast<
         const std::vector<size_t>&,
@@ -413,7 +413,7 @@ m.def("L", py::overload_cast<
     py::arg("roi"),
     py::arg("f"),
     py::arg("fmask"),
-    py::arg("periodic")=true)
+    py::arg("periodic")=true);
 
 // -------------------------------------------------------------------------------------------------
 

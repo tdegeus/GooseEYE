@@ -85,7 +85,7 @@ inline void Ensemble::L(
         Li(x0[0],x0[1],x0[2]) = 1;
 
         for( size_t istamp = 0; istamp < nstamp; ++istamp ) {
-          x1 = x0 + xt::view(stamp, istamp, xt::xrange(0,3));
+          x1 = x0 + xt::view(stamp, istamp, xt::range(0,3));
 
           // TODO: implement other pixel-path algorithms
           bressenham( Li, Fi, x0, x1 );
