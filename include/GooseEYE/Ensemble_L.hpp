@@ -62,6 +62,11 @@ inline void Ensemble::L(
   // Position vectors
   xt::xtensor_fixed<size_t, xt::xshape<3>> x0, x1;
 
+  // Pixel path
+  xt::xtensor<size_t, 2> pixelpath;
+  size_t lpath;
+
+  // Mid-point
   x0[0] = m_Shape[0] / 2;
   x0[1] = m_Shape[1] / 2;
   x0[2] = m_Shape[2] / 2;
@@ -81,13 +86,19 @@ inline void Ensemble::L(
           xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
           xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
 
-        Li = xt::zeros<T>( m_Shape );
-        Li(x0[0],x0[1],x0[2]) = 1;
+        Li.fill(0);
 
         for( size_t istamp = 0; istamp < nstamp; ++istamp ) {
-          x1 = xt::view(stamp, istamp, xt::range(0,3));
-          // TODO: implement other pixel-path algorithms
-          bressenham( Li, Fi, x0, x1 );
+          x1 = xt::view(stamp, istamp, xt::all());
+          pixelpath = path( x0, x1 );
+          lpath = pixelpath.shape(0);
+
+          for( size_t ipath = 0; ipath < lpath; ++ipath ) {
+            if( Fi(pixelpath(ipath,0),pixelpath(ipath,1),pixelpath(ipath,2)) == (T) 1 )
+              Li(pixelpath(ipath,0),pixelpath(ipath,1),pixelpath(ipath,2)) = 1;
+            else
+              break;
+          }
         }
 
         first += F(h,i,j) * Li;

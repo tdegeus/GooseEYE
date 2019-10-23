@@ -36,10 +36,16 @@ enum class path_mode
 
 // -------------------------------------------------------------------------------------------------
 
-xt::xarray<int> path(
-  const std::vector<int> &xa,
-  const std::vector<int> &xb,
+xt::xtensor<size_t,2> path(
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1,
   path_mode mode=path_mode::Bresenham);
+
+void bressenham(
+  xt::xtensor<size_t,2>& points,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1
+);
 
 // -------------------------------------------------------------------------------------------------
 // Dummy image

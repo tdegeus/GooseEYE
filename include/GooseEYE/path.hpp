@@ -13,17 +13,21 @@ namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
 
-xt::xarray<int> path(const std::vector<int> &xa, const std::vector<int> &xb, path_mode mode)
+xt::xtensor<size_t,2> path(
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1,
+  path_mode mode)
 {
-  GOOSEEYE_ASSERT(xa.size() == xb.size());
-  GOOSEEYE_ASSERT(xa.size() > 0 && xa.size() <= 3);
-
-  int ndim = static_cast<int>(xa.size());
-
-  std::vector<int> ret;
+  xt::xtensor<size_t,2> points;
 
   if (mode == path_mode::Bresenham)
   {
+    bressenham( points, x0, x1 );
+  }
+
+  return points;
+
+  /*
     // see http://www.luberth.com/plotter/line3d.c.txt.html
     int a[3], s[3], x[3], d[3], in[2], j, i, iin, nnz=0;
 
@@ -171,43 +175,53 @@ xt::xarray<int> path(const std::vector<int> &xa, const std::vector<int> &xb, pat
   }
 
   return xt::adapt(ret, {static_cast<size_t>(nnz), static_cast<size_t>(ndim)});
+  */
 }
 
 // -------------------------------------------------------------------------------------------------
 
 // https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
-template<class T>
 void bressenham(
-  xt::xarray<T>& l,
-  const xt::xarray<T>& f,
-  const xt::xtensor_fixed<int, xt::xshape<3>>& x0,
-  const xt::xtensor_fixed<int, xt::xshape<3>>& x1
+  xt::xtensor<size_t,2>& points,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1
 )
 {
-  size_t axis;
-  xt::xtensor_fixed<int, xt::xshape<3>> x, dx, s, p;
+  size_t axis, npoints, ipoint;
+  xt::xtensor_fixed<size_t, xt::xshape<3>> x, dx;
+  xt::xtensor_fixed<int, xt::xshape<3>> s, p;
 
   x = x0;
-  dx = xt::abs( x1 - x0 );
-
-  // Determine driving axis
-  if( dx[0] >= dx[1] && dx[0] >= dx[2] )
-    axis = 0;
-  else if ( dx[1] >= dx[0] && dx[1] >= dx[2] )
-    axis = 1;
-  else
-    axis = 2;
 
   // Slopes
-  s[0] = x1[0] > x0[0] ? 1 : -1;
-  s[1] = x1[1] > x0[1] ? 1 : -1;
-  s[2] = x1[2] > x0[2] ? 1 : -1;
+  for( size_t i = 0; i < 3; ++i ) {
+    dx[i] = std::abs( (int) x1[i] - (int) x0[i] );
+    s[i] = x1[i] > x0[i] ? 1 : -1;
+  };
 
   // Slope errors
   p = 2 * dx - dx[axis];
 
+  // Determine driving axis
+  if( dx[0] >= dx[1] && dx[0] >= dx[2] ) {
+    axis = 0;
+    npoints = dx[0] + 1;
+  }
+  else if ( dx[1] >= dx[0] && dx[1] >= dx[2] ) {
+    axis = 1;
+    npoints = dx[1] + 1;
+  }
+  else {
+    axis = 2;
+    npoints = dx[2] + 1;
+  }
+
+  points.resize({npoints, 3});
+  xt::view(points, 0, xt::all()) = x;
+  ipoint = 1;
+
   // Loop until end of line
-  while( x0[axis] != x1[axis] )
+  while( x[axis] != x1[axis] )
   {
     x[axis] += s[axis];
 
@@ -222,11 +236,7 @@ void bressenham(
       p[i] += 2 * dx[i];
     }
 
-    if( f(x[0],x[1],x[2]) != (T) 1 )
-      return;
-
-    l(x[0],x[1],x[2]) = (T) 1;
-
+    xt::view(points, ipoint++, xt::all()) = x;
   }
 }
 
