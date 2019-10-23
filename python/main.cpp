@@ -244,9 +244,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
     // Stamp points: returns outer pixel coordinates of roi
 
-    .def("stampPoints", py::overload_cast<
-            size_t>(&GooseEYE::Ensemble::stampPoints, py::const_),
-        py::arg("nd")=0)
+    .def("stampPoints", py::overload_cast<>(&GooseEYE::Ensemble::stampPoints, py::const_))
 
     // Lineal-path function
 /*

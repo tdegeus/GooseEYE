@@ -13,130 +13,23 @@ namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xtensor<size_t,2> Ensemble::stampPoints(
-  size_t nd
-) const
+inline xt::xtensor<size_t,2> Ensemble::stampPoints() const
 {
-  xt::xtensor<size_t,2> points;
-  bool xdir=false, ydir=false, zdir=false;
-  size_t n, idx;
+  // Initialize roi-sized matrix to 1
+  xt::xtensor<size_t,3> r = xt::ones<size_t>(m_Shape);
 
-  if( nd >= 1 )
-    xdir = m_Shape[0] > 1;
-  if( nd >= 2 )
-    ydir = m_Shape[1] > 1;
-  if( nd >= 3 )
-    zdir = m_Shape[2] > 1;
+  // Determine inner pixels (account for quasi-3D images)
+  auto ix = m_Shape[0] > 1 ? xt::range(1, m_Shape[0]-1) : xt::range(0, m_Shape[0]);
+  auto iy = m_Shape[1] > 1 ? xt::range(1, m_Shape[1]-1) : xt::range(0, m_Shape[1]);
+  auto iz = m_Shape[2] > 1 ? xt::range(1, m_Shape[2]-1) : xt::range(0, m_Shape[2]);
 
+  // Set inner pixels to 0
+  xt::view(r, ix, iy, iz) = 0;
 
-  if( xdir && !ydir && !zdir ) {
-    n = 2;
-    points = xt::zeros<int>( {n,nd} );
-    points(1,0) = m_Shape[0] - 1;
-  }
-  else if( !xdir && ydir && !zdir ) {
-    n = 2;
-    points = xt::zeros<int>( {n,nd} );
-    points(1,1) = m_Shape[1] - 1;
-  }
-  else if( !xdir && !ydir && zdir ) {
-    n = 2;
-    points = xt::zeros<int>( {n,nd} );
-    points(1,2) = m_Shape[2] - 1;
-  }
-  else if( xdir && ydir && !zdir ) {
-    n = 2*m_Shape[0] + 2*m_Shape[1] - 4;
-    points = xt::zeros<int>( {n,nd} );
+  // Get stamp
+  xt::xtensor<size_t,2> stamp = xt::from_indices(xt::argwhere(r));
 
-    idx = 0;
-    for( size_t i = 0; i < m_Shape[0]; ++i ) {
-      points(idx,0) = i;
-      points(idx++,1) = 0;
-      points(idx,0) = i;
-      points(idx++,1) = m_shape[1] - 1;
-    }
-    for( size_t i = 1; i < m_Shape[1]-1; ++i ) {
-      points(idx,0) = 0;
-      points(idx++,1) = i;
-      points(idx,0) = m_Shape[0] - 1;
-      points(idx++,1) = i;
-    }
-  }
-  else if( xdir && !ydir && zdir ) {
-    n = 2*m_Shape[0] + 2*m_Shape[2] - 4;
-    points = xt::zeros<int>( {n,nd} );
-
-    idx = 0;
-    for( size_t i = 0; i < m_Shape[0]; ++i ) {
-      points(idx,0) = i;
-      points(idx++,2) = 0;
-      points(idx,0) = i;
-      points(idx++,2) = m_Shape[2] - 1;
-    }
-    for( size_t i = 1; i < m_Shape[2]-1; ++i ) {
-      points(idx,0) = 0;
-      points(idx++,2) = i;
-      points(idx,0) = m_Shape[0] - 1;
-      points(idx++,2) = i;
-    }
-  }
-  else if( !xdir && ydir && zdir ) {
-    n = 2*m_Shape[1] + 2*m_Shape[2] - 4;
-    points = xt::zeros<int>( {n,nd} );
-
-    idx = 0;
-    for( size_t i = 0; i < m_Shape[1]; ++i ) {
-      points(idx,1) = i;
-      points(idx++,2) = 0;
-      points(idx,1) = i;
-      points(idx++,2) = m_Shape[2] - 1;
-    }
-    for( size_t i = 1; i < m_Shape[2]-1; ++i ) {
-      points(idx,1) = 0;
-      points(idx++,2) = i;
-      points(idx,1) = m_Shape[1] - 1;
-      points(idx++,2) = i;
-    }
-  }
-  else if( xdir && ydir && zdir ) {
-    n = 2*m_Shape[0]*m_Shape[1] + 2*m_Shape[0]*(m_Shape[2]-2) \
-      + 2*(m_Shape[1]-2)*(m_Shape[2]-2);
-    points = xt::zeros<int>( {n,nd} );
-
-    idx = 0;
-    for( size_t i = 0; i < m_Shape[0]; ++i ) {
-      for( size_t j = 0; j < m_Shape[1]; ++j ) {
-        points(idx,0) = i;
-        points(idx,1) = j;
-        points(idx++,2) = 0;
-        points(idx,0) = i;
-        points(idx,1) = j;
-        points(idx++,2) = m_Shape[2] - 1;
-      }
-    }
-    for( size_t i = 0; i < m_Shape[0]; ++i ) {
-      for( size_t j = 1; j < m_Shape[2]-1; ++j ) {
-        points(idx,0) = i;
-        points(idx,1) = 0;
-        points(idx++,2) = j;
-        points(idx,0) = i;
-        points(idx,1) = m_Shape[1] - 1;
-        points(idx++,2) = j;
-      }
-    }
-    for( size_t i = 1; i < m_Shape[1]-1; ++i ) {
-      for( size_t j = 1; j < m_Shape[2]-1; ++j ) {
-        points(idx,0) = 0;
-        points(idx,1) = i;
-        points(idx++,2) = j;
-        points(idx,0) = m_Shape[0] - 1;
-        points(idx,1) = i;
-        points(idx++,2) = j;
-      }
-    }
-  }
-
-  return points;
+  return stamp;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -247,8 +247,7 @@ public:
 
   // Stamp points: returns outer pixel coordinates of roi
 
-  xt::xtensor<size_t,2> stampPoints(
-    size_t nd=0) const;
+  xt::xtensor<size_t,2> stampPoints() const;
 
   // Lineal-path function
 

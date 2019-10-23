@@ -56,7 +56,7 @@ inline void Ensemble::L(
   xt::xarray<int> Li = xt::empty<T>(m_Shape);
 
   // roi stamp
-  xt::xtensor<size_t,2> stamp = stampPoints( 3 );
+  xt::xtensor<size_t,2> stamp = stampPoints();
   size_t nstamp = stamp.shape(0);
 
   // Position vectors
