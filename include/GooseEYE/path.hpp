@@ -20,8 +20,7 @@ xt::xtensor<size_t,2> path(
 {
   xt::xtensor<size_t,2> points;
 
-  if (mode == path_mode::Bresenham)
-  {
+  if (mode == path_mode::Bresenham) {
     bressenham( points, x0, x1 );
   }
 
@@ -199,9 +198,6 @@ void bressenham(
     s[i] = x1[i] > x0[i] ? 1 : -1;
   };
 
-  // Slope errors
-  p = 2 * dx - dx[axis];
-
   // Determine driving axis
   if( dx[0] >= dx[1] && dx[0] >= dx[2] ) {
     axis = 0;
@@ -216,6 +212,10 @@ void bressenham(
     npoints = dx[2] + 1;
   }
 
+  // Slope errors
+  p = 2 * dx - dx[axis];
+
+  // Allocate points
   points.resize({npoints, 3});
   xt::view(points, 0, xt::all()) = x;
   ipoint = 1;
