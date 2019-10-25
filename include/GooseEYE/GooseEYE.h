@@ -59,6 +59,40 @@ xt::xarray<int> dummy_circles(
   bool periodic=true);
 
 // -------------------------------------------------------------------------------------------------
+// Dilate image
+// -------------------------------------------------------------------------------------------------
+
+// dilate with a different number of iterations per label
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& kernel,
+  const xt::xtensor<size_t,1>& iterations,
+  bool periodic=true);
+
+// dilate with a different number of iterations per label, and "kernel::nearest"
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  const xt::xtensor<size_t,1>& iterations,
+  bool periodic=true);
+
+// dilate image (with labels 1..n)
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& kernel,
+  size_t iterations=1,
+  bool periodic=true);
+
+// dilate image (with labels 1..n), and "kernel::nearest"
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  size_t iterations=1,
+  bool periodic=true);
+
+// -------------------------------------------------------------------------------------------------
 // Clusters
 // -------------------------------------------------------------------------------------------------
 
@@ -378,6 +412,7 @@ xt::xarray<double> heightheight(
 #include "dummy_circles.hpp"
 #include "path.hpp"
 #include "kernel.hpp"
+#include "dilate.hpp"
 #include "clusters.hpp"
 #include "Ensemble.hpp"
 #include "Ensemble_mean.hpp"
