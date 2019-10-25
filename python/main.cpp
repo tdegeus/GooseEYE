@@ -242,12 +242,8 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
         py::arg("f"),
         py::arg("fmask"))
 
-    // Stamp points: returns outer pixel coordinates of roi
-
-    .def("stampPoints", py::overload_cast<>(&GooseEYE::Ensemble::stampPoints, py::const_))
-
     // Lineal-path function
-/*
+
     .def("L", py::overload_cast<
             const xt::xarray<double>&>(&GooseEYE::Ensemble::L<double>),
         py::arg("f"))
@@ -257,7 +253,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
             const xt::xarray<int>&>(&GooseEYE::Ensemble::L<double>),
         py::arg("f"),
         py::arg("fmask"))
-*/
+
     .def("__repr__",
         [](const GooseEYE::Ensemble &){ return "<GooseEYE.Ensemble>"; }
     );
@@ -407,8 +403,6 @@ m.def("heightheight", py::overload_cast<
     py::arg("fmask"),
     py::arg("periodic")=true);
 
-// Stamp points: returns outer pixel coordinates of roi
-/*
 m.def("L", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<double>&,
@@ -426,7 +420,7 @@ m.def("L", py::overload_cast<
     py::arg("f"),
     py::arg("fmask"),
     py::arg("periodic")=true);
-*/
+
 // -------------------------------------------------------------------------------------------------
 
 }

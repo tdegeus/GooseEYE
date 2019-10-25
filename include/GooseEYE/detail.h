@@ -59,6 +59,15 @@ inline std::vector<std::vector<size_t>> pad_width(const xt::xarray<T>& f);
 
 // -------------------------------------------------------------------------------------------------
 
+// Path functions
+
+inline void bressenham(
+  xt::xtensor<size_t,2>& points,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1
+);
+
+
 }}
 
 #endif

@@ -41,12 +41,6 @@ xt::xtensor<size_t,2> path(
   const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1,
   path_mode mode=path_mode::Bresenham);
 
-void bressenham(
-  xt::xtensor<size_t,2>& points,
-  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
-  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1
-);
-
 // -------------------------------------------------------------------------------------------------
 // Dummy image
 // -------------------------------------------------------------------------------------------------
@@ -251,10 +245,6 @@ public:
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
-  // Stamp points: returns outer pixel coordinates of roi
-
-  xt::xtensor<size_t,2> stampPoints() const;
-
   // Lineal-path function
 
   template <class T>
@@ -421,7 +411,6 @@ xt::xarray<double> L(
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
 #include "Ensemble_heightheight.hpp"
-#include "Ensemble_stampPoints.hpp"
 #include "Ensemble_L.hpp"
 
 #endif

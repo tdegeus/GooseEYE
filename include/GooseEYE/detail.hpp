@@ -122,6 +122,69 @@ inline std::vector<std::vector<size_t>> pad_width(const xt::xarray<T>& f)
 
 // -------------------------------------------------------------------------------------------------
 
+// https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
+void bressenham(
+  xt::xtensor<size_t,2>& points,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
+  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1
+)
+{
+  size_t axis, npoints, ipoint;
+  xt::xtensor_fixed<size_t, xt::xshape<3>> x, dx;
+  xt::xtensor_fixed<int, xt::xshape<3>> s, p;
+
+  x = x0;
+
+  // Slopes
+  for( size_t i = 0; i < 3; ++i ) {
+    dx[i] = std::abs( (int) x1[i] - (int) x0[i] );
+    s[i] = x1[i] > x0[i] ? 1 : -1;
+  };
+
+  // Determine driving axis
+  if( dx[0] >= dx[1] && dx[0] >= dx[2] ) {
+    axis = 0;
+    npoints = dx[0] + 1;
+  }
+  else if ( dx[1] >= dx[0] && dx[1] >= dx[2] ) {
+    axis = 1;
+    npoints = dx[1] + 1;
+  }
+  else {
+    axis = 2;
+    npoints = dx[2] + 1;
+  }
+
+  // Slope errors
+  p = 2 * dx - dx[axis];
+
+  // Allocate points
+  points.resize({npoints, 3});
+  xt::view(points, 0, xt::all()) = x;
+  ipoint = 1;
+
+  // Loop until end of line
+  while( x[axis] != x1[axis] )
+  {
+    x[axis] += s[axis];
+
+    for( size_t i = 0; i < 3; ++i )
+    {
+      if( i != axis && p[i] >= 0 )
+      {
+        x[i] += s[i];
+        p[i] -= 2 * dx[axis];
+      }
+
+      p[i] += 2 * dx[i];
+    }
+
+    xt::view(points, ipoint++, xt::all()) = x;
+  }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 }} // namespace ...
 
 #endif
