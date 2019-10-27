@@ -39,20 +39,6 @@ m.def("path",
     py::arg("xb"),
     py::arg("mode")=GooseEYE::path_mode::Bresenham);
 
-/*
-m.def("bressenham",
-    py::overload_cast<
-        xt::xarray<double>& l,
-        const xt::xarray<double>& f,
-        const xt::xtensor_fixed<int, xt::xshape<3>>& x0,
-        const xt::xtensor_fixed<int, xt::xshape<3>>& x1>(&GooseEYE::bressenham<double>),
-    py::arg("l"),
-    py::arg("f"),
-    py::arg("x0"),
-    py::arg("x1")
-  );
-*/
-
 // -------------------------------------------------------------------------------------------------
 
 m.def("dummy_circles",
@@ -245,14 +231,18 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     // Lineal-path function
 
     .def("L", py::overload_cast<
-            const xt::xarray<double>&>(&GooseEYE::Ensemble::L<double>),
-        py::arg("f"))
+            const xt::xarray<int>&,
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::L<int>),
+        py::arg("f"),
+        py::arg("mode")=GooseEYE::path_mode::Bresenham)
 
     .def("L", py::overload_cast<
-            const xt::xarray<double>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::L<double>),
+            const xt::xarray<int>&,
+            const xt::xarray<int>&,
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::L<int>),
         py::arg("f"),
-        py::arg("fmask"))
+        py::arg("fmask"),
+        py::arg("mode")=GooseEYE::path_mode::Bresenham)
 
     .def("__repr__",
         [](const GooseEYE::Ensemble &){ return "<GooseEYE.Ensemble>"; }
@@ -405,21 +395,25 @@ m.def("heightheight", py::overload_cast<
 
 m.def("L", py::overload_cast<
         const std::vector<size_t>&,
-        const xt::xarray<double>&,
-        bool>(&GooseEYE::L<double>),
+        const xt::xarray<int>&,
+        bool,
+        GooseEYE::path_mode>(&GooseEYE::L<int>),
     py::arg("roi"),
     py::arg("f"),
-    py::arg("periodic")=true);
+    py::arg("periodic")=true,
+    py::arg("mode")=GooseEYE::path_mode::Bresenham);
 
 m.def("L", py::overload_cast<
         const std::vector<size_t>&,
-        const xt::xarray<double>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::L<double>),
+        const xt::xarray<int>&,
+        bool,
+        GooseEYE::path_mode>(&GooseEYE::L<int>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("fmask"),
-    py::arg("periodic")=true);
+    py::arg("periodic")=true,
+    py::arg("mode")=GooseEYE::path_mode::Bresenham);
 
 // -------------------------------------------------------------------------------------------------
 

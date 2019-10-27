@@ -13,18 +13,15 @@ namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
 
-template <class T>
+template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
 inline void Ensemble::L(
   const xt::xarray<T>& f,
-  const xt::xarray<int>& fmask
-)
+  const xt::xarray<int>& fmask,
+  path_mode mode)
 {
   GOOSEEYE_ASSERT(f.shape() == fmask.shape());
   GOOSEEYE_ASSERT(f.dimension() == m_shape.size());
   GOOSEEYE_ASSERT(xt::all(xt::equal(fmask,0) || xt::equal(fmask,1)));
-  GOOSEEYE_ASSERT(m_Shape[0] == 0 || m_Shape[0] % 2 == 1);
-  GOOSEEYE_ASSERT(m_Shape[1] == 0 || m_Shape[1] % 2 == 1);
-  GOOSEEYE_ASSERT(m_Shape[2] == 0 || m_Shape[2] % 2 == 1);
   GOOSEEYE_ASSERT(m_stat == Type::L || m_stat == Type::Unset);
 
   // lock statistics
@@ -54,79 +51,74 @@ inline void Ensemble::L(
   xt::xarray<T> norm = xt::zeros<T>(m_Shape);
 
   // sub-matrix and path-matrix
-  xt::xarray<T> Fi = xt::empty<T>(m_Shape);
-  xt::xarray<T> Fmii = xt::empty<T>(m_Shape);
   xt::xarray<int> Li = xt::empty<T>(m_Shape);
 
-  // Initialize roi-sized matrix to 1
+  // ROI-shaped array used to extract a pixel stamp:
+  // a set of end-points over which to loop and check the statics
+  // - initialize to 1
   xt::xtensor<size_t,3> r = xt::ones<size_t>(m_Shape);
-
-  // Determine inner pixels (account for quasi-3D images)
-  auto ix = m_Shape[0] > 1 ? xt::range(1, m_Shape[0]-1) : xt::range(0, m_Shape[0]);
-  auto iy = m_Shape[1] > 1 ? xt::range(1, m_Shape[1]-1) : xt::range(0, m_Shape[1]);
-  auto iz = m_Shape[2] > 1 ? xt::range(1, m_Shape[2]-1) : xt::range(0, m_Shape[2]);
-
-  // Set inner pixels to 0
+  // - determine interior pixels (account for quasi-3D images)
+  auto ix = m_Shape[0] > 1 ? xt::range(1, m_Shape[0] - 1) : xt::range(0, m_Shape[0]);
+  auto iy = m_Shape[1] > 1 ? xt::range(1, m_Shape[1] - 1) : xt::range(0, m_Shape[1]);
+  auto iz = m_Shape[2] > 1 ? xt::range(1, m_Shape[2] - 1) : xt::range(0, m_Shape[2]);
+  // - set interior pixels to 0
   xt::view(r, ix, iy, iz) = 0;
 
-  // Get stamp
+  // get stamp, from the matrix "r"
   xt::xtensor<size_t,2> stamp = xt::from_indices(xt::argwhere(r));
   size_t nstamp = stamp.shape(0);
 
-  // Position vectors
+  // position vectors: begin and end-points spanning a pixel-path
   xt::xtensor_fixed<size_t, xt::xshape<3>> x0, x1;
 
-  // Pixel path
-  xt::xtensor<size_t, 2> ppath;
-  size_t lpath;
-
-  // Mid-point
-  x0[0] = m_Shape[0] / 2;
-  x0[1] = m_Shape[1] / 2;
-  x0[2] = m_Shape[2] / 2;
+  // set the mid-point
+  x0(0) = m_Pad[0][0];
+  x0(1) = m_Pad[1][0];
+  x0(2) = m_Pad[2][0];
 
   // compute correlation
-  for (size_t h = m_Pad[0][0]; h < shape[0]-m_Pad[0][1]; ++h) {
-    for (size_t i = m_Pad[1][0]; i < shape[1]-m_Pad[1][1]; ++i) {
-      for (size_t j = m_Pad[2][0]; j < shape[2]-m_Pad[2][1]; ++j) {
+  for (size_t h = m_Pad[0][0]; h < shape[0] - m_Pad[0][1]; ++h) {
+    for (size_t i = m_Pad[1][0]; i < shape[1] - m_Pad[1][1]; ++i) {
+      for (size_t j = m_Pad[2][0]; j < shape[2] - m_Pad[2][1]; ++j) {
 
         // - skip masked
         if (Fmask(h,i,j))
           continue;
 
         // - get comparison sub-matrix
-        Fi = xt::view(F,
+        auto Fi = xt::view(F,
           xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
           xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
           xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
 
         // - get inverse of comparison mask
-        Fmii = T(1) - xt::view(Fmask,
+        auto Fmii = T(1) - xt::view(Fmask,
           xt::range(h-m_Pad[0][0], h+m_Pad[0][1]+1),
           xt::range(i-m_Pad[1][0], i+m_Pad[1][1]+1),
           xt::range(j-m_Pad[2][0], j+m_Pad[2][1]+1));
 
+        // - zero-initialise
         Li.fill(0);
 
         // - walk over stamp
-        for( size_t istamp = 0; istamp < nstamp; ++istamp ) {
+        for (size_t istamp = 0; istamp < nstamp; ++istamp) {
+          // - get comparison pixel
           x1 = xt::view(stamp, istamp, xt::all());
-          ppath = path( x0, x1 );
-          lpath = ppath.shape(0);
-
+          // - get pixel path connecting "x0" and "x1"
+          xt::xtensor<size_t,2> ppath = path(x0, x1, mode);
           // - walk over pixel path
-          for( size_t ipath = 0; ipath < lpath; ++ipath ) {
-            if( Fmii(ppath(ipath,0),ppath(ipath,1),ppath(ipath,2)) == (T) 0 )
+          for (size_t ipath = 0; ipath < ppath.shape(0); ++ipath) {
+            if (Fmii(ppath(ipath,0), ppath(ipath,1), ppath(ipath,2)) == (T)0)
               continue;
-            else if( Fi(ppath(ipath,0),ppath(ipath,1),ppath(ipath,2)) == (T) 1 )
-              Li(ppath(ipath,0),ppath(ipath,1),ppath(ipath,2)) = 1;
+            if (Fi(ppath(ipath,0), ppath(ipath,1), ppath(ipath,2)) == (T)1)
+              Li(ppath(ipath,0), ppath(ipath,1), ppath(ipath,2)) = 1;
             else
               break;
           }
         }
 
         // - correlation
-        first += F(h,i,j) * Li * Fmii;
+        first += Li * Fmii;
         norm += Fmii;
       }
     }
@@ -138,12 +130,13 @@ inline void Ensemble::L(
 
 // -------------------------------------------------------------------------------------------------
 
-template <class T>
+template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
 inline void Ensemble::L(
-  const xt::xarray<T>& f)
+  const xt::xarray<T>& f,
+  path_mode mode)
 {
   xt::xarray<int> fmask = xt::zeros<int>(f.shape());
-  L(f, fmask);
+  L(f, fmask, mode);
 }
 
 // -------------------------------------------------------------------------------------------------

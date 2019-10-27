@@ -13,22 +13,19 @@ namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
 
-xt::xtensor<size_t,2> path(
-  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
-  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1,
+auto path(
+  const xt::xtensor<int,1>& x0,
+  const xt::xtensor<int,1>& x1,
   path_mode mode)
 {
-  xt::xtensor<size_t,2> points;
-
   if (mode == path_mode::Bresenham) {
-    detail::bressenham( points, x0, x1 );
+    return detail::path::bressenham(x0, x1);
   }
-  else {
-    throw std::runtime_error( "Path mode not available" );
+  else if (mode == path_mode::actual) {
+    return detail::path::actual(x0, x1);
   }
 
-  return points;
-
+  return detail::path::full(x0, x1);
 }
 
 // -------------------------------------------------------------------------------------------------

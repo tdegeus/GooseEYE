@@ -175,11 +175,12 @@ xt::xarray<double> heightheight(
 // wrapper functions: lineal-path
 // =================================================================================================
 
-template <class T>
+template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
 xt::xarray<double> L(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
-  bool periodic)
+  bool periodic,
+  path_mode mode)
 {
   Ensemble ensemble(roi, periodic);
   ensemble.L(f);
@@ -188,13 +189,13 @@ xt::xarray<double> L(
 
 // -------------------------------------------------------------------------------------------------
 
-template <class T>
+template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
 xt::xarray<double> L(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
   const xt::xarray<int>& fmask,
-  bool periodic
-)
+  bool periodic,
+  path_mode mode)
 {
   Ensemble ensemble(roi, periodic);
   ensemble.L(f, fmask);

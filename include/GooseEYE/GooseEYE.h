@@ -36,9 +36,9 @@ enum class path_mode
 
 // -------------------------------------------------------------------------------------------------
 
-xt::xtensor<size_t,2> path(
-  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x0,
-  const xt::xtensor_fixed<size_t, xt::xshape<3>>& x1,
+auto path(
+  const xt::xtensor<int,1>& x0,
+  const xt::xtensor<int,1>& x1,
   path_mode mode=path_mode::Bresenham);
 
 // -------------------------------------------------------------------------------------------------
@@ -247,14 +247,16 @@ public:
 
   // Lineal-path function
 
-  template <class T>
-  void L(
-    const xt::xarray<T>& f);
-
-  template <class T>
+  template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
   void L(
     const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask);
+    path_mode mode=path_mode::Bresenham);
+
+  template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+  void L(
+    const xt::xarray<T>& f,
+    const xt::xarray<int>& fmask,
+    path_mode mode=path_mode::Bresenham);
 
 private:
 
@@ -380,18 +382,20 @@ xt::xarray<double> heightheight(
 
 // Lineal-path function
 
-template <class T>
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
 xt::xarray<double> L(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
-  bool periodic=true);
+  bool periodic=true,
+  path_mode mode=path_mode::Bresenham);
 
-template <class T>
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
 xt::xarray<double> L(
   const std::vector<size_t>& roi,
   const xt::xarray<T>& f,
   const xt::xarray<int>& fmask,
-  bool periodic=true);
+  bool periodic=true,
+  path_mode mode=path_mode::Bresenham);
 
 // -------------------------------------------------------------------------------------------------
 
