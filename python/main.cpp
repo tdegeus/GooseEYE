@@ -230,18 +230,9 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
     // Lineal-path function
 
-    .def("L", py::overload_cast<
-            const xt::xarray<int>&,
-            GooseEYE::path_mode>(&GooseEYE::Ensemble::L<int>),
+    .def("L",
+        &GooseEYE::Ensemble::L<int>,
         py::arg("f"),
-        py::arg("mode")=GooseEYE::path_mode::Bresenham)
-
-    .def("L", py::overload_cast<
-            const xt::xarray<int>&,
-            const xt::xarray<int>&,
-            GooseEYE::path_mode>(&GooseEYE::Ensemble::L<int>),
-        py::arg("f"),
-        py::arg("fmask"),
         py::arg("mode")=GooseEYE::path_mode::Bresenham)
 
     .def("__repr__",
@@ -393,25 +384,10 @@ m.def("heightheight", py::overload_cast<
     py::arg("fmask"),
     py::arg("periodic")=true);
 
-m.def("L", py::overload_cast<
-        const std::vector<size_t>&,
-        const xt::xarray<int>&,
-        bool,
-        GooseEYE::path_mode>(&GooseEYE::L<int>),
+m.def("L",
+    &GooseEYE::L<int>,
     py::arg("roi"),
     py::arg("f"),
-    py::arg("periodic")=true,
-    py::arg("mode")=GooseEYE::path_mode::Bresenham);
-
-m.def("L", py::overload_cast<
-        const std::vector<size_t>&,
-        const xt::xarray<int>&,
-        const xt::xarray<int>&,
-        bool,
-        GooseEYE::path_mode>(&GooseEYE::L<int>),
-    py::arg("roi"),
-    py::arg("f"),
-    py::arg("fmask"),
     py::arg("periodic")=true,
     py::arg("mode")=GooseEYE::path_mode::Bresenham);
 

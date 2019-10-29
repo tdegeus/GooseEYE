@@ -252,12 +252,6 @@ public:
     const xt::xarray<T>& f,
     path_mode mode=path_mode::Bresenham);
 
-  template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-  void L(
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
-    path_mode mode=path_mode::Bresenham);
-
 private:
 
   // Type: used to lock the ensemble to a certain measure
@@ -389,14 +383,6 @@ xt::xarray<double> L(
   bool periodic=true,
   path_mode mode=path_mode::Bresenham);
 
-template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-xt::xarray<double> L(
-  const std::vector<size_t>& roi,
-  const xt::xarray<T>& f,
-  const xt::xarray<int>& fmask,
-  bool periodic=true,
-  path_mode mode=path_mode::Bresenham);
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ...
@@ -406,7 +392,6 @@ xt::xarray<double> L(
 #include "detail.hpp"
 #include "GooseEYE.hpp"
 #include "dummy_circles.hpp"
-#include "path.hpp"
 #include "kernel.hpp"
 #include "clusters.hpp"
 #include "Ensemble.hpp"

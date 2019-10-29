@@ -16,6 +16,23 @@
 namespace GooseEYE {
 
 // =================================================================================================
+// pixel path
+// =================================================================================================
+
+auto path(
+  const xt::xtensor<int,1>& x0,
+  const xt::xtensor<int,1>& x1,
+  path_mode mode)
+{
+  if (mode == path_mode::Bresenham)
+    return detail::path::bressenham(x0, x1);
+  else if (mode == path_mode::actual)
+    return detail::path::actual(x0, x1);
+  else
+    return detail::path::full(x0, x1);
+}
+
+// =================================================================================================
 // wrapper functions: distance
 // =================================================================================================
 
@@ -187,226 +204,7 @@ xt::xarray<double> L(
   return ensemble.result();
 }
 
-// -------------------------------------------------------------------------------------------------
-
-template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-xt::xarray<double> L(
-  const std::vector<size_t>& roi,
-  const xt::xarray<T>& f,
-  const xt::xarray<int>& fmask,
-  bool periodic,
-  path_mode mode)
-{
-  Ensemble ensemble(roi, periodic);
-  ensemble.L(f, fmask);
-  return ensemble.result();
-}
-
-// // =================================================================================================
-// // wrapper functions: weighted 2-point correlation
-// // =================================================================================================
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<int>& f,                    bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<int>& f, const xt::xarray<int>& fmask, bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f, fmask);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<double>& f,                    bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<double>& f, const xt::xarray<int>& fmask, bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f, fmask);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<double>& w, const xt::xarray<int>& f,                    bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<double>& w, const xt::xarray<int>& f, const xt::xarray<int>& fmask, bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f, fmask);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<double>& w, const xt::xarray<double>& f,                    bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2(const std::vector<size_t>& roi, const xt::xarray<double>& w, const xt::xarray<double>& f, const xt::xarray<int>& fmask, bool periodic, bool pad)
-// {
-//   Ensemble ensemble(roi, periodic, pad);
-
-//   ensemble.W2(w, f, fmask);
-
-//   return ensemble.result();
-// }
-
-// // =================================================================================================
-// // wrapper functions: collapsed weighted 2-point correlation
-// // =================================================================================================
-
-// xt::xarray<double> W2c(const std::vector<size_t>& roi, const xt::xarray<int>& clus, const xt::xarray<int>& cntr, const xt::xarray<int>& f,
-//   bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c(clus, cntr, f, mode);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2c(const std::vector<size_t>& roi, const xt::xarray<int>& clus, const xt::xarray<int>& cntr, const xt::xarray<int>& f, const xt::xarray<int>& fmask,
-//   bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c(clus, cntr, f, fmask, mode);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2c(const std::vector<size_t>& roi, const xt::xarray<int>& clus, const xt::xarray<int>& cntr, const xt::xarray<double>& f,
-//   bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c(clus, cntr, f, mode);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2c(const std::vector<size_t>& roi, const xt::xarray<int>& clus, const xt::xarray<int>& cntr, const xt::xarray<double>& f, const xt::xarray<int>& fmask,
-//   bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c(clus, cntr, f, fmask, mode);
-
-//   return ensemble.result();
-// }
-
-// // =================================================================================================
-// // wrapper functions: collapsed weighted 2-point correlation
-// // =================================================================================================
-
-// xt::xarray<double> W2c_auto(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<int>& f,
-//   bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c_auto(w, f, mode);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2c_auto(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<int>& f, const xt::xarray<int>& fmask,
-//   bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c_auto(w, f, fmask, mode);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2c_auto(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<double>& f,
-//   bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c_auto(w, f, mode);
-
-//   return ensemble.result();
-// }
-
-// // -------------------------------------------------------------------------------------------------
-
-// xt::xarray<double> W2c_auto(const std::vector<size_t>& roi, const xt::xarray<int>& w, const xt::xarray<double>& f, const xt::xarray<int>& fmask,
-//   bool periodic, std::string mode)
-
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.W2c_auto(w, f, fmask, mode);
-
-//   return ensemble.result();
-// }
-
-// // =================================================================================================
-// // wrapper functions: lineal path function
-// // =================================================================================================
-
-// xt::xarray<double> L(const std::vector<size_t>& roi, const xt::xarray<int>& f, bool periodic, std::string mode)
-// {
-//   Ensemble ensemble(roi, periodic);
-
-//   ensemble.L(f, mode);
-
-//   return ensemble.result();
-// }
-
-// // =================================================================================================
+// =================================================================================================
 
 } // namespace ...
 
