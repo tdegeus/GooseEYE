@@ -12,15 +12,10 @@ I[15,14] = True
 I[15,16] = True
 
 # clusters
-C = GooseEYE.Clusters(I, periodic=True).labels()
-
-# dilation settings:
-# cluster 1 -> 1 iteration
-# cluster 2 -> 2 iterations
-itr = np.arange(np.max(C) + 1, dtype='int32')
+C = GooseEYE.Clusters(I).labels()
 
 # dilate
-CD = GooseEYE.dilate(C, iterations=itr, periodic=True)
+CD = GooseEYE.dilate(C)
 # </snippet>
 
 # plot

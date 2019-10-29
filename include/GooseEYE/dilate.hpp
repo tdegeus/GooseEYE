@@ -101,12 +101,11 @@ template <
 xt::xarray<T> dilate(
   const xt::xarray<T>& f,
   const xt::xarray<S>& kernel,
-  const xt::xtensor<size_t,1>& iterations,
+  size_t iterations,
   bool periodic)
 {
   GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
   GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
-  GOOSEEYE_ASSERT(iterations.size() > xt::amax(iterations)(0));
 
   // maximum number of dimensions
   static const size_t MAX_DIM=3;
@@ -140,7 +139,7 @@ xt::xarray<T> dilate(
   auto G = F;
 
   // apply iterations
-  for (size_t iter = 0; iter < xt::amax(iterations)(0); ++iter) {
+  for (size_t iter = 0; iter < iterations; ++iter) {
     // loop over the image
     for (size_t h = Pad[0][0]; h < F.shape(0) - Pad[0][1]; ++h) {
       for (size_t i = Pad[1][0]; i < F.shape(1) - Pad[1][1]; ++i) {
@@ -149,9 +148,6 @@ xt::xarray<T> dilate(
           T l = F(h,i,j);
           // - skip if needed: do not dilate background or labels added in this iteration
           if (l == 0)
-            continue;
-          // - skip if needed: maximum number of iterations per label
-          if (iter >= iterations(l))
             continue;
           // - get sub-matrix around (h, i, j)
           auto Fi = xt::view(F,
@@ -193,44 +189,13 @@ xt::xarray<T> dilate(
 
 // -------------------------------------------------------------------------------------------------
 
-template <
-  class T,
-  class S,
-  std::enable_if_t<std::is_integral<T>::value, int>,
-  std::enable_if_t<std::is_integral<S>::value, int>>
-xt::xarray<T> dilate(
-  const xt::xarray<T>& f,
-  const xt::xarray<S>& kernel,
-  size_t iterations,
-  bool periodic)
-{
-  return dilate(f, kernel, iterations * xt::ones<size_t>({xt::amax(f)(0) + 1}), periodic);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
 xt::xarray<T> dilate(
   const xt::xarray<T>& f,
-  const xt::xtensor<size_t,1>& iterations,
+  size_t iterations,
   bool periodic)
 {
   return dilate(f, kernel::nearest(f.dimension()), iterations, periodic);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-xt::xarray<T> dilate(
-  const xt::xarray<T>& f,
-  size_t iterations,
-  bool periodic)
-{
-  return dilate(
-    f,
-    kernel::nearest(f.dimension()),
-    iterations * xt::ones<size_t>({xt::amax(f)(0) + 1}),
-    periodic);
 }
 
 // -------------------------------------------------------------------------------------------------

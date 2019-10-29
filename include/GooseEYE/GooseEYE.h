@@ -62,26 +62,7 @@ xt::xarray<int> dummy_circles(
 // Dilate image
 // -------------------------------------------------------------------------------------------------
 
-// dilate with a different number of iterations per label
-template <
-  class T,
-  class S,
-  std::enable_if_t<std::is_integral<T>::value, int> = 0,
-  std::enable_if_t<std::is_integral<S>::value, int> = 0>
-xt::xarray<T> dilate(
-  const xt::xarray<T>& f,
-  const xt::xarray<S>& kernel,
-  const xt::xtensor<size_t,1>& iterations,
-  bool periodic=true);
-
-// dilate with a different number of iterations per label, and "kernel::nearest"
-template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-xt::xarray<T> dilate(
-  const xt::xarray<T>& f,
-  const xt::xtensor<size_t,1>& iterations,
-  bool periodic=true);
-
-// dilate image (with labels 1..n)
+// dilate image
 template <
   class T,
   class S,
@@ -93,7 +74,7 @@ xt::xarray<T> dilate(
   size_t iterations=1,
   bool periodic=true);
 
-// dilate image (with labels 1..n), and "kernel::nearest"
+// dilate image, with "kernel::nearest"
 template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
 xt::xarray<T> dilate(
   const xt::xarray<T>& f,
