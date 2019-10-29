@@ -8,20 +8,103 @@
 #define GOOSEEYE_DILATE_HPP
 
 #include "GooseEYE.h"
+#include <xtensor/xstrided_view.hpp>
 
 namespace GooseEYE {
 
 // -------------------------------------------------------------------------------------------------
 
-template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
+namespace detail {
+
+template <class S, class T, class U>
+void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
+{
+  for (size_t axis = 0; axis < Shape.size(); ++axis)
+  {
+    if (Shape[axis] <= 1)
+      continue;
+
+    xt::xstrided_slice_vector sbelow;
+    xt::xstrided_slice_vector sabove;
+
+    for (size_t i = 0; i < axis; ++i) {
+      sbelow.push_back(xt::all());
+      sabove.push_back(xt::all());
+    }
+
+    sbelow.push_back(xt::range(0, Pad[axis][0]));
+    sabove.push_back(xt::range(Shape[axis] + Pad[axis][0] - 1, Shape[axis] + 2 * Pad[axis][0] - 1));
+
+    for (size_t i = axis + 1; i < Shape.size(); ++i) {
+      sbelow.push_back(xt::all());
+      sabove.push_back(xt::all());
+    }
+
+    auto below = xt::strided_view(F, sbelow);
+    auto above = xt::strided_view(F, sabove);
+
+    above = xt::where(xt::not_equal(below, 0), below, above);
+  }
+}
+
+// ---
+
+template <class S, class T, class U>
+void periodic_copy_below(S&& F, const T& Shape, const U& Pad)
+{
+  for (size_t axis = 0; axis < Shape.size(); ++axis)
+  {
+    if (Shape[axis] <= 1)
+      continue;
+
+    xt::xstrided_slice_vector sbelow;
+    xt::xstrided_slice_vector sabove;
+
+    for (size_t i = 0; i < axis; ++i) {
+      sbelow.push_back(xt::all());
+      sabove.push_back(xt::all());
+    }
+
+    sbelow.push_back(xt::range(Pad[axis][0], Pad[axis][0] + Pad[axis][1]));
+    sabove.push_back(xt::range(F.shape(axis) - Pad[axis][1], F.shape(axis)));
+
+    for (size_t i = axis + 1; i < Shape.size(); ++i) {
+      sbelow.push_back(xt::all());
+      sabove.push_back(xt::all());
+    }
+
+    auto below = xt::strided_view(F, sbelow);
+    auto above = xt::strided_view(F, sabove);
+
+    below = xt::where(xt::not_equal(above, 0), above, below);
+  }
+}
+
+// --
+
+template <class S, class T, class U>
+void periodic_copy(S&& F, const T& Shape, const U& Pad)
+{
+  periodic_copy_above(F, Shape, Pad);
+  periodic_copy_below(F, Shape, Pad);
+}
+
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <
+  class T,
+  class S,
+  std::enable_if_t<std::is_integral<T>::value, int>,
+  std::enable_if_t<std::is_integral<S>::value, int>>
 xt::xarray<T> dilate(
   const xt::xarray<T>& f,
-  const xt::xarray<int>& kernel,
+  const xt::xarray<S>& kernel,
   const xt::xtensor<size_t,1>& iterations,
   bool periodic)
 {
-  GOOSEEYE_ASSERT(xt::all(xt::equal(kernel,0) || xt::equal(kernel,1)));
-  GOOSEEYE_ASSERT(xt::all(xt::greater_equal(f,0)));
+  GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
   GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
   GOOSEEYE_ASSERT(iterations.size() > xt::amax(iterations)(0));
 
@@ -53,41 +136,53 @@ xt::xarray<T> dilate(
   // apply padding
   F = xt::pad(F, Pad, pad_mode, pad_value);
 
+  // copy of "F"
+  auto G = F;
+
   // apply iterations
   for (size_t iter = 0; iter < xt::amax(iterations)(0); ++iter) {
     // loop over the image
-    for (size_t h = Pad[0][0]; h < Shape[0]-Pad[0][1]; ++h) {
-      for (size_t i = Pad[1][0]; i < Shape[1]-Pad[1][1]; ++i) {
-        for (size_t j = Pad[2][0]; j < Shape[2]-Pad[2][1]; ++j) {
+    for (size_t h = Pad[0][0]; h < F.shape(0) - Pad[0][1]; ++h) {
+      for (size_t i = Pad[1][0]; i < F.shape(1) - Pad[1][1]; ++i) {
+        for (size_t j = Pad[2][0]; j < F.shape(2) - Pad[2][1]; ++j) {
           // - get label
           T l = F(h,i,j);
           // - skip if needed: do not dilate background or labels added in this iteration
-          if (l <= 0)
+          if (l == 0)
             continue;
           // - skip if needed: maximum number of iterations per label
           if (iter >= iterations(l))
             continue;
           // - get sub-matrix around (h, i, j)
           auto Fi = xt::view(F,
-            xt::range(h-Pad[0][0], h+Pad[0][1]+1),
-            xt::range(i-Pad[1][0], i+Pad[1][1]+1),
-            xt::range(j-Pad[2][0], j+Pad[2][1]+1));
+            xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
+            xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
+            xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
+          // - get sub-matrix around (h, i, j)
+          auto Gi = xt::view(G,
+            xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
+            xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
+            xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
           // - dilate where needed: dilated labels are added as negative numbers
-          Fi = xt::where(xt::equal(Fi, 0) && xt::equal(kernel, 1), - l * K, Fi);
+          Gi = xt::where(xt::equal(Fi, 0) && xt::equal(kernel, 1), l, Gi);
         }
       }
     }
-    // flip added label
-    F = xt::abs(F);
-  }
 
-  // TODO: apply periodicity ????
+    // apply periodicity
+    if (periodic)
+      detail::periodic_copy(G, Shape, Pad);
+
+    // flip added label
+    F = G;
+    G = F;
+  }
 
   // remove padding
   F = xt::view(F,
-    xt::range(Pad[0][0], F.shape(0)-Pad[0][1]),
-    xt::range(Pad[1][0], F.shape(1)-Pad[1][1]),
-    xt::range(Pad[2][0], F.shape(2)-Pad[2][1]));
+    xt::range(Pad[0][0], F.shape(0) - Pad[0][1]),
+    xt::range(Pad[1][0], F.shape(1) - Pad[1][1]),
+    xt::range(Pad[2][0], F.shape(2) - Pad[2][1]));
 
   // return to original rank
   F.reshape(shape);
@@ -98,10 +193,14 @@ xt::xarray<T> dilate(
 
 // -------------------------------------------------------------------------------------------------
 
-template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
+template <
+  class T,
+  class S,
+  std::enable_if_t<std::is_integral<T>::value, int>,
+  std::enable_if_t<std::is_integral<S>::value, int>>
 xt::xarray<T> dilate(
   const xt::xarray<T>& f,
-  const xt::xarray<int>& kernel,
+  const xt::xarray<S>& kernel,
   size_t iterations,
   bool periodic)
 {

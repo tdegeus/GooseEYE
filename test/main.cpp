@@ -35,10 +35,76 @@ SECTION("relabel_map")
 
 // -------------------------------------------------------------------------------------------------
 
+SECTION("dilate - 1d")
+{
+  xt::xarray<int> I = xt::zeros<int>({5});
+  xt::xarray<int> D = xt::zeros<int>({5});
+
+  I(0) = 2;
+
+  D(0) = 2;
+  D(1) = 2;
+  D(4) = 2;
+
+  auto d = GooseEYE::dilate(I);
+
+  REQUIRE(xt::all(xt::equal(D, d)));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+SECTION("dilate - 2d - 1")
+{
+  xt::xarray<int> I = xt::zeros<int>({5, 5});
+  xt::xarray<int> D = xt::zeros<int>({5, 5});
+
+  I(0, 0) = -1;
+
+  D(0, 0) = -1;
+  D(1, 0) = -1;
+  D(4, 0) = -1;
+  D(0, 1) = -1;
+  D(0, 4) = -1;
+
+  auto d = GooseEYE::dilate(I);
+
+  REQUIRE(xt::all(xt::equal(D, d)));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+SECTION("dilate - 2d - 2")
+{
+  xt::xarray<int> I = xt::zeros<int>({6, 6});
+  xt::xarray<int> D = xt::zeros<int>({6, 6});
+
+  I(0, 0) = 2;
+
+  D(0, 0) = 2;
+  D(1, 0) = 2;
+  D(2, 0) = 2;
+  D(1, 1) = 2;
+  D(1, 5) = 2;
+  D(5, 0) = 2;
+  D(4, 0) = 2;
+  D(0, 1) = 2;
+  D(5, 1) = 2;
+  D(0, 2) = 2;
+  D(0, 4) = 2;
+  D(0, 5) = 2;
+  D(5, 5) = 2;
+
+  auto d = GooseEYE::dilate(I, 2);
+
+  REQUIRE(xt::all(xt::equal(D, d)));
+}
+
+// -------------------------------------------------------------------------------------------------
+
 SECTION("centers")
 {
-  xt::xarray<size_t> I = xt::zeros<size_t>({5,5});
-  xt::xarray<size_t> C = xt::zeros<size_t>({5,5});
+  xt::xarray<size_t> I = xt::zeros<size_t>({5, 5});
+  xt::xarray<size_t> C = xt::zeros<size_t>({5, 5});
 
   I(0, 0) = 1;
   I(0, 3) = 1;
