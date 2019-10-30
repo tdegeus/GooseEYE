@@ -124,7 +124,7 @@ inline std::vector<std::vector<size_t>> pad_width(const xt::xarray<T>& f)
 
 // https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
 namespace path {
-xt::xtensor<int,2> bressenham(
+xt::xtensor<int,2> bresenham(
   const xt::xtensor<int,1>& xa,
   const xt::xtensor<int,1>& xb)
 {

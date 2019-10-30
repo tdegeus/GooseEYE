@@ -25,7 +25,7 @@ auto path(
   path_mode mode)
 {
   if (mode == path_mode::Bresenham)
-    return detail::path::bressenham(x0, x1);
+    return detail::path::bresenham(x0, x1);
   else if (mode == path_mode::actual)
     return detail::path::actual(x0, x1);
   else
