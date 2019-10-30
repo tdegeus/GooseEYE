@@ -62,6 +62,7 @@ inline void Ensemble::L(
     xt::view(stamp, xt::all(), xt::keep(i)) -= m_Pad[i][0];
 
   // correlation
+  // N.B. getting the pixel paths is relatively expensive, so it is the output-most loop
   for (size_t istamp = 0; istamp < stamp.shape(0); ++istamp) {
 
     // pixel path between the center of the ROI and the current stamp point
