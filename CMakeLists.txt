@@ -85,11 +85,12 @@ configure_package_config_file(
 # install/build
 # -------------
 
-# build test cases
+# build tests
 if(BUILD_TESTS)
   add_subdirectory(test)
 endif()
 
+# build examples
 if(BUILD_EXAMPLES)
   add_subdirectory(docs/examples)
 endif()
