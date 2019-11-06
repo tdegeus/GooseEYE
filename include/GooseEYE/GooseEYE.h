@@ -59,6 +59,29 @@ xt::xarray<int> dummy_circles(
   bool periodic=true);
 
 // -------------------------------------------------------------------------------------------------
+// Dilate image
+// -------------------------------------------------------------------------------------------------
+
+// dilate image
+template <
+  class T,
+  class S,
+  std::enable_if_t<std::is_integral<T>::value, int> = 0,
+  std::enable_if_t<std::is_integral<S>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  const xt::xarray<S>& kernel,
+  size_t iterations=1,
+  bool periodic=true);
+
+// dilate image, with "kernel::nearest"
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  size_t iterations=1,
+  bool periodic=true);
+
+// -------------------------------------------------------------------------------------------------
 // Clusters
 // -------------------------------------------------------------------------------------------------
 
@@ -393,6 +416,7 @@ xt::xarray<double> L(
 #include "GooseEYE.hpp"
 #include "dummy_circles.hpp"
 #include "kernel.hpp"
+#include "dilate.hpp"
 #include "clusters.hpp"
 #include "Ensemble.hpp"
 #include "Ensemble_mean.hpp"

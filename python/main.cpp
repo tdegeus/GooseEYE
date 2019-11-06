@@ -63,6 +63,28 @@ m.def("dummy_circles",
 
 // -------------------------------------------------------------------------------------------------
 
+m.def("dilate",
+    py::overload_cast<
+        const xt::xarray<int>&,
+        const xt::xarray<int>&,
+        size_t,
+        bool>(&GooseEYE::dilate<int, int>),
+    py::arg("f"),
+    py::arg("kernel"),
+    py::arg("iterations")=1,
+    py::arg("periodic")=true);
+
+m.def("dilate",
+    py::overload_cast<
+        const xt::xarray<int>&,
+        size_t,
+        bool>(&GooseEYE::dilate<int>),
+    py::arg("f"),
+    py::arg("iterations")=1,
+    py::arg("periodic")=true);
+
+// -------------------------------------------------------------------------------------------------
+
 py::class_<GooseEYE::Clusters>(m, "Clusters")
 
     .def(py::init<const xt::xarray<int>&, bool>(),
