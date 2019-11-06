@@ -59,6 +59,24 @@ inline std::vector<std::vector<size_t>> pad_width(const xt::xarray<T>& f);
 
 // -------------------------------------------------------------------------------------------------
 
+// Get pixel-path
+
+namespace path {
+
+inline xt::xtensor<int,2> bresenham(
+  const xt::xtensor<int,1>& x0,
+  const xt::xtensor<int,1>& x1);
+
+inline xt::xtensor<int,2> full(
+  const xt::xtensor<int,1>& x0,
+  const xt::xtensor<int,1>& x1);
+
+inline xt::xtensor<int,2> actual(
+  const xt::xtensor<int,1>& x0,
+  const xt::xtensor<int,1>& x1);
+
+}
+
 }}
 
 #endif

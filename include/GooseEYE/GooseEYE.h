@@ -36,9 +36,9 @@ enum class path_mode
 
 // -------------------------------------------------------------------------------------------------
 
-xt::xarray<int> path(
-  const std::vector<int> &xa,
-  const std::vector<int> &xb,
+auto path(
+  const xt::xtensor<int,1>& x0,
+  const xt::xtensor<int,1>& x1,
   path_mode mode=path_mode::Bresenham);
 
 // -------------------------------------------------------------------------------------------------
@@ -245,6 +245,13 @@ public:
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
+  // Lineal-path function
+
+  template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+  void L(
+    const xt::xarray<T>& f,
+    path_mode mode=path_mode::Bresenham);
+
 private:
 
   // Type: used to lock the ensemble to a certain measure
@@ -367,6 +374,15 @@ xt::xarray<double> heightheight(
   const xt::xarray<int>& fmask,
   bool periodic=true);
 
+// Lineal-path function
+
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+xt::xarray<double> L(
+  const std::vector<size_t>& roi,
+  const xt::xarray<T>& f,
+  bool periodic=true,
+  path_mode mode=path_mode::Bresenham);
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ...
@@ -376,7 +392,6 @@ xt::xarray<double> heightheight(
 #include "detail.hpp"
 #include "GooseEYE.hpp"
 #include "dummy_circles.hpp"
-#include "path.hpp"
 #include "kernel.hpp"
 #include "clusters.hpp"
 #include "Ensemble.hpp"
@@ -385,5 +400,6 @@ xt::xarray<double> heightheight(
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
 #include "Ensemble_heightheight.hpp"
+#include "Ensemble_L.hpp"
 
 #endif

@@ -3,11 +3,11 @@ import numpy as np
 import GooseEYE
 
 # generate image, store 'volume-fraction'
-I   = GooseEYE.dummy_circles((500,500))
+I = GooseEYE.dummy_circles((500, 500))
 phi = np.mean(I)
 
 # lineal path function
-L   = GooseEYE.L((101,101),I)
+L = GooseEYE.L((101, 101), I)
 # </snippet>
 
 # plot

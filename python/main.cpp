@@ -228,6 +228,13 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
         py::arg("f"),
         py::arg("fmask"))
 
+    // Lineal-path function
+
+    .def("L",
+        &GooseEYE::Ensemble::L<int>,
+        py::arg("f"),
+        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+
     .def("__repr__",
         [](const GooseEYE::Ensemble &){ return "<GooseEYE.Ensemble>"; }
     );
@@ -377,7 +384,13 @@ m.def("heightheight", py::overload_cast<
     py::arg("fmask"),
     py::arg("periodic")=true);
 
+m.def("L",
+    &GooseEYE::L<int>,
+    py::arg("roi"),
+    py::arg("f"),
+    py::arg("periodic")=true,
+    py::arg("mode")=GooseEYE::path_mode::Bresenham);
+
 // -------------------------------------------------------------------------------------------------
 
 }
-
