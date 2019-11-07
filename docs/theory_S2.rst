@@ -29,13 +29,13 @@ The 2-point probability, :math:`S_2`, is the probability that two points, at a c
     \mathcal{I}( \vec{x}+\Delta\vec{x} ) = 1
   \big\}
 
-Two limits can directly be identified. If the two points coincide, the probability that both points are white is the same as the probability that one point is white: the (volume) fraction of white, :math:`\varphi`. I.e.
+Two limits can directly be identified. If :math:`\Delta\vec{x} = \vec{0}`, :math:`S_2` is simply the probability that a point is white: the (volume) fraction of white, :math:`\varphi`. I.e.
 
 .. math::
 
   S_2 ( || \Delta \vec{x} || = 0) = \varphi
 
-If the two points are completely uncorrelated, when the points are far apart, each point has a probability :math:`\varphi` to be white, and thus
+The two points are completely uncorrelated if :math:`|| \Delta\vec{x} ||` is sufficiently large (i.e. larger than the correlation length). In this case, both a point at :math:`\vec{x}` and at :math:`\vec{x} + \Delta \vec{x}` have a probability :math:`\varphi` to be white, and thus
 
 .. math::
 
@@ -85,7 +85,7 @@ C++
 Masked correlation
 ------------------
 
-This function (as most of GooseEYE's functions) also has the possibility to mask certain pixels. The image's mask is a binary matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalisation is corrected for the reduced amount of data points, whereby the number of data points is no longer constant over the region-of-interest.
+This function (as most of GooseEYE's functions) also has the possibility to mask certain pixels (which can be used for example to exclude acquisition artefacts from the measurement). The image's mask is a binary matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalisation is corrected for the reduced amount of data points, whereby the number of data points is no longer constant over the region-of-interest.
 
 :download:`S2_mask.py <examples/S2_mask.py>`,
 :download:`S2_mask.cpp <examples/S2_mask.cpp>`
@@ -98,10 +98,14 @@ This function (as most of GooseEYE's functions) also has the possibility to mask
 Ensemble average
 ----------------
 
-To compute the ensemble average of a statistic one constructs an ``Ensemble`` with a certain shape for the region-of-interest, and then adds the result per image to it. Consider the following example.
+To compute the ensemble average of a statistic, one constructs an ``Ensemble`` with a certain shape for the region-of-interest, and then adds the result per image to it. Consider the following example.
 
 :download:`S2_ensemble.py <examples/S2_ensemble.py>`
 :download:`S2_ensemble.cpp <examples/S2_ensemble.cpp>`
+
+.. note::
+
+  An ensemble is used to compute the mean using a selection (ensemble) of relative small measurements. See `Wikipedia <https://en.wikipedia.org/wiki/Ensemble_average_(statistical_mechanics)>`__.
 
 Python
 ^^^^^^
@@ -120,7 +124,7 @@ C++
 Auto-correlation
 ----------------
 
-The the greyscale generalisation of the :ref:`theory_S2` (for floating-point images (with :math:`0 \leq \mathcal{I}(\vec{x}_i) \leq 1`) corresponds to:
+The the greyscale generalisation of the :ref:`theory_S2` (for floating-point images (with :math:`0 \leq \mathcal{I}(\vec{x}_i) \leq 1)`) corresponds to:
 
 .. math::
 
@@ -130,7 +134,7 @@ The the greyscale generalisation of the :ref:`theory_S2` (for floating-point ima
   \mathcal{I} ( \vec{x}_i + \Delta \vec{x} )
   \equiv \mathcal{I} ( \vec{x} ) \star \mathcal{I} ( \vec{x} )
 
-Along the same arguments as for the :ref:`theory_S2`, limit values can be obtained. In this case:
+where the :math:`\star` represent the convolution, in this case of :math:`\mathcal{I}` with itself. Along the same arguments as for the :ref:`theory_S2`, limit values can be obtained. In this case:
 
 .. math::
 
@@ -141,6 +145,10 @@ where the brackets :math:`\langle \ldots \rangle` denotes the spatial average.
 
 :download:`S2_autocorrelation.py <examples/S2_autocorrelation.py>`
 :download:`S2_autocorrelation.cpp <examples/S2_autocorrelation.cpp>`
+
+.. seealso::
+
+  `Wikipedia (on correlation in time, while here the correlation is in space) <https://en.wikipedia.org/wiki/Autocorrelation>`__
 
 .. image:: examples/S2_autocorrelation.svg
   :width: 700px

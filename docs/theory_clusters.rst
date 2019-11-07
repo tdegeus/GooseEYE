@@ -4,6 +4,8 @@ Obtain clusters
 Calculate clusters
 ------------------
 
+Extract clusters ('islands' of connected pixels with the same value).
+
 :download:`clusters.py <examples/clusters.py>`
 
 .. image:: examples/clusters.svg
