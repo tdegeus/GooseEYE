@@ -6,7 +6,7 @@ Lineal path function
 Theory
 ------
 
-The 2-point cluster function has a first order notion of connectedness. To quantify the true connectedness along a path, the lineal path function is used. The lineal path function quantifies the probability that an entire path of pixels connecting :math:`\vec{x}_i` and :math:`\vec{x}_i + \Delta x` is in the same phase:
+The 2-point cluster function has a first order notion of connectedness. To quantify the true connectedness along a path, the lineal path function is used. The lineal path function quantifies the probability that an entire path of pixels connecting :math:`\vec{x}_i` and :math:`\vec{x}_i + \Delta x` (denoted: :math:`\{ \vec{x}_i + \delta\vec{x}_0, \vec{x}_i + \delta\vec{x}_1, ... , \vec{x}_i + \delta\vec{x}_n \}`, where :math:`\delta\vec{x}_0 \equiv \vec{0}` and :math:`\delta\vec{x}_n \equiv \Delta\vec{x}`) is in the same phase:
 
 .. math::
 

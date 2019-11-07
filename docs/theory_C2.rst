@@ -6,7 +6,7 @@
 Theory
 ------
 
-If an image consists of isolated clusters, the 2-point cluster function can be used to quantify the probability that two points are in the same cluster. It is defined as follows:
+If an image consists of isolated clusters ('islands' of connected pixels with the same value), the 2-point cluster function can be used to quantify the probability that two points are in the same cluster. It is defined as follows:
 
 .. math::
 
