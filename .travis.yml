@@ -99,6 +99,7 @@ script:
     - ./S2_mask
     - ./S2_ensemble
     - ./C2
+    - ./L
     - ./heightheight
     # run Python examples
     - cd "${root_dir}"
@@ -107,6 +108,7 @@ script:
     - python docs/examples/S2_mask.py
     - python docs/examples/S2_ensemble.py
     - python docs/examples/C2.py
+    - python docs/examples/L.py
     - python docs/examples/W2.py
     - python docs/examples/clusters.py
     - python docs/examples/clusters_centers.py

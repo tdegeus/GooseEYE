@@ -59,3 +59,4 @@ ax.set_xlabel(r'$\Delta x$')
 ax.set_ylabel(r'$L$')
 
 plt.savefig('L.svg')
+plt.close()
