@@ -45,6 +45,15 @@ Iav = np.mean(Igr)
 WIgr = GooseEYE.W2((101,101), W, Igr, fmask=W)
 # </snippet>
 
+# skip plot with "--no-plot" command line argument
+# ------------------------------------------------
+
+import sys
+
+if len(sys.argv == 2):
+  if sys.argv[1] == "--no-plot":
+    sys.exit(0)
+
 # plot
 # ----
 
@@ -53,8 +62,10 @@ import matplotlib        as mpl
 import matplotlib.cm     as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-try   : plt.style.use(['goose','goose-latex'])
-except: pass
+try:
+  plt.style.use(['goose','goose-latex'])
+except:
+  pass
 
 cmap = mpl.colors.ListedColormap(np.array([
   [0.,0.,0.,0.],

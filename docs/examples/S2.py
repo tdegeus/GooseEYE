@@ -10,6 +10,15 @@ phi = np.mean(I)
 S2 = GooseEYE.S2((101, 101), I, I)
 # </snippet>
 
+# skip plot with "--no-plot" command line argument
+# ------------------------------------------------
+
+import sys
+
+if len(sys.argv == 2):
+  if sys.argv[1] == "--no-plot":
+    sys.exit(0)
+
 # plot
 # ----
 
@@ -18,8 +27,10 @@ import matplotlib        as mpl
 import matplotlib.cm     as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-try   : plt.style.use(['goose','goose-latex'])
-except: pass
+try:
+  plt.style.use(['goose','goose-latex'])
+except:
+  pass
 
 fig, axes = plt.subplots(figsize=(18,6), nrows=1, ncols=3)
 

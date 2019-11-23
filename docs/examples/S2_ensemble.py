@@ -11,18 +11,29 @@ for i in range(5):
 S2 = ensemble.result()
 # </snippet>
 
+phi = S2[50, 50]
+
+# skip plot with "--no-plot" command line argument
+# ------------------------------------------------
+
+import sys
+
+if len(sys.argv == 2):
+  if sys.argv[1] == "--no-plot":
+    sys.exit(0)
+
 # plot
 # ----
-
-phi = S2[50, 50]
 
 import matplotlib.pyplot as plt
 import matplotlib        as mpl
 import matplotlib.cm     as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-try   : plt.style.use(['goose','goose-latex'])
-except: pass
+try:
+  plt.style.use(['goose','goose-latex'])
+except:
+  pass
 
 fig, ax = plt.subplots()
 
