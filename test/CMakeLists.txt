@@ -28,11 +28,7 @@ endif()
 find_package(Catch2 REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(xtl REQUIRED)
-find_package(xsimd REQUIRED)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTENSOR_USE_XSIMD=ON")
 
 add_executable(main main.cpp)
-target_link_libraries(main Catch2::Catch2 xtensor xtl xsimd)
+target_link_libraries(main Catch2::Catch2 xtensor xtl)
 target_include_directories(main PRIVATE ${GOOSEEYE_INCLUDE_DIR})
