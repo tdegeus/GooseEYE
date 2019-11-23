@@ -9,11 +9,11 @@ int main()
   // --------------------------
 
   // generate image, store 'volume-fraction'
-  xt::xarray<int> I = GooseEYE::dummy_circles({500, 500});
+  xt::xarray<int> I = GooseEYE::dummy_circles({50, 50});
   double phi = xt::mean(I)();
 
   // 2-point probability
-  xt::xarray<double> S2 = GooseEYE::S2({101, 101}, I, I);
+  xt::xarray<double> S2 = GooseEYE::S2({11, 11}, I, I);
 
   // grey image + correlation
   // ------------------------
@@ -26,7 +26,7 @@ int main()
   Igr = (Igr + 0.1) / 1.2 + noise;
 
   // 2-point correlation ('auto-correlation')
-  xt::xarray<double>S2gr = GooseEYE::S2({101, 101}, Igr, Igr);
+  xt::xarray<double>S2gr = GooseEYE::S2({11, 11}, Igr, Igr);
 
   // correlation bounds: mean intensity squared and mean of the intensity squared
   double Iav_sq = std::pow(xt::mean(Igr)(), 2.0);

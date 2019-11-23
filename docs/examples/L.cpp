@@ -5,11 +5,11 @@
 int main()
 {
   // generate image, store 'volume-fraction'
-  xt::xarray<int> I = GooseEYE::dummy_circles({500, 500});
+  xt::xarray<int> I = GooseEYE::dummy_circles({50, 50});
   double phi = xt::mean(I)();
 
   // lineal path function
-  xt::xarray<double> L = GooseEYE::L({101, 101}, I);
+  xt::xarray<double> L = GooseEYE::L({11, 11}, I);
 
   return 0;
 }
