@@ -124,4 +124,15 @@ Add the following to your ``CMakeLists.txt``:
   pkg_check_modules(GOOSEEYE REQUIRED GooseEYE)
   include_directories(${GOOSEEYE_INCLUDE_DIRS})
 
+.. todo::
+
+  find_package(xsimd REQUIRED)
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTENSOR_USE_XSIMD=ON")
+
+  add_executable(main main.cpp)
+  target_link_libraries(main Catch2::Catch2 xtensor xtl xsimd)
+  target_link_libraries(main Catch2::Catch2 xtensor xtl)
+
 
