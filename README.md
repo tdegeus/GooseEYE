@@ -1,4 +1,5 @@
 [![Travis](https://travis-ci.com/tdegeus/GooseEYE.svg?branch=master)](https://travis-ci.com/tdegeus/GooseEYE)
+[![Build status](https://ci.appveyor.com/api/projects/status/woi02sgsduy8yim4?svg=true)](https://ci.appveyor.com/project/tdegeus/gooseeye)
 [![Documentation Status](https://readthedocs.org/projects/gooseeye/badge/?version=latest)](https://readthedocs.org/projects/gooseeye/badge/?version=latest)
 
 ## GooseEYE
