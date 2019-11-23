@@ -10,8 +10,15 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - g++-4.9
+      env: COMPILER=gcc GCC=4.9
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
             - g++-5
-            - python3
       env: COMPILER=gcc GCC=5
     - os: linux
       addons:
@@ -20,17 +27,33 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-            - python3
       env: COMPILER=gcc GCC=6
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env: COMPILER=gcc GCC=7
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+      env: COMPILER=clang CLANG=6.0
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
 env:
   global:
     - MINCONDA_VERSION="latest"
     - MINCONDA_LINUX="Linux-x86_64"
     - MINCONDA_OSX="MacOSX-x86_64"
 before_install:
-    - sudo apt-get -qq update
-    - sudo apt-get install -y texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra
-    - sudo apt-get install dvipng
     - |
       # Configure build variables
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -44,7 +67,7 @@ before_install:
         export CXX=clang++ CC=clang;
       fi
 install:
-    # Define the version of miniconda to download
+    # Set environment using Conda
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         MINCONDA_OS=$MINCONDA_LINUX;
       elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -52,65 +75,45 @@ install:
       fi
     - wget "http://repo.continuum.io/miniconda/Miniconda3-$MINCONDA_VERSION-$MINCONDA_OS.sh" -O miniconda.sh;
     - bash miniconda.sh -b -p $HOME/miniconda
-    - export PATH="$HOME/miniconda/bin:${PATH}"
-    - export INCLUDE_PATH="$HOME/miniconda/include:${INCLUDE_PATH}"
+    - export PATH="$HOME/miniconda/bin:$PATH"
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda install cmake -c conda-forge
-    - conda install xtl -c conda-forge
     - conda install xsimd -c conda-forge
     - conda install xtensor -c conda-forge
-    - pip install numpy matplotlib GooseMPL pybind11 pyxtensor
-    - export MPLBACKEND=Agg
-    - python -c "import GooseMPL; GooseMPL.copy_style()"
-    # store relevant
-    - root_dir="${PWD}"
-    - build_dir="${PWD}/build"
-    # make Python library
+    - conda install python -c conda-forge
+    - conda install numpy -c conda-forge
+    - conda install pyxtensor -c conda-forge
+    - conda install catch2 -c conda-forge
+    # Build/install the Python library
     - cd "${root_dir}"
     - python3 setup.py build
     - python3 setup.py install
-    # build path
-    - cd "${root_dir}"
-    - rm -r "${build_dir}"
-    - mkdir "${build_dir}"
-    - cd "${build_dir}"
-    # install catch
-    - git clone https://github.com/catchorg/Catch2.git
-    - cd Catch2
-    - mkdir build
-    - cd build
-    - mkdir opt
-    - cmake .. -DCATCH_BUILD_TESTING=OFF
-    - sudo make install
-    # make test-cases
-    - cd "${build_dir}"
-    - cmake .. -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+    # Build/install the library
+    - cmake . -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
     - make
+    - sudo make install
 script:
-    # run tests
-    - cd "${build_dir}/test"
-    - ./test
-    # run C++ examples
-    - cd "${build_dir}/docs/examples"
-    - ./S2
-    - ./S2_autocorrelation
-    - ./S2_mask
-    - ./S2_ensemble
-    - ./C2
-    - ./L
-    - ./heightheight
-    # run Python examples
-    - cd "${root_dir}"
-    - python docs/examples/S2.py
-    - python docs/examples/S2_autocorrelation.py
-    - python docs/examples/S2_mask.py
-    - python docs/examples/S2_ensemble.py
-    - python docs/examples/C2.py
-    - python docs/examples/L.py
-    - python docs/examples/W2.py
-    - python docs/examples/clusters.py
-    - python docs/examples/clusters_centers.py
-    - python docs/examples/heightheight.py
-    - python docs/examples/mean.py
+    # Run tests
+    - ./test/test
+    # Run C++ examples
+    - ./docs/examples/S2
+    - ./docs/examples/S2_autocorrelation
+    - ./docs/examples/S2_mask
+    - ./docs/examples/S2_ensemble
+    - ./docs/examples/C2
+    - ./docs/examples/L
+    - ./docs/examples/heightheight
+    # Run Python examples
+    - python docs/examples/S2.py --no-plot
+    - python docs/examples/S2_autocorrelation.py --no-plot
+    - python docs/examples/S2_mask.py --no-plot
+    - python docs/examples/S2_ensemble.py --no-plot
+    - python docs/examples/C2.py --no-plot
+    - python docs/examples/L.py --no-plot
+    - python docs/examples/W2.py --no-plot
+    - python docs/examples/clusters.py --no-plot
+    - python docs/examples/clusters_centers.py --no-plot
+    - python docs/examples/heightheight.py --no-plot
+    - python docs/examples/mean.py --no-plot
