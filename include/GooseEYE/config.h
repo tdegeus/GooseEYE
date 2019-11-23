@@ -51,19 +51,19 @@
 
 // =================================================================================================
 
-#define GOOSEEYE_WORLD_VERSION 0
-#define GOOSEEYE_MAJOR_VERSION 2
-#define GOOSEEYE_MINOR_VERSION 0
+#define GOOSEEYE_VERSION_MAJOR 0
+#define GOOSEEYE_VERSION_MINOR 2
+#define GOOSEEYE_VERSION_PATCH 1
 
 #define GOOSEEYE_VERSION_AT_LEAST(x,y,z) \
-  (GOOSEEYE_WORLD_VERSION>x || (GOOSEEYE_WORLD_VERSION>=x && \
-  (GOOSEEYE_MAJOR_VERSION>y || (GOOSEEYE_MAJOR_VERSION>=y && \
-                                GOOSEEYE_MINOR_VERSION>=z))))
+  (GOOSEEYE_VERSION_MAJOR > x || (GOOSEEYE_VERSION_MAJOR >= x && \
+  (GOOSEEYE_VERSION_MINOR > y || (GOOSEEYE_VERSION_MINOR >= y && \
+                                  GOOSEEYE_VERSION_PATCH >= z))))
 
 #define GOOSEEYE_VERSION(x,y,z) \
-  (GOOSEEYE_WORLD_VERSION==x && \
-   GOOSEEYE_MAJOR_VERSION==y && \
-   GOOSEEYE_MINOR_VERSION==z)
+  (GOOSEEYE_VERSION_MAJOR == x && \
+   GOOSEEYE_VERSION_MINOR == y && \
+   GOOSEEYE_VERSION_PATCH == z)
 
 // =================================================================================================
 

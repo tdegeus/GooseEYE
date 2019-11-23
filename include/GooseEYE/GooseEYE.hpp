@@ -200,7 +200,7 @@ xt::xarray<double> L(
   path_mode mode)
 {
   Ensemble ensemble(roi, periodic);
-  ensemble.L(f);
+  ensemble.L(f, mode);
   return ensemble.result();
 }
 

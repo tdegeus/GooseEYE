@@ -1,47 +1,50 @@
-cmake_minimum_required(VERSION 3.1)
 
-# define a project name
-project(examples)
+cmake_minimum_required(VERSION 3.0)
 
-# set optimization level
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    project(GooseEYE-examples)
+    find_package(GooseEYE REQUIRED CONFIG)
+    set(GOOSEEYE_INCLUDE_DIR ${GooseEYE_INCLUDE_DIRS})
+endif()
+
+option(WARNINGS "Show build warnings" ON)
+option(ASSERT "Enable assertions" ON)
+
 set(CMAKE_BUILD_TYPE Release)
-
-# set C++ standard
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set warnings on
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
+if(WARNINGS)
+    if(MSVC)
+        if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+            string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+        else()
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+        endif()
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-unknown-pragmas")
+    endif()
+endif()
 
-# enable optimisation
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+find_package(Catch2 REQUIRED)
+find_package(xtensor REQUIRED)
+find_package(xtl REQUIRED)
+find_package(xsimd REQUIRED)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTENSOR_USE_XSIMD=ON")
 
-# assertions
 if(NOT ASSERT)
-  add_definitions(-DNDEBUG)
+    add_definitions(-DNDEBUG)
 else()
-  add_definitions(-DXTENSOR_ENABLE_ASSERT=ON)
+    add_definitions(-DXTENSOR_ENABLE_ASSERT=ON)
 endif()
 
-# add current library
-string(CONCAT GooseEYE "${CMAKE_CURRENT_SOURCE_DIR}" "/../../include/")
-include_directories("${GooseEYE}")
-
-# load xtensor-stack libraries
-find_package(xtl REQUIRED)
-find_package(xtensor REQUIRED)
-
-# add custom include paths
-if(NOT "$ENV{INCLUDE_PATH}" STREQUAL "")
-  string(REPLACE ":" ";" INCLUDE_LIST "$ENV{INCLUDE_PATH}")
-  include_directories(${INCLUDE_LIST})
-endif()
-
-# create executables
 file(GLOB APP_SOURCES *.cpp)
 foreach(testsourcefile ${APP_SOURCES})
     string(REPLACE ".cpp" "" testname ${testsourcefile})
     get_filename_component(testname ${testname} NAME)
     add_executable(${testname} ${testsourcefile})
+    target_link_libraries(${testname} xtensor xtl xsimd)
+    target_include_directories(${testname} PRIVATE ${GOOSEEYE_INCLUDE_DIR})
 endforeach()

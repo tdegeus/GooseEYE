@@ -86,17 +86,15 @@ install:
     - conda install numpy -c conda-forge
     - conda install pyxtensor -c conda-forge
     - conda install catch2 -c conda-forge
-    # Build/install the Python library
-    - cd "${root_dir}"
-    - python3 setup.py build
-    - python3 setup.py install
     # Build/install the library
     - cmake . -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
     - make
     - sudo make install
+    - python setup.py build
+    - python setup.py install
 script:
     # Run tests
-    - ./test/test
+    - ./test/main
     # Run C++ examples
     - ./docs/examples/S2
     - ./docs/examples/S2_autocorrelation

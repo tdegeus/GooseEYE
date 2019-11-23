@@ -1,131 +1,133 @@
-#==================================================================================================#
-#                                                                                                  #
-# (c - GPLv3) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | github.com/tdegeus/GooseEYE       #
-#                                                                                                  #
-#==================================================================================================#
 
-# initialization
-# --------------
-
-# required to specify the c++ standard
 cmake_minimum_required(VERSION 3.0)
 
-# required for install
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
+# Options
+# =======
 
-# options
-option(PKGCONFIG "Build pkg-config" ON)
+project(GooseEYE)
+
 option(BUILD_TESTS "${PROJECT_NAME} Build tests" OFF)
 option(BUILD_EXAMPLES "${PROJECT_NAME} Build examples" OFF)
 
-# project settings
-# ----------------
+# Internals
+# =========
 
-# name
-project(GooseEYE)
+set(GOOSEEYE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# file that contains the version information
-set(parse_version include/GooseEYE/config.h)
+# Version
+# =======
 
-# header files
-set(headers
-  include/GooseEYE/Ensemble.hpp
-  include/GooseEYE/Ensemble_C2.hpp
-  include/GooseEYE/Ensemble_S2.hpp
-  include/GooseEYE/Ensemble_W2.hpp
-  include/GooseEYE/Ensemble_mean.hpp
-  include/GooseEYE/Ensemble_heightheight.hpp
-  include/GooseEYE/GooseEYE.h
-  include/GooseEYE/GooseEYE.hpp
-  include/GooseEYE/clusters.hpp
-  include/GooseEYE/config.h
-  include/GooseEYE/detail.h
-  include/GooseEYE/detail.hpp
-  include/GooseEYE/dummy_circles.hpp
-  include/GooseEYE/kernel.hpp
-  include/GooseEYE/path.hpp
-)
+file(
+    STRINGS "${GOOSEEYE_INCLUDE_DIR}/GooseEYE/config.h" gooseeye_version_defines
+    REGEX "#define GOOSEEYE_VERSION_(MAJOR|MINOR|PATCH)")
 
-# automatically parse the version number
-file(READ "${parse_version}" version)
-string(REGEX MATCH "define[ \t]+GOOSEEYE_WORLD_VERSION[ \t]+([0-9]+)" _ "${version}")
-set(world_version "${CMAKE_MATCH_1}")
-string(REGEX MATCH "define[ \t]+GOOSEEYE_MAJOR_VERSION[ \t]+([0-9]+)" _ "${version}")
-set(major_version "${CMAKE_MATCH_1}")
-string(REGEX MATCH "define[ \t]+GOOSEEYE_MINOR_VERSION[ \t]+([0-9]+)" _ "${version}")
-set(minor_version "${CMAKE_MATCH_1}")
-set(GOOSEEYE_VERSION ${world_version}.${major_version}.${minor_version})
+foreach(ver ${gooseeye_version_defines})
+    if(ver MATCHES "#define GOOSEEYE_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
+        set(GOOSEEYE_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
+    endif()
+endforeach()
 
-# print information to screen
-message(STATUS "Building ${PROJECT_NAME} v${GOOSEEYE_VERSION}")
+set(GOOSEEYE_VERSION
+    ${GOOSEEYE_VERSION_MAJOR}.${GOOSEEYE_VERSION_MINOR}.${GOOSEEYE_VERSION_PATCH})
 
-# paths
-# -----
+message(STATUS "Building GooseEYE v${GOOSEEYE_VERSION}")
 
-set(GOOSEEYE_ROOT_DIR        "${CMAKE_INSTALL_PREFIX}")
-set(GOOSEEYE_INCLUDE_DIR     "${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR}")
-set(INCLUDE_INSTALL_DIR      "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
-set(CMAKEPACKAGE_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
-set(PKGCONFIG_INSTALL_DIR    "${CMAKE_INSTALL_DATADIR}/pkgconfig")
-set(fcmake                   "GooseEYEConfig.cmake")
-set(fpkg                     "GooseEYE.pc")
+# Build
+# =====
 
-# configure CMake
-# ---------------
+set(GOOSEEYE_HEADERS
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/Ensemble.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/Ensemble_C2.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/Ensemble_L.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/Ensemble_S2.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/Ensemble_W2.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/Ensemble_heightheight.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/Ensemble_mean.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/GooseEYE.h
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/GooseEYE.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/clusters.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/config.h
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/detail.h
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/detail.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/dilate.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/dummy_circles.hpp
+    ${GOOSEEYE_INCLUDE_DIR}/GooseEYE/kernel.hpp)
+
+add_library(${PROJECT_NAME} INTERFACE)
+
+target_include_directories(
+    ${PROJECT_NAME} INTERFACE
+    $<BUILD_INTERFACE:${GOOSEEYE_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>)
+
+# Installation
+# ============
+
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
+install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}-targets)
+
+export(
+    EXPORT ${PROJECT_NAME}-targets
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
+
+install(
+    FILES ${GOOSEEYE_HEADERS}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+
+set(GOOSEEYE_CMAKECONFIG_INSTALL_DIR
+    "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
+    STRING "install path for ${PROJECT_NAME}Config.cmake")
 
 configure_package_config_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/GooseEYEConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/GooseEYEConfig.cmake
-  PATH_VARS GOOSEEYE_INCLUDE_DIR GOOSEEYE_ROOT_DIR
-  INSTALL_DESTINATION ${CMAKEPACKAGE_INSTALL_DIR}
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-)
+    "GooseEYEConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION ${GOOSEEYE_CMAKECONFIG_INSTALL_DIR})
 
-# install/build
-# -------------
+set(_GOOSEEYE_CMAKE_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})
 
-# build tests
+unset(CMAKE_SIZEOF_VOID_P)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${GOOSEEYE_VERSION}
+    COMPATIBILITY AnyNewerVersion)
+
+set(CMAKE_SIZEOF_VOID_P ${_GOOSEEYE_CMAKE_SIZEOF_VOID_P})
+
+install(
+    FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION ${GOOSEEYE_CMAKECONFIG_INSTALL_DIR})
+
+install(
+    EXPORT ${PROJECT_NAME}-targets
+    FILE "${PROJECT_NAME}Targets.cmake"
+    DESTINATION ${GOOSEEYE_CMAKECONFIG_INSTALL_DIR})
+
+configure_file(
+    "GooseEYE.pc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+     @ONLY)
+
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+
+# Add builds
+# ==========
+
 if(BUILD_TESTS)
-  add_subdirectory(test)
+    add_subdirectory(test)
 endif()
 
-# build examples
-if(BUILD_EXAMPLES)
-  add_subdirectory(docs/examples)
+if(BUILD_TESTS)
+    add_subdirectory(docs/examples)
 endif()
 
-# disable pkg-config for native Windows builds
-if(WIN32 OR CMAKE_HOST_SYSTEM_NAME MATCHES Windows)
-  option(PKGCONFIG "Build pkg-config ${fpkg} file" OFF)
-endif()
 
-# pkg-config
-if(PKGCONFIG)
-  configure_file(${fpkg}.in ${fpkg} @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${fpkg} DESTINATION ${PKGCONFIG_INSTALL_DIR})
-endif()
 
-# CMake
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${fcmake} DESTINATION ${CMAKEPACKAGE_INSTALL_DIR})
-
-# header files
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${headers} DESTINATION ${INCLUDE_INSTALL_DIR})
-
-# print information to screen
-# ---------------------------
-
-message(STATUS "")
-message(STATUS "+---------------------------------------------------------------------------------")
-message(STATUS "|")
-message(STATUS "| Use 'make install' to install in")
-message(STATUS "|   ${CMAKE_INSTALL_PREFIX}")
-message(STATUS "|")
-message(STATUS "| To specify a custom directory call")
-message(STATUS "|   cmake /path/to/${PROJECT_NAME} -DCMAKE_INSTALL_PREFIX=yourprefix")
-message(STATUS "|")
-message(STATUS "| For custom paths, add the following line to your '~/.bashrc'")
-message(STATUS "|   export PKG_CONFIG_PATH=${CMAKE_INSTALL_PREFIX}/share/pkgconfig:$PKG_CONFIG_PATH")
-message(STATUS "|")
-message(STATUS "+---------------------------------------------------------------------------------")
-message(STATUS "")

@@ -1,9 +1,7 @@
 prefix=@CMAKE_INSTALL_PREFIX@
-exec_prefix=${prefix}
+includedir=${prefix}/include
 
-Name: GooseEYE
-Description: Statistics
-Requires:
+Name: @PROJECT_NAME@
+Description: Geometric statistics in C++/Python
 Version: @GOOSEEYE_VERSION@
-Libs:
-Cflags: -I${prefix}/@GOOSEEYE_INCLUDE_DIR@
+Cflags: -I${includedir}
