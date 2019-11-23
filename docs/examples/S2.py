@@ -15,7 +15,7 @@ S2 = GooseEYE.S2((101, 101), I, I)
 
 import sys
 
-if len(sys.argv == 2):
+if len(sys.argv) == 2:
   if sys.argv[1] == "--no-plot":
     sys.exit(0)
 

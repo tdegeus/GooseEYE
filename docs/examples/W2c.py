@@ -37,7 +37,7 @@ WIc       = GooseEYE.W2c((101,101),clus,cntr,I,mask=W)
 
 import sys
 
-if len(sys.argv == 2):
+if len(sys.argv) == 2:
   if sys.argv[1] == "--no-plot":
     sys.exit(0)
 

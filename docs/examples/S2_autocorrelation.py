@@ -35,7 +35,7 @@ Isq_av = np.mean(Igr**2.0)
 
 import sys
 
-if len(sys.argv == 2):
+if len(sys.argv) == 2:
   if sys.argv[1] == "--no-plot":
     sys.exit(0)
 

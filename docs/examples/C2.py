@@ -21,7 +21,7 @@ C2 = GooseEYE.C2((101, 101), C, C)
 
 import sys
 
-if len(sys.argv == 2):
+if len(sys.argv) == 2:
   if sys.argv[1] == "--no-plot":
     sys.exit(0)
 

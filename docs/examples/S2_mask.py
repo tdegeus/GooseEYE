@@ -27,7 +27,7 @@ S2mask = GooseEYE.S2((101, 101), Ierr, Ierr, fmask=mask, gmask=mask)
 
 import sys
 
-if len(sys.argv == 2):
+if len(sys.argv) == 2:
   if sys.argv[1] == "--no-plot":
     sys.exit(0)
 
