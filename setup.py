@@ -17,17 +17,28 @@ patch = re.split(r'(.*)(\#define GOOSEEYE_VERSION_PATCH\ )([0-9]+)(.*)', header)
 
 __version__ = '.'.join([major, minor, patch])
 
+include_dirs = [
+  os.path.abspath('include/'),
+  pyxtensor.find_pyxtensor(),
+  pyxtensor.find_pybind11(),
+  pyxtensor.find_xtensor(),
+  pyxtensor.find_xtl()]
+
+build = pyxtensor.BuildExt
+
+xsimd = pyxtensor.find_xsimd()
+if xsimd:
+  if len(xsimd) > 0:
+    include_dirs += [xsimd]
+    build.c_opts['unix'] += ['-march=native', '-DXTENSOR_USE_XSIMD']
+    build.c_opts['msvc'] += ['/DXTENSOR_USE_XSIMD']
+
 ext_modules = [
   Extension(
     'GooseEYE',
     ['python/main.cpp'],
-    include_dirs=[
-      os.path.abspath('include/'),
-      pyxtensor.find_pyxtensor(),
-      pyxtensor.find_pybind11(),
-      pyxtensor.find_xtensor(),
-      pyxtensor.find_xtl()],
-    language='c++'
+    include_dirs = include_dirs,
+    language = 'c++'
   ),
 ]
 
@@ -43,6 +54,6 @@ setup(
   url = 'https://github.com/tdegeus/GooseEYE',
   ext_modules = ext_modules,
   install_requires = ['pybind11>=2.2.0', 'pyxtensor>=0.1.1'],
-  cmdclass = {'build_ext': pyxtensor.BuildExt},
+  cmdclass = {'build_ext': build},
   zip_safe = False,
 )

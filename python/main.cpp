@@ -4,8 +4,6 @@
 
 ================================================================================================= */
 
-#define XTENSOR_USE_XSIMD
-
 #include <pybind11/pybind11.h>
 #include <pyxtensor/pyxtensor.hpp>
 
