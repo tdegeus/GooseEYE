@@ -14,13 +14,24 @@ hh2 = GooseEYE.heightheight(roi=[200], f=y2, periodic=True)
 dx = GooseEYE.distance(roi=[200], h=[h], dim=0)
 # </snippet>
 
+# skip plot with "--no-plot" command line argument
+# ------------------------------------------------
+
+import sys
+
+if len(sys.argv) == 2:
+  if sys.argv[1] == "--no-plot":
+    sys.exit(0)
+
 # plot
 # ----
 
 import matplotlib.pyplot as plt
 
-try   : plt.style.use(['goose','goose-latex'])
-except: pass
+try:
+  plt.style.use(['goose','goose-latex'])
+except:
+  pass
 
 fig, axes = plt.subplots(ncols=2, figsize=(2*8, 6))
 

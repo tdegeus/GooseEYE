@@ -119,9 +119,26 @@ Add the following to your ``CMakeLists.txt``:
 
   set(CMAKE_CXX_STANDARD 14)
 
-  find_package(PkgConfig)
+  find_package(xtl REQUIRED)
+  find_package(xtensor REQUIRED)
+  find_package(GooseEYE REQUIRED)
 
-  pkg_check_modules(GOOSEEYE REQUIRED GooseEYE)
-  include_directories(${GOOSEEYE_INCLUDE_DIRS})
+  add_executable(main ...)
+  target_link_libraries(main xtensor xtl GooseEYE)
+
+Note that the following can greatly increase speed:
+
+.. code-block:: cmake
+
+  find_package(xsimd REQUIRED)
+
+  ...
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTENSOR_USE_XSIMD=ON")
+
+  ...
+
+  target_link_libraries(main ... xsimd)
 
 

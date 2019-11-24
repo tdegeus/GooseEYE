@@ -16,14 +16,23 @@ labels_periodic = clusters_periodic.labels()
 centers_periodic = clusters_periodic.center_positions()
 # </snippet>
 
-# plot
-# ----
-
 # get the labels
 l = np.sort(np.unique(labels))[1:]
 lp = np.sort(np.unique(labels_periodic))[1:]
 centers = centers[l, :]
 centers_periodic = centers_periodic[lp, :]
+
+# skip plot with "--no-plot" command line argument
+# ------------------------------------------------
+
+import sys
+
+if len(sys.argv) == 2:
+  if sys.argv[1] == "--no-plot":
+    sys.exit(0)
+
+# plot
+# ----
 
 import matplotlib.pyplot as plt
 import matplotlib        as mpl
@@ -36,8 +45,10 @@ cmap = cm.jet(range(256))
 cmap[0, :3] = 1.
 cmap = mpl.colors.ListedColormap(cmap)
 
-try   : plt.style.use(['goose','goose-latex'])
-except: pass
+try:
+  plt.style.use(['goose','goose-latex'])
+except:
+  pass
 
 fig, axes = plt.subplots(figsize=(18, 6), nrows=1, ncols=3)
 

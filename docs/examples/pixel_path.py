@@ -2,8 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import GooseEYE
 
-try   : plt.style.use(['goose', 'goose-latex'])
-except: pass
+try:
+  plt.style.use(['goose', 'goose-latex'])
+except:
+  pass
 
 # open new figure
 fig, axes = plt.subplots(figsize=(18,6), nrows=1, ncols=3)

@@ -22,6 +22,15 @@ S2err = GooseEYE.S2((101, 101), Ierr, Ierr)
 S2mask = GooseEYE.S2((101, 101), Ierr, Ierr, fmask=mask, gmask=mask)
 # </snippet>
 
+# skip plot with "--no-plot" command line argument
+# ------------------------------------------------
+
+import sys
+
+if len(sys.argv) == 2:
+  if sys.argv[1] == "--no-plot":
+    sys.exit(0)
+
 # plot
 # ----
 
@@ -30,8 +39,10 @@ import matplotlib        as mpl
 import matplotlib.cm     as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-try   : plt.style.use(['goose','goose-latex'])
-except: pass
+try:
+  plt.style.use(['goose','goose-latex'])
+except:
+  pass
 
 fig, axes = plt.subplots(figsize=(18,12), nrows=2, ncols=3)
 

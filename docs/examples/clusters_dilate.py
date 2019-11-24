@@ -18,6 +18,15 @@ C = GooseEYE.Clusters(I).labels()
 CD = GooseEYE.dilate(C)
 # </snippet>
 
+# skip plot with "--no-plot" command line argument
+# ------------------------------------------------
+
+import sys
+
+if len(sys.argv) == 2:
+  if sys.argv[1] == "--no-plot":
+    sys.exit(0)
+
 # plot
 # ----
 
