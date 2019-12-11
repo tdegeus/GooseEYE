@@ -26,12 +26,10 @@ inline void Ensemble::L(
 
   // padding default not periodic: mask padded items
   xt::pad_mode pad_mode = xt::pad_mode::constant;
-  int mask_value = 1;
 
   // padding optionally periodic: unmask padded items
   if (m_periodic) {
     pad_mode = xt::pad_mode::periodic;
-    mask_value = 0;
   }
 
   // apply padding

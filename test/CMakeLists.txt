@@ -20,16 +20,10 @@ target_link_libraries(main PRIVATE
     xtensor::optimize
     xtensor::use_xsimd)
 
-if(WARNINGS)
-    if(MSVC)
-        target_compile_options(main PRIVATE /W4)
-    else()
-        target_compile_options(main PRIVATE -Wall -Wextra -pedantic -Wno-unknown-pragmas)
-    endif()
+if (WARNINGS)
+    target_link_libraries(main PRIVATE GooseEYE::compiler_warnings)
 endif()
 
-if(NOT ASSERT)
-    target_compile_definitions(main PRIVATE NDEBUG)
-else()
-    target_compile_definitions(main PRIVATE XTENSOR_ENABLE_ASSERT GOOSEEYE_ENABLE_ASSERT)
+if (ASSERT)
+    target_link_libraries(main PRIVATE GooseEYE::debug)
 endif()

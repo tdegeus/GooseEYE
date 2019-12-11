@@ -83,13 +83,13 @@ set(CMAKE_SIZEOF_VOID_P ${_GOOSEEYE})
 
 install(
     FILES
-        GooseEYEConfig.cmake
+        "${CMAKE_CURRENT_SOURCE_DIR}/GooseEYEConfig.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/GooseEYEConfigVersion.cmake"
     DESTINATION
         "${CMAKE_INSTALL_LIBDIR}/cmake/GooseEYE")
 
 configure_file(
-    "GooseEYE.pc.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/GooseEYE.pc.in"
     "${CMAKE_CURRENT_BINARY_DIR}/GooseEYE.pc"
      @ONLY)
 
@@ -101,6 +101,8 @@ install(
 
 # Add builds
 # ==========
+
+include("GooseEYEConfig.cmake")
 
 if(BUILD_TESTS)
     add_subdirectory(test)
