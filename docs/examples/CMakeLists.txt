@@ -10,33 +10,20 @@ endif()
 option(WARNINGS "Show build warnings" ON)
 option(ASSERT "Enable assertions" ON)
 
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTENSOR_USE_XSIMD=ON")
-
-if(NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-endif()
-
-find_package(Catch2 REQUIRED)
-find_package(xtensor REQUIRED)
-find_package(xtl REQUIRED)
-find_package(xsimd REQUIRED)
-
-if(NOT ASSERT)
-    add_definitions(-DNDEBUG)
-else()
-    add_definitions(-DXTENSOR_ENABLE_ASSERT=ON)
-endif()
-
 file(GLOB APP_SOURCES *.cpp)
+
 foreach(testsourcefile ${APP_SOURCES})
+
     string(REPLACE ".cpp" "" testname ${testsourcefile})
     get_filename_component(testname ${testname} NAME)
+
     add_executable(${testname} ${testsourcefile})
-    target_link_libraries(${testname} PUBLIC xtensor xtl xsimd)
-    target_include_directories(${testname} PRIVATE "${GOOSEEYE_INCLUDE_DIR}")
+
+    target_link_libraries(${testname} PUBLIC
+        GooseEYE
+        xtensor::optimize
+        xtensor::use_xsimd)
+
     if(WARNINGS)
         if(MSVC)
             target_compile_options(${testname} PRIVATE /W4)
@@ -44,5 +31,12 @@ foreach(testsourcefile ${APP_SOURCES})
             target_compile_options(${testname} PRIVATE -Wall -Wextra -pedantic -Wno-unknown-pragmas)
         endif()
     endif()
+
+    if(NOT ASSERT)
+        target_compile_definitions(${testname} PRIVATE NDEBUG)
+    else()
+        target_compile_definitions(${testname} PRIVATE XTENSOR_ENABLE_ASSERT GOOSEEYE_ENABLE_ASSERT)
+    endif()
+
 endforeach()
 

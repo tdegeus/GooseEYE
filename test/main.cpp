@@ -1,8 +1,7 @@
 
-#define GOOSEEYE_ENABLE_ASSERT
 #include <GooseEYE/GooseEYE.h>
 
-#define CATCH_CONFIG_MAIN  // tells Catch to provide a main() - only do this in one cpp file
+#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 // =================================================================================================
