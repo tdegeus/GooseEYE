@@ -26,17 +26,17 @@ GooseEYE can be used from C++ or as a Python module. Please consider the theory 
    :caption: C++ INTERFACE
    :maxdepth: 1
 
+   cpp_install.rst
    cpp_intro.rst
    cpp_functions.rst
-   cpp_install.rst
 
 .. toctree::
    :caption: PYTHON INTERFACE
    :maxdepth: 1
 
+   python_install.rst
    python_intro.rst
    python_functions.rst
-   python_install.rst
 
 .. toctree::
    :caption: CONTRIBUTE
