@@ -1,17 +1,45 @@
 
-Installation
-============
+Getting GooseEYE
+================
 
-.. todo::
+Using conda
+^^^^^^^^^^^
 
-  Describe how obtains and uses xtensor.
+The quickest (but not the most efficient!) is to use *conda* to install *GooseEYE*::
 
-To compile and install one can use
+    conda install -c conda-forge python-gooseeye
 
-.. code-block:: bash
+.. warning::
 
-    python setup.py build
-    python setup.py install
+    This package benefit from *xsimd* optimisation, as it is not compiled on your hardware. Therefore compiling by hand is recommended.
 
-whereby ``python`` has to be replaced with your favourite Python executable. The prerequisites can be installed using ``pip install pyxtensor pybind11`` (again replace ``pip`` with your favourite Python executable).
+From source
+^^^^^^^^^^^
 
+Start by installing the dependencies, for example using *conda*::
+
+    conda install -c conda-forge pyxtensor xsimd
+
+Note that *xsimd* is optional, but recommended.
+
+.. note::
+
+    If you either do not want *xsimd* optimisation, or if you install *xsimd* yourself in such a way that Python can find it, you can also use::
+
+        python -m pip install pyxtensor pybind11
+
+Then, download the package::
+
+    git checkout https://github.com/tdegeus/GooseEYE.git
+    cd GooseEYE
+
+Install the package using::
+
+    python -m pip install .
+
+.. note::
+
+    The following will give more readable output::
+
+        python setup.py build
+        python setup.py install
