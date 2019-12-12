@@ -52,8 +52,8 @@
 // =================================================================================================
 
 #define GOOSEEYE_VERSION_MAJOR 0
-#define GOOSEEYE_VERSION_MINOR 2
-#define GOOSEEYE_VERSION_PATCH 1
+#define GOOSEEYE_VERSION_MINOR 3
+#define GOOSEEYE_VERSION_PATCH 0
 
 #define GOOSEEYE_VERSION_AT_LEAST(x,y,z) \
   (GOOSEEYE_VERSION_MAJOR > x || (GOOSEEYE_VERSION_MAJOR >= x && \

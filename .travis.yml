@@ -59,6 +59,10 @@ before_install:
         export CXX=clang++ CC=clang;
       fi
 install:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        cat /proc/cpuinfo;
+        ldd --version;
+      fi
     # Set environment using Conda
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         MINCONDA_OS=$MINCONDA_LINUX;

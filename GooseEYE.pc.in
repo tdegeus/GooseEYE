@@ -2,6 +2,6 @@ prefix=@CMAKE_INSTALL_PREFIX@
 includedir=${prefix}/include
 
 Name: @PROJECT_NAME@
-Description: Geometric statistics in C++/Python
+Description: Geometric statistics in C++.
 Version: @GOOSEEYE_VERSION@
 Cflags: -I${includedir}
