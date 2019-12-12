@@ -248,6 +248,40 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
         py::arg("f"),
         py::arg("fmask"))
 
+    // Collapsed weighted 2-point correlation
+
+    .def("W2c", py::overload_cast<
+            const xt::xarray<int>&,
+            const xt::xarray<int>&,
+            const xt::xarray<int>&,
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<int>),
+        py::arg("clusters"),
+        py::arg("centers"),
+        py::arg("f"),
+        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+
+    .def("W2c", py::overload_cast<
+            const xt::xarray<int>&,
+            const xt::xarray<int>&,
+            const xt::xarray<double>&,
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<double>),
+        py::arg("clusters"),
+        py::arg("centers"),
+        py::arg("f"),
+        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+
+    .def("W2c", py::overload_cast<
+            const xt::xarray<int>&,
+            const xt::xarray<int>&,
+            const xt::xarray<double>&,
+            const xt::xarray<int>&,
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<double>),
+        py::arg("clusters"),
+        py::arg("centers"),
+        py::arg("f"),
+        py::arg("fmask"),
+        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+
     // Lineal-path function
 
     .def("L",
@@ -382,6 +416,52 @@ m.def("W2", py::overload_cast<
     py::arg("w"),
     py::arg("f"),
     py::arg("fmask"),
+    py::arg("periodic")=true);
+
+// Collapsed weighted 2-point correlation
+
+m.def("W2c", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<int>&,
+        const xt::xarray<int>&,
+        const xt::xarray<int>&,
+        GooseEYE::path_mode,
+        bool>(&GooseEYE::W2c<int>),
+    py::arg("roi"),
+    py::arg("clusters"),
+    py::arg("centers"),
+    py::arg("f"),
+    py::arg("mode")=GooseEYE::path_mode::Bresenham,
+    py::arg("periodic")=true);
+
+m.def("W2c", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<int>&,
+        const xt::xarray<int>&,
+        const xt::xarray<double>&,
+        GooseEYE::path_mode,
+        bool>(&GooseEYE::W2c<double>),
+    py::arg("roi"),
+    py::arg("clusters"),
+    py::arg("centers"),
+    py::arg("f"),
+    py::arg("mode")=GooseEYE::path_mode::Bresenham,
+    py::arg("periodic")=true);
+
+m.def("W2c", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<int>&,
+        const xt::xarray<int>&,
+        const xt::xarray<double>&,
+        const xt::xarray<int>&,
+        GooseEYE::path_mode,
+        bool>(&GooseEYE::W2c<double>),
+    py::arg("roi"),
+    py::arg("clusters"),
+    py::arg("centers"),
+    py::arg("f"),
+    py::arg("fmask"),
+    py::arg("mode")=GooseEYE::path_mode::Bresenham,
     py::arg("periodic")=true);
 
 // Height-Height Correlation Function

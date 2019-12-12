@@ -257,6 +257,23 @@ public:
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask);
 
+  // Collapsed weighted 2-point correlation
+
+  template <class T>
+  void W2c(
+    const xt::xarray<int>& clusters,
+    const xt::xarray<int>& centers,
+    const xt::xarray<T>& f,
+    path_mode mode=path_mode::Bresenham);
+
+  template <class T>
+  void W2c(
+    const xt::xarray<int>& clusters,
+    const xt::xarray<int>& centers,
+    const xt::xarray<T>& f,
+    const xt::xarray<int>& fmask,
+    path_mode mode=path_mode::Bresenham);
+
   // Height-Height Correlation function
 
   template <class T>
@@ -382,6 +399,27 @@ xt::xarray<double> W2(
   const xt::xarray<int>& fmask,
   bool periodic=true);
 
+// Collapsed weighted 2-point correlation
+
+template <class T>
+xt::xarray<double> W2c(
+  const std::vector<size_t>& roi,
+  const xt::xarray<int>& clusters,
+  const xt::xarray<int>& centers,
+  const xt::xarray<T>& f,
+  path_mode mode=path_mode::Bresenham,
+  bool periodic=true);
+
+template <class T>
+xt::xarray<double> W2c(
+  const std::vector<size_t>& roi,
+  const xt::xarray<int>& clusters,
+  const xt::xarray<int>& centers,
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& fmask,
+  path_mode mode=path_mode::Bresenham,
+  bool periodic=true);
+
 // Height-Height Correlation Function
 
 template <class T>
@@ -423,6 +461,7 @@ xt::xarray<double> L(
 #include "Ensemble_S2.hpp"
 #include "Ensemble_C2.hpp"
 #include "Ensemble_W2.hpp"
+#include "Ensemble_W2c.hpp"
 #include "Ensemble_heightheight.hpp"
 #include "Ensemble_L.hpp"
 

@@ -160,6 +160,41 @@ xt::xarray<double> W2(
 }
 
 // =================================================================================================
+// wrapper functions: collapsed weighted 2-point correlation
+// =================================================================================================
+
+template <class T>
+xt::xarray<double> W2c(
+  const std::vector<size_t>& roi,
+  const xt::xarray<int>& clusters,
+  const xt::xarray<int>& centers,
+  const xt::xarray<T>& f,
+  path_mode mode,
+  bool periodic)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.W2c(clusters, centers, f, mode);
+  return ensemble.result();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <class T>
+xt::xarray<double> W2c(
+  const std::vector<size_t>& roi,
+  const xt::xarray<int>& clusters,
+  const xt::xarray<int>& centers,
+  const xt::xarray<T>& f,
+  const xt::xarray<int>& fmask,
+  path_mode mode,
+  bool periodic)
+{
+  Ensemble ensemble(roi, periodic);
+  ensemble.W2c(clusters, centers, f, fmask, mode);
+  return ensemble.result();
+}
+
+// =================================================================================================
 // wrapper functions: heightheight
 // =================================================================================================
 
