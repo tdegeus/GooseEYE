@@ -62,11 +62,10 @@ Presuming that the compiler is ``c++``, compile using::
 
 Note that you have to take care of the *xtensor* dependency, the C++ version, optimisation, enabling *xsimd*, ...
 
-
 Using pkg-config
 ^^^^^^^^^^^^^^^^
 
 Find the location of the headers can be automatised using *pkg-config*::
 
-    c++ \`pkg-config --cflags GooseEYE\` ...
+    pkg-config --cflags GooseEYE
 

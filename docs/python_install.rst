@@ -11,7 +11,7 @@ The quickest (but not the most efficient!) is to use *conda* to install *GooseEY
 
 .. warning::
 
-    This package benefit from *xsimd* optimisation, as it is not compiled on your hardware. Therefore compiling by hand is recommended.
+    This package does not benefit from *xsimd* optimisation, as it is not compiled on your hardware. Therefore compiling by hand is recommended.
 
 From source
 ^^^^^^^^^^^
