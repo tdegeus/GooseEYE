@@ -10,10 +10,16 @@
 // =================================================================================================
 
 #ifndef GOOSEEYE_DEBUG
-    #define NDEBUG
+    #ifndef NDEBUG
+        #define NDEBUG
+    #endif
 #else
-    #define GOOSEEYE_ENABLE_ASSERT
-    #define XTENSOR_ENABLE_ASSERT
+    #ifndef GOOSEEYE_ENABLE_ASSERT
+        #define GOOSEEYE_ENABLE_ASSERT
+    #endif
+    #ifndef XTENSOR_ENABLE_ASSERT
+        #define XTENSOR_ENABLE_ASSERT
+    #endif
 #endif
 
 // =================================================================================================

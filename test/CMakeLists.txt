@@ -10,7 +10,6 @@ option(WARNINGS "Show build warnings" ON)
 option(ASSERT "Enable assertions" ON)
 
 find_package(Catch2 REQUIRED)
-find_package(xtensor REQUIRED)
 
 add_executable(main main.cpp)
 
