@@ -11,15 +11,14 @@
 
 namespace GooseEYE {
 
-// -------------------------------------------------------------------------------------------------
 
 template <class T>
 inline void Ensemble::W2c(
-  const xt::xarray<int>& clusters,
-  const xt::xarray<int>& centers,
-  const xt::xarray<T>& f,
-  const xt::xarray<int>& fmask,
-  path_mode mode)
+    const xt::xarray<int>& clusters,
+    const xt::xarray<int>& centers,
+    const xt::xarray<T>& f,
+    const xt::xarray<int>& fmask,
+    path_mode mode)
 {
   GOOSEEYE_ASSERT(f.shape() == clusters.shape());
   GOOSEEYE_ASSERT(f.shape() == centers.shape());
@@ -117,7 +116,6 @@ inline void Ensemble::W2c(
               }
             }
 
-            // update counter
             q++;
           }
         }
@@ -129,20 +127,18 @@ inline void Ensemble::W2c(
   m_norm += norm;
 }
 
-// -------------------------------------------------------------------------------------------------
 
 template <class T>
 inline void Ensemble::W2c(
-  const xt::xarray<int>& clusters,
-  const xt::xarray<int>& centers,
-  const xt::xarray<T>& f,
-  path_mode mode)
+    const xt::xarray<int>& clusters,
+    const xt::xarray<int>& centers,
+    const xt::xarray<T>& f,
+    path_mode mode)
 {
   xt::xarray<int> mask = xt::zeros<int>(f.shape());
   W2c(clusters, centers, f, mask, mode);
 }
 
-// -------------------------------------------------------------------------------------------------
 
 } // namespace ...
 
