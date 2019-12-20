@@ -36,18 +36,24 @@ The individual functions are simply a wrapper around the ``GooseFEM.Ensemble`` c
 
     .. code-block:: python
 
-        ensemble.S2(...);
+        ensemble.S2(Ia, Ia)
+        ensemble.S2(Ib, Ib)
+        ensemble.S2(Ic, Ic)
         ...
 
 3.  Evaluate the result:
 
     .. code-block:: python
 
-        result = ensemble.result();
+        result = ensemble.result()
 
     .. note::
 
-        The variance around the average can be obtained using ``ensemble.variance()``
+        The variance around the average can be obtained using
+
+        .. code-block:: python
+
+            ensemble.variance()
 
     .. note::
 
@@ -55,8 +61,13 @@ The individual functions are simply a wrapper around the ``GooseFEM.Ensemble`` c
 
         .. code-block:: python
 
-            ensemble.data_first();  # first moment : x_1   + x_2   + ...
-            ensemble.data_second(); # second moment: x_1^2 + x_2^2 + ...
-            ensemble.norm();        # normalisation (number of measurements)
+            # first moment : x_1   + x_2   + ...
+            ensemble.data_first()
+
+            # second moment: x_1^2 + x_2^2 + ...
+            ensemble.data_second()
+
+            # normalisation (number of measurements)
+            ensemble.norm()
 
 Using the individual images wrapper, all these steps are combined in a single function call with almost the same arguments. The only limitation is the the raw data and normalization cannot be accessed.

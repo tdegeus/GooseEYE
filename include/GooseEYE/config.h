@@ -9,6 +9,21 @@
 
 // =================================================================================================
 
+#ifndef GOOSEEYE_DEBUG
+    #ifndef NDEBUG
+        #define NDEBUG
+    #endif
+#else
+    #ifndef GOOSEEYE_ENABLE_ASSERT
+        #define GOOSEEYE_ENABLE_ASSERT
+    #endif
+    #ifndef XTENSOR_ENABLE_ASSERT
+        #define XTENSOR_ENABLE_ASSERT
+    #endif
+#endif
+
+// =================================================================================================
+
 #define _USE_MATH_DEFINES
 
 #include <math.h>
@@ -51,18 +66,17 @@
 #define GOOSEEYE_VERSION_PATCH 0
 
 #define GOOSEEYE_VERSION_AT_LEAST(x,y,z) \
-  (GOOSEEYE_VERSION_MAJOR > x || (GOOSEEYE_VERSION_MAJOR >= x && \
-  (GOOSEEYE_VERSION_MINOR > y || (GOOSEEYE_VERSION_MINOR >= y && \
-                                  GOOSEEYE_VERSION_PATCH >= z))))
+    (GOOSEEYE_VERSION_MAJOR > x || (GOOSEEYE_VERSION_MAJOR >= x && \
+    (GOOSEEYE_VERSION_MINOR > y || (GOOSEEYE_VERSION_MINOR >= y && \
+                                    GOOSEEYE_VERSION_PATCH >= z))))
 
 #define GOOSEEYE_VERSION(x,y,z) \
-  (GOOSEEYE_VERSION_MAJOR == x && \
-   GOOSEEYE_VERSION_MINOR == y && \
-   GOOSEEYE_VERSION_PATCH == z)
+    (GOOSEEYE_VERSION_MAJOR == x && \
+     GOOSEEYE_VERSION_MINOR == y && \
+     GOOSEEYE_VERSION_PATCH == z)
 
 
-// dummy operation that can be use to suppress the "unused parameter" warnings
-#define UNUSED(p) ( (void)(p) )
+#define SIGN(a)( (a<0) ? -1 : a>0 ? 1 : 0 )
 
 #define SIGN(a)( (a<0) ? -1 : a>0 ? 1 : 0 )
 // #define POS(a) ( (a<0) ?  0 : a           )

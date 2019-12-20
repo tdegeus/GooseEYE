@@ -1,5 +1,5 @@
 language: cpp
-dist: trusty
+dist: xenial
 env:
 matrix:
   fast_finish: true
@@ -33,7 +33,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-xenial-6.0
           packages:
             - clang-6.0
       env: COMPILER=clang CLANG=6.0

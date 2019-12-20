@@ -3,6 +3,10 @@
 Developers notes
 ****************
 
+.. warning::
+
+  Page outdated: Under construction!
+
 .. todo::
 
   Under construction!
