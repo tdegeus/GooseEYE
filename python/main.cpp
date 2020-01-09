@@ -104,7 +104,10 @@ py::class_<GooseEYE::Clusters>(m, "Clusters")
 
     .def("center_positions",
         &GooseEYE::Clusters::center_positions,
-        py::arg("orig_rank")=true)
+        py::arg("as3d")=false)
+
+    .def("sizes",
+        &GooseEYE::Clusters::sizes)
 
     .def("__repr__",
         [](const GooseEYE::Clusters &){ return "<GooseEYE.Clusters>"; }

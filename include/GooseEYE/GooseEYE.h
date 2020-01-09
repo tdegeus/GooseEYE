@@ -107,8 +107,11 @@ public:
   // Return label only in the center of gravity
   xt::xarray<int> centers() const;
 
-  // Return positions of the centers of gravity (as 3-d, or in original rank)
-  xt::xtensor<double,2> center_positions(bool orig_rank=true) const;
+  // Return positions of the centers of gravity (in the original rank, or as 3-d)
+  xt::xtensor<double,2> center_positions(bool as3d=false) const;
+
+  // Return size per cluster
+  xt::xtensor<size_t,1> sizes() const;
 
 private:
 

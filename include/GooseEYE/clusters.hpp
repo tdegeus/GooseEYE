@@ -242,7 +242,7 @@ inline xt::xtensor<double,2> Clusters::average_position_periodic() const
 
 // -------------------------------------------------------------------------------------------------
 
-inline xt::xtensor<double,2> Clusters::center_positions(bool orig_rank) const
+inline xt::xtensor<double,2> Clusters::center_positions(bool as3d) const
 {
   xt::xtensor<double,2> x;
 
@@ -253,9 +253,11 @@ inline xt::xtensor<double,2> Clusters::center_positions(bool orig_rank) const
     x = this->average_position(m_l);
   }
 
-  if (orig_rank) {
-    return xt::view(x, xt::all(), xt::range(3 - m_shape.size(), 3));
+  if (as3d) {
+    return x;
   }
+
+  return xt::view(x, xt::all(), xt::range(3 - m_shape.size(), 3));
 
   return x;
 }
@@ -265,7 +267,7 @@ inline xt::xtensor<double,2> Clusters::center_positions(bool orig_rank) const
 inline xt::xarray<int> Clusters::centers() const
 {
   // get positions of the centers
-  xt::xtensor<size_t,2> x = xt::floor(this->center_positions(false));
+  xt::xtensor<size_t,2> x = xt::floor(this->center_positions(true));
 
   // allocate centers of gravity
   xt::xarray<int> c = xt::zeros<int>(m_l.shape());
@@ -286,6 +288,23 @@ inline xt::xarray<int> Clusters::labels() const
 {
   auto out = m_l;
   out.reshape(m_shape);
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline xt::xtensor<size_t,1> Clusters::sizes() const
+{
+  xt::xtensor<size_t,1> out = xt::zeros<size_t>({xt::amax(m_l)(0) + 1ul});
+
+  for (size_t h = 0; h < m_l.shape(0); ++h) {
+    for (size_t i = 0; i < m_l.shape(1); ++i) {
+      for (size_t j = 0; j < m_l.shape(2); ++j) {
+        out(m_l(h,i,j))++;
+      }
+    }
+  }
+
   return out;
 }
 
