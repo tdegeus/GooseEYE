@@ -110,6 +110,9 @@ public:
   // Return positions of the centers of gravity (in the original rank, or as 3-d)
   xt::xtensor<double,2> center_positions(bool as3d=false) const;
 
+  // Return size per cluster
+  xt::xtensor<size_t,1> sizes() const;
+
 private:
 
   // Compute clusters

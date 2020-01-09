@@ -293,6 +293,23 @@ inline xt::xarray<int> Clusters::labels() const
 
 // -------------------------------------------------------------------------------------------------
 
+inline xt::xtensor<size_t,1> Clusters::sizes() const
+{
+  xt::xtensor<size_t,1> out = xt::zeros<size_t>({xt::amax(m_l)(0) + 1ul});
+
+  for (size_t h = 0; h < m_l.shape(0); ++h) {
+    for (size_t i = 0; i < m_l.shape(1); ++i) {
+      for (size_t j = 0; j < m_l.shape(2); ++j) {
+        out(m_l(h,i,j))++;
+      }
+    }
+  }
+
+  return out;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 inline xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic)
 {
   return Clusters(f, kernel::nearest(f.dimension()), periodic).labels();
