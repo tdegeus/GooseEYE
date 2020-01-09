@@ -71,6 +71,25 @@ template <
 xt::xarray<T> dilate(
   const xt::xarray<T>& f,
   const xt::xarray<S>& kernel,
+  const xt::xtensor<size_t,1>& iterations,
+  bool periodic=true);
+
+// dilate image, with "kernel::nearest"
+template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  const xt::xtensor<size_t,1>& iterations,
+  bool periodic=true);
+
+// dilate image
+template <
+  class T,
+  class S,
+  std::enable_if_t<std::is_integral<T>::value, int> = 0,
+  std::enable_if_t<std::is_integral<S>::value, int> = 0>
+xt::xarray<T> dilate(
+  const xt::xarray<T>& f,
+  const xt::xarray<S>& kernel,
   size_t iterations=1,
   bool periodic=true);
 
