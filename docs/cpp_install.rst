@@ -30,7 +30,7 @@ Compiling
 Using CMake
 ^^^^^^^^^^^
 
-The following structure can be used form ``CMakeLists.txt``:
+The following structure can be used for your project's ``CMakeLists.txt``:
 
 .. code-block:: cmake
 
