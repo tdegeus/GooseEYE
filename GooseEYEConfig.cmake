@@ -34,32 +34,38 @@ find_dependency(xtensor)
 # Define support target "GooseEYE::compiler_warnings"
 # ===================================================
 
-if(NOT TARGET GooseEYE::compiler_warnings)
-    add_library(GooseEYE::compiler_warnings INTERFACE IMPORTED)
-    if(MSVC)
-        target_compile_options(GooseEYE::compiler_warnings INTERFACE
-            /W4)
-    else()
-        target_compile_options(GooseEYE::compiler_warnings INTERFACE
-            -Wall
-            -Wextra
-            -pedantic
-            -Wno-unknown-pragmas)
+if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER_EQUAL 3.11)
+    if(NOT TARGET GooseEYE::compiler_warnings)
+        add_library(GooseEYE::compiler_warnings INTERFACE IMPORTED)
+        if(MSVC)
+            target_compile_options(GooseEYE::compiler_warnings INTERFACE
+                /W4)
+        else()
+            target_compile_options(GooseEYE::compiler_warnings INTERFACE
+                -Wall
+                -Wextra
+                -pedantic
+                -Wno-unknown-pragmas)
+        endif()
     endif()
 endif()
 
 # Define support target "GooseEYE::assert"
 # ========================================
 
-if(NOT TARGET GooseEYE::assert)
-    add_library(GooseEYE::assert INTERFACE IMPORTED)
-    target_compile_definitions(GooseEYE::assert INTERFACE GOOSEEYE_ENABLE_ASSERT)
+if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER_EQUAL 3.11)
+    if(NOT TARGET GooseEYE::assert)
+        add_library(GooseEYE::assert INTERFACE IMPORTED)
+        target_compile_definitions(GooseEYE::assert INTERFACE GOOSEEYE_ENABLE_ASSERT)
+    endif()
 endif()
 
 # Define support target "GooseEYE::debug"
 # =======================================
 
-if(NOT TARGET GooseEYE::debug)
-    add_library(GooseEYE::debug INTERFACE IMPORTED)
-    target_compile_definitions(GooseEYE::debug INTERFACE GOOSEEYE_DEBUG)
+if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER_EQUAL 3.11)
+    if(NOT TARGET GooseEYE::debug)
+        add_library(GooseEYE::debug INTERFACE IMPORTED)
+        target_compile_definitions(GooseEYE::debug INTERFACE GOOSEEYE_DEBUG)
+    endif()
 endif()
