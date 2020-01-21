@@ -29,7 +29,8 @@ if len(sys.argv) == 2:
 import matplotlib.pyplot as plt
 
 try:
-    plt.style.use(['goose','goose-latex'])
+    plt.style.use(['goose', 'goose-latex'])
+
 except:
     pass
 
