@@ -56,7 +56,13 @@ build_script:
   - .\docs\examples\S2_ensemble
   - .\docs\examples\C2
   - .\docs\examples\L
+  - .\docs\examples\W2
+  - .\docs\examples\W2c
+  - .\docs\examples\clusters
+  - .\docs\examples\clusters_centers
+  - .\docs\examples\clusters_dilate
   - .\docs\examples\heightheight
+  - .\docs\examples\mean
   # Run Python examples
   - python docs\examples\S2.py --no-plot
   - python docs\examples\S2_autocorrelation.py --no-plot
@@ -68,5 +74,6 @@ build_script:
   - python docs\examples\W2c.py --no-plot
   - python docs\examples\clusters.py --no-plot
   - python docs\examples\clusters_centers.py --no-plot
+  - python docs\examples\clusters_dilate.py --no-plot
   - python docs\examples\heightheight.py --no-plot
   - python docs\examples\mean.py --no-plot
