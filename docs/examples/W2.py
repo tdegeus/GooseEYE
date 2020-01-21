@@ -13,11 +13,13 @@ col = np.linspace(0, M, N)
 (row, col) = np.meshgrid(row, col)
 row = row.reshape(-1)
 col = col.reshape(-1)
-r = float(M) / float(N) /4.0 * np.ones((N * N))
+r = float(M) / float(N) / 4.0 * np.ones((N * N))
+
 # random perturbation
 row += np.random.normal(0.0, float(M) / float(N), N * N)
 col += np.random.normal(0.0, float(M) / float(N), N * N)
 r *= np.random.random(N * N) * 2.0 + 0.1
+
 # generate image, store 'volume-fraction'
 I = GooseEYE.dummy_circles((M, M), row.astype(np.int), col.astype(np.int), r.astype(np.int))
 phi = np.mean(I)
@@ -38,6 +40,7 @@ WI = GooseEYE.W2((101, 101), W, I, fmask=W)
 Igr = np.array(I, copy=True).astype(np.float)
 Igr += 0.1 * (2.0 * np.random.random(Igr.size) - 1.0).reshape(Igr.shape) + 0.1
 Igr /= 1.2
+
 # mean intensity (for bounds)
 Iav = np.mean(Igr)
 

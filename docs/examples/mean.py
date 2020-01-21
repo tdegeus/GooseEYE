@@ -1,7 +1,7 @@
 import numpy as np
 import GooseEYE
 
-data = np.random.random((40,40,40))
+data = np.random.random((40, 40, 40))
 
 ensemble = GooseEYE.Ensemble([1], True, True)
 

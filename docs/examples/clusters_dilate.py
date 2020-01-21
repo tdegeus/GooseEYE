@@ -5,11 +5,11 @@ import GooseEYE
 # generate image
 I = np.zeros((21, 21), dtype='bool')
 I[4, 4] = True
-I[14,15] = True
-I[15,15] = True
-I[16,15] = True
-I[15,14] = True
-I[15,16] = True
+I[14, 15] = True
+I[15, 15] = True
+I[16, 15] = True
+I[15, 14] = True
+I[15, 16] = True
 
 # clusters
 C = GooseEYE.Clusters(I).labels()
