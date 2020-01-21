@@ -71,6 +71,21 @@ Weighted 2-point correlation.
   * :download:`Ensemble_W2.hpp <../include/GooseEYE/Ensemble_W2.hpp>`
   * :ref:`Theory & Example <theory_W2>`.
 
+GooseEYE::W2c
+-------------
+
+Collapsed weighted 2-point correlation.
+
+.. note::
+
+  An overload is available to mask certain voxels.
+
+.. seealso::
+
+  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
+  * :download:`Ensemble_W2c.hpp <../include/GooseEYE/Ensemble_W2c.hpp>`
+  * :ref:`Theory & Example <theory_W2>`.
+
 GooseEYE::heightheight
 ----------------------
 
@@ -124,9 +139,6 @@ Create a dummy binary images of circles.
   * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
   * :download:`dummy_circles.hpp <../include/GooseEYE/dummy_circles.hpp>`
   * :ref:`Example <theory_S2>`.
-
-Miscellaneous functions
-=======================
 
 .. todo::
 
