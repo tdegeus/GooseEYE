@@ -52,8 +52,8 @@ Example
 
 This example is based on a simple, periodic, image comprising circular white inclusions embedded in a black background. The figure shows from left to right: the image, the 2-point probability :math:`S_2` in two dimensions, and a cross-section of this result in the middle of the region-of-interest along the horizontal axis.
 
-:download:`S2.py <examples/S2.py>`
-:download:`S2.cpp <examples/S2.cpp>`
+| :download:`S2.py <examples/S2.py>`
+| :download:`S2.cpp <examples/S2.cpp>`
 
 .. image:: examples/S2.svg
   :width: 700px
@@ -87,8 +87,8 @@ Masked correlation
 
 This function (as most of GooseEYE's functions) also has the possibility to mask certain pixels (which can be used for example to exclude acquisition artefacts from the measurement). The image's mask is a binary matrix of exactly the same shape as the image. For each pixel in the mask with value ``1``, the corresponding pixel in the image is ignored. The normalisation is corrected for the reduced amount of data points, whereby the number of data points is no longer constant over the region-of-interest.
 
-:download:`S2_mask.py <examples/S2_mask.py>`,
-:download:`S2_mask.cpp <examples/S2_mask.cpp>`
+| :download:`S2_mask.py <examples/S2_mask.py>`,
+| :download:`S2_mask.cpp <examples/S2_mask.cpp>`
 
 .. image:: examples/S2_mask.svg
   :width: 700px
@@ -100,8 +100,8 @@ Ensemble average
 
 To compute the ensemble average of a statistic, one constructs an ``Ensemble`` with a certain shape for the region-of-interest, and then adds the result per image to it. Consider the following example.
 
-:download:`S2_ensemble.py <examples/S2_ensemble.py>`
-:download:`S2_ensemble.cpp <examples/S2_ensemble.cpp>`
+| :download:`S2_ensemble.py <examples/S2_ensemble.py>`
+| :download:`S2_ensemble.cpp <examples/S2_ensemble.cpp>`
 
 .. note::
 
@@ -143,8 +143,8 @@ where the :math:`\star` represent the convolution, in this case of :math:`\mathc
 
 where the brackets :math:`\langle \ldots \rangle` denotes the spatial average.
 
-:download:`S2_autocorrelation.py <examples/S2_autocorrelation.py>`
-:download:`S2_autocorrelation.cpp <examples/S2_autocorrelation.cpp>`
+| :download:`S2_autocorrelation.py <examples/S2_autocorrelation.py>`
+| :download:`S2_autocorrelation.cpp <examples/S2_autocorrelation.cpp>`
 
 .. seealso::
 

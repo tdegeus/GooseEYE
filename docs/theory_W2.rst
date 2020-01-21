@@ -63,7 +63,8 @@ where all pixels where :math:`\mathcal{M}(\vec{x}_i) = 1` are ignored; all pixel
 Example
 -------
 
-:download:`W2.py <examples/W2.py>`
+| :download:`W2.py <examples/W2.py>`
+| :download:`W2.cpp <examples/W2.cpp>`
 
 .. image:: examples/W2.svg
   :width: 700px
@@ -83,9 +84,8 @@ Python
 C++
 ^^^
 
-.. todo::
-
-  Create.
+.. literalinclude:: examples/W2.cpp
+   :language: cpp
 
 Collapse to single point
 ------------------------
@@ -126,7 +126,8 @@ Similarly to the above, a mask may be introduced as follows:
 Example
 ^^^^^^^
 
-:download:`W2c.py <examples/W2c.py>`
+| :download:`W2c.py <examples/W2c.py>`
+| :download:`W2c.cpp <examples/W2c.cpp>`
 
 .. image:: examples/W2c.svg
   :width: 700px
@@ -142,10 +143,6 @@ Example
 Python
 ^^^^^^
 
-.. todo::
-
-  Check after xtensor conversion is done.
-
 .. literalinclude:: examples/W2c.py
    :language: python
    :start-after: <snippet>
@@ -154,6 +151,5 @@ Python
 C++
 ^^^
 
-.. todo::
-
-  Create after xtensor conversion is done.
+.. literalinclude:: examples/W2c.cpp
+   :language: cpp
