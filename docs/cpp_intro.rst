@@ -1,6 +1,6 @@
 
-Introduction
-============
+Paradigm
+========
 
 .. note::
 
