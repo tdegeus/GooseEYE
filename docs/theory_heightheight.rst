@@ -16,8 +16,8 @@ The height-height correlation corresponds to the following:
 Example
 -------
 
-:download:`heightheight.py <examples/heightheight.py>`
-:download:`heightheight.cpp <examples/heightheight.cpp>`
+| :download:`heightheight.py <examples/heightheight.py>`
+| :download:`heightheight.cpp <examples/heightheight.cpp>`
 
 .. image:: examples/heightheight.svg
   :width: 700px

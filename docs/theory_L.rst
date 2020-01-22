@@ -42,7 +42,8 @@ An important ingredient of the computation of :math:`L` is thus the choice of th
 Example
 -------
 
-:download:`L.py <examples/L.py>`
+| :download:`L.py <examples/L.py>`
+| :download:`L.cpp <examples/L.cpp>`
 
 .. image:: examples/L.svg
   :width: 700px
@@ -58,10 +59,6 @@ Example
 Python
 ^^^^^^
 
-.. todo::
-
-  Check after xtensor conversion is done.
-
 .. literalinclude:: examples/L.py
    :language: python
    :start-after: <snippet>
@@ -70,6 +67,5 @@ Python
 C++
 ^^^
 
-.. todo::
-
-  Create after xtensor conversion is done.
+.. literalinclude:: examples/L.cpp
+   :language: cpp

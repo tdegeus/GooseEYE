@@ -53,9 +53,9 @@ xt::xarray<int> dummy_circles(
 
 xt::xarray<int> dummy_circles(
   const std::vector<size_t>& shape,
-  const std::vector<int>& row,
-  const std::vector<int>& col,
-  const std::vector<int>& r,
+  const xt::xtensor<int,1>& row,
+  const xt::xtensor<int,1>& col,
+  const xt::xtensor<int,1>& r,
   bool periodic=true);
 
 // -------------------------------------------------------------------------------------------------

@@ -20,11 +20,11 @@ Everything is contained in the namespace ``GooseEYE``.
 Ensemble or individual image
 ----------------------------
 
-There are two modes of using the code, using:
+There are two modes of using the code:
 
-*   An individual image, using individual functions (e.g. ``GooseFEM::S2(...)``, ``GooseFEM::W2(...)``, etc.)
+*   Individual image: use individual functions (e.g. ``GooseFEM::S2(...)``, ``GooseFEM::W2(...)``, etc.)
 
-*   An ensemble of images, using the ``GooseFEM::Ensemble`` class.
+*   Ensemble of images: use the ``GooseFEM::Ensemble`` class.
 
 .. todo::
 

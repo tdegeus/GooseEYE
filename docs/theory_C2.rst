@@ -22,8 +22,8 @@ whereby :math:`\mathcal{C}` is an indicator with a unique non-zero index for eac
 Example
 -------
 
-:download:`C2.py <examples/C2.py>`
-:download:`C2.cpp <examples/C2.cpp>`
+| :download:`C2.py <examples/C2.py>`
+| :download:`C2.cpp <examples/C2.cpp>`
 
 .. image:: examples/C2.svg
   :width: 700px

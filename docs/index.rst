@@ -35,14 +35,7 @@ GooseEYE can be used from C++ or as a Python module. Please consider the theory 
    :maxdepth: 1
 
    python_install.rst
-   python_intro.rst
-   python_functions.rst
-
-.. toctree::
-   :caption: CONTRIBUTE
-   :maxdepth: 1
-
-   develop.rst
+   python_usage.rst
 
 Indices and tables
 ==================

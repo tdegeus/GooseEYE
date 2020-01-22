@@ -27,7 +27,7 @@ I = GooseEYE.dummy_circles((M, M),
 phi = np.mean(I)
 
 # create 'damage' -> right of inclusion
-col += 1.1*r
+col += 1.1 * r
 r *= 0.4
 
 W = GooseEYE.dummy_circles((M, M),
@@ -43,10 +43,10 @@ clusters = Clusters.labels()
 centers = Clusters.centers()
 
 # weighted correlation
-W_I = GooseEYE.W2((101, 101), W, I, fmask = W)
+W_I = GooseEYE.W2((101, 101), W, I, fmask=W)
 
 # collapsed weighted correlation
-W_I_c = GooseEYE.W2c((101, 101), clusters, centers, I, fmask = W)
+W_I_c = GooseEYE.W2c((101, 101), clusters, centers, I, fmask=W)
 # </snippet>
 
 # skip plot with "--no-plot" command line argument
@@ -62,21 +62,22 @@ if len(sys.argv) == 2:
 # ----
 
 import matplotlib.pyplot as plt
-import matplotlib        as mpl
-import matplotlib.cm     as cm
+import matplotlib as mpl
+import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 try:
-    plt.style.use(['goose','goose-latex'])
+    plt.style.use(['goose', 'goose-latex'])
+
 except:
     pass
 
 cmap = mpl.colors.ListedColormap(np.array([
-  [0.0, 0.0, 0.0, 0.0],
-  [1.0, 0.0, 0.0, 1.0]],dtype='float64'))
+    [0.0, 0.0, 0.0, 0.0],
+    [1.0, 0.0, 0.0, 1.0]],dtype='float64'))
 
 fig, axes = plt.subplots(
-    figsize = (18,6),
+    figsize = (18, 6),
     nrows = 1,
     ncols = 3)
 
@@ -101,7 +102,7 @@ ax.set_title(r'$\mathcal{I}$ (black/white) + $\mathcal{W}$ (red)')
 
 div = make_axes_locatable(ax)
 cax = div.append_axes("right", size="5%", pad=0.1)
-cbar = plt.colorbar(im, cax = cax)
+cbar = plt.colorbar(im, cax=cax)
 cbar.set_ticks([0,1])
 
 # ---
@@ -122,7 +123,7 @@ ax.set_title(r'weighted correlation')
 
 div = make_axes_locatable(ax)
 cax = div.append_axes("right", size="5%", pad=0.1)
-cbar = plt.colorbar(im, cax = cax)
+cbar = plt.colorbar(im, cax=cax)
 
 cbar.set_ticks([-phi, 0, +phi])
 cbar.set_ticklabels([r'$-\varphi$', '0', r'$+\varphi$'])
@@ -130,6 +131,7 @@ cbar.set_ticklabels([r'$-\varphi$', '0', r'$+\varphi$'])
 # ---
 
 ax = axes[2]
+
 im = ax.imshow(W_I_c - phi,
     clim = (-phi, +phi),
     cmap = 'RdBu_r',
@@ -144,7 +146,7 @@ ax.set_title(r'collapse weights to center')
 
 div = make_axes_locatable(ax)
 cax = div.append_axes("right", size="5%", pad=0.1)
-cbar = plt.colorbar(im, cax = cax)
+cbar = plt.colorbar(im, cax=cax)
 
 cbar.set_ticks([-phi, 0, +phi])
 cbar.set_ticklabels([r'$-\varphi$', '0', r'$+\varphi$'])
