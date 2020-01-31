@@ -7,22 +7,6 @@
 #ifndef GOOSEEYE_INCLUDE_H
 #define GOOSEEYE_INCLUDE_H
 
-// =================================================================================================
-
-#ifndef GOOSEEYE_DEBUG
-    #ifndef NDEBUG
-        #define NDEBUG
-    #endif
-#else
-    #ifndef GOOSEEYE_ENABLE_ASSERT
-        #define GOOSEEYE_ENABLE_ASSERT
-    #endif
-    #ifndef XTENSOR_ENABLE_ASSERT
-        #define XTENSOR_ENABLE_ASSERT
-    #endif
-#endif
-
-// =================================================================================================
 
 #define _USE_MATH_DEFINES
 
