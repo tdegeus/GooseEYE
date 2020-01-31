@@ -139,8 +139,3 @@ Create a dummy binary images of circles.
   * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
   * :download:`dummy_circles.hpp <../include/GooseEYE/dummy_circles.hpp>`
   * :ref:`Example <theory_S2>`.
-
-.. todo::
-
-  Describe all other functions here.
-
