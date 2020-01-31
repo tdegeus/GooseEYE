@@ -43,15 +43,22 @@ The following structure can be used for your project's ``CMakeLists.txt``:
         xtensor::optimize
         xtensor::use_xsimd)
 
-See the `documentation of xtensor <https://xtensor.readthedocs.io/en/latest/>`_ concerning optimisation.
+See the `documentation of xtensor <https://xtensor.readthedocs.io/en/latest/>`_
+concerning optimisation.
 
 .. note::
 
     There are additional targets available to expedite your ``CMakeLists.txt``:
 
-    *   ``GooseEYE::assert``: enable GooseEYE assertions.
-    *   ``GooseEYE::debug``: enable GooseEYE and xtensor assertions (slow).
-    *   ``GooseEYE::compiler_warnings``: enable compiler warnings.
+    *   ``GooseEYE::assert``:
+         enable GooseEYE assertions by defining ``GOOSEEYE_ENABLE_ASSERT``.
+
+    *   ``GooseEYE::debug``:
+         enable GooseEYE assertions by defining ``GOOSEEYE_ENABLE_ASSERT`` and
+         xtensor assertions by defining ``XTENSOR_ENABLE_ASSERT`` (slow).
+
+    *   ``GooseEYE::compiler_warnings``:
+         enable compiler warnings (generic).
 
 By hand
 ^^^^^^^
