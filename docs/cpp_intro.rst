@@ -4,7 +4,9 @@ Paradigm
 
 .. note::
 
-  GooseEYE is a research code. The best reference is the code itself: this reader just gives an overview and points in the right directions.
+    GooseEYE is a research code.
+    The best reference is the code itself:
+    this reader just gives an overview and points in the right directions.
 
 Header-only
 -----------
@@ -22,19 +24,19 @@ Ensemble or individual image
 
 There are two modes of using the code:
 
-*   Individual image: use individual functions (e.g. ``GooseFEM::S2(...)``, ``GooseFEM::W2(...)``, etc.)
+*   Individual image: use individual functions
+    (e.g. ``GooseFEM::S2(...)``, ``GooseFEM::W2(...)``, etc.)
 
 *   Ensemble of images: use the ``GooseFEM::Ensemble`` class.
+    See :ref:`example <theory_S2_ensemble>`
 
-.. todo::
+The individual functions are simply a wrapper around the ``GooseFEM::Ensemble`` class.
+The general structure for an ensemble of images is as follows:
 
-  Reference the right example.
+1.  Initialize the ensemble, defining some settings of which the shape of the
+    region-of-interest is mandatory. For example:
 
-The individual functions are simply a wrapper around the ``GooseFEM::Ensemble`` class. The general structure for an ensemble of images is as follows:
-
-1.   Initialize the ensemble, defining some settings of which the shape of the region-of-interest is mandatory. For example:
-
-     .. code-block:: cpp
+    .. code-block:: cpp
 
         GooseEYE::Ensemble ensemble({51, 51});
 
@@ -76,4 +78,6 @@ The individual functions are simply a wrapper around the ``GooseFEM::Ensemble`` 
             // normalisation (number of measurements)
             ensemble.norm();
 
-Using the individual images wrapper, all these steps are combined in a single function call with almost the same arguments. The only limitation is the the raw data and normalization cannot be accessed.
+Using the individual images wrapper,
+all these steps are combined in a single function call with almost the same arguments.
+The only limitation is the the raw data and normalization cannot be accessed.
