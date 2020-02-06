@@ -24,11 +24,11 @@ foreach(testsourcefile ${APP_SOURCES})
         xtensor::optimize
         xtensor::use_xsimd)
 
-    if (WARNINGS)
+    if(WARNINGS)
         target_link_libraries(${testname} PRIVATE GooseEYE::compiler_warnings)
     endif()
 
-    if (ASSERT)
+    if(ASSERT)
         target_link_libraries(${testname} PRIVATE GooseEYE::debug)
     endif()
 
