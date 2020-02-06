@@ -19,18 +19,13 @@
 include(CMakeFindDependencyMacro)
 
 # Define target "GooseEYE"
-# ========================
 
 if(NOT TARGET GooseEYE)
     include("${CMAKE_CURRENT_LIST_DIR}/GooseEYETargets.cmake")
-    get_target_property(
-        GooseEYE_INCLUDE_DIRS
-        GooseEYE
-        INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(GooseEYE_INCLUDE_DIRS GooseEYE INTERFACE_INCLUDE_DIRECTORIES)
 endif()
 
 # Find dependencies
-# =================
 
 find_dependency(xtensor)
 
@@ -47,10 +42,7 @@ if(NOT TARGET GooseEYE::compiler_warnings)
         set_property(
             TARGET GooseEYE::compiler_warnings
             PROPERTY INTERFACE_COMPILE_OPTIONS
-            -Wall
-            -Wextra
-            -pedantic
-            -Wno-unknown-pragmas)
+            -Wall -Wextra -pedantic -Wno-unknown-pragmas)
     endif()
 endif()
 
@@ -71,6 +63,5 @@ if(NOT TARGET GooseEYE::debug)
     set_property(
         TARGET GooseEYE::debug
         PROPERTY INTERFACE_COMPILE_DEFINITIONS
-        XTENSOR_ENABLE_ASSERT
-        GOOSEEYE_ENABLE_ASSERT)
+        XTENSOR_ENABLE_ASSERT GOOSEEYE_ENABLE_ASSERT)
 endif()

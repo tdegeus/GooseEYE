@@ -19,10 +19,10 @@ target_link_libraries(main PRIVATE
     xtensor::optimize
     xtensor::use_xsimd)
 
-if (WARNINGS)
+if(WARNINGS)
     target_link_libraries(main PRIVATE GooseEYE::compiler_warnings)
 endif()
 
-if (ASSERT)
+if(ASSERT)
     target_link_libraries(main PRIVATE GooseEYE::debug)
 endif()
