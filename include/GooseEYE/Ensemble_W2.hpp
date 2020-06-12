@@ -24,11 +24,11 @@ Ensemble::W2(const xt::xarray<T>& f, const xt::xarray<T>& g, const xt::xarray<in
     // lock statistic
     m_stat = Type::W2;
 
-    // padding default not periodic: mask padded items
+    // not periodic (default): mask padded items
     xt::pad_mode pad_mode = xt::pad_mode::constant;
     int mask_value = 1;
 
-    // padding optionally periodic: unmask padded items
+    // periodic: unmask padded items
     if (m_periodic) {
         pad_mode = xt::pad_mode::periodic;
         mask_value = 0;

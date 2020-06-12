@@ -29,10 +29,10 @@ inline void Ensemble::W2c(
     // lock statistic
     m_stat = Type::W2c;
 
-    // padding default not periodic: mask padded items
+    // not periodic (default): mask padded items
     xt::pad_mode pad_mode = xt::pad_mode::constant;
 
-    // padding optionally periodic: unmask padded items
+    // periodic: unmask padded items
     if (m_periodic) {
         pad_mode = xt::pad_mode::periodic;
     }

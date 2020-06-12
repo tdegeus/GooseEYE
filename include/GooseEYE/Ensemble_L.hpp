@@ -20,10 +20,10 @@ inline void Ensemble::L(const xt::xarray<T>& f, path_mode mode)
     // lock statistics
     m_stat = Type::L;
 
-    // padding default not periodic: mask padded items
+    // not periodic (default): mask padded items
     xt::pad_mode pad_mode = xt::pad_mode::constant;
 
-    // padding optionally periodic: unmask padded items
+    // periodic: unmask padded items
     if (m_periodic) {
         pad_mode = xt::pad_mode::periodic;
     }

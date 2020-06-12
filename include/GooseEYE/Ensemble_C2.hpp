@@ -28,11 +28,11 @@ inline void Ensemble::C2(
     // lock statistic
     m_stat = Type::C2;
 
-    // padding default not periodic: mask padded items
+    // not periodic (default): mask padded items
     xt::pad_mode pad_mode = xt::pad_mode::constant;
     int mask_value = 1;
 
-    // padding optionally periodic: unmask padded items
+    // periodic: unmask padded items
     if (m_periodic) {
         pad_mode = xt::pad_mode::periodic;
         mask_value = 0;
