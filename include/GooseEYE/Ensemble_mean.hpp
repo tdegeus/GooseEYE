@@ -14,7 +14,7 @@ namespace GooseEYE {
 template <class T>
 void Ensemble::mean(const xt::xarray<T>& f)
 {
-    GOOSEEYE_ASSERT(m_Shape == std::vector<size_t>(MAX_DIM, 1));
+    GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1));
     GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
 
     m_stat = Type::mean;
@@ -29,7 +29,7 @@ void Ensemble::mean(const xt::xarray<T>& f, const xt::xarray<int>& fmask)
 {
     GOOSEEYE_ASSERT(f.shape() == fmask.shape());
     GOOSEEYE_ASSERT(xt::all(xt::equal(fmask, 0) || xt::equal(fmask, 1)));
-    GOOSEEYE_ASSERT(m_Shape == std::vector<size_t>(MAX_DIM, 1));
+    GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1));
     GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
 
     m_stat = Type::mean;

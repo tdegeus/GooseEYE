@@ -11,7 +11,7 @@
 
 namespace GooseEYE {
 
-xt::xarray<int> dummy_circles(
+inline xt::xarray<int> dummy_circles(
     const std::vector<size_t>& shape,
     const xt::xtensor<int,1>& row,
     const xt::xtensor<int,1>& col,
@@ -55,7 +55,7 @@ xt::xarray<int> dummy_circles(
     return out;
 }
 
-xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic)
+inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic)
 {
     GOOSEEYE_ASSERT(shape.size() == 2);
 

@@ -4,12 +4,8 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-// =================================================================================================
-
 TEST_CASE("GooseFEM::Clusters", "clusters.hpp")
 {
-
-// -------------------------------------------------------------------------------------------------
 
 SECTION("relabel_map")
 {
@@ -32,8 +28,6 @@ SECTION("relabel_map")
   )));
 }
 
-// -------------------------------------------------------------------------------------------------
-
 SECTION("dilate - 1d")
 {
   xt::xarray<int> I = xt::zeros<int>({5});
@@ -49,8 +43,6 @@ SECTION("dilate - 1d")
 
   REQUIRE(xt::all(xt::equal(D, d)));
 }
-
-// -------------------------------------------------------------------------------------------------
 
 SECTION("dilate - 2d - 1")
 {
@@ -69,8 +61,6 @@ SECTION("dilate - 2d - 1")
 
   REQUIRE(xt::all(xt::equal(D, d)));
 }
-
-// -------------------------------------------------------------------------------------------------
 
 SECTION("dilate - 2d - 2")
 {
@@ -98,8 +88,6 @@ SECTION("dilate - 2d - 2")
   REQUIRE(xt::all(xt::equal(D, d)));
 }
 
-// -------------------------------------------------------------------------------------------------
-
 SECTION("centers")
 {
   xt::xarray<size_t> I = xt::zeros<size_t>({5, 5});
@@ -121,45 +109,5 @@ SECTION("centers")
 
   REQUIRE(xt::all(xt::equal(C, c)));
 }
-
-// -------------------------------------------------------------------------------------------------
-
-}
-
-// =================================================================================================
-
-TEST_CASE("GooseEYE::Ensemble", "Ensemble.hpp")
-{
-
-// -------------------------------------------------------------------------------------------------
-
-SECTION("L")
-{
-  xt::xarray<int> I = xt::zeros<int>({5, 5});
-  I(2,1) = 1;
-  I(2,2) = 1;
-  I(2,3) = 1;
-
-  xt::xarray<double> O = GooseEYE::L({7, 7}, I, false);
-
-  // Check if middle pixel is equal to phase probability
-  REQUIRE(O(3,3) == 0.12);
-
-  // Check if correct number of pixels are non-zero
-  REQUIRE(xt::nonzero(O)[0].size() == 5);
-
-  // Remove midlle pixel, no pixels connected anymore
-  I(2,2) = 0;
-
-  O = GooseEYE::L({7,7}, I, false);
-
-  // Check if middle pixel is equal to phase probability
-  REQUIRE(O(3,3) == 0.08);
-
-  // Check if correct number of pixels are non-zero
-  REQUIRE(xt::nonzero(O)[0].size() == 1);
-}
-
-// -------------------------------------------------------------------------------------------------
 
 }

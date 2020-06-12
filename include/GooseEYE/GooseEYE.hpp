@@ -11,7 +11,7 @@
 
 namespace GooseEYE {
 
-xt::xtensor<int,2> path(const xt::xtensor<int,1>& x0, const xt::xtensor<int,1>& x1, path_mode mode)
+inline xt::xtensor<int,2> path(const xt::xtensor<int,1>& x0, const xt::xtensor<int,1>& x1, path_mode mode)
 {
     if (mode == path_mode::Bresenham) {
         return detail::path::bresenham(x0, x1);
@@ -24,25 +24,25 @@ xt::xtensor<int,2> path(const xt::xtensor<int,1>& x0, const xt::xtensor<int,1>& 
     }
 }
 
-xt::xarray<double> distance(const std::vector<size_t>& roi)
+inline xt::xarray<double> distance(const std::vector<size_t>& roi)
 {
     Ensemble ensemble(roi);
     return ensemble.distance();
 }
 
-xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim)
+inline xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim)
 {
     Ensemble ensemble(roi);
     return ensemble.distance(dim);
 }
 
-xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h)
+inline xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h)
 {
     Ensemble ensemble(roi);
     return ensemble.distance(h);
 }
 
-xt::xarray<double> distance(
+inline xt::xarray<double> distance(
     const std::vector<size_t>& roi,
     const std::vector<double>& h,
     size_t dim)
@@ -52,7 +52,7 @@ xt::xarray<double> distance(
 }
 
 template <class T>
-xt::xarray<double> S2(
+inline xt::xarray<double> S2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     const xt::xarray<T>& g,
@@ -64,7 +64,7 @@ xt::xarray<double> S2(
 }
 
 template <class T>
-xt::xarray<double> S2(
+inline xt::xarray<double> S2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     const xt::xarray<T>& g,
@@ -77,7 +77,7 @@ xt::xarray<double> S2(
     return ensemble.result();
 }
 
-xt::xarray<double> C2(
+inline xt::xarray<double> C2(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& f,
     const xt::xarray<int>& g,
@@ -88,7 +88,7 @@ xt::xarray<double> C2(
     return ensemble.result();
 }
 
-xt::xarray<double> C2(
+inline xt::xarray<double> C2(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& f,
     const xt::xarray<int>& g,
@@ -102,7 +102,7 @@ xt::xarray<double> C2(
 }
 
 template <class T>
-xt::xarray<double> W2(
+inline xt::xarray<double> W2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& w,
     const xt::xarray<T>& f,
@@ -114,7 +114,7 @@ xt::xarray<double> W2(
 }
 
 template <class T>
-xt::xarray<double> W2(
+inline xt::xarray<double> W2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& w,
     const xt::xarray<T>& f,
@@ -127,7 +127,7 @@ xt::xarray<double> W2(
 }
 
 template <class T>
-xt::xarray<double> W2c(
+inline xt::xarray<double> W2c(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& clusters,
     const xt::xarray<int>& centers,
@@ -141,7 +141,7 @@ xt::xarray<double> W2c(
 }
 
 template <class T>
-xt::xarray<double> W2c(
+inline xt::xarray<double> W2c(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& clusters,
     const xt::xarray<int>& centers,
@@ -156,7 +156,7 @@ xt::xarray<double> W2c(
 }
 
 template <class T>
-xt::xarray<double> heightheight(
+inline xt::xarray<double> heightheight(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     bool periodic)
@@ -167,7 +167,7 @@ xt::xarray<double> heightheight(
 }
 
 template <class T>
-xt::xarray<double> heightheight(
+inline xt::xarray<double> heightheight(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask,
@@ -179,7 +179,7 @@ xt::xarray<double> heightheight(
 }
 
 template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-xt::xarray<double> L(
+inline xt::xarray<double> L(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     bool periodic,

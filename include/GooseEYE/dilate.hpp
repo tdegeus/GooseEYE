@@ -15,7 +15,7 @@ namespace GooseEYE {
 namespace detail {
 
 template <class S, class T, class U>
-void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
+inline void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
 {
     for (size_t axis = 0; axis < Shape.size(); ++axis) {
         if (Shape[axis] <= 1) {
@@ -50,7 +50,7 @@ void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
 // ---
 
 template <class S, class T, class U>
-void periodic_copy_below(S&& F, const T& Shape, const U& Pad)
+inline void periodic_copy_below(S&& F, const T& Shape, const U& Pad)
 {
     for (size_t axis = 0; axis < Shape.size(); ++axis) {
         if (Shape[axis] <= 1) {
@@ -83,7 +83,7 @@ void periodic_copy_below(S&& F, const T& Shape, const U& Pad)
 // --
 
 template <class S, class T, class U>
-void periodic_copy(S&& F, const T& Shape, const U& Pad)
+inline void periodic_copy(S&& F, const T& Shape, const U& Pad)
 {
     periodic_copy_above(F, Shape, Pad);
     periodic_copy_below(F, Shape, Pad);
@@ -96,7 +96,7 @@ template <
     class S,
     std::enable_if_t<std::is_integral<T>::value, int>,
     std::enable_if_t<std::is_integral<S>::value, int>>
-xt::xarray<T> dilate(
+inline xt::xarray<T> dilate(
     const xt::xarray<T>& f,
     const xt::xarray<S>& kernel,
     const xt::xtensor<size_t, 1>& iterations,
@@ -197,7 +197,7 @@ xt::xarray<T> dilate(
 }
 
 template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-xt::xarray<T> dilate(
+inline xt::xarray<T> dilate(
     const xt::xarray<T>& f,
     const xt::xtensor<size_t,
     1>& iterations,
@@ -207,7 +207,7 @@ xt::xarray<T> dilate(
 }
 
 template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-xt::xarray<T> dilate(const xt::xarray<T>& f, size_t iterations, bool periodic)
+inline xt::xarray<T> dilate(const xt::xarray<T>& f, size_t iterations, bool periodic)
 {
     xt::xtensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
     return dilate(f, kernel::nearest(f.dimension()), iter, periodic);
@@ -218,7 +218,7 @@ template <
     class S,
     std::enable_if_t<std::is_integral<T>::value, int>,
     std::enable_if_t<std::is_integral<S>::value, int>>
-xt::xarray<T> dilate(
+inline xt::xarray<T> dilate(
     const xt::xarray<T>& f,
     const xt::xarray<S>& kernel,
     size_t iterations,

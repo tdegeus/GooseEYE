@@ -12,6 +12,22 @@
 namespace GooseEYE {
 namespace detail {
 
+/*
+Get the axis after converting an array to 3d
+See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=atleast_Nd
+
+@arg rank : Rank of the input array.
+@arg axis : Axis along the input array.
+@ret Axis along the 3d-equivalent-array.
+*/
+inline size_t atleast3d_axis(size_t rank, size_t axis)
+{
+    size_t N = 3;
+    size_t end = static_cast<size_t>(std::round(double(N - rank) / double(N)));
+    return axis + end;
+}
+
+// TODO: remove
 inline std::vector<size_t> as_dim(
     const size_t ndim,
     const std::vector<size_t>& shape,
@@ -28,6 +44,7 @@ inline std::vector<size_t> as_dim(
     return out;
 }
 
+// TODO: remove
 inline std::vector<std::vector<size_t>> as_dim(
     const size_t ndim,
     const std::vector<std::vector<size_t>>& shape,
@@ -53,6 +70,7 @@ inline std::vector<std::vector<size_t>> as_dim(
     return out;
 }
 
+// TODO: remove
 template <class T>
 inline std::vector<size_t> shape_as_dim(const size_t ndim, const xt::xarray<T>& f, size_t prepend)
 {
@@ -60,28 +78,40 @@ inline std::vector<size_t> shape_as_dim(const size_t ndim, const xt::xarray<T>& 
     return as_dim(ndim, shape, prepend);
 }
 
-template <class T>
-inline std::vector<size_t> shape(const xt::xarray<T>& f)
+template <class E>
+inline std::vector<size_t> shape(E&& e)
 {
-    return std::vector<size_t>(f.shape().cbegin(), f.shape().cend());
+    return std::vector<size_t>(e.shape().cbegin(), e.shape().cend());
 }
 
+
+// TODO: Remove ?
+/*
+Compute "shape / 2".
+
+@arg shape : A vector.
+@ret The floored-result.
+*/
 inline std::vector<size_t> half_shape(const std::vector<size_t>& shape)
 {
-    std::vector<size_t> out = shape;
+    std::vector<size_t> ret = shape;
 
-    for (size_t i = 0; i < out.size(); ++i) {
-        if (out[i] % 2 == 0) {
-            out[i] = out[i] / 2;
-        }
-        else {
-            out[i] = (out[i] - 1) / 2;
-        }
+    for (size_t i = 0; i < ret.size(); ++i) {
+        ret[i] = (shape[i] - shape[i] % 2) / 2;
     }
 
-    return out;
+    return ret;
 }
 
+/*
+Compute padding-width for a certain kernel.
+This is the number of voxels by which a kernel will overlap along each axis when it is
+convoluted over an image.
+The output is {{begin_1, end_1}, {begin_2, end_2}, ... {begin_N,  end_N}}
+
+@arg shape : Shape of the kernel.
+@ret Pad-width.
+*/
 inline std::vector<std::vector<size_t>> pad_width(const std::vector<size_t>& shape)
 {
     std::vector<std::vector<size_t>> pad(shape.size(), std::vector<size_t>(2));
@@ -100,16 +130,26 @@ inline std::vector<std::vector<size_t>> pad_width(const std::vector<size_t>& sha
     return pad;
 }
 
+/*
+Overload to compute directly on the object itself, not on its shape.
+*/
 template <class T>
-inline std::vector<std::vector<size_t>> pad_width(const xt::xarray<T>& f)
+inline std::vector<std::vector<size_t>> pad_width(const xt::xarray<T>& a)
 {
-    std::vector<size_t> shape(f.shape().cbegin(), f.shape().cend());
+    std::vector<size_t> shape(a.shape().cbegin(), a.shape().cend());
     return pad_width(shape);
 }
 
-// https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
+/*
+Compute pixel-path using the Bresenham-algorithm.
+See: https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
+
+@arg xa : Pixel coordinate (e.g. {0, 0, 0}).
+@arg xb : Pixel coordinate (e.g. {10, 5, 0}).
+@ret The path: the coordinate of one pixel per row.
+*/
 namespace path {
-xt::xtensor<int,2> bresenham(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
+inline xt::xtensor<int,2> bresenham(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;
@@ -180,8 +220,15 @@ xt::xtensor<int,2> bresenham(const xt::xtensor<int,1>& xa, const xt::xtensor<int
 }
 } // namespace path
 
+/*
+Compute pixel-path.
+
+@arg xa : Pixel coordinate (e.g. {0, 0, 0}).
+@arg xb : Pixel coordinate (e.g. {10, 5, 0}).
+@ret The path: the coordinate of one pixel per row.
+*/
 namespace path {
-xt::xtensor<int,2> actual(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
+inline xt::xtensor<int,2> actual(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;
@@ -271,8 +318,15 @@ xt::xtensor<int,2> actual(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>
 }
 } // namespace path
 
+/*
+Compute pixel-path.
+
+@arg xa : Pixel coordinate (e.g. {0, 0, 0}).
+@arg xb : Pixel coordinate (e.g. {10, 5, 0}).
+@ret The path: the coordinate of one pixel per row.
+*/
 namespace path {
-xt::xtensor<int,2> full(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
+inline xt::xtensor<int,2> full(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;

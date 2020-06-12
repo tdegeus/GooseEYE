@@ -8,7 +8,7 @@
 #define GOOSEEYE_H
 
 #include "config.h"
-#include "detail.h"
+#include "detail.hpp"
 
 namespace GooseEYE {
 
@@ -22,14 +22,18 @@ Return kernel with nearest neighbours.
 @arg ndim : Number of dimensions (rank).
 @ret The kernel.
 */
-xt::xarray<int> nearest(size_t ndim);
+inline xt::xarray<int> nearest(size_t ndim);
 
 } // namespace kernel
 
 /*
 Different methods to compute a pixel-path.
 */
-enum class path_mode { Bresenham, actual, full };
+enum class path_mode {
+    Bresenham,
+    actual,
+    full
+};
 
 /*
 Compute a path between two pixels.
@@ -38,7 +42,7 @@ Compute a path between two pixels.
 @opt mode : Method to use (see "path_mode").
 @ret The path: the coordinate of one pixel per row.
 */
-xt::xtensor<int,2> path(
+inline xt::xtensor<int,2> path(
     const xt::xtensor<int,1>& x0,
     const xt::xtensor<int,1>& x1,
     path_mode mode = path_mode::Bresenham);
@@ -49,7 +53,7 @@ Dummy image with circles. The positions and radii of the circles are randomly ge
 @opt periodic : Switch to assume image periodic.
 @ret The dummy image.
 */
-xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
+inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
 
 /*
 Dummy image with circles.
@@ -60,7 +64,7 @@ Dummy image with circles.
 @opt periodic : Switch to assume image periodic.
 @ret The dummy image.
 */
-xt::xarray<int> dummy_circles(
+inline xt::xarray<int> dummy_circles(
     const std::vector<size_t>& shape,
     const xt::xtensor<int,1>& row,
     const xt::xtensor<int,1>& col,
@@ -81,7 +85,7 @@ template <
     class S,
     std::enable_if_t<std::is_integral<T>::value, int> = 0,
     std::enable_if_t<std::is_integral<S>::value, int> = 0>
-xt::xarray<T> dilate(
+inline xt::xarray<T> dilate(
     const xt::xarray<T>& f,
     const xt::xarray<S>& kernel,
     const xt::xtensor<size_t,1>& iterations,
@@ -92,7 +96,7 @@ Dilate image. Select "kernel::nearest" as kernel.
 See above for parameters.
 */
 template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-xt::xarray<T> dilate(
+inline xt::xarray<T> dilate(
     const xt::xarray<T>& f,
     const xt::xtensor<size_t,1>& iterations,
     bool periodic = true);
@@ -106,7 +110,7 @@ template <
     class S,
     std::enable_if_t<std::is_integral<T>::value, int> = 0,
     std::enable_if_t<std::is_integral<S>::value, int> = 0>
-xt::xarray<T> dilate(
+inline xt::xarray<T> dilate(
     const xt::xarray<T>& f,
     const xt::xarray<S>& kernel,
     size_t iterations = 1,
@@ -117,7 +121,7 @@ Dilate image. Fixed number of iterations for all labels. Select "kernel::nearest
 See above for parameters.
 */
 template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-xt::xarray<T> dilate(
+inline xt::xarray<T> dilate(
     const xt::xarray<T>& f,
     size_t iterations = 1,
     bool periodic = true);
@@ -253,11 +257,11 @@ public:
 
     /*
     Get the relative distance of each pixel in the 'region-of-interest' to its center,
-    along a dimension (distance can now be positive and negative).
-    @arg dim : Select dimension.
+    along a specific axis (distance can now be positive and negative).
+    @arg axis : Select axis.
     @ret The distances along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> distance(size_t dim) const;
+    xt::xarray<double> distance(size_t axis) const;
 
     /*
     Get the relative distance of each pixel in the 'region-of-interest' to its center.
@@ -269,13 +273,13 @@ public:
 
     /*
     Get the relative distance of each pixel in the 'region-of-interest' to its center,
-    along a dimension (distance can now be positive and negative).
+    along a specific axis (distance can now be positive and negative).
     Convert the distance to physical dimensions.
     @arg h : The physical dimensions of one pixel (in each direction).
-    @arg dim : Select dimension.
+    @arg axis : Select axis.
     @ret The distances along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> distance(const std::vector<double>& h, size_t dim) const;
+    xt::xarray<double> distance(const std::vector<double>& h, size_t axis) const;
 
     /*
     Add realization to arithmetic mean.
@@ -404,46 +408,45 @@ private:
     // Switch to compute the variance (for the entire ensemble).
     bool m_variance;
 
-    // Raw (not normalized) result, and normalization.
+    // Raw (not normalized) result, and normalization:
     // - sum of the first moment: x_1 + x_2 + ...
-    xt::xarray<double> m_first; // TODO: make xt::xtensor<double,3>
+    xt::xtensor<double,3> m_first;
     // - sum of the second moment: x_1^2 + x_2^2 + ...
-    xt::xarray<double> m_second; // TODO: make xt::xtensor<double,3>
+    xt::xtensor<double,3> m_second;
     // - number of measurements per pixel
-    xt::xarray<double> m_norm; // TODO: make xt::xtensor<double,3>
+    xt::xtensor<double,3> m_norm;
 
-    // Shape of the ROI.
-    // - the original input
+    // Shape of the region-of-interest, as specified.
+    std::vector<size_t> m_shape_orig;
+
+    // 3d equivalent of "m_shape_orig".
     std::vector<size_t> m_shape;
-    // - pseudo 3-d equivalent
-    std::vector<size_t> m_Shape; // TODO: rename or remove
 
-    // Padding size
+    // Pad size (3d).
     std::vector<std::vector<size_t>> m_pad;
-    std::vector<std::vector<size_t>> m_Pad; // pseudo 3-d equivalent
 };
 
 // ---------------------------------------------------------
 // Wrapper functions to compute the statistics for one image
 // ---------------------------------------------------------
 
-xt::xarray<double> distance(const std::vector<size_t>& roi);
+inline xt::xarray<double> distance(const std::vector<size_t>& roi);
 
-xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim);
+inline xt::xarray<double> distance(const std::vector<size_t>& roi, size_t axis);
 
-xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h);
+inline xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h);
 
-xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t dim);
+inline xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t axis);
 
 template <class T>
-xt::xarray<double> S2(
+inline xt::xarray<double> S2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     const xt::xarray<T>& g,
     bool periodic = true);
 
 template <class T>
-xt::xarray<double> S2(
+inline xt::xarray<double> S2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     const xt::xarray<T>& g,
@@ -451,13 +454,13 @@ xt::xarray<double> S2(
     const xt::xarray<int>& gmask,
     bool periodic = true);
 
-xt::xarray<double> C2(
+inline xt::xarray<double> C2(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& f,
     const xt::xarray<int>& g,
     bool periodic = true);
 
-xt::xarray<double> C2(
+inline xt::xarray<double> C2(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& f,
     const xt::xarray<int>& g,
@@ -466,14 +469,14 @@ xt::xarray<double> C2(
     bool periodic = true);
 
 template <class T>
-xt::xarray<double> W2(
+inline xt::xarray<double> W2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& w,
     const xt::xarray<T>& f,
     bool periodic = true);
 
 template <class T>
-xt::xarray<double> W2(
+inline xt::xarray<double> W2(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& w,
     const xt::xarray<T>& f,
@@ -481,7 +484,7 @@ xt::xarray<double> W2(
     bool periodic = true);
 
 template <class T>
-xt::xarray<double> W2c(
+inline xt::xarray<double> W2c(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& clusters,
     const xt::xarray<int>& centers,
@@ -490,7 +493,7 @@ xt::xarray<double> W2c(
     bool periodic = true);
 
 template <class T>
-xt::xarray<double> W2c(
+inline xt::xarray<double> W2c(
     const std::vector<size_t>& roi,
     const xt::xarray<int>& clusters,
     const xt::xarray<int>& centers,
@@ -500,20 +503,20 @@ xt::xarray<double> W2c(
     bool periodic = true);
 
 template <class T>
-xt::xarray<double> heightheight(
+inline xt::xarray<double> heightheight(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     bool periodic = true);
 
 template <class T>
-xt::xarray<double> heightheight(
+inline xt::xarray<double> heightheight(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     const xt::xarray<int>& fmask,
     bool periodic = true);
 
 template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-xt::xarray<double> L(
+inline xt::xarray<double> L(
     const std::vector<size_t>& roi,
     const xt::xarray<T>& f,
     bool periodic = true,
@@ -531,7 +534,6 @@ xt::xarray<double> L(
 #include "Ensemble_mean.hpp"
 #include "GooseEYE.hpp"
 #include "clusters.hpp"
-#include "detail.hpp"
 #include "dilate.hpp"
 #include "dummy_circles.hpp"
 #include "kernel.hpp"

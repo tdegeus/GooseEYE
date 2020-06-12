@@ -12,133 +12,120 @@
 namespace GooseEYE {
 
 inline Ensemble::Ensemble(const std::vector<size_t>& roi, bool periodic, bool variance)
-    : m_periodic(periodic), m_variance(variance), m_shape(roi)
+    : m_periodic(periodic), m_variance(variance), m_shape_orig(roi)
 {
-    GOOSEEYE_ASSERT(m_shape.size() <= MAX_DIM);
+    GOOSEEYE_ASSERT(m_shape_orig.size() <= MAX_DIM);
 
+    m_first = xt::atleast_3d(xt::zeros<double>(m_shape_orig));
+    m_second = zeros_like(m_first);
+    m_norm = zeros_like(m_first);
+    m_shape = std::vector<size_t>(m_first.shape().begin(), m_first.shape().end());
     m_pad = detail::pad_width(m_shape);
-    m_Shape = detail::as_dim(MAX_DIM, m_shape, 1);
-    m_Pad = detail::as_dim(MAX_DIM, m_pad, 0);
-
-    m_first = xt::zeros<double>(m_Shape);
-    m_second = xt::zeros<double>(m_Shape);
-    m_norm = xt::zeros<double>(m_Shape);
 }
 
 inline xt::xarray<double> Ensemble::result() const
 {
-    xt::xarray<double> I = xt::ones<double>(m_norm.shape());
-    xt::xarray<double> norm = xt::where(m_norm <= 0, I, m_norm);
-    xt::xarray<double> out = m_first / norm;
-    out.reshape(m_shape);
+    xt::xarray<double> ret = m_first / xt::where(m_norm <= 0, 1.0, m_norm);
 
     if (m_stat == Type::heightheight) {
-        out = xt::pow(out, 0.5);
+        ret = xt::pow(ret, 0.5);
     }
 
-    return out;
+    return ret.reshape(m_shape_orig);
 }
 
 inline xt::xarray<double> Ensemble::variance() const
 {
-    xt::xarray<double> I = xt::ones<double>(m_norm.shape());
-    xt::xarray<double> norm = xt::where(m_norm <= 0, I, m_norm);
-    xt::xarray<double> out = (m_second / norm - xt::pow(m_first / norm, 2.0)) * norm / (norm - 1);
-    out.reshape(m_shape);
+    xt::xtensor<double,3> norm = xt::where(m_norm <= 0, 1.0, m_norm);
+    xt::xarray<double> ret = (m_second / norm - xt::pow(m_first / norm, 2.0)) * norm / (norm - 1);
 
     if (m_stat == Type::heightheight) {
-        out = xt::pow(out, 0.5);
+        ret = xt::pow(ret, 0.5);
     }
     else if (m_stat != Type::mean) {
         throw std::runtime_error("Not implemented");
     }
 
-    return out;
+    return ret.reshape(m_shape_orig);
 }
 
 inline xt::xarray<double> Ensemble::data_first() const
 {
-    xt::xarray<double> out = m_first;
-    out.reshape(m_shape);
-    return out;
+    xt::xarray<double> ret = m_first;
+    return ret.reshape(m_shape_orig);
 }
 
 inline xt::xarray<double> Ensemble::data_second() const
 {
-    xt::xarray<double> out = m_second;
-    out.reshape(m_shape);
-    return out;
+    xt::xarray<double> ret = m_second;
+    return ret.reshape(m_shape_orig);
 }
 
 inline xt::xarray<double> Ensemble::norm() const
 {
-    xt::xarray<double> out = m_norm;
-    out.reshape(m_shape);
-    return out;
+    xt::xarray<double> ret = m_norm;
+    return ret.reshape(m_shape_orig);
 }
 
-inline xt::xarray<double> Ensemble::distance(size_t dim) const
+inline xt::xarray<double> Ensemble::distance(size_t axis) const
 {
-    GOOSEEYE_ASSERT(dim < m_shape.size());
+    GOOSEEYE_ASSERT(axis < m_shape_orig.size());
+    axis = detail::atleast3d_axis(m_shape_orig.size(), axis);
 
-    dim += MAX_DIM - m_shape.size();
+    xt::xtensor<double,3> ret = xt::empty<double>(m_shape);
 
-    xt::xarray<double> out = xt::empty<double>(m_Shape);
+    double start = -1 * static_cast<double>(m_pad[axis][0]);
+    double stop = static_cast<double>(m_pad[axis][1]);
 
-    double start = -1 * static_cast<double>(m_Pad[dim][0]);
-    double stop = static_cast<double>(m_Pad[dim][1]);
+    xt::xarray<double> D = xt::linspace<double>(start, stop, m_shape[axis]);
 
-    xt::xarray<double> D = xt::linspace<double>(start, stop, m_Shape[dim]);
-
-    for (size_t h = 0; h < m_Shape[0]; ++h) {
-        for (size_t i = 0; i < m_Shape[1]; ++i) {
-            for (size_t j = 0; j < m_Shape[2]; ++j) {
-                if (dim == 0) {
-                    out(h, i, j) = D(h);
+    for (size_t h = 0; h < m_shape[0]; ++h) {
+        for (size_t i = 0; i < m_shape[1]; ++i) {
+            for (size_t j = 0; j < m_shape[2]; ++j) {
+                if (axis == 0) {
+                    ret(h, i, j) = D(h);
                 }
-                else if (dim == 1) {
-                    out(h, i, j) = D(i);
+                else if (axis == 1) {
+                    ret(h, i, j) = D(i);
                 }
-                else if (dim == 2) {
-                    out(h, i, j) = D(j);
+                else if (axis == 2) {
+                    ret(h, i, j) = D(j);
                 }
             }
         }
     }
 
-    out.reshape(m_shape);
-
-    return out;
+    return ret.reshape(m_shape_orig);
 }
 
 inline xt::xarray<double> Ensemble::distance() const
 {
-    xt::xarray<double> out = xt::zeros<double>(m_shape);
+    xt::xarray<double> ret = xt::zeros<double>(m_shape_orig);
 
-    for (size_t i = 0; i < m_shape.size(); ++i) {
-        out += xt::pow(this->distance(i), 2.0);
+    for (size_t i = 0; i < m_shape_orig.size(); ++i) {
+        ret += xt::pow(this->distance(i), 2.0);
     }
 
-    return xt::pow(out, 0.5);
+    return xt::pow(ret, 0.5);
 }
 
 inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h) const
 {
-    GOOSEEYE_ASSERT(m_shape.size() == h.size());
+    GOOSEEYE_ASSERT(m_shape_orig.size() == h.size());
 
-    xt::xarray<double> out = xt::zeros<double>(m_shape);
+    xt::xarray<double> ret = xt::zeros<double>(m_shape_orig);
 
-    for (size_t i = 0; i < m_shape.size(); ++i) {
-        out += xt::pow(this->distance(i) * h[i], 2.0);
+    for (size_t i = 0; i < m_shape_orig.size(); ++i) {
+        ret += xt::pow(this->distance(i) * h[i], 2.0);
     }
 
-    return xt::pow(out, .5);
+    return xt::pow(ret, 0.5);
 }
 
-inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h, size_t dim) const
+inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h, size_t axis) const
 {
-    GOOSEEYE_ASSERT(m_shape.size() == h.size());
-    return this->distance(dim) * h[dim];
+    GOOSEEYE_ASSERT(m_shape_orig.size() == h.size());
+    return this->distance(axis) * h[axis];
 }
 
 } // namespace GooseEYE

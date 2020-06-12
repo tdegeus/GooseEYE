@@ -12,7 +12,7 @@
 namespace GooseEYE {
 namespace kernel {
 
-xt::xarray<int> nearest(size_t ndim)
+inline xt::xarray<int> nearest(size_t ndim)
 {
     GOOSEEYE_ASSERT(ndim > 0 && ndim <= 3);
 
