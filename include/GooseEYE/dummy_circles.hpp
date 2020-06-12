@@ -1,23 +1,15 @@
-/* =================================================================================================
+/*
 
 (c - GPLv3) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | github.com/tdegeus/GooseEYE
 
-================================================================================================= */
+*/
 
 #ifndef GOOSEEYE_DUMMY_CIRCLES_HPP
 #define GOOSEEYE_DUMMY_CIRCLES_HPP
 
-// =================================================================================================
-
 #include "config.h"
 
-// =================================================================================================
-
 namespace GooseEYE {
-
-// =================================================================================================
-// create a dummy image with circles at position "row","col" with radius "r"
-// =================================================================================================
 
 xt::xarray<int> dummy_circles(
     const std::vector<size_t>& shape,
@@ -32,17 +24,12 @@ xt::xarray<int> dummy_circles(
 
     xt::xarray<int> out = xt::zeros<int>(shape);
 
-    if (periodic)
-    {
-        for (size_t i = 0; i < row.size(); ++i)
-        {
-            for (int di = -r(i); di <= r(i); ++di)
-            {
-                for (int dj = -r(i); dj <= r(i); ++dj)
-                {
+    if (periodic) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            for (int di = -r(i); di <= r(i); ++di) {
+                for (int dj = -r(i); dj <= r(i); ++dj) {
                     int dr = (int)(ceil(pow((double)(pow(di, 2) + pow(dj, 2)), 0.5)));
-                    if (dr < r(i))
-                    {
+                    if (dr < r(i)) {
                         out.periodic(row(i) + di, col(i) + dj) = 1;
                     }
                 }
@@ -52,18 +39,13 @@ xt::xarray<int> dummy_circles(
         return out;
     }
 
-    for (size_t i = 0; i < row.size(); ++i)
-    {
-        for (int di = -r(i); di <= r(i); ++di)
-        {
-            for (int dj = -r(i); dj <= r(i); ++dj)
-            {
-                if (out.in_bounds(row(i) + di, col(i) + dj))
-                {
+    for (size_t i = 0; i < row.size(); ++i) {
+        for (int di = -r(i); di <= r(i); ++di) {
+            for (int dj = -r(i); dj <= r(i); ++dj) {
+                if (out.in_bounds(row(i) + di, col(i) + dj)) {
                     int dr = (int)(ceil(pow((double)(pow(di, 2) + pow(dj, 2)), 0.5)));
-                    if (dr < r(i))
-                    {
-                        out(row(i)+di, col(i)+dj) = 1;
+                    if (dr < r(i)) {
+                        out(row(i) + di, col(i) + dj) = 1;
                     }
                 }
             }
@@ -72,11 +54,6 @@ xt::xarray<int> dummy_circles(
 
     return out;
 }
-
-// =================================================================================================
-// create a dummy image with a default number of circles
-// at random positions and random radii
-// =================================================================================================
 
 xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic)
 {
@@ -94,10 +71,8 @@ xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic)
     xt::xtensor<int,1> r = xt::empty<int>({M * N});
 
     // define regular grid of circles
-    for (size_t i = 0; i < N; i++)
-    {
-        for (size_t j = 0; j < M; j++)
-        {
+    for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < M; j++) {
             row[i * M + j] = (int)((double)i * (double)shape[0] / (double)N);
             col[i * M + j] = (int)((double)j * (double)shape[1] / (double)M);
             r[i * M + j] = (int)R;
@@ -109,8 +84,7 @@ xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic)
     int dM = (int)(0.5 * (double)shape[1] / (double)M);
 
     // randomly perturb circles (move in any direction, enlarge/shrink)
-    for (size_t i = 0; i < N * M; i++)
-    {
+    for (size_t i = 0; i < N * M; i++) {
         row(i) += (int)(((double)(std::rand() % 2) - 0.5) * 2.0) * std::rand() % dN;
         col(i) += (int)(((double)(std::rand() % 2) - 0.5) * 2.0) * std::rand() % dM;
         r(i) = (int)(((double)(std::rand() % 100) / 100.0 * 2.0 + 0.1) * (double)(r(i)));
@@ -120,10 +94,6 @@ xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic)
     return dummy_circles(shape, row, col, r, periodic);
 }
 
-// =================================================================================================
-
-} // namespace ...
-
-// =================================================================================================
+} // namespace GooseEYE
 
 #endif

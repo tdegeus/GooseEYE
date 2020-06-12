@@ -1,8 +1,8 @@
-/* =================================================================================================
+/*
 
 (c - GPLv3) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | github.com/tdegeus/GooseEYE
 
-================================================================================================= */
+*/
 
 #ifndef GOOSEEYE_DILATE_HPP
 #define GOOSEEYE_DILATE_HPP
@@ -12,15 +12,12 @@
 
 namespace GooseEYE {
 
-// -------------------------------------------------------------------------------------------------
-
 namespace detail {
 
 template <class S, class T, class U>
 void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
 {
-    for (size_t axis = 0; axis < Shape.size(); ++axis)
-    {
+    for (size_t axis = 0; axis < Shape.size(); ++axis) {
         if (Shape[axis] <= 1) {
             continue;
         }
@@ -35,9 +32,8 @@ void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
 
         sbelow.push_back(xt::range(0, Pad[axis][0]));
 
-        sabove.push_back(xt::range(
-                Shape[axis] + Pad[axis][0] - 1,
-                Shape[axis] + 2 * Pad[axis][0] - 1));
+        sabove.push_back(
+            xt::range(Shape[axis] + Pad[axis][0] - 1, Shape[axis] + 2 * Pad[axis][0] - 1));
 
         for (size_t i = axis + 1; i < Shape.size(); ++i) {
             sbelow.push_back(xt::all());
@@ -56,8 +52,7 @@ void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
 template <class S, class T, class U>
 void periodic_copy_below(S&& F, const T& Shape, const U& Pad)
 {
-    for (size_t axis = 0; axis < Shape.size(); ++axis)
-    {
+    for (size_t axis = 0; axis < Shape.size(); ++axis) {
         if (Shape[axis] <= 1) {
             continue;
         }
@@ -94,27 +89,25 @@ void periodic_copy(S&& F, const T& Shape, const U& Pad)
     periodic_copy_below(F, Shape, Pad);
 }
 
-}
-
-// -------------------------------------------------------------------------------------------------
+} // namespace detail
 
 template <
-        class T,
-        class S,
-        std::enable_if_t<std::is_integral<T>::value, int>,
-        std::enable_if_t<std::is_integral<S>::value, int>>
+    class T,
+    class S,
+    std::enable_if_t<std::is_integral<T>::value, int>,
+    std::enable_if_t<std::is_integral<S>::value, int>>
 xt::xarray<T> dilate(
-        const xt::xarray<T>& f,
-        const xt::xarray<S>& kernel,
-        const xt::xtensor<size_t,1>& iterations,
-        bool periodic)
+    const xt::xarray<T>& f,
+    const xt::xarray<S>& kernel,
+    const xt::xtensor<size_t, 1>& iterations,
+    bool periodic)
 {
     GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
     GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
     GOOSEEYE_ASSERT((size_t)(xt::amax(f)(0)) <= iterations.size() + 1ul);
 
     // maximum number of dimensions
-    static const size_t MAX_DIM=3;
+    static const size_t MAX_DIM = 3;
 
     // read/convert input
     auto shape = detail::shape(f);
@@ -143,15 +136,14 @@ xt::xarray<T> dilate(
     // keep copy to check which labels were added in the iteration
     auto G = F;
 
-    for (size_t iter = 0; iter < xt::amax(iterations)(0); ++iter)
-    {
+    for (size_t iter = 0; iter < xt::amax(iterations)(0); ++iter) {
 
         for (size_t h = Pad[0][0]; h < F.shape(0) - Pad[0][1]; ++h) {
             for (size_t i = Pad[1][0]; i < F.shape(1) - Pad[1][1]; ++i) {
                 for (size_t j = Pad[2][0]; j < F.shape(2) - Pad[2][1]; ++j) {
 
                     // get label
-                    T l = F(h,i,j);
+                    T l = F(h, i, j);
 
                     // skip if needed:
                     // - do not dilate background or labels added in this iteration
@@ -164,18 +156,20 @@ xt::xarray<T> dilate(
                     }
 
                     // get sub-matrix around (h, i, j)
-                    auto Fi = xt::view(F,
-                            xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
-                            xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
-                            xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
+                    auto Fi = xt::view(
+                        F,
+                        xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
+                        xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
+                        xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
 
-                    auto Gi = xt::view(G,
-                            xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
-                            xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
-                            xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
+                    auto Gi = xt::view(
+                        G,
+                        xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
+                        xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
+                        xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
 
-                  // dilate where needed: dilated labels are added as negative numbers
-                  Gi = xt::where(xt::equal(Fi, 0) && xt::equal(kernel, 1), l, Gi);
+                    // dilate where needed: dilated labels are added as negative numbers
+                    Gi = xt::where(xt::equal(Fi, 0) && xt::equal(kernel, 1), l, Gi);
                 }
             }
         }
@@ -188,62 +182,52 @@ xt::xarray<T> dilate(
         // flip added label
         F = G;
         G = F;
-
     }
 
     // remove padding
-    F = xt::view(F,
-            xt::range(Pad[0][0], F.shape(0) - Pad[0][1]),
-            xt::range(Pad[1][0], F.shape(1) - Pad[1][1]),
-            xt::range(Pad[2][0], F.shape(2) - Pad[2][1]));
+    F = xt::view(
+        F,
+        xt::range(Pad[0][0], F.shape(0) - Pad[0][1]),
+        xt::range(Pad[1][0], F.shape(1) - Pad[1][1]),
+        xt::range(Pad[2][0], F.shape(2) - Pad[2][1]));
 
     F.reshape(shape);
 
     return F;
 }
 
-// -------------------------------------------------------------------------------------------------
-
 template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
 xt::xarray<T> dilate(
-        const xt::xarray<T>& f,
-        const xt::xtensor<size_t,1>& iterations,
-        bool periodic)
+    const xt::xarray<T>& f,
+    const xt::xtensor<size_t,
+    1>& iterations,
+    bool periodic)
 {
     return dilate(f, kernel::nearest(f.dimension()), iterations, periodic);
 }
 
-// -------------------------------------------------------------------------------------------------
-
 template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-xt::xarray<T> dilate(
-        const xt::xarray<T>& f,
-        size_t iterations,
-        bool periodic)
+xt::xarray<T> dilate(const xt::xarray<T>& f, size_t iterations, bool periodic)
 {
-    xt::xtensor<size_t,1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
+    xt::xtensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
     return dilate(f, kernel::nearest(f.dimension()), iter, periodic);
 }
 
-// -------------------------------------------------------------------------------------------------
-
 template <
-        class T,
-        class S,
-        std::enable_if_t<std::is_integral<T>::value, int>,
-        std::enable_if_t<std::is_integral<S>::value, int>>
+    class T,
+    class S,
+    std::enable_if_t<std::is_integral<T>::value, int>,
+    std::enable_if_t<std::is_integral<S>::value, int>>
 xt::xarray<T> dilate(
-        const xt::xarray<T>& f,
-        const xt::xarray<S>& kernel,
-        size_t iterations,
-        bool periodic)
+    const xt::xarray<T>& f,
+    const xt::xarray<S>& kernel,
+    size_t iterations,
+    bool periodic)
 {
-    xt::xtensor<size_t,1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
+    xt::xtensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
     return dilate(f, kernel, iter, periodic);
 }
 
-// -------------------------------------------------------------------------------------------------
-
-} // namespace ...
+} // namespace GooseEYE
 
 #endif
