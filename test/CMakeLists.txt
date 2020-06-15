@@ -11,7 +11,9 @@ option(ASSERT "Enable assertions" ON)
 
 find_package(Catch2 REQUIRED)
 
-add_executable(main main.cpp)
+file(GLOB sources "*.cpp")
+
+add_executable(main ${sources})
 
 target_link_libraries(main PRIVATE
     Catch2::Catch2
