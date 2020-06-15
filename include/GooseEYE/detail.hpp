@@ -12,6 +12,8 @@
 namespace GooseEYE {
 namespace detail {
 
+// TODO: test
+// TODO: rename atleast_3d_axis
 /*
 Get the axis after converting an array to 3d
 See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=atleast_Nd
@@ -23,6 +25,8 @@ See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=a
 inline size_t atleast3d_axis(size_t rank, size_t axis)
 {
     size_t N = 3;
+    assert(axis < rank);
+    assert(rank <= N);
     size_t end = static_cast<size_t>(std::round(double(N - rank) / double(N)));
     return axis + end;
 }

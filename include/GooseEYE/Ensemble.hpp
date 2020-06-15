@@ -72,29 +72,30 @@ inline xt::xarray<double> Ensemble::distance(size_t axis) const
     GOOSEEYE_ASSERT(axis < m_shape_orig.size());
     axis = detail::atleast3d_axis(m_shape_orig.size(), axis);
 
-    xt::xtensor<double,3> ret = xt::empty<double>(m_shape);
+    xt::xtensor<double,3> dist = xt::empty<double>(m_shape);
 
-    double start = -1 * static_cast<double>(m_pad[axis][0]);
-    double stop = static_cast<double>(m_pad[axis][1]);
-
-    xt::xarray<double> D = xt::linspace<double>(start, stop, m_shape[axis]);
+    xt::xarray<double> D = xt::linspace<double>(
+        static_cast<double>(m_pad[axis][0]) * -1.0,
+        static_cast<double>(m_pad[axis][1]),
+        m_shape[axis]);
 
     for (size_t h = 0; h < m_shape[0]; ++h) {
         for (size_t i = 0; i < m_shape[1]; ++i) {
             for (size_t j = 0; j < m_shape[2]; ++j) {
                 if (axis == 0) {
-                    ret(h, i, j) = D(h);
+                    dist(h, i, j) = D(h);
                 }
                 else if (axis == 1) {
-                    ret(h, i, j) = D(i);
+                    dist(h, i, j) = D(i);
                 }
                 else if (axis == 2) {
-                    ret(h, i, j) = D(j);
+                    dist(h, i, j) = D(j);
                 }
             }
         }
     }
 
+    xt::xarray<double> ret = dist;
     return ret.reshape(m_shape_orig);
 }
 

@@ -42,8 +42,9 @@ inline void Ensemble::heightheight(const xt::xarray<T>& f, const xt::xarray<int>
         for (size_t i = m_pad[1][0]; i < shape[1] - m_pad[1][1]; ++i) {
             for (size_t j = m_pad[2][0]; j < shape[2] - m_pad[2][1]; ++j) {
                 // - skip masked
-                if (Fmask(h, i, j))
+                if (Fmask(h, i, j)) {
                     continue;
+                }
                 // - get comparison sub-matrix
                 auto Fi = xt::view(F,
                     xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
