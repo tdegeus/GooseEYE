@@ -75,7 +75,7 @@ inline xt::xarray<double> Ensemble::distance(size_t axis) const
     xt::xtensor<double,3> dist = xt::empty<double>(m_shape);
 
     xt::xarray<double> D = xt::linspace<double>(
-        static_cast<double>(m_pad[axis][0]) * -1.0,
+        -1.0 * static_cast<double>(m_pad[axis][0]),
         static_cast<double>(m_pad[axis][1]),
         m_shape[axis]);
 
