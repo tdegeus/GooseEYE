@@ -95,7 +95,7 @@ inline xt::xarray<double> Ensemble::distance(size_t axis) const
         }
     }
 
-    xt::xarray<double> ret = dist;
+    xt::xarray<double> ret = std::move(dist);
     return ret.reshape(m_shape_orig);
 }
 
