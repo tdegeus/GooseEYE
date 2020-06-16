@@ -31,6 +31,23 @@ inline size_t atleast3d_axis(size_t rank, size_t axis)
     return axis + end;
 }
 
+/*
+Get the axes after converting an array to 3d
+See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=atleast_Nd
+
+@arg rank : Rank of the input array.
+@arg axes : Axes along the input array.
+@ret Axes along the 3d-equivalent-array.
+*/
+inline xt::xtensor<size_t,1> atleast3d_axes(size_t rank, const xt::xtensor<size_t,1>& axes)
+{
+    xt::xtensor<size_t,1> ret = xt::empty_like(axes);
+    for (size_t i = 0; i < axes.size(); ++i) {
+        ret(i) = atleast3d_axis(rank, axes(i));
+    }
+    return ret;
+}
+
 // TODO: remove
 inline std::vector<size_t> as_dim(
     const size_t ndim,

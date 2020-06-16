@@ -193,6 +193,26 @@ xt::xtensor<size_t,1> relabel_map(const xt::xarray<int>& src, const xt::xarray<i
 
 // -------------------------------------------------------------------------------------------------
 
+
+/*
+Convert positions to an image.
+@arg img : The image.
+@arg positions : The position.
+@arg labels : The label to apply for each image.
+@ret The image, with labels inserted (overwritten) at the positions.
+*/
+template <typename T, typename U, typename V>
+inline T pos2img(const T& img, const U& positions, const V& labels);
+
+/*
+Get the position of the center of each label.
+@arg labels : An image with labels [0..N].
+@opt periodic : Switch to assume image periodic.
+@ret The position of the center of each label.
+*/
+template <class T>
+xt::xtensor<double,2> center_of_mass(const T& labels, bool periodic = true);
+
 /*
 Compute ensemble averaged statistics, by repetitively calling the member-function of a certain
 statistical measure with different data.

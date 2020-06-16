@@ -13,6 +13,77 @@
 
 namespace GooseEYE {
 
+template <typename T, typename U, typename V>
+inline T pos2img(const T& img, const U& pos, const V& labels)
+{
+    GOOSEEYE_ASSERT(img.dimension() > 0);
+    GOOSEEYE_ASSERT(img.dimension() <= 3);
+    GOOSEEYE_ASSERT(img.dimension() == pos.shape(1));
+    GOOSEEYE_ASSERT(pos.shape(0) == labels.size());
+    GOOSEEYE_ASSERT(labels.dimension() == 1);
+
+    using value_type = typename T::value_type;
+    T res = img;
+
+    if (res.dimension() == 1) {
+        xt::view(res, xt::keep(pos)) = labels;
+    }
+    else if (res.dimension() == 2) {
+        for (size_t i = 0; i < pos.shape(0); ++i) {
+            res(pos(i, 0), pos(i, 1)) = static_cast<value_type>(labels(i));
+        }
+    }
+    else {
+        for (size_t i = 0; i < pos.shape(0); ++i) {
+            res(pos(i, 0), pos(i, 1), pos(i, 2)) = static_cast<value_type>(labels(i));
+        }
+    }
+
+    return res;
+}
+
+// For periodic algorithm, see:
+// https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
+template <class T>
+inline xt::xtensor<double,2> center_of_mass(const T& labels, bool periodic)
+{
+    static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
+    GOOSEEYE_ASSERT(labels.dimension() > 0);
+    GOOSEEYE_ASSERT(xt::all(labels >= 0));
+    double pi = xt::numeric_constants<double>::PI;
+    size_t N = static_cast<size_t>(xt::amax(labels)(0)) + 1ul;
+    size_t rank = labels.dimension();
+    auto axes = detail::atleast3d_axes(rank, xt::arange<size_t>(rank));
+    xt::xtensor<double,1> shape = xt::adapt(detail::shape(labels));
+    xt::xtensor<double,2> ret = xt::zeros<double>({N, rank});
+
+    for (size_t l = 0; l < N; ++l) {
+        xt::xtensor<double,2> positions = xt::from_indices(xt::argwhere(xt::equal(labels, l)));
+        if (positions.size() == 0) {
+            continue;
+        }
+        if (!periodic) {
+            xt::view(ret, l, xt::all()) = xt::mean(positions, 0);
+        }
+        else {
+            if (xt::all(xt::equal(positions, 0.0))) {
+                continue;
+            }
+            auto theta = 2.0 * pi * positions / shape;
+            auto xi = xt::cos(theta);
+            auto zeta = xt::sin(theta);
+            auto xi_bar = xt::mean(xi, 0);
+            auto zeta_bar = xt::mean(zeta, 0);
+            auto theta_bar = xt::atan2(-zeta_bar, -xi_bar) + pi;
+            auto positions_bar = shape * theta_bar / (2.0 * pi);
+            xt::view(ret, l, xt::all()) = positions_bar;
+        }
+    }
+
+    return xt::view(ret, xt::all(), xt::keep(axes));
+}
+
+
 inline Clusters::Clusters(const xt::xarray<int>& f, bool periodic)
     : Clusters(f, kernel::nearest(f.dimension()), periodic)
 {
