@@ -1,8 +1,8 @@
-/* =================================================================================================
+/*
 
 (c - GPLv3) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | github.com/tdegeus/GooseEYE
 
-================================================================================================= */
+*/
 
 #include <pybind11/pybind11.h>
 #include <pyxtensor/pyxtensor.hpp>
@@ -17,13 +17,9 @@ PYBIND11_MODULE(GooseEYE, m)
 
 m.doc() = "Geometrical statistics";
 
-// -------------------------------------------------------------------------------------------------
-
 py::module kernel = m.def_submodule("kernel", "Kernel definition");
 
 kernel.def("nearest", &GooseEYE::kernel::nearest, py::arg("ndim"));
-
-// -------------------------------------------------------------------------------------------------
 
 py::enum_<GooseEYE::path_mode>(m, "path_mode")
     .value("Bresenham", GooseEYE::path_mode::Bresenham)
@@ -35,16 +31,14 @@ m.def("path",
     &GooseEYE::path,
     py::arg("xa"),
     py::arg("xb"),
-    py::arg("mode")=GooseEYE::path_mode::Bresenham);
-
-// -------------------------------------------------------------------------------------------------
+    py::arg("mode") = GooseEYE::path_mode::Bresenham);
 
 m.def("dummy_circles",
     py::overload_cast<
         const std::vector<size_t>&,
         bool>(&GooseEYE::dummy_circles),
     py::arg("shape"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("dummy_circles",
     py::overload_cast<
@@ -57,9 +51,7 @@ m.def("dummy_circles",
     py::arg("row"),
     py::arg("col"),
     py::arg("r"),
-    py::arg("periodic")=true);
-
-// -------------------------------------------------------------------------------------------------
+    py::arg("periodic") = true);
 
 m.def("dilate",
     py::overload_cast<
@@ -70,7 +62,7 @@ m.def("dilate",
     py::arg("f"),
     py::arg("kernel"),
     py::arg("iterations"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("dilate",
     py::overload_cast<
@@ -79,7 +71,7 @@ m.def("dilate",
         bool>(&GooseEYE::dilate<int>),
     py::arg("f"),
     py::arg("iterations"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("dilate",
     py::overload_cast<
@@ -89,8 +81,8 @@ m.def("dilate",
         bool>(&GooseEYE::dilate<int, int>),
     py::arg("f"),
     py::arg("kernel"),
-    py::arg("iterations")=1,
-    py::arg("periodic")=true);
+    py::arg("iterations") = 1,
+    py::arg("periodic") = true);
 
 m.def("dilate",
     py::overload_cast<
@@ -98,23 +90,21 @@ m.def("dilate",
         size_t,
         bool>(&GooseEYE::dilate<int>),
     py::arg("f"),
-    py::arg("iterations")=1,
-    py::arg("periodic")=true);
-
-// -------------------------------------------------------------------------------------------------
+    py::arg("iterations") = 1,
+    py::arg("periodic") = true);
 
 py::class_<GooseEYE::Clusters>(m, "Clusters")
 
     .def(py::init<const xt::xarray<int>&, bool>(),
         "Clusters",
         py::arg("f"),
-        py::arg("periodic")=true)
+        py::arg("periodic") = true)
 
     .def(py::init<const xt::xarray<int>&, const xt::xarray<int>&, bool>(),
         "Clusters",
         py::arg("f"),
         py::arg("kernel"),
-        py::arg("periodic")=true)
+        py::arg("periodic") = true)
 
     .def("labels",
         &GooseEYE::Clusters::labels)
@@ -124,7 +114,7 @@ py::class_<GooseEYE::Clusters>(m, "Clusters")
 
     .def("center_positions",
         &GooseEYE::Clusters::center_positions,
-        py::arg("as3d")=false)
+        py::arg("as3d") = false)
 
     .def("sizes",
         &GooseEYE::Clusters::sizes)
@@ -133,14 +123,21 @@ py::class_<GooseEYE::Clusters>(m, "Clusters")
         [](const GooseEYE::Clusters &){ return "<GooseEYE.Clusters>"; }
     );
 
-// -------------------------------------------------------------------------------------------------
-
 m.def("clusters",
     &GooseEYE::clusters,
     py::arg("f"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
-// -------------------------------------------------------------------------------------------------
+m.def("pos2img",
+    &GooseEYE::pos2img<xt::xarray<size_t>, xt::xtensor<double,2>, xt::xtensor<size_t,1>>,
+    py::arg("img"),
+    py::arg("positions"),
+    py::arg("labels"));
+
+m.def("center_of_mass",
+    &GooseEYE::center_of_mass<xt::xarray<size_t>>,
+    py::arg("labels"),
+    py::arg("periodic") = true);
 
 py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
@@ -149,8 +146,8 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     .def(py::init<std::vector<size_t>&, bool, bool>(),
         "Ensemble",
         py::arg("roi"),
-        py::arg("periodic")=true,
-        py::arg("variance")=false)
+        py::arg("periodic") = true,
+        py::arg("variance") = false)
 
     // Get ensemble averaged result or raw data, and distance
 
@@ -281,7 +278,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
         py::arg("clusters"),
         py::arg("centers"),
         py::arg("f"),
-        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+        py::arg("mode") = GooseEYE::path_mode::Bresenham)
 
     .def("W2c", py::overload_cast<
             const xt::xarray<int>&,
@@ -291,7 +288,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
         py::arg("clusters"),
         py::arg("centers"),
         py::arg("f"),
-        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+        py::arg("mode") = GooseEYE::path_mode::Bresenham)
 
     .def("W2c", py::overload_cast<
             const xt::xarray<int>&,
@@ -303,20 +300,18 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
         py::arg("centers"),
         py::arg("f"),
         py::arg("fmask"),
-        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+        py::arg("mode") = GooseEYE::path_mode::Bresenham)
 
     // Lineal-path function
 
     .def("L",
         &GooseEYE::Ensemble::L<int>,
         py::arg("f"),
-        py::arg("mode")=GooseEYE::path_mode::Bresenham)
+        py::arg("mode") = GooseEYE::path_mode::Bresenham)
 
     .def("__repr__",
         [](const GooseEYE::Ensemble &){ return "<GooseEYE.Ensemble>"; }
     );
-
-// -------------------------------------------------------------------------------------------------
 
 // distance
 
@@ -354,7 +349,7 @@ m.def("S2", py::overload_cast<
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 
 m.def("S2", py::overload_cast<
@@ -365,7 +360,7 @@ m.def("S2", py::overload_cast<
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("S2", py::overload_cast<
         const std::vector<size_t>&,
@@ -379,7 +374,7 @@ m.def("S2", py::overload_cast<
     py::arg("g"),
     py::arg("fmask"),
     py::arg("gmask"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 // 2-point cluster
 
@@ -391,7 +386,7 @@ m.def("C2", py::overload_cast<
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("C2", py::overload_cast<
         const std::vector<size_t>&,
@@ -405,7 +400,7 @@ m.def("C2", py::overload_cast<
     py::arg("g"),
     py::arg("fmask"),
     py::arg("gmask"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 // Weighted 2-point correlation
 
@@ -417,7 +412,7 @@ m.def("W2", py::overload_cast<
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("W2", py::overload_cast<
         const std::vector<size_t>&,
@@ -427,7 +422,7 @@ m.def("W2", py::overload_cast<
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("W2", py::overload_cast<
         const std::vector<size_t>&,
@@ -439,7 +434,7 @@ m.def("W2", py::overload_cast<
     py::arg("w"),
     py::arg("f"),
     py::arg("fmask"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 // Collapsed weighted 2-point correlation
 
@@ -454,8 +449,8 @@ m.def("W2c", py::overload_cast<
     py::arg("clusters"),
     py::arg("centers"),
     py::arg("f"),
-    py::arg("mode")=GooseEYE::path_mode::Bresenham,
-    py::arg("periodic")=true);
+    py::arg("mode") = GooseEYE::path_mode::Bresenham,
+    py::arg("periodic") = true);
 
 m.def("W2c", py::overload_cast<
         const std::vector<size_t>&,
@@ -468,8 +463,8 @@ m.def("W2c", py::overload_cast<
     py::arg("clusters"),
     py::arg("centers"),
     py::arg("f"),
-    py::arg("mode")=GooseEYE::path_mode::Bresenham,
-    py::arg("periodic")=true);
+    py::arg("mode") = GooseEYE::path_mode::Bresenham,
+    py::arg("periodic") = true);
 
 m.def("W2c", py::overload_cast<
         const std::vector<size_t>&,
@@ -484,8 +479,8 @@ m.def("W2c", py::overload_cast<
     py::arg("centers"),
     py::arg("f"),
     py::arg("fmask"),
-    py::arg("mode")=GooseEYE::path_mode::Bresenham,
-    py::arg("periodic")=true);
+    py::arg("mode") = GooseEYE::path_mode::Bresenham,
+    py::arg("periodic") = true);
 
 // Height-Height Correlation Function
 
@@ -495,7 +490,7 @@ m.def("heightheight", py::overload_cast<
         bool>(&GooseEYE::heightheight<double>),
     py::arg("roi"),
     py::arg("f"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("heightheight", py::overload_cast<
         const std::vector<size_t>&,
@@ -505,15 +500,13 @@ m.def("heightheight", py::overload_cast<
     py::arg("roi"),
     py::arg("f"),
     py::arg("fmask"),
-    py::arg("periodic")=true);
+    py::arg("periodic") = true);
 
 m.def("L",
     &GooseEYE::L<int>,
     py::arg("roi"),
     py::arg("f"),
-    py::arg("periodic")=true,
-    py::arg("mode")=GooseEYE::path_mode::Bresenham);
-
-// -------------------------------------------------------------------------------------------------
+    py::arg("periodic") = true,
+    py::arg("mode") = GooseEYE::path_mode::Bresenham);
 
 }

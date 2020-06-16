@@ -37,16 +37,15 @@ for (subplot, mode) in enumerate(modes):
         GooseEYE.path([0,0], [+9,-2], mode=modes[mode]),
     )
 
-    # store the paths as image, for plotting
-    img = np.zeros((19,19), dtype='int')
-    for i, path in enumerate(paths):
-        img[path[:,0]+9, path[:,1]+9] = i+1
-
     # plot the paths
+    img = np.zeros((19, 19), dtype='int')
+    for i, path in enumerate(paths):
+        img = GooseEYE.pos2img(img, path + 9, (i + 1) * np.ones(path.shape[0]))
+
     ax = axes[subplot]
-    ax.imshow(img, cmap='afmhot_r', extent=(0, .9999, 0, .9999))
-    ax.plot(grid[0], grid[1], lw=1., c='k')
-    ax.plot(grid[1], grid[0], lw=1., c='k')
+    ax.imshow(img, cmap='afmhot_r', extent=(0, 0.9999, 0, 0.9999))
+    ax.plot(grid[0], grid[1], lw=1, c='k')
+    ax.plot(grid[1], grid[0], lw=1, c='k')
     ax.xaxis.set_ticks([])
     ax.yaxis.set_ticks([])
     ax.set_xlabel(r'$\Delta x$')
