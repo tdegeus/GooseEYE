@@ -42,6 +42,8 @@ inline T pos2img(const T& img, const U& pos, const V& labels)
     return res;
 }
 
+// For periodic algorithm, see:
+// https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
 template <class T>
 inline xt::xtensor<double,2> center_of_mass(const T& labels, bool periodic)
 {
