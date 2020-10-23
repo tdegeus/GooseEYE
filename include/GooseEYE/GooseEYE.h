@@ -83,11 +83,11 @@ In each case the background are 0.
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<T>::value, int> = 0,
-    std::enable_if_t<std::is_integral<S>::value, int> = 0>
-inline xt::xarray<T> dilate(
-    const xt::xarray<T>& f,
-    const xt::xarray<S>& kernel,
+    std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0,
+    std::enable_if_t<std::is_integral<typename S::value_type>::value, int> = 0>
+inline T dilate(
+    const T& f,
+    const S& kernel,
     const xt::xtensor<size_t,1>& iterations,
     bool periodic = true);
 
@@ -95,9 +95,9 @@ inline xt::xarray<T> dilate(
 Dilate image. Select "kernel::nearest" as kernel.
 See above for parameters.
 */
-template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-inline xt::xarray<T> dilate(
-    const xt::xarray<T>& f,
+template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
+inline T dilate(
+    const T& f,
     const xt::xtensor<size_t,1>& iterations,
     bool periodic = true);
 
@@ -108,11 +108,11 @@ See above for parameters.
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<T>::value, int> = 0,
-    std::enable_if_t<std::is_integral<S>::value, int> = 0>
-inline xt::xarray<T> dilate(
-    const xt::xarray<T>& f,
-    const xt::xarray<S>& kernel,
+    std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0,
+    std::enable_if_t<std::is_integral<typename S::value_type>::value, int> = 0>
+inline T dilate(
+    const T& f,
+    const S& kernel,
     size_t iterations = 1,
     bool periodic = true);
 
@@ -120,9 +120,9 @@ inline xt::xarray<T> dilate(
 Dilate image. Fixed number of iterations for all labels. Select "kernel::nearest" as kernel.
 See above for parameters.
 */
-template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-inline xt::xarray<T> dilate(
-    const xt::xarray<T>& f,
+template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
+inline T dilate(
+    const T& f,
     size_t iterations = 1,
     bool periodic = true);
 

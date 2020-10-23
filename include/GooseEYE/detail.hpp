@@ -155,7 +155,7 @@ inline std::vector<std::vector<size_t>> pad_width(const std::vector<size_t>& sha
 Overload to compute directly on the object itself, not on its shape.
 */
 template <class T>
-inline std::vector<std::vector<size_t>> pad_width(const xt::xarray<T>& a)
+inline std::vector<std::vector<size_t>> pad_width(const T& a)
 {
     std::vector<size_t> shape(a.shape().cbegin(), a.shape().cend());
     return pad_width(shape);
