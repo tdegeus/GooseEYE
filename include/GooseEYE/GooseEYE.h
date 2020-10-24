@@ -88,7 +88,7 @@ template <
 inline T dilate(
     const T& f,
     const S& kernel,
-    const xt::xtensor<size_t,1>& iterations,
+    const xt::xtensor<size_t, 1>& iterations,
     bool periodic = true);
 
 /*

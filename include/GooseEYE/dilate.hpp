@@ -111,7 +111,7 @@ inline T dilate(
     }
 
     auto shape = f.shape();
-    xt::xtensor<typename S::value_type,3> K = xt::atleast_3d(kernel);
+    xt::xtensor<typename S::value_type, 3> K = xt::atleast_3d(kernel);
     auto Pad = detail::pad_width(K);
     xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), Pad, pad_mode, pad_value);
 
