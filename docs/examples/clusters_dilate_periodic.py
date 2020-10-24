@@ -5,11 +5,11 @@ import GooseEYE
 # generate image
 I = np.zeros((21, 21), dtype='bool')
 I[4, 4] = True
-I[14, 15] = True
-I[15, 15] = True
-I[16, 15] = True
-I[15, 14] = True
-I[15, 16] = True
+I[18, 19] = True
+I[19, 19] = True
+I[20, 19] = True
+I[19, 18] = True
+I[19, 20] = True
 
 # clusters
 C = GooseEYE.Clusters(I).labels()
@@ -63,16 +63,6 @@ cbar = plt.colorbar(im, cax=cax)
 cbar.set_ticks([0, 1])
 
 ax = axes[1]
-im = ax.imshow(C, clim=(0, np.max(C) + 1), cmap=cmap)
-ax.xaxis.set_ticks([0, 20])
-ax.yaxis.set_ticks([0, 20])
-ax.set_xlim([-0.5, 20.5])
-ax.set_ylim([-0.5, 20.5])
-ax.set_xlabel(r'$x$')
-ax.set_ylabel(r'$y$')
-ax.set_title (r'clusters')
-
-ax = axes[2]
 im = ax.imshow(CD, clim=(0, np.max(C) + 1), cmap=cmap)
 ax.xaxis.set_ticks([0, 20])
 ax.yaxis.set_ticks([0, 20])
@@ -82,4 +72,14 @@ ax.set_xlabel(r'$x$')
 ax.set_ylabel(r'$y$')
 ax.set_title (r'clusters + dilate')
 
-plt.savefig('clusters_dilate.svg')
+ax = axes[2]
+im = ax.imshow(np.tile(CD, (3, 3)), clim=(0, np.max(C) + 1), cmap=cmap)
+ax.xaxis.set_ticks([0, 60])
+ax.yaxis.set_ticks([0, 60])
+ax.set_xlim([-0.5, 60.5])
+ax.set_ylim([-0.5, 60.5])
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_title (r'periodic copy')
+
+plt.savefig('clusters_dilate_periodic.svg')

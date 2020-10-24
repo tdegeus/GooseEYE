@@ -70,6 +70,12 @@ Python
    :start-after: <snippet>
    :end-before: </snippet>
 
+.. note::
+
+    There is an additional example to show the effect of periodicity:
+    :download:`clusters_dilate_periodic.py <examples/clusters_dilate_periodic.py>`
+    :download:`clusters_dilate_periodic.svg <examples/clusters_dilate_periodic.svg>`
+
 C++
 ^^^
 

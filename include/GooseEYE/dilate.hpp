@@ -14,30 +14,28 @@ namespace GooseEYE {
 
 namespace detail {
 
-template <class S, class T, class U>
-inline void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
+template <class S, class U>
+inline void periodic_copy_below_to_above(S&& F, const U& Pad)
 {
-    for (size_t axis = 0; axis < Shape.size(); ++axis) {
-        if (Shape[axis] <= 1) {
+    xt::xstrided_slice_vector sbelow(F.dimension());
+    xt::xstrided_slice_vector sabove(F.dimension());
+
+    for (size_t ax = 0; ax < F.dimension(); ++ax) {
+        if (F.shape(ax) <= 1) {
             continue;
         }
 
-        xt::xstrided_slice_vector sbelow;
-        xt::xstrided_slice_vector sabove;
-
-        for (size_t i = 0; i < axis; ++i) {
-            sbelow.push_back(xt::all());
-            sabove.push_back(xt::all());
+        for (size_t i = 0; i < ax; ++i) {
+            sbelow[i] = xt::all();
+            sabove[i] = xt::all();
         }
 
-        sbelow.push_back(xt::range(0, Pad[axis][0]));
+        sbelow[ax] = xt::range(0, Pad[ax][0]);
+        sabove[ax] = xt::range(F.shape(ax) - Pad[ax][1] - Pad[ax][0], F.shape(ax) - Pad[ax][1]);
 
-        sabove.push_back(
-            xt::range(Shape[axis] + Pad[axis][0] - 1, Shape[axis] + 2 * Pad[axis][0] - 1));
-
-        for (size_t i = axis + 1; i < Shape.size(); ++i) {
-            sbelow.push_back(xt::all());
-            sabove.push_back(xt::all());
+        for (size_t i = ax + 1; i < F.dimension(); ++i) {
+            sbelow[i] = xt::all();
+            sabove[i] = xt::all();
         }
 
         auto below = xt::strided_view(F, sbelow);
@@ -47,30 +45,28 @@ inline void periodic_copy_above(S&& F, const T& Shape, const U& Pad)
     }
 }
 
-// ---
-
-template <class S, class T, class U>
-inline void periodic_copy_below(S&& F, const T& Shape, const U& Pad)
+template <class S, class U>
+inline void periodic_copy_above_to_below(S&& F, const U& Pad)
 {
-    for (size_t axis = 0; axis < Shape.size(); ++axis) {
-        if (Shape[axis] <= 1) {
+    xt::xstrided_slice_vector sbelow(F.dimension());
+    xt::xstrided_slice_vector sabove(F.dimension());
+
+    for (size_t ax = 0; ax < F.dimension(); ++ax) {
+        if (F.shape(ax) <= 1) {
             continue;
         }
 
-        xt::xstrided_slice_vector sbelow;
-        xt::xstrided_slice_vector sabove;
-
-        for (size_t i = 0; i < axis; ++i) {
-            sbelow.push_back(xt::all());
-            sabove.push_back(xt::all());
+        for (size_t i = 0; i < ax; ++i) {
+            sbelow[i] = xt::all();
+            sabove[i] = xt::all();
         }
 
-        sbelow.push_back(xt::range(Pad[axis][0], Pad[axis][0] + Pad[axis][1]));
-        sabove.push_back(xt::range(F.shape(axis) - Pad[axis][1], F.shape(axis)));
+        sbelow[ax] = xt::range(Pad[ax][0], Pad[ax][0] + Pad[ax][1]);
+        sabove[ax] = xt::range(F.shape(ax) - Pad[ax][1], F.shape(ax));
 
-        for (size_t i = axis + 1; i < Shape.size(); ++i) {
-            sbelow.push_back(xt::all());
-            sabove.push_back(xt::all());
+        for (size_t i = ax + 1; i < F.dimension(); ++i) {
+            sbelow[i] = xt::all();
+            sabove[i] = xt::all();
         }
 
         auto below = xt::strided_view(F, sbelow);
@@ -80,13 +76,11 @@ inline void periodic_copy_below(S&& F, const T& Shape, const U& Pad)
     }
 }
 
-// --
-
-template <class S, class T, class U>
-inline void periodic_copy(S&& F, const T& Shape, const U& Pad)
+template <class S, class U>
+inline void periodic_copy(S&& F, const U& Pad)
 {
-    periodic_copy_above(F, Shape, Pad);
-    periodic_copy_below(F, Shape, Pad);
+    periodic_copy_above_to_below(F, Pad);
+    periodic_copy_below_to_above(F, Pad);
 }
 
 } // namespace detail
@@ -94,36 +88,21 @@ inline void periodic_copy(S&& F, const T& Shape, const U& Pad)
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<T>::value, int>,
-    std::enable_if_t<std::is_integral<S>::value, int>>
-inline xt::xarray<T> dilate(
-    const xt::xarray<T>& f,
-    const xt::xarray<S>& kernel,
+    std::enable_if_t<std::is_integral<typename T::value_type>::value, int>,
+    std::enable_if_t<std::is_integral<typename S::value_type>::value, int>>
+inline T dilate(
+    const T& f,
+    const S& kernel,
     const xt::xtensor<size_t, 1>& iterations,
     bool periodic)
 {
-    GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
-    GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
-    GOOSEEYE_ASSERT((size_t)(xt::amax(f)(0)) <= iterations.size() + 1ul);
-
-    // maximum number of dimensions
+    using value_type = typename T::value_type;
     static const size_t MAX_DIM = 3;
+    GOOSEEYE_ASSERT(f.dimension() <= MAX_DIM);
+    GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
+    GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
+    GOOSEEYE_ASSERT(static_cast<size_t>(xt::amax(f)()) <= iterations.size() + 1);
 
-    // read/convert input
-    auto shape = detail::shape(f);
-    auto shape_kernel = detail::shape(kernel);
-    auto pad = detail::pad_width(kernel);
-    auto Shape = detail::as_dim(MAX_DIM, shape, 1);
-    auto Shape_kernel = detail::as_dim(MAX_DIM, shape_kernel, 1);
-    auto Pad = detail::as_dim(MAX_DIM, pad, 0);
-
-    // copy input, make pseudo 3-d
-    auto F = f;
-    auto K = kernel;
-    F.reshape(Shape);
-    K.reshape(Shape_kernel);
-
-    // padding
     xt::pad_mode pad_mode = xt::pad_mode::constant;
     int pad_value = 0;
 
@@ -131,10 +110,12 @@ inline xt::xarray<T> dilate(
         pad_mode = xt::pad_mode::periodic;
     }
 
-    F = xt::pad(F, Pad, pad_mode, pad_value);
+    auto shape = f.shape();
+    xt::xtensor<typename S::value_type, 3> K = xt::atleast_3d(kernel);
+    auto Pad = detail::pad_width(K);
+    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), Pad, pad_mode, pad_value);
 
-    // keep copy to check which labels were added in the iteration
-    auto G = F;
+    xt::xtensor<value_type, 3> G = F; // keep copy to check which labels were added in the iteration
 
     for (size_t iter = 0; iter < xt::amax(iterations)(0); ++iter) {
 
@@ -143,7 +124,7 @@ inline xt::xarray<T> dilate(
                 for (size_t j = Pad[2][0]; j < F.shape(2) - Pad[2][1]; ++j) {
 
                     // get label
-                    T l = F(h, i, j);
+                    value_type l = F(h, i, j);
 
                     // skip if needed:
                     // - do not dilate background or labels added in this iteration
@@ -156,27 +137,25 @@ inline xt::xarray<T> dilate(
                     }
 
                     // get sub-matrix around (h, i, j)
-                    auto Fi = xt::view(
-                        F,
+                    auto Fi = xt::view(F,
                         xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
                         xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
                         xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
 
-                    auto Gi = xt::view(
-                        G,
+                    auto Gi = xt::view(G,
                         xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
                         xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
                         xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
 
                     // dilate where needed: dilated labels are added as negative numbers
-                    Gi = xt::where(xt::equal(Fi, 0) && xt::equal(kernel, 1), l, Gi);
+                    Gi = xt::where(xt::equal(Fi, 0) && xt::equal(K, 1), l, Gi);
                 }
             }
         }
 
         // apply periodicity
         if (periodic) {
-            detail::periodic_copy(G, Shape, Pad);
+            detail::periodic_copy(G, Pad);
         }
 
         // flip added label
@@ -185,29 +164,25 @@ inline xt::xarray<T> dilate(
     }
 
     // remove padding
-    F = xt::view(
-        F,
+    F = xt::view(F,
         xt::range(Pad[0][0], F.shape(0) - Pad[0][1]),
         xt::range(Pad[1][0], F.shape(1) - Pad[1][1]),
         xt::range(Pad[2][0], F.shape(2) - Pad[2][1]));
 
-    F.reshape(shape);
-
-    return F;
+    return xt::adapt(F.data(), shape);
 }
 
-template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-inline xt::xarray<T> dilate(
-    const xt::xarray<T>& f,
-    const xt::xtensor<size_t,
-    1>& iterations,
+template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
+inline T dilate(
+    const T& f,
+    const xt::xtensor<size_t,1>& iterations,
     bool periodic)
 {
     return dilate(f, kernel::nearest(f.dimension()), iterations, periodic);
 }
 
-template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-inline xt::xarray<T> dilate(const xt::xarray<T>& f, size_t iterations, bool periodic)
+template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
+inline T dilate(const T& f, size_t iterations, bool periodic)
 {
     xt::xtensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
     return dilate(f, kernel::nearest(f.dimension()), iter, periodic);
@@ -216,11 +191,11 @@ inline xt::xarray<T> dilate(const xt::xarray<T>& f, size_t iterations, bool peri
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<T>::value, int>,
-    std::enable_if_t<std::is_integral<S>::value, int>>
-inline xt::xarray<T> dilate(
-    const xt::xarray<T>& f,
-    const xt::xarray<S>& kernel,
+    std::enable_if_t<std::is_integral<typename T::value_type>::value, int>,
+    std::enable_if_t<std::is_integral<typename S::value_type>::value, int>>
+inline T dilate(
+    const T& f,
+    const S& kernel,
     size_t iterations,
     bool periodic)
 {
