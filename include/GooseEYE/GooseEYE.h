@@ -83,8 +83,8 @@ In each case the background are 0.
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0,
-    std::enable_if_t<std::is_integral<typename S::value_type>::value, int> = 0>
+    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
+                     std::is_integral<typename S::value_type>::value, int> = 0>
 inline T dilate(
     const T& f,
     const S& kernel,
@@ -108,8 +108,8 @@ See above for parameters.
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0,
-    std::enable_if_t<std::is_integral<typename S::value_type>::value, int> = 0>
+    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
+                     std::is_integral<typename S::value_type>::value, int> = 0>
 inline T dilate(
     const T& f,
     const S& kernel,
