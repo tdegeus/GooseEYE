@@ -132,64 +132,57 @@ inline T dilate(
 
 class Clusters {
 public:
+
     // Constructors
     Clusters() = default;
 
-    Clusters(const xt::xarray<int>& f, bool periodic = true);
+    template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
+    Clusters(const T& f, bool periodic = true);
 
-    Clusters(const xt::xarray<int>& f, const xt::xarray<int>& kernel, bool periodic = true);
+    template <
+        class T,
+        class S,
+        std::enable_if_t<std::is_integral<typename T::value_type>::value &&
+                         std::is_integral<typename S::value_type>::value, int> = 0>
+    Clusters(const T& f, const S& kernel, bool periodic = true);
 
     // Return labels (1..n)
-    xt::xarray<int> labels() const;
+    auto labels() const;
 
     // Return label only in the center of gravity
-    xt::xarray<int> centers() const;
+    auto centers() const;
 
     // Return positions of the centers of gravity (in the original rank, or as 3-d)
-    xt::xtensor<double,2> center_positions(bool as3d = false) const;
+    xt::xtensor<double, 2> center_positions(bool as3d = false) const;
 
     // Return size per cluster
-    xt::xtensor<size_t,1> sizes() const;
+    xt::xtensor<size_t, 1> sizes() const;
 
 private:
     // Compute clusters
     void compute();
 
     // Compute position of the cluster centers
-    xt::xtensor<double,2> average_position(const xt::xarray<int>& lab) const;
-    xt::xtensor<double,2> average_position_periodic() const;
+    template <class T> xt::xtensor<double, 2> average_position(const T& lab) const;
+    xt::xtensor<double, 2> average_position_periodic() const;
 
-    // Maximum number of dimensions
     static const size_t MAX_DIM = 3;
-
-    // Shape of the image
-    std::vector<size_t> m_shape;
-    std::vector<size_t> m_Shape; // pseudo 3-d equivalent
-
-    // Padding size
+    std::vector<size_t> m_shape; // shape of the input image
     std::vector<std::vector<size_t>> m_pad;
-    std::vector<std::vector<size_t>> m_Pad; // pseudo 3-d equivalent
-
-    // Kernel
-    xt::xarray<int> m_kernel;
-
-    // Shape of the kernel
-    std::vector<size_t> m_shape_kernel;
-    std::vector<size_t> m_Shape_kernel; // pseudo 3-d equivalent
-
-    // Labels
+    xt::xtensor<int, 3> m_kernel;
     bool m_periodic;
-    xt::xarray<int> m_l;    // labels (>= 1, 0 = background), 3-d
-    xt::xarray<int> m_l_np; // labels before applying periodicity
+    xt::xtensor<int, 3> m_l;    // labels (>= 1, 0 = background), 3-d
+    xt::xtensor<int, 3> m_l_np; // labels before applying periodicity
 };
 
 // Wrapper function
 
-xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic = true);
+template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
+auto clusters(const T& f, bool periodic = true);
 
 // Find map to relabel
 
-xt::xtensor<size_t,1> relabel_map(const xt::xarray<int>& src, const xt::xarray<int>& dest);
+xt::xtensor<size_t, 1> relabel_map(const xt::xarray<int>& src, const xt::xarray<int>& dest);
 
 // -------------------------------------------------------------------------------------------------
 
