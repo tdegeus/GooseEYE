@@ -28,26 +28,4 @@ SECTION("relabel_map")
   )));
 }
 
-SECTION("centers")
-{
-  xt::xarray<size_t> I = xt::zeros<size_t>({5, 5});
-  xt::xarray<size_t> C = xt::zeros<size_t>({5, 5});
-
-  I(0, 0) = 1;
-  I(0, 3) = 1;
-  I(0, 4) = 1;
-  I(3, 0) = 1;
-  I(3, 3) = 1;
-  I(3, 4) = 1;
-
-  C(0, 4) = 1;
-  C(3, 4) = 2;
-
-  GooseEYE::Clusters clusters(I, true);
-
-  auto c = clusters.centers();
-
-  REQUIRE(xt::all(xt::equal(C, c)));
-}
-
 }

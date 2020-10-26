@@ -88,8 +88,8 @@ inline void periodic_copy(S&& F, const U& Pad)
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value, int>,
-    std::enable_if_t<std::is_integral<typename S::value_type>::value, int>>
+    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
+                     std::is_integral<typename S::value_type>::value, int>>
 inline T dilate(
     const T& f,
     const S& kernel,
@@ -191,8 +191,8 @@ inline T dilate(const T& f, size_t iterations, bool periodic)
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value, int>,
-    std::enable_if_t<std::is_integral<typename S::value_type>::value, int>>
+    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
+                     std::is_integral<typename S::value_type>::value, int>>
 inline T dilate(
     const T& f,
     const S& kernel,

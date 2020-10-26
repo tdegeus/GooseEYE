@@ -124,12 +124,12 @@ py::class_<GooseEYE::Clusters>(m, "Clusters")
     );
 
 m.def("clusters",
-    &GooseEYE::clusters,
+    &GooseEYE::clusters<xt::xarray<int>>,
     py::arg("f"),
     py::arg("periodic") = true);
 
 m.def("pos2img",
-    &GooseEYE::pos2img<xt::xarray<size_t>, xt::xtensor<double,2>, xt::xtensor<size_t,1>>,
+    &GooseEYE::pos2img<xt::xarray<size_t>, xt::xtensor<double, 2>, xt::xtensor<size_t, 1>>,
     py::arg("img"),
     py::arg("positions"),
     py::arg("labels"));

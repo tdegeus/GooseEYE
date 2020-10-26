@@ -83,8 +83,8 @@ In each case the background are 0.
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0,
-    std::enable_if_t<std::is_integral<typename S::value_type>::value, int> = 0>
+    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
+                     std::is_integral<typename S::value_type>::value, int> = 0>
 inline T dilate(
     const T& f,
     const S& kernel,
@@ -108,8 +108,8 @@ See above for parameters.
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0,
-    std::enable_if_t<std::is_integral<typename S::value_type>::value, int> = 0>
+    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
+                     std::is_integral<typename S::value_type>::value, int> = 0>
 inline T dilate(
     const T& f,
     const S& kernel,
@@ -126,18 +126,20 @@ inline T dilate(
     size_t iterations = 1,
     bool periodic = true);
 
-// -------------------------------------------------------------------------------------------------
-// Clusters - TODO
-// -------------------------------------------------------------------------------------------------
-
+/*
+Compute clusters and obtain certain characteristic about them.
+*/
 class Clusters {
 public:
+
     // Constructors
     Clusters() = default;
 
-    Clusters(const xt::xarray<int>& f, bool periodic = true);
+    template <class T>
+    Clusters(const T& f, bool periodic = true);
 
-    Clusters(const xt::xarray<int>& f, const xt::xarray<int>& kernel, bool periodic = true);
+    template <class T, class S>
+    Clusters(const T& f, const S& kernel, bool periodic = true);
 
     // Return labels (1..n)
     xt::xarray<int> labels() const;
@@ -146,53 +148,40 @@ public:
     xt::xarray<int> centers() const;
 
     // Return positions of the centers of gravity (in the original rank, or as 3-d)
-    xt::xtensor<double,2> center_positions(bool as3d = false) const;
+    xt::xtensor<double, 2> center_positions(bool as3d = false) const;
 
     // Return size per cluster
-    xt::xtensor<size_t,1> sizes() const;
+    xt::xtensor<size_t, 1> sizes() const;
 
 private:
-    // Compute clusters
+
     void compute();
 
-    // Compute position of the cluster centers
-    xt::xtensor<double,2> average_position(const xt::xarray<int>& lab) const;
-    xt::xtensor<double,2> average_position_periodic() const;
+    template <class T>
+    xt::xtensor<double, 2> average_position(const T& lab) const;
 
-    // Maximum number of dimensions
+    xt::xtensor<double, 2> average_position_periodic() const;
+
     static const size_t MAX_DIM = 3;
-
-    // Shape of the image
-    std::vector<size_t> m_shape;
-    std::vector<size_t> m_Shape; // pseudo 3-d equivalent
-
-    // Padding size
+    std::vector<size_t> m_shape; // shape of the input image
     std::vector<std::vector<size_t>> m_pad;
-    std::vector<std::vector<size_t>> m_Pad; // pseudo 3-d equivalent
-
-    // Kernel
-    xt::xarray<int> m_kernel;
-
-    // Shape of the kernel
-    std::vector<size_t> m_shape_kernel;
-    std::vector<size_t> m_Shape_kernel; // pseudo 3-d equivalent
-
-    // Labels
+    xt::xtensor<int, 3> m_kernel;
     bool m_periodic;
-    xt::xarray<int> m_l;    // labels (>= 1, 0 = background), 3-d
-    xt::xarray<int> m_l_np; // labels before applying periodicity
+    xt::xtensor<int, 3> m_l;    // labels (>= 1, 0 = background), 3-d
+    xt::xtensor<int, 3> m_l_np; // labels before applying periodicity
 };
 
-// Wrapper function
+/*
+Compute clusters. Wraps "GooseEYE::Clusters(...).labels()".
+*/
+template <class T>
+xt::xarray<int> clusters(const T& f, bool periodic = true);
 
-xt::xarray<int> clusters(const xt::xarray<int>& f, bool periodic = true);
-
-// Find map to relabel
-
-xt::xtensor<size_t,1> relabel_map(const xt::xarray<int>& src, const xt::xarray<int>& dest);
-
-// -------------------------------------------------------------------------------------------------
-
+/*
+Find map to relabel.
+*/
+template <class T, class S>
+xt::xtensor<size_t, 1> relabel_map(const T& src, const S& dest);
 
 /*
 Convert positions to an image.
@@ -211,7 +200,7 @@ Get the position of the center of each label.
 @ret The position of the center of each label.
 */
 template <class T>
-xt::xtensor<double,2> center_of_mass(const T& labels, bool periodic = true);
+xt::xtensor<double, 2> center_of_mass(const T& labels, bool periodic = true);
 
 /*
 Compute ensemble averaged statistics, by repetitively calling the member-function of a certain

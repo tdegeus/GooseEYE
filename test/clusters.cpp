@@ -87,4 +87,24 @@ SECTION("center_of_mass - labels")
     REQUIRE(xt::all(xt::equal(res_c, c)));
 }
 
+SECTION("Clusters::centers")
+{
+  xt::xarray<size_t> I = xt::zeros<size_t>({5, 5});
+  xt::xarray<size_t> C = xt::zeros<size_t>({5, 5});
+
+  I(0, 0) = 1;
+  I(0, 3) = 1;
+  I(0, 4) = 1;
+  I(3, 0) = 1;
+  I(3, 3) = 1;
+  I(3, 4) = 1;
+
+  C(0, 4) = 1;
+  C(3, 4) = 2;
+
+  GooseEYE::Clusters clusters(I, true);
+  REQUIRE(xt::all(xt::equal(C, clusters.centers())));
+  REQUIRE(xt::all(xt::equal(GooseEYE::clusters(I, true), clusters.labels())));
+}
+
 }

@@ -15,7 +15,7 @@ namespace detail {
 // TODO: test
 // TODO: rename atleast_3d_axis
 /*
-Get the axis after converting an array to 3d
+Get the axis after converting an array to 3d.
 See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=atleast_Nd
 
 @arg rank : Rank of the input array.
@@ -32,21 +32,35 @@ inline size_t atleast3d_axis(size_t rank, size_t axis)
 }
 
 /*
-Get the axes after converting an array to 3d
+Get the axes after converting an array to 3d.
 See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=atleast_Nd
 
 @arg rank : Rank of the input array.
 @arg axes : Axes along the input array.
 @ret Axes along the 3d-equivalent-array.
 */
-inline xt::xtensor<size_t,1> atleast3d_axes(size_t rank, const xt::xtensor<size_t,1>& axes)
+inline xt::xtensor<size_t, 1> atleast3d_axes(size_t rank, const xt::xtensor<size_t, 1>& axes)
 {
-    xt::xtensor<size_t,1> ret = xt::empty_like(axes);
+    xt::xtensor<size_t, 1> ret = xt::empty_like(axes);
     for (size_t i = 0; i < axes.size(); ++i) {
         ret(i) = atleast3d_axis(rank, axes(i));
     }
     return ret;
 }
+
+/*
+Get the axes after converting an array to 3d.
+See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=atleast_Nd
+
+@arg rank : Rank of the input array.
+@ret Axes along the 3d-equivalent-array.
+*/
+inline xt::xtensor<size_t, 1> atleast3d_axes(size_t rank)
+{
+    return atleast3d_axes(rank, xt::arange<size_t>(rank));
+}
+
+
 
 // TODO: remove
 inline std::vector<size_t> as_dim(
