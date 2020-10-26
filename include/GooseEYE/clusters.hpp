@@ -334,17 +334,17 @@ inline xt::xarray<int> Clusters::labels() const
 
 inline xt::xtensor<size_t, 1> Clusters::sizes() const
 {
-    xt::xtensor<size_t, 1> out = xt::zeros<size_t>({xt::amax(m_l)() + size_t(1)});
+    xt::xtensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(m_l)() + size_t(1)});
 
     for (size_t h = 0; h < m_l.shape(0); ++h) {
         for (size_t i = 0; i < m_l.shape(1); ++i) {
             for (size_t j = 0; j < m_l.shape(2); ++j) {
-                out(m_l(h, i, j))++;
+                ret(m_l(h, i, j))++;
             }
         }
     }
 
-    return out;
+    return ret;
 }
 
 template <class T>
