@@ -45,20 +45,22 @@ inline T pos2img(const T& img, const U& pos, const V& labels)
 // For periodic algorithm, see:
 // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
 template <class T>
-inline xt::xtensor<double,2> center_of_mass(const T& labels, bool periodic)
+inline xt::xtensor<double, 2> center_of_mass(const T& labels, bool periodic)
 {
     static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
+
     GOOSEEYE_ASSERT(labels.dimension() > 0);
     GOOSEEYE_ASSERT(xt::all(labels >= 0));
+
     double pi = xt::numeric_constants<double>::PI;
     size_t N = static_cast<size_t>(xt::amax(labels)(0)) + 1ul;
     size_t rank = labels.dimension();
-    auto axes = detail::atleast3d_axes(rank, xt::arange<size_t>(rank));
-    xt::xtensor<double,1> shape = xt::adapt(detail::shape(labels));
-    xt::xtensor<double,2> ret = xt::zeros<double>({N, rank});
+    auto axes = detail::atleast3d_axes(rank);
+    xt::xtensor<double, 1> shape = xt::adapt(labels.shape());
+    xt::xtensor<double, 2> ret = xt::zeros<double>({N, rank});
 
     for (size_t l = 0; l < N; ++l) {
-        xt::xtensor<double,2> positions = xt::from_indices(xt::argwhere(xt::equal(labels, l)));
+        xt::xtensor<double, 2> positions = xt::from_indices(xt::argwhere(xt::equal(labels, l)));
         if (positions.size() == 0) {
             continue;
         }
@@ -83,21 +85,19 @@ inline xt::xtensor<double,2> center_of_mass(const T& labels, bool periodic)
     return xt::view(ret, xt::all(), xt::keep(axes));
 }
 
-
-template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
+template <class T>
 inline Clusters::Clusters(const T& f, bool periodic)
     : Clusters(f, kernel::nearest(f.dimension()), periodic)
 {
 }
 
-template <
-        class T,
-        class S,
-        std::enable_if_t<std::is_integral<typename T::value_type>::value &&
-                         std::is_integral<typename S::value_type>::value, int>>
+template <class T, class S>
 inline Clusters::Clusters(const T& f, const S& kernel, bool periodic)
     : m_periodic(periodic)
 {
+    static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
+    static_assert(std::is_integral<typename S::value_type>::value, "Integral kernel required.");
+
     GOOSEEYE_ASSERT(xt::all(xt::equal(f, 0) || xt::equal(f, 1)));
     GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
     GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
@@ -316,18 +316,13 @@ inline xt::xtensor<double, 2> Clusters::center_positions(bool as3d) const
 
 inline xt::xarray<int> Clusters::centers() const
 {
-    // get positions of the centers
     xt::xtensor<size_t, 2> x = xt::floor(this->center_positions(true));
-
-    // allocate centers of gravity
     xt::xarray<int> c = xt::zeros<int>(m_l.shape());
 
-    // fill the centers of gravity
     for (size_t l = 1; l < x.shape(0); ++l) {
         c(x(l, 0), x(l, 1), x(l, 2)) = l;
     }
 
-    // return using the original rank
     c.reshape(m_shape);
     return c;
 }
@@ -352,31 +347,30 @@ inline xt::xtensor<size_t, 1> Clusters::sizes() const
     return out;
 }
 
-template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
+template <class T>
 inline xt::xarray<int> clusters(const T& f, bool periodic)
 {
     return Clusters(f, kernel::nearest(f.dimension()), periodic).labels();
 }
 
-inline xt::xtensor<size_t,1> relabel_map(const xt::xarray<int>& src, const xt::xarray<int>& dest)
+template <class T, class S>
+inline xt::xtensor<size_t, 1> relabel_map(const T& src, const S& dest)
 {
-    GOOSEEYE_ASSERT(src.shape() == dest.shape());
+    GOOSEEYE_ASSERT(xt::has_shape(src, dest.shape()));
 
-    size_t n_src = xt::amax(src)[0] + 1;
+    xt::xtensor<size_t, 1> ret = xt::zeros<size_t>({static_cast<size_t>(xt::amax(src)() + 1)});
+    auto A = xt::atleast_3d(src);
+    auto B = xt::atleast_3d(dest);
 
-    auto shape = detail::shape_as_dim(3, dest, 1);
-
-    xt::xtensor<size_t,1> out = xt::zeros<size_t>({n_src});
-
-    for (size_t h = 0; h < shape[0]; ++h) {
-        for (size_t i = 0; i < shape[1]; ++i) {
-            for (size_t j = 0; j < shape[2]; ++j) {
-                out(src(h, i, j)) = dest(h, i, j);
+    for (size_t h = 0; h < A.shape(0); ++h) {
+        for (size_t i = 0; i < A.shape(1); ++i) {
+            for (size_t j = 0; j < A.shape(2); ++j) {
+                ret(A(h, i, j)) = B(h, i, j);
             }
         }
     }
 
-    return out;
+    return ret;
 }
 
 } // namespace GooseEYE

@@ -126,24 +126,19 @@ inline T dilate(
     size_t iterations = 1,
     bool periodic = true);
 
-// -------------------------------------------------------------------------------------------------
-// Clusters - TODO
-// -------------------------------------------------------------------------------------------------
-
+/*
+Compute clusters and obtain certain characteristic about them.
+*/
 class Clusters {
 public:
 
     // Constructors
     Clusters() = default;
 
-    template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
+    template <class T>
     Clusters(const T& f, bool periodic = true);
 
-    template <
-        class T,
-        class S,
-        std::enable_if_t<std::is_integral<typename T::value_type>::value &&
-                         std::is_integral<typename S::value_type>::value, int> = 0>
+    template <class T, class S>
     Clusters(const T& f, const S& kernel, bool periodic = true);
 
     // Return labels (1..n)
@@ -159,11 +154,12 @@ public:
     xt::xtensor<size_t, 1> sizes() const;
 
 private:
-    // Compute clusters
+
     void compute();
 
-    // Compute position of the cluster centers
-    template <class T> xt::xtensor<double, 2> average_position(const T& lab) const;
+    template <class T>
+    xt::xtensor<double, 2> average_position(const T& lab) const;
+
     xt::xtensor<double, 2> average_position_periodic() const;
 
     static const size_t MAX_DIM = 3;
@@ -175,17 +171,17 @@ private:
     xt::xtensor<int, 3> m_l_np; // labels before applying periodicity
 };
 
-// Wrapper function
-
-template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
+/*
+Compute clusters. Wraps "GooseEYE::Clusters(...).labels()".
+*/
+template <class T>
 xt::xarray<int> clusters(const T& f, bool periodic = true);
 
-// Find map to relabel
-
-xt::xtensor<size_t, 1> relabel_map(const xt::xarray<int>& src, const xt::xarray<int>& dest);
-
-// -------------------------------------------------------------------------------------------------
-
+/*
+Find map to relabel.
+*/
+template <class T, class S>
+xt::xtensor<size_t, 1> relabel_map(const T& src, const S& dest);
 
 /*
 Convert positions to an image.
@@ -204,7 +200,7 @@ Get the position of the center of each label.
 @ret The position of the center of each label.
 */
 template <class T>
-xt::xtensor<double,2> center_of_mass(const T& labels, bool periodic = true);
+xt::xtensor<double, 2> center_of_mass(const T& labels, bool periodic = true);
 
 /*
 Compute ensemble averaged statistics, by repetitively calling the member-function of a certain
