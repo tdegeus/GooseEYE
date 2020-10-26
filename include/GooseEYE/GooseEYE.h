@@ -147,10 +147,10 @@ public:
     Clusters(const T& f, const S& kernel, bool periodic = true);
 
     // Return labels (1..n)
-    auto labels() const;
+    xt::xarray<int> labels() const;
 
     // Return label only in the center of gravity
-    auto centers() const;
+    xt::xarray<int> centers() const;
 
     // Return positions of the centers of gravity (in the original rank, or as 3-d)
     xt::xtensor<double, 2> center_positions(bool as3d = false) const;
@@ -178,7 +178,7 @@ private:
 // Wrapper function
 
 template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
-auto clusters(const T& f, bool periodic = true);
+xt::xarray<int> clusters(const T& f, bool periodic = true);
 
 // Find map to relabel
 

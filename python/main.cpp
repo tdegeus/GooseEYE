@@ -124,8 +124,7 @@ py::class_<GooseEYE::Clusters>(m, "Clusters")
     );
 
 m.def("clusters",
-    static_cast<xt::xarray<int> (*)(const xt::xarray<int>&, bool)>(
-        &GooseEYE::clusters<xt::xarray<int>>),
+    &GooseEYE::clusters<xt::xarray<int>>,
     py::arg("f"),
     py::arg("periodic") = true);
 

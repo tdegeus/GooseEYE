@@ -310,12 +310,11 @@ inline xt::xtensor<double, 2> Clusters::center_positions(bool as3d) const
         return x;
     }
 
-    return xt::view(x, xt::all(), xt::range(3 - m_shape.size(), 3));
-
-    return x;
+    xt::xtensor<size_t, 1> axes = detail::atleast3d_axes(m_shape.size());
+    return xt::view(x, xt::all(), xt::keep(axes));
 }
 
-inline auto Clusters::centers() const
+inline xt::xarray<int> Clusters::centers() const
 {
     // get positions of the centers
     xt::xtensor<size_t, 2> x = xt::floor(this->center_positions(true));
@@ -333,7 +332,7 @@ inline auto Clusters::centers() const
     return c;
 }
 
-inline auto Clusters::labels() const
+inline xt::xarray<int> Clusters::labels() const
 {
     return xt::adapt(m_l.data(), m_shape);
 }
@@ -354,7 +353,7 @@ inline xt::xtensor<size_t, 1> Clusters::sizes() const
 }
 
 template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
-inline auto clusters(const T& f, bool periodic)
+inline xt::xarray<int> clusters(const T& f, bool periodic)
 {
     return Clusters(f, kernel::nearest(f.dimension()), periodic).labels();
 }
