@@ -42,9 +42,9 @@ Compute a path between two pixels.
 @opt mode : Method to use (see "path_mode").
 @ret The path: the coordinate of one pixel per row.
 */
-inline xt::xtensor<int,2> path(
-    const xt::xtensor<int,1>& x0,
-    const xt::xtensor<int,1>& x1,
+inline xt::xtensor<int, 2> path(
+    const xt::xtensor<int, 1>& x0,
+    const xt::xtensor<int, 1>& x1,
     path_mode mode = path_mode::Bresenham);
 
 /*
@@ -66,9 +66,9 @@ Dummy image with circles.
 */
 inline xt::xarray<int> dummy_circles(
     const std::vector<size_t>& shape,
-    const xt::xtensor<int,1>& row,
-    const xt::xtensor<int,1>& col,
-    const xt::xtensor<int,1>& r,
+    const xt::xtensor<int, 1>& row,
+    const xt::xtensor<int, 1>& col,
+    const xt::xtensor<int, 1>& r,
     bool periodic = true);
 
 /*
