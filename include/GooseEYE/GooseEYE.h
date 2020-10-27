@@ -51,9 +51,13 @@ inline xt::xtensor<int, 2> path(
 Dummy image with circles. The positions and radii of the circles are randomly generated.
 @arg shape : Shape of the output image.
 @opt periodic : Switch to assume image periodic.
+@opt seed : Random seed: e.g. `static_cast<size_t>(std::time(0))`
 @ret The dummy image.
 */
-inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
+inline xt::xarray<int> dummy_circles(
+    const std::vector<size_t>& shape,
+    bool periodic = true,
+    size_t seed = 0);
 
 /*
 Dummy image with circles.

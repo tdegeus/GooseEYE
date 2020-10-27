@@ -36,9 +36,11 @@ m.def("path",
 m.def("dummy_circles",
     py::overload_cast<
         const std::vector<size_t>&,
-        bool>(&GooseEYE::dummy_circles),
+        bool,
+        size_t>(&GooseEYE::dummy_circles),
     py::arg("shape"),
-    py::arg("periodic") = true);
+    py::arg("periodic") = true,
+    py::arg("seed") = 0);
 
 m.def("dummy_circles",
     py::overload_cast<
