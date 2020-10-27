@@ -11,7 +11,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc GCC=5
+      env: COMPILER=gcc GCC=5 RUN_EXAMLES="false"
     - os: linux
       addons:
         apt:
@@ -19,7 +19,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6
+      env: COMPILER=gcc GCC=6 RUN_EXAMLES="false"
     - os: linux
       addons:
         apt:
@@ -27,7 +27,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-      env: COMPILER=gcc GCC=7
+      env: COMPILER=gcc GCC=7 RUN_EXAMLES="true"
     - os: linux
       addons:
         apt:
@@ -36,10 +36,15 @@ matrix:
             - llvm-toolchain-xenial-6.0
           packages:
             - clang-6.0
-      env: COMPILER=clang CLANG=6.0
+      env: COMPILER=clang CLANG=6.0 RUN_EXAMLES="false"
     - os: osx
       osx_image: xcode8
       compiler: clang
+      env: RUN_EXAMLES="false"
+    - os: osx
+      osx_image: xcode9
+      compiler: clang
+      env: RUN_EXAMLES="false"
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -92,30 +97,30 @@ script:
     # Run tests
     - ./test/main
     # Run C++ examples
-    - ./docs/examples/S2
-    - ./docs/examples/S2_autocorrelation
-    - ./docs/examples/S2_mask
-    - ./docs/examples/S2_ensemble
-    - ./docs/examples/C2
-    - ./docs/examples/L
-    - ./docs/examples/W2
-    - ./docs/examples/W2c
-    - ./docs/examples/clusters
-    - ./docs/examples/clusters_centers
-    - ./docs/examples/clusters_dilate
-    - ./docs/examples/heightheight
-    - ./docs/examples/mean
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2_autocorrelation; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2_mask; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2_ensemble; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/C2; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/L; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/W2; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/W2c; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/clusters; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/clusters_centers; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/clusters_dilate; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/heightheight; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/mean; fi
     # Run Python examples
-    - python docs/examples/S2.py --no-plot
-    - python docs/examples/S2_autocorrelation.py --no-plot
-    - python docs/examples/S2_mask.py --no-plot
-    - python docs/examples/S2_ensemble.py --no-plot
-    - python docs/examples/C2.py --no-plot
-    - python docs/examples/L.py --no-plot
-    - python docs/examples/W2.py --no-plot
-    - python docs/examples/W2c.py --no-plot
-    - python docs/examples/clusters.py --no-plot
-    - python docs/examples/clusters_centers.py --no-plot
-    - python docs/examples/clusters_dilate.py --no-plot
-    - python docs/examples/heightheight.py --no-plot
-    - python docs/examples/mean.py --no-plot
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2_autocorrelation.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2_mask.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2_ensemble.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/C2.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/L.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/W2.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/W2c.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/clusters.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/clusters_centers.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/clusters_dilate.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/heightheight.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/mean.py --check; fi
