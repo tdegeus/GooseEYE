@@ -16,7 +16,8 @@ environment:
     - MINICONDA: C:\myname-conda
 
 init:
-  - set RUN_EXAMPLES="false"
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set RUN_EXAMPLES="false"
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" set RUN_EXAMPLES="true"
   - "ECHO %MINICONDA%"
   - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set VCVARPATH="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
   - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set VCARGUMENT=%PLATFORM%

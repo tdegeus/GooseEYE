@@ -15,11 +15,11 @@ Options:
 import numpy as np
 import GooseEYE
 
-# generate image, store 'volume-fraction'
+# generate image, extract 'volume-fraction' for plotting
 I = GooseEYE.dummy_circles((500, 500))
 phi = np.mean(I)
 
-# 2-point probability
+# 2-point probability for comparison
 S2 = GooseEYE.S2((101, 101), I, I)
 
 # determine clusters, based on the binary image
