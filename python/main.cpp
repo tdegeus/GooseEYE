@@ -33,14 +33,16 @@ m.def("path",
     py::arg("xb"),
     py::arg("mode") = GooseEYE::path_mode::Bresenham);
 
+m.def("set_seed",
+    &GooseEYE::set_seed,
+    py::arg("seed") = 0);
+
 m.def("dummy_circles",
     py::overload_cast<
         const std::vector<size_t>&,
-        bool,
-        size_t>(&GooseEYE::dummy_circles),
+        bool>(&GooseEYE::dummy_circles),
     py::arg("shape"),
-    py::arg("periodic") = true,
-    py::arg("seed") = 0);
+    py::arg("periodic") = true);
 
 m.def("dummy_circles",
     py::overload_cast<

@@ -49,8 +49,8 @@ if __name__ == '__main__':
         import h5py
 
         with h5py.File('C2.h5', 'r') as data:
-            assert np.allclose(data['I'][...], I)
-            assert np.allclose(data['C'][...], C)
+            assert np.all(np.equal(data['I'][...], I))
+            assert np.all(np.equal(data['C'][...], C))
             assert np.allclose(data['C2'][...], C2)
 
     if args['--plot']:

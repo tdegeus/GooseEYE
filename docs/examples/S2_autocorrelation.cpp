@@ -1,36 +1,47 @@
-#include <xtensor/xarray.hpp>
-#include <xtensor/xrandom.hpp>
-#include <xtensor/xio.hpp>
 #include <GooseEYE/GooseEYE.h>
+#include <xtensor.hpp>
+#include <highfive/H5Easy.hpp>
+
+#define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
+#define MYASSERT_IMPL(expr, file, line) \
+    if (!(expr)) { \
+        throw std::runtime_error( \
+            std::string(file) + ':' + std::to_string(line) + \
+            ": assertion failed (" #expr ") \n\t"); \
+    }
 
 int main()
 {
+    xt::random::seed(0);
+
     // binary image + correlation
     // --------------------------
 
     // generate image, store 'volume-fraction'
-    xt::xarray<int> I = GooseEYE::dummy_circles({50, 50});
-    double phi = xt::mean(I)();
+    auto I = GooseEYE::dummy_circles({50, 50});
 
     // 2-point probability
-    xt::xarray<double> S2 = GooseEYE::S2({11, 11}, I, I);
+    auto S2 = GooseEYE::S2({11, 11}, I, I);
 
     // grey image + correlation
     // ------------------------
 
     // noise
-    xt::xarray<double> noise = 0.1 * (2.0 * xt::random::rand<double>(I.shape()) - 1.0);
+    auto noise = 0.1 * (2.0 * xt::random::rand<double>(I.shape()) - 1.0);
 
     // convert to grey-scale image and introduce noise
-    xt::xarray<double> Igr = I;
+    auto Igr = I;
     Igr = (Igr + 0.1) / 1.2 + noise;
 
     // 2-point correlation ('auto-correlation')
-    xt::xarray<double>S2gr = GooseEYE::S2({11, 11}, Igr, Igr);
+    auto S2gr = GooseEYE::S2({11, 11}, Igr, Igr);
 
-    // correlation bounds: mean intensity squared and mean of the intensity squared
-    double Iav_sq = std::pow(xt::mean(Igr)(), 2.0);
-    double Isq_av = xt::mean(xt::pow(Igr, 2.0))();
+    // check against previous versions
+    H5Easy::File data("S2_autocorrelation.h5", H5Easy::File::ReadOnly);
+    MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
+    MYASSERT(xt::allclose(S2, H5Easy::load<decltype(S2)>(data, "S2")));
+    MYASSERT(xt::allclose(Igr, H5Easy::load<decltype(Igr)>(data, "Igr")));
+    MYASSERT(xt::allclose(S2gr, H5Easy::load<decltype(S2gr)>(data, "S2gr")));
 
     return 0;
 }
