@@ -15,8 +15,6 @@ Options:
 import numpy as np
 import GooseEYE
 
-np.random.seed(0)
-
 # binary image + correlation
 # --------------------------
 
@@ -31,7 +29,7 @@ S2 = GooseEYE.S2((101, 101), I, I)
 # ------------------------
 
 # noise
-noise = 0.1 * (2.0 * np.random.random(I.shape) - 1.0)
+noise = 0.1 * (2.0 * GooseEYE.random.random(I.shape) - 1.0)
 
 # grey-scale image
 Igr = np.array(I, copy=True).astype(np.float)

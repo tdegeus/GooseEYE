@@ -21,6 +21,17 @@ py::module kernel = m.def_submodule("kernel", "Kernel definition");
 
 kernel.def("nearest", &GooseEYE::kernel::nearest, py::arg("ndim"));
 
+py::module random = m.def_submodule("random", "Random number generator");
+
+random.def("seed", &GooseEYE::random::seed, py::arg("seed") = 0);
+
+random.def("random",
+    [](const std::vector<size_t>& shape) {
+        xt::xarray<double> result = GooseEYE::random::random(shape);
+        return result;
+    },
+    py::arg("shape"));
+
 py::enum_<GooseEYE::path_mode>(m, "path_mode")
     .value("Bresenham", GooseEYE::path_mode::Bresenham)
     .value("actual", GooseEYE::path_mode::actual)
@@ -32,10 +43,6 @@ m.def("path",
     py::arg("xa"),
     py::arg("xb"),
     py::arg("mode") = GooseEYE::path_mode::Bresenham);
-
-m.def("set_seed",
-    &GooseEYE::set_seed,
-    py::arg("seed") = 0);
 
 m.def("dummy_circles",
     py::overload_cast<

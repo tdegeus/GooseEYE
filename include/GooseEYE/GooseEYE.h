@@ -27,6 +27,32 @@ inline xt::xarray<int> nearest(size_t ndim);
 } // namespace kernel
 
 /*
+Random number generator.
+*/
+namespace random {
+
+/*
+Set the random seed.
+@opt seed : Random seed: e.g. `static_cast<size_t>(std::time(0))`
+*/
+inline void seed(size_t seed = 0);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+*/
+auto random(std::initializer_list<size_t> shape);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+*/
+template <class T>
+auto random(const T& shape);
+
+} // namespace random
+
+/*
 Different methods to compute a pixel-path.
 */
 enum class path_mode {
@@ -46,12 +72,6 @@ inline xt::xtensor<int, 2> path(
     const xt::xtensor<int, 1>& x0,
     const xt::xtensor<int, 1>& x1,
     path_mode mode = path_mode::Bresenham);
-
-/*
-Set the random seed.
-@opt seed : Random seed: e.g. `static_cast<size_t>(std::time(0))`
-*/
-inline void set_seed(size_t seed = 0);
 
 /*
 Dummy image with circles. The positions and radii of the circles are randomly generated.
@@ -555,5 +575,6 @@ inline xt::xarray<double> L(
 #include "dilate.hpp"
 #include "dummy_circles.hpp"
 #include "kernel.hpp"
+#include "random.hpp"
 
 #endif

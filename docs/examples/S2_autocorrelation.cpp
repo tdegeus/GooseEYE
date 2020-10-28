@@ -12,29 +12,27 @@
 
 int main()
 {
-    xt::random::seed(0);
-
     // binary image + correlation
     // --------------------------
 
     // generate image, store 'volume-fraction'
-    auto I = GooseEYE::dummy_circles({50, 50});
+    auto I = GooseEYE::dummy_circles({500, 500});
 
     // 2-point probability
-    auto S2 = GooseEYE::S2({11, 11}, I, I);
+    auto S2 = GooseEYE::S2({101, 101}, I, I);
 
     // grey image + correlation
     // ------------------------
 
     // noise
-    auto noise = 0.1 * (2.0 * xt::random::rand<double>(I.shape()) - 1.0);
+    auto noise = 0.1 * (2.0 * GooseEYE::random::random(I.shape()) - 1.0);
 
     // convert to grey-scale image and introduce noise
-    auto Igr = I;
+    xt::xarray<double> Igr = I;
     Igr = (Igr + 0.1) / 1.2 + noise;
 
     // 2-point correlation ('auto-correlation')
-    auto S2gr = GooseEYE::S2({11, 11}, Igr, Igr);
+    auto S2gr = GooseEYE::S2({101, 101}, Igr, Igr);
 
     // check against previous versions
     H5Easy::File data("S2_autocorrelation.h5", H5Easy::File::ReadOnly);
