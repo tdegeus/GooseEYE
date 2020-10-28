@@ -125,6 +125,7 @@ script:
     - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters.py --check; fi
     - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_centers.py --check; fi
     - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_dilate.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_dilate_periodic.py --check; fi
     - if [ "$RUN_EXAMPLES" -eq "true" ]; python heightheight.py --check; fi
     - if [ "$RUN_EXAMPLES" -eq "true" ]; python mean.py --check; fi
     - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd ../..; fi

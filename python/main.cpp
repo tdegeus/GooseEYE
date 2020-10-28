@@ -32,6 +32,15 @@ random.def("random",
     },
     py::arg("shape"));
 
+random.def("normal",
+    [](const std::vector<size_t>& shape, double mean, double std_dev) {
+        xt::xarray<double> result = GooseEYE::random::normal(shape, mean, std_dev);
+        return result;
+    },
+    py::arg("shape"),
+    py::arg("mean") = 0,
+    py::arg("std_dev") = 1);
+
 py::enum_<GooseEYE::path_mode>(m, "path_mode")
     .value("Bresenham", GooseEYE::path_mode::Bresenham)
     .value("actual", GooseEYE::path_mode::actual)

@@ -1,8 +1,14 @@
-#include <xtensor/xarray.hpp>
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xrandom.hpp>
-#include <xtensor/xio.hpp>
 #include <GooseEYE/GooseEYE.h>
+#include <xtensor.hpp>
+#include <highfive/H5Easy.hpp>
+
+#define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
+#define MYASSERT_IMPL(expr, file, line) \
+    if (!(expr)) { \
+        throw std::runtime_error( \
+            std::string(file) + ':' + std::to_string(line) + \
+            ": assertion failed (" #expr ") \n\t"); \
+    }
 
 int main()
 {
@@ -19,17 +25,16 @@ int main()
     std::tie(rowmat, colmat) = xt::meshgrid(row, col);
     rowmat = xt::ravel(rowmat);
     colmat = xt::ravel(colmat);
-    xt::xtensor<double,1> r = (double)(M) / (double)(N) / 4.0 * xt::ones<double>({N * N});
+    xt::xtensor<double, 1> r = (double)(M) / (double)(N) / 4.0 * xt::ones<double>({N * N});
 
     // random perturbation
-    rowmat += xt::random::randn<double>({N * N}, 0.0, (double)(M) / (double)(N));
-    colmat += xt::random::randn<double>({N * N}, 0.0, (double)(M) / (double)(N));
-    xt::xtensor<double,1> dr = xt::random::rand<double>({N * N}) * 2.0 + 0.1;;
+    rowmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
+    colmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
+    xt::xtensor<double, 1> dr = GooseEYE::random::random({N * N}) * 2.0 + 0.1;;
     r = r * dr;
 
-    // generate image, store 'volume-fraction'
+    // generate image
     auto I = GooseEYE::dummy_circles({M, M}, rowmat, colmat, r);
-    double phi = xt::mean(I)(0);
 
     // create 'damage' -> right of inclusion
     colmat += 1.1 * r;
@@ -45,15 +50,20 @@ int main()
 
     // convert to gray-scale image and introduce noise
     xt::xarray<double> Igr = I;
-    Igr += 0.1 * (2.0 * xt::random::rand<double>(Igr.shape()) - 1.0) + 0.1;
+    Igr += 0.1 * (2.0 * GooseEYE::random::normal(Igr.shape()) - 1.0) + 0.1;
     Igr /= 1.2;
-
-    // mean intensity (for bounds)
-    double Iav = xt::mean(Igr)(0);
 
     // weighted correlation
     xt::xarray<double> Wd = W;
     auto WIgr = GooseEYE::W2({101, 101}, Wd, Igr, W);
+
+    // check against previous versions
+    H5Easy::File data("W2.h5", H5Easy::File::ReadOnly);
+    MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
+    MYASSERT(xt::all(xt::equal(W, H5Easy::load<decltype(W)>(data, "W"))));
+    MYASSERT(xt::allclose(Igr, H5Easy::load<decltype(Igr)>(data, "Igr")));
+    MYASSERT(xt::allclose(WI, H5Easy::load<decltype(WI)>(data, "WI")));
+    MYASSERT(xt::allclose(WIgr, H5Easy::load<decltype(WIgr)>(data, "WIgr")));
 
     return 0;
 }

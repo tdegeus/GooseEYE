@@ -19,7 +19,7 @@ inline void seed(size_t seed)
     xt::random::seed(seed);
 }
 
-inline auto random(std::initializer_list<size_t> shape)
+inline auto random(const std::vector<size_t>& shape)
 {
     return xt::random::rand<double>(shape);
 }
@@ -28,6 +28,17 @@ template <class T>
 inline auto random(const T& shape)
 {
     return xt::random::rand<double>(shape);
+}
+
+inline auto normal(const std::vector<size_t>& shape, double mean, double std_dev)
+{
+    return xt::random::randn<double>(shape, mean, std_dev);
+}
+
+template <class T>
+inline auto normal(const T& shape, double mean, double std_dev)
+{
+    return xt::random::randn<double>(shape, mean, std_dev);
 }
 
 } // namespace random

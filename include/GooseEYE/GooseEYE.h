@@ -41,7 +41,7 @@ inline void seed(size_t seed = 0);
 Return random numbers.
 @opt shape : Shape of the output array.
 */
-auto random(std::initializer_list<size_t> shape);
+auto random(const std::vector<size_t>& shape);
 
 /*
 Return random numbers.
@@ -49,6 +49,23 @@ Return random numbers.
 */
 template <class T>
 auto random(const T& shape);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+@opt mean : The mean of the distribution.
+@opt std_dev : The standard deviation of the distribution.
+*/
+auto normal(const std::vector<size_t>& shape, double mean = 0, double std_dev = 1);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+@opt mean : The mean of the distribution.
+@opt std_dev : The standard deviation of the distribution.
+*/
+template <class T>
+auto normal(const T& shape, double mean = 0, double std_dev = 1);
 
 } // namespace random
 

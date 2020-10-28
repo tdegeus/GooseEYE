@@ -1,8 +1,14 @@
-#include <xtensor/xarray.hpp>
-#include <xtensor/xtensor.hpp>
-#include <xtensor/xrandom.hpp>
-#include <xtensor/xio.hpp>
 #include <GooseEYE/GooseEYE.h>
+#include <xtensor.hpp>
+#include <highfive/H5Easy.hpp>
+
+#define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
+#define MYASSERT_IMPL(expr, file, line) \
+    if (!(expr)) { \
+        throw std::runtime_error( \
+            std::string(file) + ':' + std::to_string(line) + \
+            ": assertion failed (" #expr ") \n\t"); \
+    }
 
 int main()
 {
@@ -19,14 +25,13 @@ int main()
     xt::xtensor<double,1> r = (double)(M) / (double)(N) / 4.0 * xt::ones<double>({N * N});
 
     // random perturbation
-    rowmat += xt::random::randn<double>({N * N}, 0.0, (double)(M) / (double)(N));
-    colmat += xt::random::randn<double>({N * N}, 0.0, (double)(M) / (double)(N));
-    xt::xtensor<double,1> dr = xt::random::rand<double>({N * N}) * 2.0 + 0.1;;
+    rowmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
+    colmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
+    xt::xtensor<double,1> dr = GooseEYE::random::random({N * N}) * 2.0 + 0.1;;
     r = r * dr;
 
     // generate image, store 'volume-fraction'
     auto I = GooseEYE::dummy_circles({M, M}, rowmat, colmat, r);
-    double phi = xt::mean(I)(0);
 
     // create 'damage' -> right of inclusion
     colmat += 1.1 * r;
@@ -44,6 +49,15 @@ int main()
 
     // collapsed weighted correlation
     auto W_I_c = GooseEYE::W2c({101, 101}, clusters, centers, I, W);
+
+    // check against previous versions
+    H5Easy::File data("W2c.h5", H5Easy::File::ReadOnly);
+    MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
+    MYASSERT(xt::all(xt::equal(clusters, H5Easy::load<decltype(clusters)>(data, "clusters"))));
+    MYASSERT(xt::all(xt::equal(centers, H5Easy::load<decltype(centers)>(data, "centers"))));
+    MYASSERT(xt::all(xt::equal(W, H5Easy::load<decltype(W)>(data, "W"))));
+    MYASSERT(xt::allclose(W_I, H5Easy::load<decltype(W_I)>(data, "W_I")));
+    MYASSERT(xt::allclose(W_I_c, H5Easy::load<decltype(W_I_c)>(data, "W_I_c")));
 
     return 0;
 }
