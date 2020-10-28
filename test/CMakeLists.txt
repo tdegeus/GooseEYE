@@ -6,9 +6,11 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     find_package(GooseEYE REQUIRED CONFIG)
 endif()
 
-option(WARNINGS "Show build warnings" ON)
-option(ASSERT "Enable assertions" ON)
+set(WARNINGS ON)
+set(ASSERT ON)
+set(DEBUG ON)
 
+find_package(xtensor REQUIRED)
 find_package(Catch2 REQUIRED)
 
 file(GLOB sources "*.cpp")
@@ -26,5 +28,9 @@ if(WARNINGS)
 endif()
 
 if(ASSERT)
+    target_link_libraries(main PRIVATE GooseEYE::assert)
+endif()
+
+if(DEBUG)
     target_link_libraries(main PRIVATE GooseEYE::debug)
 endif()

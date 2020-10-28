@@ -52,30 +52,34 @@ build_script:
   # Run tests
   - .\test\main
   # Run C++ examples
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\S2}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\S2_autocorrelation}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\S2_mask}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\S2_ensemble}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\C2}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\L}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\W2}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\W2c}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\clusters}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\clusters_centers}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\clusters_dilate}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\heightheight}
-  - if("%RUN_EXMAPLES" -eq "true"){.\docs\examples\mean}
+  - if("%RUN_EXMAPLES" -eq "true"){cd docs\examples}
+  - if("%RUN_EXMAPLES" -eq "true"){.\S2}
+  - if("%RUN_EXMAPLES" -eq "true"){.\S2_autocorrelation}
+  - if("%RUN_EXMAPLES" -eq "true"){.\S2_mask}
+  - if("%RUN_EXMAPLES" -eq "true"){.\S2_ensemble}
+  - if("%RUN_EXMAPLES" -eq "true"){.\C2}
+  - if("%RUN_EXMAPLES" -eq "true"){.\L}
+  - if("%RUN_EXMAPLES" -eq "true"){.\W2}
+  - if("%RUN_EXMAPLES" -eq "true"){.\W2c}
+  - if("%RUN_EXMAPLES" -eq "true"){.\clusters}
+  - if("%RUN_EXMAPLES" -eq "true"){.\clusters_centers}
+  - if("%RUN_EXMAPLES" -eq "true"){.\clusters_dilate}
+  - if("%RUN_EXMAPLES" -eq "true"){.\heightheight}
+  - if("%RUN_EXMAPLES" -eq "true"){.\mean}
+  - if("%RUN_EXMAPLES" -eq "true"){cd ..\..}
   # Run Python examples
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\S2.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\S2_autocorrelation.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\S2_mask.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\S2_ensemble.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\C2.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\L.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\W2.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\W2c.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\clusters.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\clusters_centers.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\clusters_dilate.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\heightheight.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python docs\examples\mean.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){cd docs\examples}
+  - if("%RUN_EXMAPLES" -eq "true"){python S2.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python S2_autocorrelation.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python S2_mask.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python S2_ensemble.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python C2.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python L.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python W2.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python W2c.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python clusters.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python clusters_centers.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python clusters_dilate.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python heightheight.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python mean.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){cd ..\..}

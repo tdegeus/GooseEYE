@@ -11,7 +11,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc GCC=5 RUN_EXAMLES="false"
+      env: COMPILER=gcc GCC=5 RUN_EXAMLES="false" USE_XSIMD=1
     - os: linux
       addons:
         apt:
@@ -19,7 +19,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 RUN_EXAMLES="false"
+      env: COMPILER=gcc GCC=6 RUN_EXAMLES="false" USE_XSIMD=1
     - os: linux
       addons:
         apt:
@@ -27,7 +27,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-      env: COMPILER=gcc GCC=7 RUN_EXAMLES="true"
+      env: COMPILER=gcc GCC=7 RUN_EXAMLES="true" USE_XSIMD=1
     - os: linux
       addons:
         apt:
@@ -36,15 +36,15 @@ matrix:
             - llvm-toolchain-xenial-6.0
           packages:
             - clang-6.0
-      env: COMPILER=clang CLANG=6.0 RUN_EXAMLES="false"
+      env: COMPILER=clang CLANG=6.0 RUN_EXAMLES="false" USE_XSIMD=1
     - os: osx
       osx_image: xcode8
       compiler: clang
-      env: RUN_EXAMLES="false"
+      env: RUN_EXAMLES="false" USE_XSIMD=1
     - os: osx
       osx_image: xcode9
       compiler: clang
-      env: RUN_EXAMLES="true"
+      env: RUN_EXAMLES="true" USE_XSIMD=1
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -88,7 +88,7 @@ install:
     - conda install -c conda-forge pyxtensor
     - conda install -c conda-forge catch2
     # Build/install the library
-    - cmake . -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+    - cmake . -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DSIMD=${USE_XSIMD}
     - make
     - sudo make install
     - python setup.py build
@@ -97,30 +97,34 @@ script:
     # Run tests
     - ./test/main
     # Run C++ examples
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2_autocorrelation; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2_mask; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/S2_ensemble; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/C2; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/L; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/W2; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/W2c; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/clusters; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/clusters_centers; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/clusters_dilate; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/heightheight; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./docs/examples/mean; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd docs/examples; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2_autocorrelation; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2_mask; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2_ensemble; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./C2; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./L; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./W2; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./W2c; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./clusters; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./clusters_centers; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./clusters_dilate; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./heightheight; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./mean; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd ../..; fi
     # Run Python examples
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2_autocorrelation.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2_mask.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/S2_ensemble.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/C2.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/L.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/W2.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/W2c.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/clusters.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/clusters_centers.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/clusters_dilate.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/heightheight.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python docs/examples/mean.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd docs/examples; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2_autocorrelation.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2_mask.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2_ensemble.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python C2.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python L.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python W2.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python W2c.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_centers.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_dilate.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python heightheight.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; python mean.py --check; fi
+    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd ../..; fi

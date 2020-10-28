@@ -1,8 +1,8 @@
 r'''
-    Plot and/or check C2.
+    Plot and/or check.
 
 Usage:
-    C2.py [options]
+    script [options]
 
 Options:
     -s, --save      Save output for later check.

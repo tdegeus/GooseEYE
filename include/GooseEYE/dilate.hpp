@@ -97,8 +97,7 @@ inline T dilate(
     bool periodic)
 {
     using value_type = typename T::value_type;
-    static const size_t MAX_DIM = 3;
-    GOOSEEYE_ASSERT(f.dimension() <= MAX_DIM);
+    GOOSEEYE_ASSERT(f.dimension() <= 3);
     GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
     GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
     GOOSEEYE_ASSERT(static_cast<size_t>(xt::amax(f)()) <= iterations.size() + 1);
