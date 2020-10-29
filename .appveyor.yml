@@ -9,18 +9,13 @@ platform:
 
 image:
   - Visual Studio 2017
-  # - Visual Studio 2015
 
 environment:
   matrix:
     - MINICONDA: C:\myname-conda
 
 init:
-  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set RUN_EXAMPLES="false"
-  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" set RUN_EXAMPLES="true"
   - "ECHO %MINICONDA%"
-  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set VCVARPATH="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
-  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set VCARGUMENT=%PLATFORM%
   - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" set VCVARPATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - echo "%VCVARPATH% %VCARGUMENT%"
   - "%VCVARPATH% %VCARGUMENT%"
@@ -55,36 +50,36 @@ build_script:
   # Run tests
   - .\test\main
   # Run C++ examples
-  - if("%RUN_EXMAPLES" -eq "true"){cd docs\examples}
-  - if("%RUN_EXMAPLES" -eq "true"){.\S2}
-  - if("%RUN_EXMAPLES" -eq "true"){.\S2_autocorrelation}
-  - if("%RUN_EXMAPLES" -eq "true"){.\S2_mask}
-  - if("%RUN_EXMAPLES" -eq "true"){.\S2_ensemble}
-  - if("%RUN_EXMAPLES" -eq "true"){.\C2}
-  - if("%RUN_EXMAPLES" -eq "true"){.\L}
-  - if("%RUN_EXMAPLES" -eq "true"){.\W2}
-  - if("%RUN_EXMAPLES" -eq "true"){.\W2c}
-  - if("%RUN_EXMAPLES" -eq "true"){.\clusters}
-  - if("%RUN_EXMAPLES" -eq "true"){.\clusters_centers}
-  - if("%RUN_EXMAPLES" -eq "true"){.\clusters_dilate}
-  - if("%RUN_EXMAPLES" -eq "true"){.\heightheight}
-  - if("%RUN_EXMAPLES" -eq "true"){.\mean}
-  - if("%RUN_EXMAPLES" -eq "true"){cd ..\..}
+  - cd docs\examples
+  - .\S2
+  - .\S2_autocorrelation
+  - .\S2_mask
+  - .\S2_ensemble
+  - .\C2
+  - .\L
+  - .\W2
+  - .\W2c
+  - .\clusters
+  - .\clusters_centers
+  - .\clusters_dilate
+  - .\heightheight
+  - .\mean
+  - cd ..\..
   # Run Python examples
-  - if("%RUN_EXMAPLES" -eq "true"){cd docs\examples}
-  - if("%RUN_EXMAPLES" -eq "true"){python S2.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python S2_autocorrelation.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python S2_mask.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python S2_ensemble.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python C2.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python L.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python W2.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python W2c.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python clusters.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python clusters_centers.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python clusters_dilate.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python clusters_dilate_periodic.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python heightheight.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python mean.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){python pixel_path.py --check}
-  - if("%RUN_EXMAPLES" -eq "true"){cd ..\..}
+  - cd docs\examples
+  - python S2.py --check
+  - python S2_autocorrelation.py --check
+  - python S2_mask.py --check
+  - python S2_ensemble.py --check
+  - python C2.py --check
+  - python L.py --check
+  - python W2.py --check
+  - python W2c.py --check
+  - python clusters.py --check
+  - python clusters_centers.py --check
+  - python clusters_dilate.py --check
+  - python clusters_dilate_periodic.py --check
+  - python heightheight.py --check
+  - python mean.py --check
+  - python pixel_path.py --check
+  - cd ..\..

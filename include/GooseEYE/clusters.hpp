@@ -120,7 +120,7 @@ inline Clusters::Clusters(const T& f, const S& kernel, bool periodic)
     // rename labels to lowest possible label starting from 1
     xt::xtensor<int, 1> labels = xt::unique(m_l);
     xt::xtensor<int, 1> renum = xt::empty<int>({m_l.size()});
-    xt::view(renum, xt::keep(labels)) = xt::arange<int>(labels.size());
+    xt::view(renum, xt::keep(labels)) = xt::arange<int>(static_cast<int>(labels.size()));
     for (auto& i : m_l) {
         i = renum(i);
     }
