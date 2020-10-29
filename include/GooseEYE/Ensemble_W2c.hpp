@@ -11,17 +11,24 @@
 
 namespace GooseEYE {
 
-template <class T>
+template <class C, class T, class M>
 inline void Ensemble::W2c(
-    const xt::xarray<int>& clusters,
-    const xt::xarray<int>& centers,
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
+    const C& clusters,
+    const C& centers,
+    const T& f,
+    const M& fmask,
     path_mode mode)
 {
+    using value_type = typename T::value_type;
+    using mask_type = typename M::value_type;
+    using cluster_type = typename C::value_type;
+
+    static_assert(std::is_integral<typename C::value_type>::value, "Integral clusters required.");
+    static_assert(std::is_integral<typename M::value_type>::value, "Integral mask required.");
+
     GOOSEEYE_ASSERT(f.shape() == clusters.shape());
     GOOSEEYE_ASSERT(f.shape() == centers.shape());
-    GOOSEEYE_ASSERT(f.shape() == fmask.shape());
+    GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()));
     GOOSEEYE_ASSERT(f.dimension() == m_shape_orig.size());
     GOOSEEYE_ASSERT(xt::all(xt::equal(fmask, 0) || xt::equal(fmask, 1)));
     GOOSEEYE_ASSERT(m_stat == Type::W2c || m_stat == Type::Unset);
@@ -38,16 +45,16 @@ inline void Ensemble::W2c(
     }
 
     // apply padding
-    xt::xtensor<T,3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<int,3> Fmask = xt::pad(xt::atleast_3d(fmask), m_pad, pad_mode);
-    xt::xtensor<int,3> Clusters = xt::pad(xt::atleast_3d(clusters), m_pad, pad_mode);
-    xt::xtensor<int,3> Centers = xt::pad(xt::atleast_3d(centers), m_pad, pad_mode);
-    std::vector<size_t> shape = detail::shape(F);
+    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    xt::xtensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    xt::xtensor<mask_type, 3> Fmask = xt::pad(xt::atleast_3d(fmask), m_pad, pad_mode);
+    xt::xtensor<cluster_type, 3> Clusters = xt::pad(xt::atleast_3d(clusters), m_pad, pad_mode);
+    xt::xtensor<cluster_type, 3> Centers = xt::pad(xt::atleast_3d(centers), m_pad, pad_mode);
 
     // ROI-shaped array used to extract a pixel stamp:
     // a set of end-points over which to loop and check the statics
     // - initialize to 1
-    xt::xtensor<int,3> r = xt::ones<int>(m_shape);
+    xt::xtensor<int, 3> r = xt::ones<int>(m_shape);
     // - determine interior pixels (account for quasi-3D images)
     auto ix = m_shape[0] > 1 ? xt::range(1, m_shape[0] - 1) : xt::range(0, m_shape[0]);
     auto iy = m_shape[1] > 1 ? xt::range(1, m_shape[1] - 1) : xt::range(0, m_shape[1]);
@@ -71,9 +78,9 @@ inline void Ensemble::W2c(
             {stamp(istamp, 0), stamp(istamp, 1), stamp(istamp, 2)},
             mode);
 
-        for (size_t h = m_pad[0][0]; h < shape[0] - m_pad[0][1]; ++h) {
-            for (size_t i = m_pad[1][0]; i < shape[1] - m_pad[1][1]; ++i) {
-                for (size_t j = m_pad[2][0]; j < shape[2] - m_pad[2][1]; ++j) {
+        for (size_t h = m_pad[0][0]; h < F.shape(0) - m_pad[0][1]; ++h) {
+            for (size_t i = m_pad[1][0]; i < F.shape(1) - m_pad[1][1]; ++i) {
+                for (size_t j = m_pad[2][0]; j < F.shape(2) - m_pad[2][1]; ++j) {
 
                     auto label = Centers(h, i, j);
                     int q = -1;
@@ -105,7 +112,7 @@ inline void Ensemble::W2c(
                                 m_first(
                                     m_pad[0][0] + path(q, 0),
                                     m_pad[1][0] + path(q, 1),
-                                    m_pad[1][0] + path(q, 2)) += F(h + dh, i + di, j + dj);
+                                    m_pad[1][0] + path(q, 2)) += Fd(h + dh, i + di, j + dj);
                             }
                         }
 
@@ -117,12 +124,8 @@ inline void Ensemble::W2c(
     }
 }
 
-template <class T>
-inline void Ensemble::W2c(
-    const xt::xarray<int>& clusters,
-    const xt::xarray<int>& centers,
-    const xt::xarray<T>& f,
-    path_mode mode)
+template <class C, class T>
+inline void Ensemble::W2c(const C& clusters, const C& centers, const T& f, path_mode mode)
 {
     xt::xarray<int> mask = xt::zeros<int>(f.shape());
     W2c(clusters, centers, f, mask, mode);

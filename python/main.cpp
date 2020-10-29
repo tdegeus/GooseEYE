@@ -203,12 +203,12 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     // Mean
 
     .def("mean", py::overload_cast<
-            const xt::xarray<double>&>(&GooseEYE::Ensemble::mean<double>),
+            const xt::xarray<double>&>(&GooseEYE::Ensemble::mean<xt::xarray<double>>),
         py::arg("f"))
 
     .def("mean", py::overload_cast<
             const xt::xarray<double>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::mean<double>),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::mean<xt::xarray<double>, xt::xarray<int>>),
         py::arg("f"),
         py::arg("fmask"))
 
@@ -216,13 +216,13 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
     .def("S2", py::overload_cast<
             const xt::xarray<int>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::S2<int>),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::S2<xt::xarray<int>>),
         py::arg("f"),
         py::arg("g"))
 
     .def("S2", py::overload_cast<
             const xt::xarray<double>&,
-            const xt::xarray<double>&>(&GooseEYE::Ensemble::S2<double>),
+            const xt::xarray<double>&>(&GooseEYE::Ensemble::S2<xt::xarray<double>>),
         py::arg("f"),
         py::arg("g"))
 
@@ -230,7 +230,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
             const xt::xarray<double>&,
             const xt::xarray<double>&,
             const xt::xarray<int>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::S2<double>),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::S2<xt::xarray<double>, xt::xarray<int>>),
         py::arg("f"),
         py::arg("g"),
         py::arg("fmask"),
@@ -239,12 +239,12 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     // Height-Height Correlation Function
 
     .def("heightheight", py::overload_cast<
-            const xt::xarray<double>&>(&GooseEYE::Ensemble::heightheight<double>),
+            const xt::xarray<double>&>(&GooseEYE::Ensemble::heightheight<xt::xarray<double>>),
         py::arg("f"))
 
     .def("heightheight", py::overload_cast<
             const xt::xarray<double>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::heightheight<double>),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::heightheight<xt::xarray<double>, xt::xarray<int>>),
         py::arg("f"),
         py::arg("fmask"))
 
@@ -252,7 +252,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
     .def("C2", py::overload_cast<
             const xt::xarray<int>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::C2),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::C2<xt::xarray<int>>),
         py::arg("f"),
         py::arg("g"))
 
@@ -260,7 +260,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
             const xt::xarray<int>&,
             const xt::xarray<int>&,
             const xt::xarray<int>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::C2),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::C2<xt::xarray<int>, xt::xarray<int>>),
         py::arg("f"),
         py::arg("g"),
         py::arg("fmask"),
@@ -270,20 +270,20 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
 
     .def("W2", py::overload_cast<
             const xt::xarray<int>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::W2<int>),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::W2<xt::xarray<int>>),
         py::arg("w"),
         py::arg("f"))
 
     .def("W2", py::overload_cast<
             const xt::xarray<double>&,
-            const xt::xarray<double>&>(&GooseEYE::Ensemble::W2<double>),
+            const xt::xarray<double>&>(&GooseEYE::Ensemble::W2<xt::xarray<double>>),
         py::arg("w"),
         py::arg("f"))
 
     .def("W2", py::overload_cast<
             const xt::xarray<double>&,
             const xt::xarray<double>&,
-            const xt::xarray<int>&>(&GooseEYE::Ensemble::W2<double>),
+            const xt::xarray<int>&>(&GooseEYE::Ensemble::W2<xt::xarray<double>, xt::xarray<int>>),
         py::arg("w"),
         py::arg("f"),
         py::arg("fmask"))
@@ -294,7 +294,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
             const xt::xarray<int>&,
             const xt::xarray<int>&,
             const xt::xarray<int>&,
-            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<int>),
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::xarray<int>, xt::xarray<int>>),
         py::arg("clusters"),
         py::arg("centers"),
         py::arg("f"),
@@ -304,7 +304,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
             const xt::xarray<int>&,
             const xt::xarray<int>&,
             const xt::xarray<double>&,
-            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<double>),
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::xarray<int>, xt::xarray<double>>),
         py::arg("clusters"),
         py::arg("centers"),
         py::arg("f"),
@@ -315,7 +315,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
             const xt::xarray<int>&,
             const xt::xarray<double>&,
             const xt::xarray<int>&,
-            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<double>),
+            GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::xarray<int>, xt::xarray<double>, xt::xarray<int>>),
         py::arg("clusters"),
         py::arg("centers"),
         py::arg("f"),
@@ -325,7 +325,7 @@ py::class_<GooseEYE::Ensemble>(m, "Ensemble")
     // Lineal-path function
 
     .def("L",
-        &GooseEYE::Ensemble::L<int>,
+        &GooseEYE::Ensemble::L<xt::xarray<int>>,
         py::arg("f"),
         py::arg("mode") = GooseEYE::path_mode::Bresenham)
 
@@ -365,7 +365,7 @@ m.def("S2", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<int>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::S2<int>),
+        bool>(&GooseEYE::S2<xt::xarray<int>>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
@@ -376,7 +376,7 @@ m.def("S2", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<double>&,
         const xt::xarray<double>&,
-        bool>(&GooseEYE::S2<double>),
+        bool>(&GooseEYE::S2<xt::xarray<double>>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
@@ -388,7 +388,7 @@ m.def("S2", py::overload_cast<
         const xt::xarray<double>&,
         const xt::xarray<int>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::S2<double>),
+        bool>(&GooseEYE::S2<xt::xarray<double>, xt::xarray<int>>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
@@ -402,7 +402,7 @@ m.def("C2", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<int>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::C2),
+        bool>(&GooseEYE::C2<xt::xarray<int>>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
@@ -414,7 +414,7 @@ m.def("C2", py::overload_cast<
         const xt::xarray<int>&,
         const xt::xarray<int>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::C2),
+        bool>(&GooseEYE::C2<xt::xarray<int>, xt::xarray<int>>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
@@ -428,7 +428,7 @@ m.def("W2", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<int>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::W2<int>),
+        bool>(&GooseEYE::W2<xt::xarray<int>>),
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
@@ -438,7 +438,7 @@ m.def("W2", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<double>&,
         const xt::xarray<double>&,
-        bool>(&GooseEYE::W2<double>),
+        bool>(&GooseEYE::W2<xt::xarray<double>>),
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
@@ -449,7 +449,7 @@ m.def("W2", py::overload_cast<
         const xt::xarray<double>&,
         const xt::xarray<double>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::W2<double>),
+        bool>(&GooseEYE::W2<xt::xarray<double>, xt::xarray<int>>),
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
@@ -464,7 +464,7 @@ m.def("W2c", py::overload_cast<
         const xt::xarray<int>&,
         const xt::xarray<int>&,
         GooseEYE::path_mode,
-        bool>(&GooseEYE::W2c<int>),
+        bool>(&GooseEYE::W2c<xt::xarray<int>, xt::xarray<int>>),
     py::arg("roi"),
     py::arg("clusters"),
     py::arg("centers"),
@@ -478,7 +478,7 @@ m.def("W2c", py::overload_cast<
         const xt::xarray<int>&,
         const xt::xarray<double>&,
         GooseEYE::path_mode,
-        bool>(&GooseEYE::W2c<double>),
+        bool>(&GooseEYE::W2c<xt::xarray<int>, xt::xarray<double>>),
     py::arg("roi"),
     py::arg("clusters"),
     py::arg("centers"),
@@ -493,7 +493,7 @@ m.def("W2c", py::overload_cast<
         const xt::xarray<double>&,
         const xt::xarray<int>&,
         GooseEYE::path_mode,
-        bool>(&GooseEYE::W2c<double>),
+        bool>(&GooseEYE::W2c<xt::xarray<int>, xt::xarray<double>, xt::xarray<int>>),
     py::arg("roi"),
     py::arg("clusters"),
     py::arg("centers"),
@@ -507,7 +507,7 @@ m.def("W2c", py::overload_cast<
 m.def("heightheight", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<double>&,
-        bool>(&GooseEYE::heightheight<double>),
+        bool>(&GooseEYE::heightheight<xt::xarray<double>>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("periodic") = true);
@@ -516,14 +516,14 @@ m.def("heightheight", py::overload_cast<
         const std::vector<size_t>&,
         const xt::xarray<double>&,
         const xt::xarray<int>&,
-        bool>(&GooseEYE::heightheight<double>),
+        bool>(&GooseEYE::heightheight<xt::xarray<double>, xt::xarray<int>>),
     py::arg("roi"),
     py::arg("f"),
     py::arg("fmask"),
     py::arg("periodic") = true);
 
 m.def("L",
-    &GooseEYE::L<int>,
+    &GooseEYE::L<xt::xarray<int>>,
     py::arg("roi"),
     py::arg("f"),
     py::arg("periodic") = true,

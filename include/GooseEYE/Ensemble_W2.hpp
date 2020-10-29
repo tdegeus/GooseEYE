@@ -11,12 +11,16 @@
 
 namespace GooseEYE {
 
-template <class T>
+template <class T, class M>
 inline void
-Ensemble::W2(const xt::xarray<T>& f, const xt::xarray<T>& g, const xt::xarray<int>& gmask)
+Ensemble::W2(const T& f, const T& g, const M& gmask)
 {
-    GOOSEEYE_ASSERT(f.shape() == g.shape());
-    GOOSEEYE_ASSERT(f.shape() == gmask.shape());
+    using value_type = typename T::value_type;
+
+    static_assert(std::is_integral<typename M::value_type>::value, "Integral mask required.");
+
+    GOOSEEYE_ASSERT(xt::has_shape(f, g.shape()));
+    GOOSEEYE_ASSERT(xt::has_shape(f, gmask.shape()));
     GOOSEEYE_ASSERT(f.dimension() == m_shape_orig.size());
     GOOSEEYE_ASSERT(xt::all(xt::equal(gmask, 0) || xt::equal(gmask, 1)));
     GOOSEEYE_ASSERT(m_stat == Type::W2 || m_stat == Type::Unset);
@@ -35,28 +39,29 @@ Ensemble::W2(const xt::xarray<T>& f, const xt::xarray<T>& g, const xt::xarray<in
     }
 
     // apply padding
-    xt::xtensor<T,3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<T,3> G = xt::pad(xt::atleast_3d(g), m_pad, pad_mode);
-    xt::xtensor<T,3> Gmask = xt::pad(xt::atleast_3d(gmask), m_pad, xt::pad_mode::constant, mask_value);
-    std::vector<size_t> shape = detail::shape(F);
+    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    xt::xtensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    xt::xtensor<double, 3> G = xt::pad(xt::atleast_3d(g), m_pad, pad_mode);
+    xt::xtensor<double, 3> Gmask =
+        xt::pad(xt::atleast_3d(gmask), m_pad, xt::pad_mode::constant, mask_value);
 
     // compute correlation
-    for (size_t h = m_pad[0][0]; h < shape[0] - m_pad[0][1]; ++h) {
-        for (size_t i = m_pad[1][0]; i < shape[1] - m_pad[1][1]; ++i) {
-            for (size_t j = m_pad[2][0]; j < shape[2] - m_pad[2][1]; ++j) {
+    for (size_t h = m_pad[0][0]; h < F.shape(0) - m_pad[0][1]; ++h) {
+        for (size_t i = m_pad[1][0]; i < F.shape(1) - m_pad[1][1]; ++i) {
+            for (size_t j = m_pad[2][0]; j < F.shape(2) - m_pad[2][1]; ++j) {
                 // - get comparison sub-matrix
                 auto Gi = xt::view(G,
                     xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
                     xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
                     xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
                 // - get inverse of comparison mask
-                auto Gmii = T(1) - xt::view(Gmask,
+                auto Gmii = 1.0 - xt::view(Gmask,
                     xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
                     xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
                     xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
                 // - correlation (account for mask)
                 if (F(h, i, j) != 0) {
-                    m_first += F(h, i, j) * Gi * Gmii;
+                    m_first += Fd(h, i, j) * Gi * Gmii;
                 }
                 // - normalisation
                 m_norm += F(h, i, j) * Gmii;
@@ -66,7 +71,7 @@ Ensemble::W2(const xt::xarray<T>& f, const xt::xarray<T>& g, const xt::xarray<in
 }
 
 template <class T>
-inline void Ensemble::W2(const xt::xarray<T>& f, const xt::xarray<T>& g)
+inline void Ensemble::W2(const T& f, const T& g)
 {
     xt::xarray<int> mask = xt::zeros<int>(f.shape());
     W2(f, g, mask);

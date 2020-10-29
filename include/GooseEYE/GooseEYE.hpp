@@ -27,38 +27,35 @@ inline xt::xtensor<int, 2> path(
     }
 }
 
-inline xt::xarray<double> distance(const std::vector<size_t>& roi)
+inline auto distance(const std::vector<size_t>& roi)
 {
     Ensemble ensemble(roi);
     return ensemble.distance();
 }
 
-inline xt::xarray<double> distance(const std::vector<size_t>& roi, size_t dim)
+inline auto distance(const std::vector<size_t>& roi, size_t dim)
 {
     Ensemble ensemble(roi);
     return ensemble.distance(dim);
 }
 
-inline xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h)
+inline auto distance(const std::vector<size_t>& roi, const std::vector<double>& h)
 {
     Ensemble ensemble(roi);
     return ensemble.distance(h);
 }
 
-inline xt::xarray<double> distance(
-    const std::vector<size_t>& roi,
-    const std::vector<double>& h,
-    size_t dim)
+inline auto distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t dim)
 {
     Ensemble ensemble(roi);
     return ensemble.distance(h, dim);
 }
 
 template <class T>
-inline xt::xarray<double> S2(
+inline auto S2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
-    const xt::xarray<T>& g,
+    const T& f,
+    const T& g,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -66,13 +63,13 @@ inline xt::xarray<double> S2(
     return ensemble.result();
 }
 
-template <class T>
-inline xt::xarray<double> S2(
+template <class T, class M>
+inline auto S2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
-    const xt::xarray<T>& g,
-    const xt::xarray<int>& fmask,
-    const xt::xarray<int>& gmask,
+    const T& f,
+    const T& g,
+    const M& fmask,
+    const M& gmask,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -80,10 +77,11 @@ inline xt::xarray<double> S2(
     return ensemble.result();
 }
 
-inline xt::xarray<double> C2(
+template <class T>
+inline auto C2(
     const std::vector<size_t>& roi,
-    const xt::xarray<int>& f,
-    const xt::xarray<int>& g,
+    const T& f,
+    const T& g,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -91,12 +89,13 @@ inline xt::xarray<double> C2(
     return ensemble.result();
 }
 
-inline xt::xarray<double> C2(
+template <class T, class M>
+inline auto C2(
     const std::vector<size_t>& roi,
-    const xt::xarray<int>& f,
-    const xt::xarray<int>& g,
-    const xt::xarray<int>& fmask,
-    const xt::xarray<int>& gmask,
+    const T& f,
+    const T& g,
+    const M& fmask,
+    const M& gmask,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -105,10 +104,10 @@ inline xt::xarray<double> C2(
 }
 
 template <class T>
-inline xt::xarray<double> W2(
+inline auto W2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& w,
-    const xt::xarray<T>& f,
+    const T& w,
+    const T& f,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -116,12 +115,12 @@ inline xt::xarray<double> W2(
     return ensemble.result();
 }
 
-template <class T>
-inline xt::xarray<double> W2(
+template <class T, class M>
+inline auto W2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& w,
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
+    const T& w,
+    const T& f,
+    const M& fmask,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -129,12 +128,12 @@ inline xt::xarray<double> W2(
     return ensemble.result();
 }
 
-template <class T>
-inline xt::xarray<double> W2c(
+template <class C, class T>
+inline auto W2c(
     const std::vector<size_t>& roi,
-    const xt::xarray<int>& clusters,
-    const xt::xarray<int>& centers,
-    const xt::xarray<T>& f,
+    const C& clusters,
+    const C& centers,
+    const T& f,
     path_mode mode,
     bool periodic)
 {
@@ -143,13 +142,13 @@ inline xt::xarray<double> W2c(
     return ensemble.result();
 }
 
-template <class T>
-inline xt::xarray<double> W2c(
+template <class C, class T, class M>
+inline auto W2c(
     const std::vector<size_t>& roi,
-    const xt::xarray<int>& clusters,
-    const xt::xarray<int>& centers,
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
+    const C& clusters,
+    const C& centers,
+    const T& f,
+    const M& fmask,
     path_mode mode,
     bool periodic)
 {
@@ -159,9 +158,9 @@ inline xt::xarray<double> W2c(
 }
 
 template <class T>
-inline xt::xarray<double> heightheight(
+inline auto heightheight(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
+    const T& f,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -169,11 +168,11 @@ inline xt::xarray<double> heightheight(
     return ensemble.result();
 }
 
-template <class T>
-inline xt::xarray<double> heightheight(
+template <class T, class M>
+inline auto heightheight(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
+    const T& f,
+    const M& fmask,
     bool periodic)
 {
     Ensemble ensemble(roi, periodic);
@@ -181,10 +180,10 @@ inline xt::xarray<double> heightheight(
     return ensemble.result();
 }
 
-template <class T, std::enable_if_t<std::is_integral<T>::value, int>>
-inline xt::xarray<double> L(
+template <class T>
+inline auto L(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
+    const T& f,
     bool periodic,
     path_mode mode)
 {

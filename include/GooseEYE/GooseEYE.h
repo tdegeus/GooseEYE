@@ -144,7 +144,7 @@ See above for parameters.
 template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
 inline T dilate(
     const T& f,
-    const xt::xtensor<size_t,1>& iterations,
+    const xt::xtensor<size_t, 1>& iterations,
     bool periodic = true);
 
 /*
@@ -224,7 +224,7 @@ template <class T>
 xt::xarray<int> clusters(const T& f, bool periodic = true);
 
 /*
-Find map to relabel.
+Find map to relabel from "src" to "dest".
 */
 template <class T, class S>
 xt::xtensor<size_t, 1> relabel_map(const T& src, const S& dest);
@@ -342,10 +342,10 @@ public:
     @opt fmask : Mask certain pixels (binary, 1: masked, 0: not masked).
     */
     template <class T>
-    void mean(const xt::xarray<T>& f);
+    void mean(const T& f);
 
-    template <class T>
-    void mean(const xt::xarray<T>& f, const xt::xarray<int>& fmask);
+    template <class T, class M>
+    void mean(const T& f, const M& fmask);
 
     /*
     Add realization to 2-point correlation: P(f(i) * g(i + di)).
@@ -355,16 +355,10 @@ public:
     @opt gmask : Mask certain pixels of g (binary, 1: masked, 0: not masked).
     */
     template <class T>
-    void S2(
-        const xt::xarray<T>& f,
-        const xt::xarray<T>& g);
+    void S2(const T& f, const T& g);
 
-    template <class T>
-    void S2(
-        const xt::xarray<T>& f,
-        const xt::xarray<T>& g,
-        const xt::xarray<int>& fmask,
-        const xt::xarray<int>& gmask);
+    template <class T, class M>
+    void S2(const T& f, const T& g, const M& fmask, const M& gmask);
 
     /*
     Add realization to 2-point cluster function: P(f(i) == g(i + di)).
@@ -373,15 +367,11 @@ public:
     @opt fmask : Mask certain pixels of f (binary, 1: masked, 0: not masked).
     @opt gmask : Mask certain pixels of g (binary, 1: masked, 0: not masked).
     */
-    void C2(
-        const xt::xarray<int>& f,
-        const xt::xarray<int>& g);
+    template <class T>
+    void C2(const T& f, const T& g);
 
-    void C2(
-        const xt::xarray<int>& f,
-        const xt::xarray<int>& g,
-        const xt::xarray<int>& fmask,
-        const xt::xarray<int>& gmask);
+    template <class T, class M>
+    void C2(const T& f, const T& g, const M& fmask, const M& gmask);
 
     /*
     Add realization to weighted 2-point correlation.
@@ -390,10 +380,10 @@ public:
     @opt fmask : Mask certain pixels of f (binary, 1: masked, 0: not masked).
     */
     template <class T>
-    void W2(const xt::xarray<T>& w, const xt::xarray<T>& f);
+    void W2(const T& w, const T& f);
 
-    template <class T>
-    void W2(const xt::xarray<T>& w, const xt::xarray<T>& f, const xt::xarray<int>& fmask);
+    template <class T, class M>
+    void W2(const T& w, const T& f, const M& fmask);
 
     /*
     Add realization to collapsed weighted 2-point correlation
@@ -403,19 +393,19 @@ public:
     @opt mode : Method to use (see "path_mode").
     @opt fmask : Mask certain pixels of f (binary, 1: masked, 0: not masked).
     */
-    template <class T>
+    template <class C, class T>
     void W2c(
-        const xt::xarray<int>& clusters,
-        const xt::xarray<int>& centers,
-        const xt::xarray<T>& f,
+        const C& clusters,
+        const C& centers,
+        const T& f,
         path_mode mode = path_mode::Bresenham);
 
-    template <class T>
+    template <class C, class T, class M>
     void W2c(
-        const xt::xarray<int>& clusters,
-        const xt::xarray<int>& centers,
-        const xt::xarray<T>& f,
-        const xt::xarray<int>& fmask,
+        const C& clusters,
+        const C& centers,
+        const T& f,
+        const M& fmask,
         path_mode mode = path_mode::Bresenham);
 
     /*
@@ -424,18 +414,18 @@ public:
     @opt fmask : Mask certain pixels of f (binary, 1: masked, 0: not masked).
     */
     template <class T>
-    void heightheight(const xt::xarray<T>& f);
+    void heightheight(const T& f);
 
-    template <class T>
-    void heightheight(const xt::xarray<T>& f, const xt::xarray<int>& fmask);
+    template <class T, class M>
+    void heightheight(const T& f, const M& fmask);
 
     /*
     Add realization to lineal-path function
     @arg f : The image.
     @opt mode : Method to use (see "path_mode").
     */
-    template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-    void L(const xt::xarray<T>& f, path_mode mode = path_mode::Bresenham);
+    template <class T>
+    void L(const T& f, path_mode mode = path_mode::Bresenham);
 
 private:
 
@@ -465,11 +455,11 @@ private:
 
     // Raw (not normalized) result, and normalization:
     // - sum of the first moment: x_1 + x_2 + ...
-    xt::xtensor<double,3> m_first;
+    xt::xtensor<double, 3> m_first;
     // - sum of the second moment: x_1^2 + x_2^2 + ...
-    xt::xtensor<double,3> m_second;
+    xt::xtensor<double, 3> m_second;
     // - number of measurements per pixel
-    xt::xtensor<double,3> m_norm;
+    xt::xtensor<double, 3> m_norm;
 
     // Shape of the region-of-interest, as specified.
     std::vector<size_t> m_shape_orig;
@@ -485,95 +475,94 @@ private:
 // Wrapper functions to compute the statistics for one image
 // ---------------------------------------------------------
 
-inline xt::xarray<double> distance(const std::vector<size_t>& roi);
-
-inline xt::xarray<double> distance(const std::vector<size_t>& roi, size_t axis);
-
-inline xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h);
-
-inline xt::xarray<double> distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t axis);
+inline auto distance(const std::vector<size_t>& roi);
+inline auto distance(const std::vector<size_t>& roi, size_t axis);
+inline auto distance(const std::vector<size_t>& roi, const std::vector<double>& h);
+inline auto distance(const std::vector<size_t>& roi, const std::vector<double>& h, size_t axis);
 
 template <class T>
-inline xt::xarray<double> S2(
+inline auto S2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
-    const xt::xarray<T>& g,
+    const T& f,
+    const T& g,
     bool periodic = true);
 
-template <class T>
-inline xt::xarray<double> S2(
+template <class T, class M>
+inline auto S2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
-    const xt::xarray<T>& g,
-    const xt::xarray<int>& fmask,
-    const xt::xarray<int>& gmask,
-    bool periodic = true);
-
-inline xt::xarray<double> C2(
-    const std::vector<size_t>& roi,
-    const xt::xarray<int>& f,
-    const xt::xarray<int>& g,
-    bool periodic = true);
-
-inline xt::xarray<double> C2(
-    const std::vector<size_t>& roi,
-    const xt::xarray<int>& f,
-    const xt::xarray<int>& g,
-    const xt::xarray<int>& fmask,
-    const xt::xarray<int>& gmask,
+    const T& f,
+    const T& g,
+    const M& fmask,
+    const M& gmask,
     bool periodic = true);
 
 template <class T>
-inline xt::xarray<double> W2(
+inline auto C2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& w,
-    const xt::xarray<T>& f,
+    const T& f,
+    const T& g,
+    bool periodic = true);
+
+template <class T, class M>
+inline auto C2(
+    const std::vector<size_t>& roi,
+    const T& f,
+    const T& g,
+    const M& fmask,
+    const M& gmask,
     bool periodic = true);
 
 template <class T>
-inline xt::xarray<double> W2(
+inline auto W2(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& w,
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
+    const T& w,
+    const T& f,
     bool periodic = true);
 
-template <class T>
-inline xt::xarray<double> W2c(
+template <class T, class M>
+inline auto W2(
     const std::vector<size_t>& roi,
-    const xt::xarray<int>& clusters,
-    const xt::xarray<int>& centers,
-    const xt::xarray<T>& f,
+    const T& w,
+    const T& f,
+    const M& fmask,
+    bool periodic = true);
+
+template <class C, class T>
+inline auto W2c(
+    const std::vector<size_t>& roi,
+    const C& clusters,
+    const C& centers,
+    const T& f,
+    path_mode mode = path_mode::Bresenham,
+    bool periodic = true);
+
+template <class C, class T, class M>
+inline auto W2c(
+    const std::vector<size_t>& roi,
+    const C& clusters,
+    const C& centers,
+    const T& f,
+    const M& fmask,
     path_mode mode = path_mode::Bresenham,
     bool periodic = true);
 
 template <class T>
-inline xt::xarray<double> W2c(
+inline auto heightheight(
     const std::vector<size_t>& roi,
-    const xt::xarray<int>& clusters,
-    const xt::xarray<int>& centers,
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
-    path_mode mode = path_mode::Bresenham,
+    const T& f,
+    bool periodic = true);
+
+template <class T, class M>
+inline auto heightheight(
+    const std::vector<size_t>& roi,
+    const T& f,
+    const M& fmask,
     bool periodic = true);
 
 template <class T>
-inline xt::xarray<double> heightheight(
+inline auto L(
     const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
-    bool periodic = true);
-
-template <class T>
-inline xt::xarray<double> heightheight(
-    const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
-    const xt::xarray<int>& fmask,
-    bool periodic = true);
-
-template <class T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
-inline xt::xarray<double> L(
-    const std::vector<size_t>& roi,
-    const xt::xarray<T>& f,
+    const T& f,
     bool periodic = true,
     path_mode mode = path_mode::Bresenham);
 
