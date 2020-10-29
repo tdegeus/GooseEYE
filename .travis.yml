@@ -38,10 +38,6 @@ matrix:
             - clang-6.0
       env: COMPILER=clang CLANG=6.0 RUN_EXAMLES="false" USE_XSIMD=1
     - os: osx
-      osx_image: xcode8
-      compiler: clang
-      env: RUN_EXAMLES="false" USE_XSIMD=1
-    - os: osx
       osx_image: xcode9
       compiler: clang
       env: RUN_EXAMLES="true" USE_XSIMD=1
@@ -101,35 +97,35 @@ script:
     # Run tests
     - ./test/main
     # Run C++ examples
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd docs/examples; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2_autocorrelation; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2_mask; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./S2_ensemble; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./C2; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./L; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./W2; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./W2c; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./clusters; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./clusters_centers; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./clusters_dilate; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./heightheight; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then ./mean; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd ../..; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then cd docs/examples; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./S2; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./S2_autocorrelation; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./S2_mask; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./S2_ensemble; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./C2; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./L; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./W2; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./W2c; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./clusters; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./clusters_centers; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./clusters_dilate; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./heightheight; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then ./mean; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then cd ../..; fi
     # Run Python examples
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd docs/examples; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2_autocorrelation.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2_mask.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python S2_ensemble.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python C2.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python L.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python W2.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python W2c.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_centers.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_dilate.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python clusters_dilate_periodic.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python heightheight.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; python mean.py --check; fi
-    - if [ "$RUN_EXAMPLES" -eq "true" ]; then cd ../..; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then cd docs/examples; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python S2.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python S2_autocorrelation.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python S2_mask.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python S2_ensemble.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python C2.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python L.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python W2.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python W2c.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python clusters.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python clusters_centers.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python clusters_dilate.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python clusters_dilate_periodic.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python heightheight.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python mean.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; then cd ../..; fi
