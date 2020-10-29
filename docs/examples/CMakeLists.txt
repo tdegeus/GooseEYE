@@ -7,10 +7,10 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(GOOSEEYE_INCLUDE_DIR ${GooseEYE_INCLUDE_DIRS})
 endif()
 
-set(WARNINGS ON)
 set(ASSERT OFF)
 set(DEBUG OFF)
 option(SIMD "Enable xsimd" ON)
+option(WARNINGS "Enable warnings" ON)
 
 set(CMAKE_BUILD_TYPE Release)
 

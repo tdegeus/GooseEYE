@@ -9,7 +9,7 @@ platform:
 
 image:
   - Visual Studio 2017
-  - Visual Studio 2015
+  # - Visual Studio 2015
 
 environment:
   matrix:
@@ -45,7 +45,7 @@ install:
     catch2
     highfive
   # Build/install the library
-  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DSIMD=OFF .
+  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DSIMD=OFF -DWARNINGS=OFF .
   - nmake
   - nmake install
   - python setup.py build

@@ -6,10 +6,10 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     find_package(GooseEYE REQUIRED CONFIG)
 endif()
 
-set(WARNINGS ON)
 set(ASSERT ON)
 set(DEBUG ON)
 option(SIMD "Enable xsimd" ON)
+option(WARNINGS "Enable warnings" ON)
 
 find_package(xtensor REQUIRED)
 find_package(Catch2 REQUIRED)
