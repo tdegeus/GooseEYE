@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
         import h5py
 
-        with h5py.File('clusters_dilate.h5', 'w') as data:
+        with h5py.File('clusters_dilate_periodic.h5', 'w') as data:
             data['I'] = I
             data['C'] = C
             data['CD'] = CD
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
         import h5py
 
-        with h5py.File('clusters_dilate.h5', 'r') as data:
+        with h5py.File('clusters_dilate_periodic.h5', 'r') as data:
             assert np.all(np.equal(data['I'][...], I))
             assert np.all(np.equal(data['C'][...], C))
             assert np.all(np.equal(data['CD'][...], CD))
