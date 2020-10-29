@@ -15,8 +15,11 @@ namespace random {
 
 inline void seed(size_t seed)
 {
-    std::srand(seed);
-    xt::random::seed(seed);
+    using default_engine_type = std::mt19937;
+    using seed_type = default_engine_type::result_type;
+
+    std::srand(static_cast<unsigned>(seed));
+    xt::random::seed(static_cast<seed_type>(seed));
 }
 
 inline auto random(const std::vector<size_t>& shape)
