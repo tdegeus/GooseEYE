@@ -86,4 +86,5 @@ build_script:
   - if("%RUN_EXMAPLES" -eq "true"){python clusters_dilate_periodic.py --check}
   - if("%RUN_EXMAPLES" -eq "true"){python heightheight.py --check}
   - if("%RUN_EXMAPLES" -eq "true"){python mean.py --check}
+  - if("%RUN_EXMAPLES" -eq "true"){python pixel_path.py --check}
   - if("%RUN_EXMAPLES" -eq "true"){cd ..\..}

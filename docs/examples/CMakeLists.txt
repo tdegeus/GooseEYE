@@ -36,7 +36,6 @@ foreach(testsourcefile ${APP_SOURCES})
     target_link_libraries(${testname} PUBLIC
         GooseEYE
         xtensor::optimize
-        xtensor::use_xsimd
         HighFive)
 
     if(SIMD)

@@ -128,4 +128,5 @@ script:
     - if [ "$RUN_EXAMPLES" = "true" ]; python clusters_dilate_periodic.py --check; fi
     - if [ "$RUN_EXAMPLES" = "true" ]; python heightheight.py --check; fi
     - if [ "$RUN_EXAMPLES" = "true" ]; python mean.py --check; fi
+    - if [ "$RUN_EXAMPLES" = "true" ]; python pixel_path.py --check; fi
     - if [ "$RUN_EXAMPLES" = "true" ]; then cd ../..; fi

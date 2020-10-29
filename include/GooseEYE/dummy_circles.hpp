@@ -11,11 +11,6 @@
 
 namespace GooseEYE {
 
-inline void set_seed(size_t seed)
-{
-    std::srand(seed);
-}
-
 inline xt::xarray<int> dummy_circles(
     const std::vector<size_t>& shape,
     const xt::xtensor<int,1>& row,
