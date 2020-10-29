@@ -11,13 +11,13 @@
 
 namespace GooseEYE {
 
-template <class T, class S>
-inline void Ensemble::S2(const T& f, const T& g, const S& fmask, const S& gmask)
+template <class T, class M>
+inline void Ensemble::S2(const T& f, const T& g, const M& fmask, const M& gmask)
 {
     using value_type = typename T::value_type;
-    using mask_type = typename S::value_type;
+    using mask_type = typename M::value_type;
 
-    static_assert(std::is_integral<typename S::value_type>::value, "Integral mask required.");
+    static_assert(std::is_integral<mask_type>::value, "Integral mask required.");
 
     GOOSEEYE_ASSERT(xt::has_shape(f, g.shape()));
     GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()));

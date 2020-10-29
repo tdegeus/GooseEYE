@@ -23,8 +23,8 @@ inline void Ensemble::W2c(
     using mask_type = typename M::value_type;
     using cluster_type = typename C::value_type;
 
-    static_assert(std::is_integral<typename C::value_type>::value, "Integral clusters required.");
-    static_assert(std::is_integral<typename M::value_type>::value, "Integral mask required.");
+    static_assert(std::is_integral<cluster_type>::value, "Integral clusters required.");
+    static_assert(std::is_integral<mask_type>::value, "Integral mask required.");
 
     GOOSEEYE_ASSERT(f.shape() == clusters.shape());
     GOOSEEYE_ASSERT(f.shape() == centers.shape());

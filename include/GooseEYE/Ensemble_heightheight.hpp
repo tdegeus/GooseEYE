@@ -16,7 +16,7 @@ inline void Ensemble::heightheight(const T& f, const M& fmask)
 {
     using mask_type = typename M::value_type;
 
-    static_assert(std::is_integral<typename M::value_type>::value, "Integral mask required.");
+    static_assert(std::is_integral<mask_type>::value, "Integral mask required.");
 
     GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()));
     GOOSEEYE_ASSERT(f.dimension() == m_shape_orig.size());

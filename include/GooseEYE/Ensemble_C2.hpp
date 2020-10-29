@@ -17,8 +17,8 @@ inline void Ensemble::C2(const T& f, const T& g, const M& fmask, const M& gmask)
     using value_type = typename T::value_type;
     using mask_type = typename M::value_type;
 
-    static_assert(std::is_integral<typename T::value_type>::value, "Integral image required.");
-    static_assert(std::is_integral<typename M::value_type>::value, "Integral mask required.");
+    static_assert(std::is_integral<value_type>::value, "Integral image required.");
+    static_assert(std::is_integral<mask_type>::value, "Integral mask required.");
 
     GOOSEEYE_ASSERT(xt::has_shape(f, g.shape()));
     GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()));
