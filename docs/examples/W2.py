@@ -23,7 +23,7 @@ N = 15
 M = 500
 row = np.linspace(0, M, N)
 col = np.linspace(0, M, N)
-(row, col) = np.meshgrid(row, col)
+row, col = np.meshgrid(row, col, indexing='ij') # ('indexing' only for comparison with C++ code)
 row = row.reshape(-1)
 col = col.reshape(-1)
 r = float(M) / float(N) / 4.0 * np.ones((N * N))
@@ -34,13 +34,13 @@ col += GooseEYE.random.normal([N * N], 0.0, float(M) / float(N))
 r *= GooseEYE.random.random([N * N]) * 2.0 + 0.1
 
 # generate image, extract 'volume-fraction' for plotting
-I = GooseEYE.dummy_circles((M, M), row.astype(np.int), col.astype(np.int), r.astype(np.int))
+I = GooseEYE.dummy_circles((M, M), np.round(row), np.round(col), np.round(r))
 phi = np.mean(I)
 
 # create 'damage' -> right of inclusion
 col += 1.1 * r
 r *= 0.4
-W = GooseEYE.dummy_circles((M, M), row.astype(np.int), col.astype(np.int), r.astype(np.int))
+W = GooseEYE.dummy_circles((M, M), np.round(row), np.round(col), np.round(r))
 W[I == 1] = 0
 
 # weighted correlation
@@ -58,7 +58,7 @@ Igr /= 1.2
 Iav = np.mean(Igr)
 
 # weighted correlation
-WIgr = GooseEYE.W2((101, 101), W, Igr, fmask=W)
+WIgr = GooseEYE.W2((101, 101), W.astype(np.float), Igr, fmask=W)
 # </snippet>
 
 if __name__ == '__main__':

@@ -30,16 +30,16 @@ int main()
     // random perturbation
     rowmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
     colmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
-    xt::xtensor<double, 1> dr = GooseEYE::random::random({N * N}) * 2.0 + 0.1;;
+    xt::xtensor<double, 1> dr = GooseEYE::random::random({N * N}) * 2.0 + 0.1;
     r = r * dr;
 
     // generate image
-    auto I = GooseEYE::dummy_circles({M, M}, rowmat, colmat, r);
+    auto I = GooseEYE::dummy_circles({M, M}, xt::round(rowmat), xt::round(colmat), xt::round(r));
 
     // create 'damage' -> right of inclusion
     colmat += 1.1 * r;
     r *= 0.4;
-    auto W = GooseEYE::dummy_circles({M, M}, rowmat, colmat, r);
+    auto W = GooseEYE::dummy_circles({M, M}, xt::round(rowmat), xt::round(colmat), xt::round(r));
     W = xt::where(xt::equal(I, 1), 0, W);
 
     // weighted correlation
@@ -50,12 +50,11 @@ int main()
 
     // convert to gray-scale image and introduce noise
     xt::xarray<double> Igr = I;
-    Igr += 0.1 * (2.0 * GooseEYE::random::normal(Igr.shape()) - 1.0) + 0.1;
+    Igr += 0.1 * (2.0 * GooseEYE::random::random(Igr.shape()) - 1.0) + 0.1;
     Igr /= 1.2;
 
     // weighted correlation
-    xt::xarray<double> Wd = W;
-    auto WIgr = GooseEYE::W2({101, 101}, Wd, Igr, W);
+    auto WIgr = GooseEYE::W2({101, 101}, xt::xarray<double>(W), Igr, W);
 
     // check against previous versions
     H5Easy::File data("W2.h5", H5Easy::File::ReadOnly);

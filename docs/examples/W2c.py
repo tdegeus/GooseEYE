@@ -20,7 +20,7 @@ N = 15
 M = 500
 row = np.linspace(0, M, N)
 col = np.linspace(0, M, N)
-row, col = np.meshgrid(row, col)
+row, col = np.meshgrid(row, col, indexing='ij') # ('indexing' only for comparison with C++ code)
 row = row.reshape(-1)
 col = col.reshape(-1)
 r = float(M) / float(N) / 4.0 * np.ones((N * N))
@@ -30,24 +30,14 @@ row += GooseEYE.random.normal([N * N], 0.0, float(M) / float(N))
 col += GooseEYE.random.normal([N * N], 0.0, float(M) / float(N))
 r *= GooseEYE.random.random([N * N]) * 2.0 + 0.1
 
-# generate image
-I = GooseEYE.dummy_circles((M, M),
-    row.astype(np.int),
-    col.astype(np.int),
-    r.astype(np.int))
-
-# get 'volume fraction'
+# generate image, extract 'volume-fraction' for plotting
+I = GooseEYE.dummy_circles((M, M), np.round(row), np.round(col), np.round(r))
 phi = np.mean(I)
 
 # create 'damage' -> right of inclusion
 col += 1.1 * r
 r *= 0.4
-
-W = GooseEYE.dummy_circles((M, M),
-    row.astype(np.int),
-    col.astype(np.int),
-    r.astype(np.int))
-
+W = GooseEYE.dummy_circles((M, M), np.round(row), np.round(col), np.round(r))
 W[I == 1] = 0
 
 # compute individual damage clusters and their centers
@@ -56,10 +46,10 @@ clusters = Clusters.labels()
 centers = Clusters.centers()
 
 # weighted correlation
-W_I = GooseEYE.W2((101, 101), W, I, fmask=W)
+WI = GooseEYE.W2((101, 101), W, I, fmask=W)
 
 # collapsed weighted correlation
-W_I_c = GooseEYE.W2c((101, 101), clusters, centers, I, fmask=W)
+WIc = GooseEYE.W2c((101, 101), clusters, centers, I, fmask=W)
 # </snippet>
 
 if __name__ == '__main__':
@@ -77,8 +67,8 @@ if __name__ == '__main__':
             data['clusters'] = clusters
             data['centers'] = centers
             data['W'] = W
-            data['W_I'] = W_I
-            data['W_I_c'] = W_I_c
+            data['WI'] = WI
+            data['WIc'] = WIc
 
     if args['--check']:
 
@@ -89,8 +79,8 @@ if __name__ == '__main__':
             assert np.all(np.equal(data['clusters'][...], clusters))
             assert np.all(np.equal(data['centers'][...], centers))
             assert np.all(np.equal(data['W'][...], W))
-            assert np.allclose(data['W_I'][...], W_I)
-            assert np.allclose(data['W_I_c'][...], W_I_c)
+            assert np.allclose(data['WI'][...], WI)
+            assert np.allclose(data['WIc'][...], WIc)
 
     if args['--plot']:
 
@@ -142,7 +132,7 @@ if __name__ == '__main__':
 
         ax = axes[1]
 
-        im = ax.imshow(W_I - phi,
+        im = ax.imshow(WI - phi,
             clim = (-phi, +phi),
             cmap = 'RdBu_r',
             extent = (-50, 50, -50, 50))
@@ -165,7 +155,7 @@ if __name__ == '__main__':
 
         ax = axes[2]
 
-        im = ax.imshow(W_I_c - phi,
+        im = ax.imshow(WIc - phi,
             clim = (-phi, +phi),
             cmap = 'RdBu_r',
             extent = (-50, 50, -50, 50))
