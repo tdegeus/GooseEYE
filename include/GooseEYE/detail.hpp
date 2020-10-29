@@ -184,7 +184,9 @@ See: https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
 @ret The path: the coordinate of one pixel per row.
 */
 namespace path {
-inline xt::xtensor<int,2> bresenham(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
+
+template <class T>
+inline xt::xtensor<int, 2> bresenham(const T& xa, const T& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;
@@ -205,9 +207,9 @@ inline xt::xtensor<int,2> bresenham(const xt::xtensor<int,1>& xa, const xt::xten
     // sign of the distance (can be -1/+1 or 0)
     // current position (temporary value)
     for (i = 0; i < ndim; i++) {
-        a[i] = std::abs(xb[i] - xa[i]) << 1;
-        s[i] = SIGN(xb[i] - xa[i]);
-        x[i] = xa[i];
+        a[i] = std::abs((int)xb[i] - (int)xa[i]) << 1;
+        s[i] = SIGN((int)xb[i] - (int)xa[i]);
+        x[i] = (int)xa[i];
     }
 
     // determine which direction is dominant
@@ -263,7 +265,9 @@ Compute pixel-path.
 @ret The path: the coordinate of one pixel per row.
 */
 namespace path {
-inline xt::xtensor<int,2> actual(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
+
+template <class T>
+inline xt::xtensor<int, 2> actual(const T& xa, const T& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;
@@ -361,7 +365,9 @@ Compute pixel-path.
 @ret The path: the coordinate of one pixel per row.
 */
 namespace path {
-inline xt::xtensor<int,2> full(const xt::xtensor<int,1>& xa, const xt::xtensor<int,1>& xb)
+
+template <class T>
+inline xt::xtensor<int,2> full(const T& xa, const T& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;

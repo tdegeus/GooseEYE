@@ -59,8 +59,6 @@ inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool peri
 {
     GOOSEEYE_ASSERT(shape.size() == 2);
 
-    std::srand((size_t)std::time(0));
-
     // set default: number of circles in both directions and (constant) radius
     size_t N = (size_t)(0.05 * (double)shape[0]);
     size_t M = (size_t)(0.05 * (double)shape[1]);

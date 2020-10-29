@@ -9,7 +9,6 @@ platform:
 
 image:
   - Visual Studio 2017
-  - Visual Studio 2015
 
 environment:
   matrix:
@@ -17,8 +16,6 @@ environment:
 
 init:
   - "ECHO %MINICONDA%"
-  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set VCVARPATH="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
-  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set VCARGUMENT=%PLATFORM%
   - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" set VCVARPATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - echo "%VCVARPATH% %VCARGUMENT%"
   - "%VCVARPATH% %VCARGUMENT%"
@@ -32,15 +29,18 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda install -c conda-forge cmake
-  - conda install -c conda-forge xsimd
-  - conda install -c conda-forge xtensor
-  - conda install -c conda-forge python
-  - conda install -c conda-forge numpy
-  - conda install -c conda-forge pyxtensor
-  - conda install -c conda-forge catch2
+  - conda install -c conda-forge mamba
+  - >-
+    mamba install -c conda-forge
+    cmake
+    xtensor
+    python
+    numpy
+    pyxtensor
+    catch2
+    highfive
   # Build/install the library
-  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON .
+  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=OFF -DSIMD=OFF -DWARNINGS=OFF .
   - nmake
   - nmake install
   - python setup.py build
@@ -49,31 +49,37 @@ install:
 build_script:
   # Run tests
   - .\test\main
-  # Run C++ examples
-  - .\docs\examples\S2
-  - .\docs\examples\S2_autocorrelation
-  - .\docs\examples\S2_mask
-  - .\docs\examples\S2_ensemble
-  - .\docs\examples\C2
-  - .\docs\examples\L
-  - .\docs\examples\W2
-  - .\docs\examples\W2c
-  - .\docs\examples\clusters
-  - .\docs\examples\clusters_centers
-  - .\docs\examples\clusters_dilate
-  - .\docs\examples\heightheight
-  - .\docs\examples\mean
-  # Run Python examples
-  - python docs\examples\S2.py --no-plot
-  - python docs\examples\S2_autocorrelation.py --no-plot
-  - python docs\examples\S2_mask.py --no-plot
-  - python docs\examples\S2_ensemble.py --no-plot
-  - python docs\examples\C2.py --no-plot
-  - python docs\examples\L.py --no-plot
-  - python docs\examples\W2.py --no-plot
-  - python docs\examples\W2c.py --no-plot
-  - python docs\examples\clusters.py --no-plot
-  - python docs\examples\clusters_centers.py --no-plot
-  - python docs\examples\clusters_dilate.py --no-plot
-  - python docs\examples\heightheight.py --no-plot
-  - python docs\examples\mean.py --no-plot
+  # # Run C++ examples
+  # - cd docs\examples
+  # - .\S2
+  # - .\S2_autocorrelation
+  # - .\S2_mask
+  # - .\S2_ensemble
+  # - .\C2
+  # - .\L
+  # - .\W2
+  # - .\W2c
+  # - .\clusters
+  # - .\clusters_centers
+  # - .\clusters_dilate
+  # - .\heightheight
+  # - .\mean
+  # - cd ..\..
+  # # Run Python examples
+  # - cd docs\examples
+  # - python S2.py --check
+  # - python S2_autocorrelation.py --check
+  # - python S2_mask.py --check
+  # - python S2_ensemble.py --check
+  # - python C2.py --check
+  # - python L.py --check
+  # - python W2.py --check
+  # - python W2c.py --check
+  # - python clusters.py --check
+  # - python clusters_centers.py --check
+  # - python clusters_dilate.py --check
+  # - python clusters_dilate_periodic.py --check
+  # - python heightheight.py --check
+  # - python mean.py --check
+  # - python pixel_path.py --check
+  # - cd ..\..

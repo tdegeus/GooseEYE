@@ -27,6 +27,49 @@ inline xt::xarray<int> nearest(size_t ndim);
 } // namespace kernel
 
 /*
+Random number generator.
+*/
+namespace random {
+
+/*
+Set the random seed.
+@opt seed : Random seed: e.g. `static_cast<size_t>(std::time(0))`
+*/
+inline void seed(size_t seed = 0);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+*/
+auto random(const std::vector<size_t>& shape);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+*/
+template <class T>
+auto random(const T& shape);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+@opt mean : The mean of the distribution.
+@opt std_dev : The standard deviation of the distribution.
+*/
+auto normal(const std::vector<size_t>& shape, double mean = 0, double std_dev = 1);
+
+/*
+Return random numbers.
+@opt shape : Shape of the output array.
+@opt mean : The mean of the distribution.
+@opt std_dev : The standard deviation of the distribution.
+*/
+template <class T>
+auto normal(const T& shape, double mean = 0, double std_dev = 1);
+
+} // namespace random
+
+/*
 Different methods to compute a pixel-path.
 */
 enum class path_mode {
@@ -42,18 +85,21 @@ Compute a path between two pixels.
 @opt mode : Method to use (see "path_mode").
 @ret The path: the coordinate of one pixel per row.
 */
-inline xt::xtensor<int,2> path(
-    const xt::xtensor<int,1>& x0,
-    const xt::xtensor<int,1>& x1,
+inline xt::xtensor<int, 2> path(
+    const xt::xtensor<int, 1>& x0,
+    const xt::xtensor<int, 1>& x1,
     path_mode mode = path_mode::Bresenham);
 
 /*
 Dummy image with circles. The positions and radii of the circles are randomly generated.
 @arg shape : Shape of the output image.
 @opt periodic : Switch to assume image periodic.
+
 @ret The dummy image.
 */
-inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
+inline xt::xarray<int> dummy_circles(
+    const std::vector<size_t>& shape,
+    bool periodic = true);
 
 /*
 Dummy image with circles.
@@ -66,9 +112,9 @@ Dummy image with circles.
 */
 inline xt::xarray<int> dummy_circles(
     const std::vector<size_t>& shape,
-    const xt::xtensor<int,1>& row,
-    const xt::xtensor<int,1>& col,
-    const xt::xtensor<int,1>& r,
+    const xt::xtensor<int, 1>& row,
+    const xt::xtensor<int, 1>& col,
+    const xt::xtensor<int, 1>& r,
     bool periodic = true);
 
 /*
@@ -546,5 +592,6 @@ inline xt::xarray<double> L(
 #include "dilate.hpp"
 #include "dummy_circles.hpp"
 #include "kernel.hpp"
+#include "random.hpp"
 
 #endif

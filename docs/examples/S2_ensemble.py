@@ -1,3 +1,16 @@
+r'''
+    Plot and/or check.
+
+Usage:
+    script [options]
+
+Options:
+    -s, --save      Save output for later check.
+    -c, --check     Check against earlier results.
+    -p, --plot      Plot.
+    -h, --help      Show this help.
+'''
+
 # <snippet>
 import numpy as np
 import GooseEYE
@@ -11,42 +24,51 @@ for i in range(5):
 S2 = ensemble.result()
 # </snippet>
 
-phi = S2[50, 50]
+if __name__ == '__main__':
 
-# skip plot with "--no-plot" command line argument
-# ------------------------------------------------
+    import docopt
 
-import sys
+    args = docopt.docopt(__doc__)
 
-if len(sys.argv) == 2:
-    if sys.argv[1] == "--no-plot":
-        sys.exit(0)
+    if args['--save']:
 
-# plot
-# ----
+        import h5py
 
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import matplotlib.cm as cm
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+        with h5py.File('S2_ensemble.h5', 'w') as data:
+            data['S2'] = S2
 
-try:
-    plt.style.use(['goose', 'goose-latex'])
-except:
-    pass
+    if args['--check']:
 
-fig, ax = plt.subplots()
+        import h5py
 
-im = ax.imshow(S2, clim=(0, phi), cmap='jet', extent=(-50, 50, -50, 50))
-ax.xaxis.set_ticks([-50, 0, +50])
-ax.yaxis.set_ticks([-50, 0, +50])
-ax.set_xlabel(r'$\Delta x$')
-ax.set_ylabel(r'$\Delta y$')
-ax.set_title (r'$S_2$')
-div = make_axes_locatable(ax)
-cax = div.append_axes("right", size="5%", pad=0.1)
-cbar = plt.colorbar(im, cax=cax)
-cbar.set_ticks([0 , phi])
-cbar.set_ticklabels(['0', r'$\varphi$'])
+        with h5py.File('S2_ensemble.h5', 'r') as data:
+            assert np.allclose(data['S2'][...], S2)
 
-plt.savefig('S2_ensemble.svg')
+    if args['--plot']:
+
+        import matplotlib.pyplot as plt
+        import matplotlib as mpl
+        import matplotlib.cm as cm
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        try:
+            plt.style.use(['goose', 'goose-latex'])
+        except:
+            pass
+
+        fig, ax = plt.subplots()
+
+        phi = S2[50, 50]
+        im = ax.imshow(S2, clim=(0, phi), cmap='jet', extent=(-50, 50, -50, 50))
+        ax.xaxis.set_ticks([-50, 0, +50])
+        ax.yaxis.set_ticks([-50, 0, +50])
+        ax.set_xlabel(r'$\Delta x$')
+        ax.set_ylabel(r'$\Delta y$')
+        ax.set_title (r'$S_2$')
+        div = make_axes_locatable(ax)
+        cax = div.append_axes("right", size="5%", pad=0.1)
+        cbar = plt.colorbar(im, cax=cax)
+        cbar.set_ticks([0 , phi])
+        cbar.set_ticklabels(['0', r'$\varphi$'])
+
+        plt.savefig('S2_ensemble.svg')

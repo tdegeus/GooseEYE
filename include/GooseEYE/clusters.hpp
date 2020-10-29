@@ -120,7 +120,7 @@ inline Clusters::Clusters(const T& f, const S& kernel, bool periodic)
     // rename labels to lowest possible label starting from 1
     xt::xtensor<int, 1> labels = xt::unique(m_l);
     xt::xtensor<int, 1> renum = xt::empty<int>({m_l.size()});
-    xt::view(renum, xt::keep(labels)) = xt::arange<int>(labels.size());
+    xt::view(renum, xt::keep(labels)) = xt::arange<int>(static_cast<int>(labels.size()));
     for (auto& i : m_l) {
         i = renum(i);
     }
@@ -144,7 +144,7 @@ inline void Clusters::compute()
     // N.B. By default the algorithm simply loops over the image, consequently it will miss that
     // clusters may touch further down in the image, labelling one cluster with several labels.
     // Using "renum" these touching clusters will glued and assigned one single label.
-    xt::xtensor<int, 1> renum = xt::arange<int>(m_l.size());
+    xt::xtensor<int, 1> renum = xt::arange<int>(static_cast<int>(m_l.size()));
 
     for (size_t h = m_pad[0][0]; h < m_l.shape(0) - m_pad[0][1]; ++h) {
         for (size_t i = m_pad[1][0]; i < m_l.shape(1) - m_pad[1][1]; ++i) {
@@ -319,7 +319,7 @@ inline xt::xarray<int> Clusters::centers() const
     xt::xtensor<size_t, 2> x = xt::floor(this->center_positions(true));
     xt::xarray<int> c = xt::zeros<int>(m_l.shape());
 
-    for (size_t l = 1; l < x.shape(0); ++l) {
+    for (int l = 1; l < static_cast<int>(x.shape(0)); ++l) {
         c(x(l, 0), x(l, 1), x(l, 2)) = l;
     }
 

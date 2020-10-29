@@ -1,15 +1,27 @@
-#include <xtensor/xarray.hpp>
-#include <xtensor/xio.hpp>
 #include <GooseEYE/GooseEYE.h>
+#include <xtensor.hpp>
+#include <highfive/H5Easy.hpp>
+
+#define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
+#define MYASSERT_IMPL(expr, file, line) \
+    if (!(expr)) { \
+        throw std::runtime_error( \
+            std::string(file) + ':' + std::to_string(line) + \
+            ": assertion failed (" #expr ") \n\t"); \
+    }
 
 int main()
 {
-    // generate image, store 'volume-fraction'
-    xt::xarray<int> I = GooseEYE::dummy_circles({50, 50});
-    double phi = xt::mean(I)();
+    // generate image
+    auto I = GooseEYE::dummy_circles({500, 500});
 
     // lineal path function
-    xt::xarray<double> L = GooseEYE::L({11, 11}, I);
+    auto L = GooseEYE::L({101, 101}, I);
+
+    // check against previous versions
+    H5Easy::File data("L.h5", H5Easy::File::ReadOnly);
+    MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
+    MYASSERT(xt::allclose(L, H5Easy::load<decltype(L)>(data, "L")));
 
     return 0;
 }
