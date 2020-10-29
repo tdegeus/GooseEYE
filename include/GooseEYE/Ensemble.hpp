@@ -70,7 +70,7 @@ inline xt::xarray<double> Ensemble::norm() const
 inline xt::xarray<double> Ensemble::distance(size_t axis) const
 {
     GOOSEEYE_ASSERT(axis < m_shape_orig.size());
-    axis = detail::atleast3d_axis(m_shape_orig.size(), axis);
+    axis = detail::atleast_3d_axis(m_shape_orig.size(), axis);
 
     xt::xtensor<double,3> dist = xt::empty<double>(m_shape);
 
