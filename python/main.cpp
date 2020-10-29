@@ -424,25 +424,32 @@ m.def("C2", py::overload_cast<
 
 // Weighted 2-point correlation
 
-m.def("W2",
-    static_cast<xt::xarray<double> (*)(const std::vector<size_t>&, const xt::xarray<int>&, const xt::xarray<int>&, bool)>(
-        &GooseEYE::W2<xt::xarray<int>>),
+m.def("W2", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<int>&,
+        const xt::xarray<int>&,
+        bool>(&GooseEYE::W2<xt::xarray<int>>),
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
     py::arg("periodic") = true);
 
-m.def("W2",
-    static_cast<xt::xarray<double> (*)(const std::vector<size_t>&, const xt::xarray<double>&, const xt::xarray<double>&, bool)>(
-        &GooseEYE::W2<xt::xarray<double>>),
+m.def("W2", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<double>&,
+        const xt::xarray<double>&,
+        bool>(&GooseEYE::W2<xt::xarray<double>>),
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
     py::arg("periodic") = true);
 
-m.def("W2",
-    static_cast<xt::xarray<double> (*)(const std::vector<size_t>&, const xt::xarray<double>&, const xt::xarray<double>&, const xt::xarray<int>&, bool)>(
-        &GooseEYE::W2<xt::xarray<double>, xt::xarray<int>>),
+m.def("W2", py::overload_cast<
+        const std::vector<size_t>&,
+        const xt::xarray<double>&,
+        const xt::xarray<double>&,
+        const xt::xarray<int>&,
+        bool>(&GooseEYE::W2<xt::xarray<double>, xt::xarray<int>>),
     py::arg("roi"),
     py::arg("w"),
     py::arg("f"),
