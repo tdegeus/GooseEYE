@@ -12,8 +12,6 @@
 namespace GooseEYE {
 namespace detail {
 
-// TODO: test
-// TODO: rename atleast_3d_axis
 /*
 Get the axis after converting an array to 3d.
 See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=atleast_Nd
@@ -22,7 +20,7 @@ See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=a
 @arg axis : Axis along the input array.
 @ret Axis along the 3d-equivalent-array.
 */
-inline size_t atleast3d_axis(size_t rank, size_t axis)
+inline size_t atleast_3d_axis(size_t rank, size_t axis)
 {
     size_t N = 3;
     assert(axis < rank);
@@ -39,11 +37,11 @@ See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=a
 @arg axes : Axes along the input array.
 @ret Axes along the 3d-equivalent-array.
 */
-inline xt::xtensor<size_t, 1> atleast3d_axes(size_t rank, const xt::xtensor<size_t, 1>& axes)
+inline xt::xtensor<size_t, 1> atleast_3d_axes(size_t rank, const xt::xtensor<size_t, 1>& axes)
 {
     xt::xtensor<size_t, 1> ret = xt::empty_like(axes);
     for (size_t i = 0; i < axes.size(); ++i) {
-        ret(i) = atleast3d_axis(rank, axes(i));
+        ret(i) = atleast_3d_axis(rank, axes(i));
     }
     return ret;
 }
@@ -55,72 +53,23 @@ See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=a
 @arg rank : Rank of the input array.
 @ret Axes along the 3d-equivalent-array.
 */
-inline xt::xtensor<size_t, 1> atleast3d_axes(size_t rank)
+inline xt::xtensor<size_t, 1> atleast_3d_axes(size_t rank)
 {
-    return atleast3d_axes(rank, xt::arange<size_t>(rank));
+    return atleast_3d_axes(rank, xt::arange<size_t>(rank));
 }
 
+/*
+Return shape as vector.
 
-
-// TODO: remove
-inline std::vector<size_t> as_dim(
-    const size_t ndim,
-    const std::vector<size_t>& shape,
-    size_t prepend)
-{
-    std::vector<size_t> out(ndim, prepend);
-
-    size_t pad = ndim - shape.size();
-
-    for (size_t i = 0; i < shape.size(); ++i) {
-        out[i + pad] = shape[i];
-    }
-
-    return out;
-}
-
-// TODO: remove
-inline std::vector<std::vector<size_t>> as_dim(
-    const size_t ndim,
-    const std::vector<std::vector<size_t>>& shape,
-    size_t prepend)
-{
-    #ifndef NDEBUG
-    assert(shape.size() > 0);
-    for (auto& i : shape) {
-        assert(i.size() == shape[0].size());
-    }
-    #endif
-
-    std::vector<std::vector<size_t>> out(ndim, std::vector<size_t>(shape[0].size(), prepend));
-
-    size_t pad = ndim - shape.size();
-
-    for (size_t i = 0; i < shape.size(); ++i) {
-        for (size_t j = 0; j < shape[i].size(); ++j) {
-            out[i + pad][j] = shape[i][j];
-        }
-    }
-
-    return out;
-}
-
-// TODO: remove
+@arg mat : An n-d array.
+@ret The shape of `arg` as `std::vector<size_t>`.
+*/
 template <class T>
-inline std::vector<size_t> shape_as_dim(const size_t ndim, const xt::xarray<T>& f, size_t prepend)
+inline std::vector<size_t> shape(T&& mat)
 {
-    std::vector<size_t> shape(f.shape().cbegin(), f.shape().cend());
-    return as_dim(ndim, shape, prepend);
+    return std::vector<size_t>(mat.shape().cbegin(), mat.shape().cend());
 }
 
-template <class E>
-inline std::vector<size_t> shape(E&& e)
-{
-    return std::vector<size_t>(e.shape().cbegin(), e.shape().cend());
-}
-
-
-// TODO: Remove ?
 /*
 Compute "shape / 2".
 

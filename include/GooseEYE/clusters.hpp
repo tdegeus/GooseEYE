@@ -4,8 +4,6 @@
 
 */
 
-// TODO
-
 #ifndef GOOSEEYE_CLUSTERS_HPP
 #define GOOSEEYE_CLUSTERS_HPP
 
@@ -55,7 +53,7 @@ inline xt::xtensor<double, 2> center_of_mass(const T& labels, bool periodic)
     double pi = xt::numeric_constants<double>::PI;
     size_t N = static_cast<size_t>(xt::amax(labels)(0)) + 1ul;
     size_t rank = labels.dimension();
-    auto axes = detail::atleast3d_axes(rank);
+    auto axes = detail::atleast_3d_axes(rank);
     xt::xtensor<double, 1> shape = xt::adapt(labels.shape());
     xt::xtensor<double, 2> ret = xt::zeros<double>({N, rank});
 
@@ -310,7 +308,7 @@ inline xt::xtensor<double, 2> Clusters::center_positions(bool as3d) const
         return x;
     }
 
-    xt::xtensor<size_t, 1> axes = detail::atleast3d_axes(m_shape.size());
+    xt::xtensor<size_t, 1> axes = detail::atleast_3d_axes(m_shape.size());
     return xt::view(x, xt::all(), xt::keep(axes));
 }
 
