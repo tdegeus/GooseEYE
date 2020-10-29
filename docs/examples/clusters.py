@@ -47,7 +47,7 @@ if __name__ == '__main__':
         with h5py.File('clusters.h5', 'r') as data:
             assert np.all(np.equal(data['I'][...], I))
             assert np.all(np.equal(data['clusters'][...], clusters))
-            assert np.all(np.equal(data['labels_periodic'][...], labels_periodic))
+            assert np.all(np.equal(data['clusters_periodic'][...], clusters_periodic))
 
     if args['--plot']:
 
