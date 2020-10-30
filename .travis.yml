@@ -87,6 +87,8 @@ install:
       pyxtensor
       catch2
       highfive
+      h5py
+      docopt
     # Build/install the library
     - cmake . -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DSIMD=${USE_XSIMD}
     - make

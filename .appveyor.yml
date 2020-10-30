@@ -40,6 +40,8 @@ install:
     pyxtensor
     catch2
     highfive
+    h5py
+    docopt
   # Build/install the library
   - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DSIMD=ON -DWARNINGS=OFF .
   - nmake
