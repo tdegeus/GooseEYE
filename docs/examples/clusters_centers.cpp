@@ -1,5 +1,4 @@
 #include <GooseEYE/GooseEYE.h>
-#include <xtensor.hpp>
 #include <highfive/H5Easy.hpp>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
@@ -25,6 +24,7 @@ int main()
     auto labels_periodic = clusters_periodic.labels();
     auto centers_periodic = clusters_periodic.center_positions();
 
+    // check against previous versions
     H5Easy::File data("clusters_centers.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::all(xt::equal(labels, H5Easy::load<decltype(labels)>(data, "labels"))));

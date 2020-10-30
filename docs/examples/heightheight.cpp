@@ -1,5 +1,4 @@
 #include <GooseEYE/GooseEYE.h>
-#include <xtensor.hpp>
 #include <highfive/H5Easy.hpp>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)

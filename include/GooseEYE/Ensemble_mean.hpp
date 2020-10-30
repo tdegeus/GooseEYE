@@ -12,7 +12,7 @@
 namespace GooseEYE {
 
 template <class T>
-void Ensemble::mean(const xt::xarray<T>& f)
+void Ensemble::mean(const T& f)
 {
     GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1));
     GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
@@ -24,10 +24,12 @@ void Ensemble::mean(const xt::xarray<T>& f)
     m_norm(0) += static_cast<double>(f.size());
 }
 
-template <class T>
-void Ensemble::mean(const xt::xarray<T>& f, const xt::xarray<int>& fmask)
+template <class T, class M>
+void Ensemble::mean(const T& f, const M& fmask)
 {
-    GOOSEEYE_ASSERT(f.shape() == fmask.shape());
+    static_assert(std::is_integral<typename M::value_type>::value, "Integral mask required.");
+
+    GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()));
     GOOSEEYE_ASSERT(xt::all(xt::equal(fmask, 0) || xt::equal(fmask, 1)));
     GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1));
     GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
