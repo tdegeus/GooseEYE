@@ -487,7 +487,7 @@ inline auto S2(
     const T& g,
     bool periodic = true);
 
-template <class T, class M, class = typename std::enable_if_t<xt::has_iterator_interface<M>::value>>
+template <class T, class M>
 inline auto S2(
     const std::vector<size_t>& roi,
     const T& f,
@@ -503,7 +503,7 @@ inline auto C2(
     const T& g,
     bool periodic = true);
 
-template <class T, class M, class = typename std::enable_if_t<xt::has_iterator_interface<M>::value>>
+template <class T, class M>
 inline auto C2(
     const std::vector<size_t>& roi,
     const T& f,
@@ -519,7 +519,7 @@ inline auto W2(
     const T& f,
     bool periodic = true);
 
-template <class T, class M, class = typename std::enable_if_t<xt::has_iterator_interface<M>::value>>
+template <class T, class M>
 inline auto W2(
     const std::vector<size_t>& roi,
     const T& w,
@@ -552,7 +552,7 @@ inline auto heightheight(
     const T& f,
     bool periodic = true);
 
-template <class T, class M, class = typename std::enable_if_t<xt::has_iterator_interface<M>::value>>
+template <class T, class M>
 inline auto heightheight(
     const std::vector<size_t>& roi,
     const T& f,

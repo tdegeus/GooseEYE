@@ -63,7 +63,7 @@ inline auto S2(
     return ensemble.result();
 }
 
-template <class T, class M, class Enable>
+template <class T, class M>
 inline auto S2(
     const std::vector<size_t>& roi,
     const T& f,
@@ -89,7 +89,7 @@ inline auto C2(
     return ensemble.result();
 }
 
-template <class T, class M, class Enable>
+template <class T, class M>
 inline auto C2(
     const std::vector<size_t>& roi,
     const T& f,
@@ -115,7 +115,7 @@ inline auto W2(
     return ensemble.result();
 }
 
-template <class T, class M, class Enable>
+template <class T, class M>
 inline auto W2(
     const std::vector<size_t>& roi,
     const T& w,
@@ -168,7 +168,7 @@ inline auto heightheight(
     return ensemble.result();
 }
 
-template <class T, class M, class Enable>
+template <class T, class M>
 inline auto heightheight(
     const std::vector<size_t>& roi,
     const T& f,
