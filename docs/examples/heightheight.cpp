@@ -1,5 +1,4 @@
 #include <GooseEYE/GooseEYE.h>
-#include <xtensor.hpp>
 #include <highfive/H5Easy.hpp>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
@@ -24,16 +23,12 @@ int main()
     xt::xarray<double> dx = GooseEYE::distance({200}, {h,}, 0);
 
     // check against previous versions
-    // note that the stored data based unix,
-    // the random data is expected to be different on Windows
-#ifndef _WIN32
     H5Easy::File data("heightheight.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::allclose(y1, H5Easy::load<decltype(y1)>(data, "y1")));
     MYASSERT(xt::allclose(y2, H5Easy::load<decltype(y2)>(data, "y2")));
     MYASSERT(xt::allclose(hh1, H5Easy::load<decltype(hh1)>(data, "hh1")));
     MYASSERT(xt::allclose(hh2, H5Easy::load<decltype(hh2)>(data, "hh2")));
     MYASSERT(xt::allclose(dx, H5Easy::load<decltype(dx)>(data, "dx")));
-#endif
 
     return 0;
 }

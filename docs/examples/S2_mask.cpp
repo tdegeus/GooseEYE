@@ -1,5 +1,4 @@
 #include <GooseEYE/GooseEYE.h>
-#include <xtensor.hpp>
 #include <highfive/H5Easy.hpp>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
@@ -31,9 +30,6 @@ int main()
     xt::xarray<double> S2mask = GooseEYE::S2({101, 101}, Ierr, Ierr, mask, mask);
 
     // check against previous versions
-    // note that the stored data based unix,
-    // the random data is expected to be different on Windows
-#ifndef _WIN32
     H5Easy::File data("S2_mask.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::all(xt::equal(Ierr, H5Easy::load<decltype(Ierr)>(data, "Ierr"))));
@@ -41,7 +37,6 @@ int main()
     MYASSERT(xt::allclose(S2, H5Easy::load<decltype(S2)>(data, "S2")));
     MYASSERT(xt::allclose(S2err, H5Easy::load<decltype(S2err)>(data, "S2err")));
     MYASSERT(xt::allclose(S2mask, H5Easy::load<decltype(S2mask)>(data, "S2mask")));
-#endif
 
     return 0;
 }

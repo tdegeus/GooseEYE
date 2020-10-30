@@ -34,13 +34,14 @@ install:
     mamba install -c conda-forge
     cmake
     xtensor
+    xsimd
     python
     numpy
     pyxtensor
     catch2
     highfive
   # Build/install the library
-  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=OFF -DSIMD=OFF -DWARNINGS=OFF .
+  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DSIMD=ON -DWARNINGS=OFF .
   - nmake
   - nmake install
   - python setup.py build
@@ -49,37 +50,56 @@ install:
 build_script:
   # Run tests
   - .\test\main
-  # # Run C++ examples
-  # - cd docs\examples
-  # - .\S2
-  # - .\S2_autocorrelation
-  # - .\S2_mask
-  # - .\S2_ensemble
-  # - .\C2
-  # - .\L
-  # - .\W2
-  # - .\W2c
-  # - .\clusters
-  # - .\clusters_centers
-  # - .\clusters_dilate
-  # - .\heightheight
-  # - .\mean
-  # - cd ..\..
-  # # Run Python examples
-  # - cd docs\examples
-  # - python S2.py --check
-  # - python S2_autocorrelation.py --check
-  # - python S2_mask.py --check
-  # - python S2_ensemble.py --check
-  # - python C2.py --check
-  # - python L.py --check
-  # - python W2.py --check
-  # - python W2c.py --check
-  # - python clusters.py --check
-  # - python clusters_centers.py --check
-  # - python clusters_dilate.py --check
-  # - python clusters_dilate_periodic.py --check
-  # - python heightheight.py --check
-  # - python mean.py --check
-  # - python pixel_path.py --check
-  # - cd ..\..
+  # Run Python examples
+  # Note: random number generated differently on Windows, so available data does not work
+  - cd docs\examples
+  - python S2.py --save
+  - python S2_autocorrelation.py --save
+  - python S2_mask.py --save
+  - python S2_ensemble.py --save
+  - python C2.py --save
+  - python L.py --save
+  - python W2.py --save
+  - python W2c.py --save
+  - python clusters.py --save
+  - python clusters_centers.py --save
+  - python clusters_dilate.py --save
+  - python clusters_dilate_periodic.py --save
+  - python heightheight.py --save
+  - python mean.py --save
+  - python pixel_path.py --save
+  - cd ..\..
+  # Check Python examples
+  - cd docs\examples
+  - python S2.py --check
+  - python S2_autocorrelation.py --check
+  - python S2_mask.py --check
+  - python S2_ensemble.py --check
+  - python C2.py --check
+  - python L.py --check
+  - python W2.py --check
+  - python W2c.py --check
+  - python clusters.py --check
+  - python clusters_centers.py --check
+  - python clusters_dilate.py --check
+  - python clusters_dilate_periodic.py --check
+  - python heightheight.py --check
+  - python mean.py --check
+  - python pixel_path.py --check
+  - cd ..\..
+  # Check C++ examples
+  - cd docs\examples
+  - .\S2
+  - .\S2_autocorrelation
+  - .\S2_mask
+  - .\S2_ensemble
+  - .\C2
+  - .\L
+  - .\W2
+  - .\W2c
+  - .\clusters
+  - .\clusters_centers
+  - .\clusters_dilate
+  - .\heightheight
+  - .\mean
+  - cd ..\..

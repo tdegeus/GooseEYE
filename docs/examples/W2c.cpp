@@ -1,5 +1,4 @@
 #include <GooseEYE/GooseEYE.h>
-#include <xtensor.hpp>
 #include <highfive/H5Easy.hpp>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
@@ -51,9 +50,6 @@ int main()
     auto WIc = GooseEYE::W2c({101, 101}, clusters, centers, I, W);
 
     // check against previous versions
-    // note that the stored data based unix,
-    // the random data is expected to be different on Windows
-#ifndef _WIN32
     H5Easy::File data("W2c.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::all(xt::equal(clusters, H5Easy::load<decltype(clusters)>(data, "clusters"))));
@@ -61,7 +57,6 @@ int main()
     MYASSERT(xt::all(xt::equal(W, H5Easy::load<decltype(W)>(data, "W"))));
     MYASSERT(xt::allclose(WI, H5Easy::load<decltype(WI)>(data, "WI")));
     MYASSERT(xt::allclose(WIc, H5Easy::load<decltype(WIc)>(data, "WIc")));
-#endif
 
     return 0;
 }

@@ -1,5 +1,4 @@
 #include <GooseEYE/GooseEYE.h>
-#include <xtensor.hpp>
 #include <highfive/H5Easy.hpp>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
@@ -26,13 +25,9 @@ int main()
     auto variance = ensemble.variance();
 
     // check against previous versions
-    // note that the stored data based unix,
-    // the random data is expected to be different on Windows
-#ifndef _WIN32
     H5Easy::File data("mean.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::allclose(mean, H5Easy::load<decltype(mean)>(data, "mean")));
     MYASSERT(xt::allclose(variance, H5Easy::load<decltype(variance)>(data, "variance")));
-#endif
 
     return 0;
 }
