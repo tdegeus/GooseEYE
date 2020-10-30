@@ -123,6 +123,7 @@ inline auto W2(
     const M& fmask,
     bool periodic)
 {
+    static_assert(xt::has_data_interface<M>::value, "Mask must be xtensor type");
     Ensemble ensemble(roi, periodic);
     ensemble.W2(w, f, fmask);
     return ensemble.result();
