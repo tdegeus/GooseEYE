@@ -90,8 +90,7 @@ inline Clusters::Clusters(const T& f, bool periodic)
 }
 
 template <class T, class S>
-inline Clusters::Clusters(const T& f, const S& kernel, bool periodic)
-    : m_periodic(periodic)
+inline Clusters::Clusters(const T& f, const S& kernel, bool periodic) : m_periodic(periodic)
 {
     static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
     static_assert(std::is_integral<typename S::value_type>::value, "Integral kernel required.");
@@ -261,8 +260,8 @@ inline xt::xtensor<double, 2> Clusters::average_position_periodic() const
     size_t N = xt::amax(m_l)() + 1;
 
     // allocate average position
-    xt::xtensor<double,2> x = xt::zeros<double>({N, size_t(3)});
-    xt::xtensor<double,1> n = xt::zeros<double>({N});
+    xt::xtensor<double, 2> x = xt::zeros<double>({N, size_t(3)});
+    xt::xtensor<double, 1> n = xt::zeros<double>({N});
 
     for (size_t h = 0; h < m_l.shape(0); ++h) {
         for (size_t i = 0; i < m_l.shape(1); ++i) {

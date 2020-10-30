@@ -57,10 +57,8 @@ inline void Ensemble::L(const T& f, path_mode mode)
     for (size_t istamp = 0; istamp < stamp.shape(0); ++istamp) {
 
         // pixel path between the center of the ROI and the current stamp point
-        xt::xtensor<int,2> path = GooseEYE::path(
-            {0, 0, 0},
-            {stamp(istamp, 0), stamp(istamp, 1), stamp(istamp, 2)},
-            mode);
+        xt::xtensor<int, 2> path =
+            GooseEYE::path({0, 0, 0}, {stamp(istamp, 0), stamp(istamp, 1), stamp(istamp, 2)}, mode);
 
         // compute correlation along this path, for the entire image
         for (size_t h = m_pad[0][0]; h < F.shape(0) - m_pad[0][1]; ++h) {

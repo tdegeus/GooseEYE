@@ -172,10 +172,7 @@ inline T dilate(
 }
 
 template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
-inline T dilate(
-    const T& f,
-    const xt::xtensor<size_t,1>& iterations,
-    bool periodic)
+inline T dilate(const T& f, const xt::xtensor<size_t, 1>& iterations, bool periodic)
 {
     return dilate(f, kernel::nearest(f.dimension()), iterations, periodic);
 }

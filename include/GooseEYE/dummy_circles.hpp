@@ -13,9 +13,9 @@ namespace GooseEYE {
 
 inline xt::xarray<int> dummy_circles(
     const std::vector<size_t>& shape,
-    const xt::xtensor<int,1>& row,
-    const xt::xtensor<int,1>& col,
-    const xt::xtensor<int,1>& r,
+    const xt::xtensor<int, 1>& row,
+    const xt::xtensor<int, 1>& col,
+    const xt::xtensor<int, 1>& r,
     bool periodic)
 {
     GOOSEEYE_ASSERT(row.shape() == col.shape());
@@ -64,9 +64,9 @@ inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool peri
     size_t M = (size_t)(0.05 * (double)shape[1]);
     size_t R = (size_t)(pow((0.3 * (double)(shape[0] * shape[1])) / (M_PI * (double)(N * M)), 0.5));
 
-    xt::xtensor<int,1> row = xt::empty<int>({M * N});
-    xt::xtensor<int,1> col = xt::empty<int>({M * N});
-    xt::xtensor<int,1> r = xt::empty<int>({M * N});
+    xt::xtensor<int, 1> row = xt::empty<int>({M * N});
+    xt::xtensor<int, 1> col = xt::empty<int>({M * N});
+    xt::xtensor<int, 1> r = xt::empty<int>({M * N});
 
     // define regular grid of circles
     for (size_t i = 0; i < N; i++) {

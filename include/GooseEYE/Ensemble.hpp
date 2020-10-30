@@ -36,7 +36,7 @@ inline xt::xarray<double> Ensemble::result() const
 
 inline xt::xarray<double> Ensemble::variance() const
 {
-    xt::xtensor<double,3> norm = xt::where(m_norm <= 0, 1.0, m_norm);
+    xt::xtensor<double, 3> norm = xt::where(m_norm <= 0, 1.0, m_norm);
     xt::xarray<double> ret = (m_second / norm - xt::pow(m_first / norm, 2.0)) * norm / (norm - 1);
 
     if (m_stat == Type::heightheight) {
@@ -72,7 +72,7 @@ inline xt::xarray<double> Ensemble::distance(size_t axis) const
     GOOSEEYE_ASSERT(axis < m_shape_orig.size());
     axis = detail::atleast_3d_axis(m_shape_orig.size(), axis);
 
-    xt::xtensor<double,3> dist = xt::empty<double>(m_shape);
+    xt::xtensor<double, 3> dist = xt::empty<double>(m_shape);
 
     xt::xarray<double> D = xt::linspace<double>(
         -1.0 * static_cast<double>(m_pad[axis][0]),

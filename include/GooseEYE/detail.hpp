@@ -316,7 +316,7 @@ Compute pixel-path.
 namespace path {
 
 template <class T>
-inline xt::xtensor<int,2> full(const T& xa, const T& xb)
+inline xt::xtensor<int, 2> full(const T& xa, const T& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;
