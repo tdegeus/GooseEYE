@@ -35,11 +35,15 @@ int main()
     auto S2gr = GooseEYE::S2({101, 101}, Igr, Igr);
 
     // check against previous versions
+    // note that the stored data based unix,
+    // the random data is expected to be different on Windows
+#ifndef _WIN32
     H5Easy::File data("S2_autocorrelation.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::allclose(S2, H5Easy::load<decltype(S2)>(data, "S2")));
     MYASSERT(xt::allclose(Igr, H5Easy::load<decltype(Igr)>(data, "Igr")));
     MYASSERT(xt::allclose(S2gr, H5Easy::load<decltype(S2gr)>(data, "S2gr")));
+#endif
 
     return 0;
 }

@@ -23,8 +23,12 @@ int main()
     auto S2 = ensemble.result();
 
     // check against previous versions
+    // note that the stored data based unix,
+    // the random data is expected to be different on Windows
+#ifndef _WIN32
     H5Easy::File data("S2_ensemble.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::allclose(S2, H5Easy::load<decltype(S2)>(data, "S2")));
+#endif
 
     return 0;
 }

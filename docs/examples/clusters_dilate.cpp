@@ -28,10 +28,14 @@ int main()
     auto CD = GooseEYE::dilate(C);
 
     // check against previous versions
+    // note that the stored data based unix,
+    // the random data is expected to be different on Windows
+#ifndef _WIN32
     H5Easy::File data("clusters_dilate.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::all(xt::equal(C, H5Easy::load<decltype(C)>(data, "C"))));
     MYASSERT(xt::all(xt::equal(CD, H5Easy::load<decltype(CD)>(data, "CD"))));
+#endif
 
     return 0;
 }

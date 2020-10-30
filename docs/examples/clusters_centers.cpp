@@ -25,12 +25,17 @@ int main()
     auto labels_periodic = clusters_periodic.labels();
     auto centers_periodic = clusters_periodic.center_positions();
 
+    // check against previous versions
+    // note that the stored data based unix,
+    // the random data is expected to be different on Windows
+#ifndef _WIN32
     H5Easy::File data("clusters_centers.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::all(xt::equal(labels, H5Easy::load<decltype(labels)>(data, "labels"))));
     MYASSERT(xt::allclose(centers, H5Easy::load<decltype(centers)>(data, "centers")));
     MYASSERT(xt::all(xt::equal(labels_periodic, H5Easy::load<decltype(labels_periodic)>(data, "labels_periodic"))));
     MYASSERT(xt::allclose(centers_periodic, H5Easy::load<decltype(centers_periodic)>(data, "centers_periodic")));
+#endif
 
     return 0;
 }

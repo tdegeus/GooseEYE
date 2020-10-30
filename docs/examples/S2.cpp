@@ -19,9 +19,13 @@ int main()
     auto S2 = GooseEYE::S2({101, 101}, I, I);
 
     // check against previous versions
+    // note that the stored data based unix,
+    // the random data is expected to be different on Windows
+#ifndef _WIN32
     H5Easy::File data("S2.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::allclose(S2, H5Easy::load<decltype(S2)>(data, "S2")));
+#endif
 
     return 0;
 }
