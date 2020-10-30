@@ -138,9 +138,9 @@ PYBIND11_MODULE(GooseEYE, m)
         .def("__repr__", [](const GooseEYE::Clusters&) { return "<GooseEYE.Clusters>"; });
 
     m.def(
-        "clusters", 
-        &GooseEYE::clusters<xt::xarray<int>>, 
-        py::arg("f"), 
+        "clusters",
+        &GooseEYE::clusters<xt::xarray<int>>,
+        py::arg("f"),
         py::arg("periodic") = true);
 
     m.def(
@@ -610,8 +610,8 @@ PYBIND11_MODULE(GooseEYE, m)
         "L",
         [](const std::vector<size_t>& roi,
            const xt::xarray<int>& f,
-           GooseEYE::path_mode mode,
-           bool periodic) {
+           bool periodic,
+           GooseEYE::path_mode mode) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.L(f, mode);
             return ensemble.result();
