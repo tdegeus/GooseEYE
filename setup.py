@@ -34,8 +34,6 @@ if xsimd:
         build.c_opts['unix'] += ['-march=native', '-DXTENSOR_USE_XSIMD']
         build.c_opts['msvc'] += ['/DXTENSOR_USE_XSIMD']
 
-build.c_opts['msvc'] += ['/permissive-']
-
 ext_modules = [Extension(
     'GooseEYE',
     ['python/main.cpp'],
