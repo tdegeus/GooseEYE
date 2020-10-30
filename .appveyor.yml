@@ -40,11 +40,11 @@ install:
     catch2
     highfive
   # Build/install the library
+  - python setup.py build
+  - python setup.py install
   - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTS=ON -DBUILD_EXAMPLES=OFF -DSIMD=OFF -DWARNINGS=OFF .
   - nmake
   - nmake install
-  - python setup.py build
-  - python setup.py install
 
 build_script:
   # Run tests
