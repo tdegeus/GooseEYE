@@ -115,15 +115,14 @@ inline auto W2(
     return ensemble.result();
 }
 
-template <class T, class M>
+template <class T, class M, class = typename std::enable_if_t<xt::has_iterator_interface<M>::value>>
 inline auto W2(
     const std::vector<size_t>& roi,
     const T& w,
     const T& f,
     const M& fmask,
-    bool periodic)
+    bool periodic = true)
 {
-    static_assert(xt::has_data_interface<M>::value, "Mask must be xtensor type");
     Ensemble ensemble(roi, periodic);
     ensemble.W2(w, f, fmask);
     return ensemble.result();
