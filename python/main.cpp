@@ -361,34 +361,35 @@ m.def("distance", py::overload_cast<
 
 // 2-point correlation
 
-m.def("S2", py::overload_cast<
-        const std::vector<size_t>&,
-        const xt::xarray<int>&,
-        const xt::xarray<int>&,
-        bool>(&GooseEYE::S2<xt::xarray<int>>),
+m.def("S2",
+    [](const std::vector<size_t>& roi, const xt::xarray<int>& f, const xt::xarray<int>& g, bool periodic) {
+        GooseEYE::Ensemble ensemble(roi, periodic);
+        ensemble.S2(f, g);
+        return ensemble.result();
+    },
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
     py::arg("periodic") = true);
 
 
-m.def("S2", py::overload_cast<
-        const std::vector<size_t>&,
-        const xt::xarray<double>&,
-        const xt::xarray<double>&,
-        bool>(&GooseEYE::S2<xt::xarray<double>>),
+m.def("S2",
+    [](const std::vector<size_t>& roi, const xt::xarray<double>& f, const xt::xarray<double>& g, bool periodic) {
+        GooseEYE::Ensemble ensemble(roi, periodic);
+        ensemble.S2(f, g);
+        return ensemble.result();
+    },
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
     py::arg("periodic") = true);
 
-m.def("S2", py::overload_cast<
-        const std::vector<size_t>&,
-        const xt::xarray<double>&,
-        const xt::xarray<double>&,
-        const xt::xarray<int>&,
-        const xt::xarray<int>&,
-        bool>(&GooseEYE::S2<xt::xarray<double>, xt::xarray<int>>),
+m.def("S2",
+    [](const std::vector<size_t>& roi, const xt::xarray<double>& f, const xt::xarray<double>& g, const xt::xarray<int>& fmask, const xt::xarray<int>& gmask, bool periodic) {
+        GooseEYE::Ensemble ensemble(roi, periodic);
+        ensemble.S2(f, g, fmask, gmask);
+        return ensemble.result();
+    },
     py::arg("roi"),
     py::arg("f"),
     py::arg("g"),
