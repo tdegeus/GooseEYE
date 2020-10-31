@@ -64,7 +64,7 @@ inline auto S2(
     const T& g,
     const M& fmask,
     const M& gmask,
-   bool periodic)
+    bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.S2(f, g, fmask, gmask);
