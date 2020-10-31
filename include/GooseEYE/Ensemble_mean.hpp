@@ -36,14 +36,12 @@ void Ensemble::mean(const T& f, const M& fmask)
 
     m_stat = Type::mean;
 
-    m_first(0) += static_cast<double>(
-        xt::sum(xt::where(xt::equal(fmask, 0), f, 0.0))[0]);
+    m_first(0) += static_cast<double>(xt::sum(xt::where(xt::equal(fmask, 0), f, 0.0))[0]);
 
-    m_second(0) += static_cast<double>(
-        xt::sum(xt::where(xt::equal(fmask, 0), xt::pow(f, 2.0), 0.0))[0]);
+    m_second(0) +=
+        static_cast<double>(xt::sum(xt::where(xt::equal(fmask, 0), xt::pow(f, 2.0), 0.0))[0]);
 
-    m_norm(0) += static_cast<double>(
-        xt::sum(1 - fmask)[0]);
+    m_norm(0) += static_cast<double>(xt::sum(1 - fmask)[0]);
 }
 
 } // namespace GooseEYE

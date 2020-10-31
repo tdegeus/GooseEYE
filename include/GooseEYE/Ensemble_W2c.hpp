@@ -12,12 +12,8 @@
 namespace GooseEYE {
 
 template <class C, class T, class M>
-inline void Ensemble::W2c(
-    const C& clusters,
-    const C& centers,
-    const T& f,
-    const M& fmask,
-    path_mode mode)
+inline void
+Ensemble::W2c(const C& clusters, const C& centers, const T& f, const M& fmask, path_mode mode)
 {
     using value_type = typename T::value_type;
     using mask_type = typename M::value_type;
@@ -63,7 +59,7 @@ inline void Ensemble::W2c(
     xt::view(r, ix, iy, iz) = 0;
 
     // get stamp, from the matrix "r"
-    xt::xtensor<int,2> stamp = xt::from_indices(xt::argwhere(r));
+    xt::xtensor<int, 2> stamp = xt::from_indices(xt::argwhere(r));
     for (size_t i = 0; i < MAX_DIM; ++i) {
         xt::view(stamp, xt::all(), xt::keep(i)) -= m_pad[i][0];
     }
@@ -73,10 +69,8 @@ inline void Ensemble::W2c(
     for (size_t istamp = 0; istamp < stamp.shape(0); ++istamp) {
 
         // pixel path between the center of the ROI and the current stamp point
-        xt::xtensor<int,2> path = GooseEYE::path(
-            {0, 0, 0},
-            {stamp(istamp, 0), stamp(istamp, 1), stamp(istamp, 2)},
-            mode);
+        xt::xtensor<int, 2> path =
+            GooseEYE::path({0, 0, 0}, {stamp(istamp, 0), stamp(istamp, 1), stamp(istamp, 2)}, mode);
 
         for (size_t h = m_pad[0][0]; h < F.shape(0) - m_pad[0][1]; ++h) {
             for (size_t i = m_pad[1][0]; i < F.shape(1) - m_pad[1][1]; ++i) {

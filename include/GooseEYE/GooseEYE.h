@@ -72,11 +72,7 @@ auto normal(const T& shape, double mean = 0, double std_dev = 1);
 /*
 Different methods to compute a pixel-path.
 */
-enum class path_mode {
-    Bresenham,
-    actual,
-    full
-};
+enum class path_mode { Bresenham, actual, full };
 
 /*
 Compute a path between two pixels.
@@ -97,9 +93,7 @@ Dummy image with circles. The positions and radii of the circles are randomly ge
 
 @ret The dummy image.
 */
-inline xt::xarray<int> dummy_circles(
-    const std::vector<size_t>& shape,
-    bool periodic = true);
+inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
 
 /*
 Dummy image with circles.
@@ -430,16 +424,7 @@ public:
 private:
 
     // Type: used to lock the ensemble to a certain measure.
-    enum class Type {
-        Unset,
-        mean,
-        S2,
-        C2,
-        W2,
-        W2c,
-        L,
-        heightheight
-    };
+    enum class Type { Unset, mean, S2, C2, W2, W2c, L, heightheight };
 
     // Initialize class as unlocked.
     Type m_stat = Type::Unset;

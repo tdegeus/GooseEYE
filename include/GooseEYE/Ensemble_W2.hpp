@@ -12,8 +12,7 @@
 namespace GooseEYE {
 
 template <class T, class M>
-inline void
-Ensemble::W2(const T& f, const T& g, const M& gmask)
+inline void Ensemble::W2(const T& f, const T& g, const M& gmask)
 {
     using value_type = typename T::value_type;
     using mask_type = typename M::value_type;

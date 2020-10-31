@@ -11,10 +11,8 @@
 
 namespace GooseEYE {
 
-inline xt::xtensor<int, 2> path(
-    const xt::xtensor<int, 1>& x0,
-    const xt::xtensor<int, 1>& x1,
-    path_mode mode)
+inline xt::xtensor<int, 2>
+path(const xt::xtensor<int, 1>& x0, const xt::xtensor<int, 1>& x1, path_mode mode)
 {
     if (mode == path_mode::Bresenham) {
         return detail::path::bresenham(x0, x1);
@@ -52,11 +50,7 @@ inline auto distance(const std::vector<size_t>& roi, const std::vector<double>& 
 }
 
 template <class T>
-inline auto S2(
-    const std::vector<size_t>& roi,
-    const T& f,
-    const T& g,
-    bool periodic)
+inline auto S2(const std::vector<size_t>& roi, const T& f, const T& g, bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.S2(f, g);
@@ -78,11 +72,7 @@ inline auto S2(
 }
 
 template <class T>
-inline auto C2(
-    const std::vector<size_t>& roi,
-    const T& f,
-    const T& g,
-    bool periodic)
+inline auto C2(const std::vector<size_t>& roi, const T& f, const T& g, bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.C2(f, g);
@@ -104,11 +94,7 @@ inline auto C2(
 }
 
 template <class T>
-inline auto W2(
-    const std::vector<size_t>& roi,
-    const T& w,
-    const T& f,
-    bool periodic)
+inline auto W2(const std::vector<size_t>& roi, const T& w, const T& f, bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.W2(w, f);
@@ -116,12 +102,8 @@ inline auto W2(
 }
 
 template <class T, class M>
-inline auto W2(
-    const std::vector<size_t>& roi,
-    const T& w,
-    const T& f,
-    const M& fmask,
-    bool periodic)
+inline auto
+W2(const std::vector<size_t>& roi, const T& w, const T& f, const M& fmask, bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.W2(w, f, fmask);
@@ -158,10 +140,7 @@ inline auto W2c(
 }
 
 template <class T>
-inline auto heightheight(
-    const std::vector<size_t>& roi,
-    const T& f,
-    bool periodic)
+inline auto heightheight(const std::vector<size_t>& roi, const T& f, bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.heightheight(f);
@@ -169,11 +148,7 @@ inline auto heightheight(
 }
 
 template <class T, class M>
-inline auto heightheight(
-    const std::vector<size_t>& roi,
-    const T& f,
-    const M& fmask,
-    bool periodic)
+inline auto heightheight(const std::vector<size_t>& roi, const T& f, const M& fmask, bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.heightheight(f, fmask);
@@ -181,11 +156,7 @@ inline auto heightheight(
 }
 
 template <class T>
-inline auto L(
-    const std::vector<size_t>& roi,
-    const T& f,
-    bool periodic,
-    path_mode mode)
+inline auto L(const std::vector<size_t>& roi, const T& f, bool periodic, path_mode mode)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.L(f, mode);

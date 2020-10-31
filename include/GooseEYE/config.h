@@ -24,11 +24,11 @@
 #include <xtensor/xadapt.hpp>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>
+#include <xtensor/xmath.hpp>
 #include <xtensor/xpad.hpp>
 #include <xtensor/xsort.hpp>
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
-#include <xtensor/xmath.hpp>
 
 #ifdef GOOSEEYE_ENABLE_ASSERT
 #define GOOSEEYE_ASSERT(expr) GOOSEEYE_ASSERT_IMPL(expr, __FILE__, __LINE__)
