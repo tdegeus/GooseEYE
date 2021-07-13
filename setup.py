@@ -51,6 +51,6 @@ setup(
     author_email = 'tom@geus.me',
     url = 'https://github.com/tdegeus/GooseEYE',
     ext_modules = ext_modules,
-    install_requires = ['pybind11>=2.2.0', 'pyxtensor>=0.1.1'],
+    setup_requires = ['pybind11', 'pyxtensor'],
     cmdclass = {'build_ext': build},
     zip_safe = False)
