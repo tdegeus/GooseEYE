@@ -5,15 +5,19 @@
 */
 
 #include <pybind11/pybind11.h>
-#include <pyxtensor/pyxtensor.hpp>
+#include <pybind11/stl.h>
 
-#define GOOSEEYE_ENABLE_ASSERT
+#define FORCE_IMPORT_ARRAY
+#include <xtensor-python/pyarray.hpp>
+#include <xtensor-python/pytensor.hpp>
+
 #include <GooseEYE/GooseEYE.h>
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(GooseEYE, m)
+PYBIND11_MODULE(_GooseEYE, m)
 {
+    xt::import_numpy();
 
     m.doc() = "Geometrical statistics";
 

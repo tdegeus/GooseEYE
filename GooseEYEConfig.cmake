@@ -46,6 +46,16 @@ if(NOT TARGET GooseEYE::compiler_warnings)
     endif()
 endif()
 
+# Define support target "GooseEYE::warnings"
+
+if(NOT TARGET GooseEYE::warnings)
+    add_library(GooseEYE::warnings INTERFACE IMPORTED)
+    set_property(
+        TARGET GooseEYE::warnings
+        PROPERTY INTERFACE_COMPILE_DEFINITIONS
+        GOOSEEYE_ENABLE_WARNING_PYTHON)
+endif()
+
 # Define support target "GooseEYE::assert"
 
 if(NOT TARGET GooseEYE::assert)

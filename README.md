@@ -1,5 +1,5 @@
-[![Travis](https://travis-ci.com/tdegeus/GooseEYE.svg?branch=master)](https://travis-ci.com/tdegeus/GooseEYE)
-[![Build status](https://ci.appveyor.com/api/projects/status/woi02sgsduy8yim4?svg=true)](https://ci.appveyor.com/project/tdegeus/gooseeye)
+[![CI](https://github.com/tdegeus/GooseEYE/workflows/CI/badge.svg)](https://github.com/tdegeus/GooseEYE/actions)
+[![Doxygen -> gh-pages](https://github.com/tdegeus/GooseEYE/workflows/gh-pages/badge.svg)](https://tdegeus.github.io/GooseEYE)
 [![Documentation Status](https://readthedocs.org/projects/gooseeye/badge/?version=latest)](https://readthedocs.org/projects/gooseeye/badge/?version=latest)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/gooseeye.svg)](https://anaconda.org/conda-forge/gooseeye)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/python-gooseeye.svg)](https://anaconda.org/conda-forge/python-gooseeye)

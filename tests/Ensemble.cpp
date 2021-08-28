@@ -1,6 +1,6 @@
-
-#include <GooseEYE/GooseEYE.h>
+#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
+#include <GooseEYE/GooseEYE.h>
 
 TEST_CASE("GooseEYE::Ensemble", "Ensemble.hpp")
 {

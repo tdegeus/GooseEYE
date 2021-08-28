@@ -1,8 +1,8 @@
-/*
-
-(c - GPLv3) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | github.com/tdegeus/GooseEYE
-
-*/
+/**
+ *  \file
+ *  \copyright Copyright 2017. Tom de Geus. All rights reserved.
+ *  \license This project is released under the GPLv3 License.
+ */
 
 #ifndef GOOSEEYE_DILATE_HPP
 #define GOOSEEYE_DILATE_HPP
@@ -113,7 +113,6 @@ inline T dilate(
     xt::xtensor<typename S::value_type, 3> K = xt::atleast_3d(kernel);
     auto Pad = detail::pad_width(K);
     xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), Pad, pad_mode, pad_value);
-
     xt::xtensor<value_type, 3> G = F; // keep copy to check which labels were added in the iteration
 
     for (size_t iter = 0; iter < xt::amax(iterations)(0); ++iter) {
