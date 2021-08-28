@@ -1,0 +1,51 @@
+name: gh-pages
+
+on:
+
+  push:
+    branches:
+      - master
+
+  release:
+    types: [released]
+
+jobs:
+
+  publish:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+
+    - name: Basic GitHub action setup
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set conda environment (using micromamba for speed)
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-file: .ci_environment_docs.yaml
+        environment-name: myenv
+
+    - name: Configure using CMake
+      run: cmake -Bbuild -DBUILD_DOCS=1
+
+    - name: Build the docs
+      working-directory: build
+      run: make docs
+
+    - name: Deploy to GitHub Pages
+      if: success()
+      uses: crazy-max/ghaction-github-pages@v2
+      with:
+        target_branch: gh-pages
+        build_dir: build/html
+        jekyll: false
+        keep_history: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
