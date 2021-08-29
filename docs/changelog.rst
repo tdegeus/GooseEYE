@@ -2,6 +2,13 @@
 Changelog
 *********
 
+v0.6.1
+======
+
+*   Using scikit-build, doxygen
+*   Renaming "test" -> "tests"
+*   [Python] Fixing setup dependencies
+
 v0.6.0
 ======
 
