@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "detail.hpp"
+#include "version.h"
 
 namespace GooseEYE {
 

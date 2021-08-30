@@ -41,6 +41,8 @@
 /**
 \cond
 */
+#define Q(x) #x
+#define QUOTE(x) Q(x)
 
 #define GOOSEEYE_WARNING_IMPL(message, file, line, function) \
     std::cout << \

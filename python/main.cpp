@@ -21,6 +21,10 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.doc() = "Geometrical statistics";
 
+    m.def("version",
+          &GooseEYE::version,
+          "Return version string.");
+
     py::module kernel = m.def_submodule("kernel", "Kernel definition");
 
     kernel.def("nearest", &GooseEYE::kernel::nearest, py::arg("ndim"));
