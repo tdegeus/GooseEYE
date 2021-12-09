@@ -1,4 +1,4 @@
-r'''
+r"""
     Plot and/or check.
 
 Usage:
@@ -9,47 +9,46 @@ Options:
     -c, --check     Check against earlier results.
     -p, --plot      Plot.
     -h, --help      Show this help.
-'''
-
+"""
 # <snippet>
-import numpy as np
 import GooseEYE
+import numpy as np
 
 # generate image
-I = GooseEYE.dummy_circles((500, 500), periodic=True)
+img = GooseEYE.dummy_circles((500, 500), periodic=True)
 
 # clusters
-clusters = GooseEYE.clusters(I, periodic=False)
+clusters = GooseEYE.clusters(img, periodic=False)
 
 # clusters, if the image is periodic
-clusters_periodic = GooseEYE.clusters(I, periodic=True)
+clusters_periodic = GooseEYE.clusters(img, periodic=True)
 # </snippet>
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import docopt
 
     args = docopt.docopt(__doc__)
 
-    if args['--save']:
+    if args["--save"]:
 
         import h5py
 
-        with h5py.File('clusters.h5', 'w') as data:
-            data['I'] = I
-            data['clusters'] = clusters
-            data['clusters_periodic'] = clusters_periodic
+        with h5py.File("clusters.h5", "w") as data:
+            data["I"] = img
+            data["clusters"] = clusters
+            data["clusters_periodic"] = clusters_periodic
 
-    if args['--check']:
+    if args["--check"]:
 
         import h5py
 
-        with h5py.File('clusters.h5', 'r') as data:
-            assert np.all(np.equal(data['I'][...], I))
-            assert np.all(np.equal(data['clusters'][...], clusters))
-            assert np.all(np.equal(data['clusters_periodic'][...], clusters_periodic))
+        with h5py.File("clusters.h5", "r") as data:
+            assert np.all(np.equal(data["I"][...], img))
+            assert np.all(np.equal(data["clusters"][...], clusters))
+            assert np.all(np.equal(data["clusters_periodic"][...], clusters_periodic))
 
-    if args['--plot']:
+    if args["--plot"]:
 
         import matplotlib.pyplot as plt
         import matplotlib as mpl
@@ -59,25 +58,25 @@ if __name__ == '__main__':
         # color-scheme: modify such that the background is white
         # N.B. for a transparent background -> 4th column == 1.
         cmap = cm.jet(range(256))
-        cmap[0, :3] = 1.
+        cmap[0, :3] = 1.0
         cmap = mpl.colors.ListedColormap(cmap)
 
         try:
-            plt.style.use(['goose', 'goose-latex'])
-        except:
+            plt.style.use(["goose", "goose-latex"])
+        except OSError:
             pass
 
         fig, axes = plt.subplots(figsize=(18, 6), nrows=1, ncols=3)
 
         ax = axes[0]
-        im = ax.imshow(I, clim=(0, 1), cmap=mpl.colors.ListedColormap(cm.gray([0, 255])))
+        im = ax.imshow(img, clim=(0, 1), cmap=mpl.colors.ListedColormap(cm.gray([0, 255])))
         ax.xaxis.set_ticks([0, 500])
         ax.yaxis.set_ticks([0, 500])
         ax.set_xlim([0, 500])
         ax.set_ylim([0, 500])
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_title (r'image')
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"image")
         div = make_axes_locatable(ax)
         cax = div.append_axes("right", size="5%", pad=0.1)
         cbar = plt.colorbar(im, cax=cax)
@@ -89,9 +88,9 @@ if __name__ == '__main__':
         ax.yaxis.set_ticks([0, 500])
         ax.set_xlim([0, 500])
         ax.set_ylim([0, 500])
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_title (r'clusters')
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"clusters")
         div = make_axes_locatable(ax)
         cax = div.append_axes("right", size="5%", pad=0.1)
         cbar = plt.colorbar(im, cax=cax)
@@ -103,12 +102,12 @@ if __name__ == '__main__':
         ax.yaxis.set_ticks([0, 500])
         ax.set_xlim([0, 500])
         ax.set_ylim([0, 500])
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_title (r'clusters (periodic)')
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"clusters (periodic)")
         div = make_axes_locatable(ax)
         cax = div.append_axes("right", size="5%", pad=0.1)
         cbar = plt.colorbar(im, cax=cax)
         cbar.set_ticks([])
 
-        plt.savefig('clusters.svg')
+        plt.savefig("clusters.svg")

@@ -1,4 +1,4 @@
-r'''
+r"""
     Plot and/or check.
 
 Usage:
@@ -9,43 +9,42 @@ Options:
     -c, --check     Check against earlier results.
     -p, --plot      Plot.
     -h, --help      Show this help.
-'''
-
+"""
 # <snippet>
-import numpy as np
 import GooseEYE
+import numpy as np
 
 # generate image, extract 'volume-fraction' for plotting
-I = GooseEYE.dummy_circles((500, 500))
-phi = np.mean(I)
+img = GooseEYE.dummy_circles((500, 500))
+phi = np.mean(img)
 
 # lineal path function
-L = GooseEYE.L((101, 101), I)
+L = GooseEYE.L((101, 101), img)
 # </snippet>
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import docopt
 
     args = docopt.docopt(__doc__)
 
-    if args['--save']:
+    if args["--save"]:
 
         import h5py
 
-        with h5py.File('L.h5', 'w') as data:
-            data['I'] = I
-            data['L'] = L
+        with h5py.File("L.h5", "w") as data:
+            data["I"] = img
+            data["L"] = L
 
-    if args['--check']:
+    if args["--check"]:
 
         import h5py
 
-        with h5py.File('L.h5', 'r') as data:
-            assert np.all(np.equal(data['I'][...], I))
-            assert np.allclose(data['L'][...], L)
+        with h5py.File("L.h5", "r") as data:
+            assert np.all(np.equal(data["I"][...], img))
+            assert np.allclose(data["L"][...], L)
 
-    if args['--plot']:
+    if args["--plot"]:
 
         import matplotlib.pyplot as plt
         import matplotlib as mpl
@@ -53,46 +52,46 @@ if __name__ == '__main__':
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
         try:
-            plt.style.use(['goose', 'goose-latex'])
-        except:
+            plt.style.use(["goose", "goose-latex"])
+        except OSError:
             pass
 
         fig, axes = plt.subplots(figsize=(18, 6), nrows=1, ncols=3)
 
         ax = axes[0]
-        im = ax.imshow(I, clim=(0, 1), cmap=mpl.colors.ListedColormap(cm.gray([0, 255])))
+        im = ax.imshow(img, clim=(0, 1), cmap=mpl.colors.ListedColormap(cm.gray([0, 255])))
         ax.xaxis.set_ticks([0, 500])
         ax.yaxis.set_ticks([0, 500])
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_title (r'$\mathcal{I}$')
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"$\mathcal{I}$")
         div = make_axes_locatable(ax)
         cax = div.append_axes("right", size="5%", pad=0.1)
         cbar = plt.colorbar(im, cax=cax)
         cbar.set_ticks([0, 1])
 
         ax = axes[1]
-        im = ax.imshow(L, clim=(0, phi), cmap='jet', extent=(-50, 50, -50, 50))
+        im = ax.imshow(L, clim=(0, phi), cmap="jet", extent=(-50, 50, -50, 50))
         ax.xaxis.set_ticks([-50, 0, +50])
         ax.yaxis.set_ticks([-50, 0, +50])
-        ax.set_xlabel(r'$\Delta x$')
-        ax.set_ylabel(r'$\Delta y$')
-        ax.set_title (r'$L$')
+        ax.set_xlabel(r"$\Delta x$")
+        ax.set_ylabel(r"$\Delta y$")
+        ax.set_title(r"$L$")
         div = make_axes_locatable(ax)
         cax = div.append_axes("right", size="5%", pad=0.1)
         cbar = plt.colorbar(im, cax=cax)
         cbar.set_ticks([0, phi])
-        cbar.set_ticklabels(['0', r'$\varphi$'])
+        cbar.set_ticklabels(["0", r"$\varphi$"])
 
         ax = axes[2]
-        ax.plot(np.arange(-50, 51), L[50, :], color='b')
+        ax.plot(np.arange(-50, 51), L[50, :], color="b")
         ax.xaxis.set_ticks([-50, 0, +50])
         ax.yaxis.set_ticks([0, phi])
-        ax.yaxis.set_ticklabels([0, r'$\varphi$'])
+        ax.yaxis.set_ticklabels([0, r"$\varphi$"])
         ax.set_xlim([-50, +50])
         ax.set_ylim([0, phi])
-        ax.set_xlabel(r'$\Delta x$')
-        ax.set_ylabel(r'$L$')
+        ax.set_xlabel(r"$\Delta x$")
+        ax.set_ylabel(r"$L$")
 
-        plt.savefig('L.svg')
+        plt.savefig("L.svg")
         plt.close()

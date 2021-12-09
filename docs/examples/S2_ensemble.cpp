@@ -13,8 +13,7 @@ int main()
 {
     GooseEYE::Ensemble ensemble({101, 101});
 
-    for (size_t i = 0; i < 5; ++i)
-    {
+    for (size_t i = 0; i < 5; ++i) {
         auto I = GooseEYE::dummy_circles({200, 200});
         ensemble.S2(I, I);
     }

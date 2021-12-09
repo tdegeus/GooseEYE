@@ -1,8 +1,8 @@
 /**
- *  \file
- *  \copyright Copyright 2017. Tom de Geus. All rights reserved.
- *  \license This project is released under the GPLv3 License.
- */
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the GPLv3 License.
+*/
 
 #ifndef GOOSEEYE_DILATE_HPP
 #define GOOSEEYE_DILATE_HPP
@@ -88,13 +88,12 @@ inline void periodic_copy(S&& F, const U& Pad)
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
-                     std::is_integral<typename S::value_type>::value, int>>
-inline T dilate(
-    const T& f,
-    const S& kernel,
-    const xt::xtensor<size_t, 1>& iterations,
-    bool periodic)
+    std::enable_if_t<
+        std::is_integral<typename T::value_type>::value &&
+            std::is_integral<typename S::value_type>::value,
+        int>>
+inline T
+dilate(const T& f, const S& kernel, const xt::xtensor<size_t, 1>& iterations, bool periodic)
 {
     using value_type = typename T::value_type;
     GOOSEEYE_ASSERT(f.dimension() <= 3);
@@ -135,12 +134,14 @@ inline T dilate(
                     }
 
                     // get sub-matrix around (h, i, j)
-                    auto Fi = xt::view(F,
+                    auto Fi = xt::view(
+                        F,
                         xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
                         xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
                         xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
 
-                    auto Gi = xt::view(G,
+                    auto Gi = xt::view(
+                        G,
                         xt::range(h - Pad[0][0], h + Pad[0][1] + 1),
                         xt::range(i - Pad[1][0], i + Pad[1][1] + 1),
                         xt::range(j - Pad[2][0], j + Pad[2][1] + 1));
@@ -162,7 +163,8 @@ inline T dilate(
     }
 
     // remove padding
-    F = xt::view(F,
+    F = xt::view(
+        F,
         xt::range(Pad[0][0], F.shape(0) - Pad[0][1]),
         xt::range(Pad[1][0], F.shape(1) - Pad[1][1]),
         xt::range(Pad[2][0], F.shape(2) - Pad[2][1]));
@@ -186,13 +188,11 @@ inline T dilate(const T& f, size_t iterations, bool periodic)
 template <
     class T,
     class S,
-    std::enable_if_t<std::is_integral<typename T::value_type>::value &&
-                     std::is_integral<typename S::value_type>::value, int>>
-inline T dilate(
-    const T& f,
-    const S& kernel,
-    size_t iterations,
-    bool periodic)
+    std::enable_if_t<
+        std::is_integral<typename T::value_type>::value &&
+            std::is_integral<typename S::value_type>::value,
+        int>>
+inline T dilate(const T& f, const S& kernel, size_t iterations, bool periodic)
 {
     xt::xtensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
     return dilate(f, kernel, iter, periodic);

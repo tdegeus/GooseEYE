@@ -27,7 +27,7 @@ Note that *xsimd* is optional, but recommended.
     You can also use::
 
         python -m pip install pyxtensor pybind11
-        
+
     for use without *conda*. Note that you install *xsimd* yourself in such a way that Python can find it in order to use it.
 
 Then, download the package::

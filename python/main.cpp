@@ -21,9 +21,7 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.doc() = "Geometrical statistics";
 
-    m.def("version",
-          &GooseEYE::version,
-          "Return version string.");
+    m.def("version", &GooseEYE::version, "Return version string.");
 
     py::module kernel = m.def_submodule("kernel", "Kernel definition");
 
@@ -146,10 +144,7 @@ PYBIND11_MODULE(_GooseEYE, m)
         .def("__repr__", [](const GooseEYE::Clusters&) { return "<GooseEYE.Clusters>"; });
 
     m.def(
-        "clusters",
-        &GooseEYE::clusters<xt::xarray<int>>,
-        py::arg("f"),
-        py::arg("periodic") = true);
+        "clusters", &GooseEYE::clusters<xt::xarray<int>>, py::arg("f"), py::arg("periodic") = true);
 
     m.def(
         "pos2img",
@@ -588,9 +583,7 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.def(
         "heightheight",
-        [](const std::vector<size_t>& roi,
-           const xt::xarray<double>& f,
-           bool periodic) {
+        [](const std::vector<size_t>& roi, const xt::xarray<double>& f, bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.heightheight(f);
             return ensemble.result();

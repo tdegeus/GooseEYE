@@ -75,4 +75,3 @@ Using pkg-config
 Find the location of the headers can be automatised using *pkg-config*::
 
     pkg-config --cflags GooseEYE
-

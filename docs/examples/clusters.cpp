@@ -1,6 +1,6 @@
+#include <GooseEYE/GooseEYE.h>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>
-#include <GooseEYE/GooseEYE.h>
 
 int main()
 {

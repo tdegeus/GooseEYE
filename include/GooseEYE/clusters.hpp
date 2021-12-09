@@ -1,8 +1,8 @@
 /**
- *  \file
- *  \copyright Copyright 2017. Tom de Geus. All rights reserved.
- *  \license This project is released under the GPLv3 License.
- */
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the GPLv3 License.
+*/
 
 #ifndef GOOSEEYE_CLUSTERS_HPP
 #define GOOSEEYE_CLUSTERS_HPP
@@ -151,7 +151,8 @@ inline void Clusters::compute()
                     continue;
                 }
                 // - get current labels in the ROI
-                auto Li = xt::view(m_l,
+                auto Li = xt::view(
+                    m_l,
                     xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
                     xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
                     xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
@@ -184,7 +185,8 @@ inline void Clusters::compute()
     }
 
     // remove padding
-    m_l = xt::view(m_l,
+    m_l = xt::view(
+        m_l,
         xt::range(m_pad[0][0], m_l.shape(0) - m_pad[0][1]),
         xt::range(m_pad[1][0], m_l.shape(1) - m_pad[1][1]),
         xt::range(m_pad[2][0], m_l.shape(2) - m_pad[2][1]));
