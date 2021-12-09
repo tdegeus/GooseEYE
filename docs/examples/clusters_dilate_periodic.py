@@ -1,4 +1,4 @@
-r'''
+r"""
     Plot and/or check.
 
 Usage:
@@ -9,53 +9,52 @@ Options:
     -c, --check     Check against earlier results.
     -p, --plot      Plot.
     -h, --help      Show this help.
-'''
-
+"""
 # <snippet>
-import numpy as np
 import GooseEYE
+import numpy as np
 
 # generate image
-I = np.zeros((21, 21), dtype='bool')
-I[4, 4] = True
-I[18, 19] = True
-I[19, 19] = True
-I[20, 19] = True
-I[19, 18] = True
-I[19, 20] = True
+img = np.zeros((21, 21), dtype="bool")
+img[4, 4] = True
+img[18, 19] = True
+img[19, 19] = True
+img[20, 19] = True
+img[19, 18] = True
+img[19, 20] = True
 
 # clusters
-C = GooseEYE.Clusters(I).labels()
+C = GooseEYE.Clusters(img).labels()
 
 # dilate
 CD = GooseEYE.dilate(C)
 # </snippet>
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import docopt
 
     args = docopt.docopt(__doc__)
 
-    if args['--save']:
+    if args["--save"]:
 
         import h5py
 
-        with h5py.File('clusters_dilate_periodic.h5', 'w') as data:
-            data['I'] = I
-            data['C'] = C
-            data['CD'] = CD
+        with h5py.File("clusters_dilate_periodic.h5", "w") as data:
+            data["I"] = img
+            data["C"] = C
+            data["CD"] = CD
 
-    if args['--check']:
+    if args["--check"]:
 
         import h5py
 
-        with h5py.File('clusters_dilate_periodic.h5', 'r') as data:
-            assert np.all(np.equal(data['I'][...], I))
-            assert np.all(np.equal(data['C'][...], C))
-            assert np.all(np.equal(data['CD'][...], CD))
+        with h5py.File("clusters_dilate_periodic.h5", "r") as data:
+            assert np.all(np.equal(data["I"][...], img))
+            assert np.all(np.equal(data["C"][...], C))
+            assert np.all(np.equal(data["CD"][...], CD))
 
-    if args['--plot']:
+    if args["--plot"]:
 
         import matplotlib.pyplot as plt
         import matplotlib as mpl
@@ -69,21 +68,21 @@ if __name__ == '__main__':
         cmap = mpl.colors.ListedColormap(cmap)
 
         try:
-            plt.style.use(['goose', 'goose-latex'])
-        except:
+            plt.style.use(["goose", "goose-latex"])
+        except OSError:
             pass
 
         fig, axes = plt.subplots(figsize=(18, 6), nrows=1, ncols=3)
 
         ax = axes[0]
-        im = ax.imshow(I, clim=(0, 1), cmap=mpl.colors.ListedColormap(cm.gray([0, 255])))
+        im = ax.imshow(img, clim=(0, 1), cmap=mpl.colors.ListedColormap(cm.gray([0, 255])))
         ax.xaxis.set_ticks([0, 20])
         ax.yaxis.set_ticks([0, 20])
         ax.set_xlim([-0.5, 20.5])
         ax.set_ylim([-0.5, 20.5])
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_title (r'image')
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"image")
         div = make_axes_locatable(ax)
         cax = div.append_axes("right", size="5%", pad=0.1)
         cbar = plt.colorbar(im, cax=cax)
@@ -95,9 +94,9 @@ if __name__ == '__main__':
         ax.yaxis.set_ticks([0, 20])
         ax.set_xlim([-0.5, 20.5])
         ax.set_ylim([-0.5, 20.5])
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_title (r'clusters + dilate')
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"clusters + dilate")
 
         ax = axes[2]
         im = ax.imshow(np.tile(CD, (3, 3)), clim=(0, np.max(C) + 1), cmap=cmap)
@@ -105,8 +104,8 @@ if __name__ == '__main__':
         ax.yaxis.set_ticks([0, 60])
         ax.set_xlim([-0.5, 60.5])
         ax.set_ylim([-0.5, 60.5])
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_title (r'periodic copy')
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"periodic copy")
 
-        plt.savefig('clusters_dilate_periodic.svg')
+        plt.savefig("clusters_dilate_periodic.svg")

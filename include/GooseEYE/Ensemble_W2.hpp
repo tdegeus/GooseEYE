@@ -1,8 +1,8 @@
 /**
- *  \file
- *  \copyright Copyright 2017. Tom de Geus. All rights reserved.
- *  \license This project is released under the GPLv3 License.
- */
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the GPLv3 License.
+*/
 
 #ifndef GOOSEEYE_ENSEMBLE_W2_HPP
 #define GOOSEEYE_ENSEMBLE_W2_HPP
@@ -50,15 +50,17 @@ inline void Ensemble::W2(const T& f, const T& g, const M& gmask)
         for (size_t i = m_pad[1][0]; i < F.shape(1) - m_pad[1][1]; ++i) {
             for (size_t j = m_pad[2][0]; j < F.shape(2) - m_pad[2][1]; ++j) {
                 // - get comparison sub-matrix
-                auto Gi = xt::view(G,
+                auto Gi = xt::view(
+                    G,
                     xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
                     xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
                     xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
                 // - get inverse of comparison mask
-                auto Gmii = 1.0 - xt::view(Gmask,
-                    xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
-                    xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
-                    xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
+                auto Gmii = 1.0 - xt::view(
+                                      Gmask,
+                                      xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
+                                      xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
+                                      xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
                 // - correlation (account for mask)
                 if (F(h, i, j) != 0) {
                     m_first += Fd(h, i, j) * Gi * Gmii;

@@ -1,8 +1,8 @@
 /**
- *  \file
- *  \copyright Copyright 2017. Tom de Geus. All rights reserved.
- *  \license This project is released under the GPLv3 License.
- */
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the GPLv3 License.
+*/
 
 #ifndef GOOSEEYE_INCLUDE_H
 #define GOOSEEYE_INCLUDE_H
@@ -45,16 +45,13 @@
 #define QUOTE(x) Q(x)
 
 #define GOOSEEYE_WARNING_IMPL(message, file, line, function) \
-    std::cout << \
-        std::string(file) + ":" + std::to_string(line) + \
-        " (" + std::string(function) + ")" + \
-        ": " message ") \n\t"; \
+    std::cout << std::string(file) + ":" + std::to_string(line) + " (" + std::string(function) + \
+                     ")" + ": " message ") \n\t";
 
 #define GOOSEEYE_ASSERT_IMPL(expr, file, line, function) \
     if (!(expr)) { \
         throw std::runtime_error( \
-            std::string(file) + ":" + std::to_string(line) + \
-            " (" + std::string(function) + ")" + \
+            std::string(file) + ":" + std::to_string(line) + " (" + std::string(function) + ")" + \
             ": assertion failed (" #expr ") \n\t"); \
     }
 
@@ -112,7 +109,8 @@
  *      #define GOOSEEYE_ENABLE_WARNING_PYTHON
  */
 #ifdef GOOSEEYE_ENABLE_WARNING_PYTHON
-#define GOOSEEYE_WARNING_PYTHON(message) GOOSEEYE_WARNING_IMPL(message, __FILE__, __LINE__, __FUNCTION__)
+#define GOOSEEYE_WARNING_PYTHON(message) \
+    GOOSEEYE_WARNING_IMPL(message, __FILE__, __LINE__, __FUNCTION__)
 #else
 #define GOOSEEYE_WARNING_PYTHON(message)
 #endif
@@ -120,6 +118,7 @@
 /**
  *  Toolbox to compute statistics.
  */
-namespace GooseEYE {}
+namespace GooseEYE {
+}
 
 #endif

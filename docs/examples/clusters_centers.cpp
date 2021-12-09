@@ -29,8 +29,10 @@ int main()
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
     MYASSERT(xt::all(xt::equal(labels, H5Easy::load<decltype(labels)>(data, "labels"))));
     MYASSERT(xt::allclose(centers, H5Easy::load<decltype(centers)>(data, "centers")));
-    MYASSERT(xt::all(xt::equal(labels_periodic, H5Easy::load<decltype(labels_periodic)>(data, "labels_periodic"))));
-    MYASSERT(xt::allclose(centers_periodic, H5Easy::load<decltype(centers_periodic)>(data, "centers_periodic")));
+    MYASSERT(xt::all(xt::equal(
+        labels_periodic, H5Easy::load<decltype(labels_periodic)>(data, "labels_periodic"))));
+    MYASSERT(xt::allclose(
+        centers_periodic, H5Easy::load<decltype(centers_periodic)>(data, "centers_periodic")));
 
     return 0;
 }

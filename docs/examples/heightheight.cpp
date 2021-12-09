@@ -18,9 +18,11 @@ int main()
     xt::xarray<double> y1 = xt::sin(x);
     xt::xarray<double> y2 = xt::sin(2. * x);
 
-    xt::xarray<double> hh1 = GooseEYE::heightheight({200,}, y1, true);
-    xt::xarray<double> hh2 = GooseEYE::heightheight({200,}, y2, true);
-    xt::xarray<double> dx = GooseEYE::distance({200}, {h,}, 0);
+    std::vector<size_t> roi = {200};
+    std::vector<double> hv = {h};
+    xt::xarray<double> hh1 = GooseEYE::heightheight(roi, y1, true);
+    xt::xarray<double> hh2 = GooseEYE::heightheight(roi, y2, true);
+    xt::xarray<double> dx = GooseEYE::distance(roi, hv, 0);
 
     // check against previous versions
     H5Easy::File data("heightheight.h5", H5Easy::File::ReadOnly);

@@ -1,8 +1,8 @@
 /**
- *  \file
- *  \copyright Copyright 2017. Tom de Geus. All rights reserved.
- *  \license This project is released under the GPLv3 License.
- */
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the GPLv3 License.
+*/
 
 #ifndef GOOSEEYE_HPP
 #define GOOSEEYE_HPP
@@ -58,13 +58,13 @@ inline auto S2(const std::vector<size_t>& roi, const T& f, const T& g, bool peri
 }
 
 template <class T, class M>
-inline auto S2(
-    const std::vector<size_t>& roi,
-    const T& f,
-    const T& g,
-    const M& fmask,
-    const M& gmask,
-    bool periodic)
+inline auto
+S2(const std::vector<size_t>& roi,
+   const T& f,
+   const T& g,
+   const M& fmask,
+   const M& gmask,
+   bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.S2(f, g, fmask, gmask);
@@ -80,13 +80,13 @@ inline auto C2(const std::vector<size_t>& roi, const T& f, const T& g, bool peri
 }
 
 template <class T, class M>
-inline auto C2(
-    const std::vector<size_t>& roi,
-    const T& f,
-    const T& g,
-    const M& fmask,
-    const M& gmask,
-    bool periodic)
+inline auto
+C2(const std::vector<size_t>& roi,
+   const T& f,
+   const T& g,
+   const M& fmask,
+   const M& gmask,
+   bool periodic)
 {
     Ensemble ensemble(roi, periodic);
     ensemble.C2(f, g, fmask, gmask);
@@ -111,8 +111,8 @@ W2(const std::vector<size_t>& roi, const T& w, const T& f, const M& fmask, bool 
 }
 
 template <class C, class T>
-inline auto W2c(
-    const std::vector<size_t>& roi,
+inline auto
+W2c(const std::vector<size_t>& roi,
     const C& clusters,
     const C& centers,
     const T& f,
@@ -125,8 +125,8 @@ inline auto W2c(
 }
 
 template <class C, class T, class M>
-inline auto W2c(
-    const std::vector<size_t>& roi,
+inline auto
+W2c(const std::vector<size_t>& roi,
     const C& clusters,
     const C& centers,
     const T& f,

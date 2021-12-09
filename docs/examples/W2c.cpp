@@ -21,12 +21,12 @@ int main()
     std::tie(rowmat, colmat) = xt::meshgrid(row, col);
     rowmat = xt::ravel(rowmat);
     colmat = xt::ravel(colmat);
-    xt::xtensor<double,1> r = (double)(M) / (double)(N) / 4.0 * xt::ones<double>({N * N});
+    xt::xtensor<double, 1> r = (double)(M) / (double)(N) / 4.0 * xt::ones<double>({N * N});
 
     // random perturbation
     rowmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
     colmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
-    xt::xtensor<double,1> dr = GooseEYE::random::random({N * N}) * 2.0 + 0.1;
+    xt::xtensor<double, 1> dr = GooseEYE::random::random({N * N}) * 2.0 + 0.1;
     r = r * dr;
 
     // generate image
@@ -60,4 +60,3 @@ int main()
 
     return 0;
 }
-

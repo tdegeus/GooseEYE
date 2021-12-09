@@ -1,8 +1,8 @@
 /**
- *  \file
- *  \copyright Copyright 2017. Tom de Geus. All rights reserved.
- *  \license This project is released under the GPLv3 License.
- */
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the GPLv3 License.
+*/
 
 #ifndef GOOSEEYE_ENSEMBLE_HEIGHTHEIGHT_HPP
 #define GOOSEEYE_ENSEMBLE_HEIGHTHEIGHT_HPP
@@ -52,15 +52,17 @@ inline void Ensemble::heightheight(const T& f, const M& fmask)
                     continue;
                 }
                 // - get comparison sub-matrix
-                auto Fi = xt::view(F,
+                auto Fi = xt::view(
+                    F,
                     xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
                     xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
                     xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
                 // - get inverse of comparison mask
-                auto Fmii = 1.0 - xt::view(Fmaskd,
-                    xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
-                    xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
-                    xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
+                auto Fmii = 1.0 - xt::view(
+                                      Fmaskd,
+                                      xt::range(h - m_pad[0][0], h + m_pad[0][1] + 1),
+                                      xt::range(i - m_pad[1][0], i + m_pad[1][1] + 1),
+                                      xt::range(j - m_pad[2][0], j + m_pad[2][1] + 1));
                 // - update sum of the m_first moment
                 m_first += xt::pow(Fi - F(h, i, j), 2.0) * Fmii;
                 // - update sum of the m_second moment

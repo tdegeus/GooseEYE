@@ -15,8 +15,7 @@ int main()
 
     GooseEYE::Ensemble ensemble({1}, true, true);
 
-    for (size_t i = 0; i < random_data.shape(0); ++i)
-    {
+    for (size_t i = 0; i < random_data.shape(0); ++i) {
         xt::xarray<double> slice = xt::view(random_data, i, xt::all(), xt::all());
         ensemble.mean(slice);
     }
@@ -31,4 +30,3 @@ int main()
 
     return 0;
 }
-
