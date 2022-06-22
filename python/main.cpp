@@ -114,7 +114,8 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.def(
         "dilate",
-        py::overload_cast<const xt::pyarray<int>&, size_t, bool>(&GooseEYE::dilate<xt::pyarray<int>>),
+        py::overload_cast<const xt::pyarray<int>&, size_t, bool>(
+            &GooseEYE::dilate<xt::pyarray<int>>),
         py::arg("f"),
         py::arg("iterations") = 1,
         py::arg("periodic") = true);
@@ -145,7 +146,10 @@ PYBIND11_MODULE(_GooseEYE, m)
         .def("__repr__", [](const GooseEYE::Clusters&) { return "<GooseEYE.Clusters>"; });
 
     m.def(
-        "clusters", &GooseEYE::clusters<xt::pyarray<int>>, py::arg("f"), py::arg("periodic") = true);
+        "clusters",
+        &GooseEYE::clusters<xt::pyarray<int>>,
+        py::arg("f"),
+        py::arg("periodic") = true);
 
     m.def(
         "pos2img",
@@ -271,7 +275,8 @@ PYBIND11_MODULE(_GooseEYE, m)
                 const xt::pyarray<int>&,
                 const xt::pyarray<int>&,
                 const xt::pyarray<int>&,
-                const xt::pyarray<int>&>(&GooseEYE::Ensemble::C2<xt::pyarray<int>, xt::pyarray<int>>),
+                const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::C2<xt::pyarray<int>, xt::pyarray<int>>),
             py::arg("f"),
             py::arg("g"),
             py::arg("fmask"),
@@ -324,7 +329,8 @@ PYBIND11_MODULE(_GooseEYE, m)
                 const xt::pyarray<int>&,
                 const xt::pyarray<int>&,
                 const xt::pyarray<double>&,
-                GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::pyarray<int>, xt::pyarray<double>>),
+                GooseEYE::path_mode>(
+                &GooseEYE::Ensemble::W2c<xt::pyarray<int>, xt::pyarray<double>>),
             py::arg("clusters"),
             py::arg("centers"),
             py::arg("f"),
