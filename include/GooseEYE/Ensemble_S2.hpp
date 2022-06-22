@@ -41,12 +41,12 @@ inline void Ensemble::S2(const T& f, const T& g, const M& fmask, const M& gmask)
     }
 
     // apply padding
-    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<double, 3> G = xt::pad(xt::atleast_3d(g), m_pad, pad_mode);
-    xt::xtensor<mask_type, 3> Fmask =
+    array_type::tensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<double, 3> G = xt::pad(xt::atleast_3d(g), m_pad, pad_mode);
+    array_type::tensor<mask_type, 3> Fmask =
         xt::pad(xt::atleast_3d(fmask), m_pad, xt::pad_mode::constant, mask_value);
-    xt::xtensor<double, 3> Gmask =
+    array_type::tensor<double, 3> Gmask =
         xt::pad(xt::atleast_3d(gmask), m_pad, xt::pad_mode::constant, mask_value);
 
     // compute correlation
@@ -83,7 +83,7 @@ inline void Ensemble::S2(const T& f, const T& g, const M& fmask, const M& gmask)
 template <class T>
 inline void Ensemble::S2(const T& f, const T& g)
 {
-    xt::xarray<int> mask = xt::zeros<int>(f.shape());
+    array_type::array<int> mask = xt::zeros<int>(f.shape());
     S2(f, g, mask, mask);
 }
 

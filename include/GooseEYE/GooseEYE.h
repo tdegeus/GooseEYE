@@ -23,7 +23,7 @@ Return kernel with nearest neighbours.
 \param ndim Number of dimensions (rank).
 \return The kernel.
 */
-inline xt::xarray<int> nearest(size_t ndim);
+inline array_type::array<int> nearest(size_t ndim);
 
 } // namespace kernel
 
@@ -86,9 +86,9 @@ Compute a path between two pixels.
 \param mode Method to use (see "path_mode").
 \return The path: the coordinate of one pixel per row.
 */
-inline xt::xtensor<int, 2> path(
-    const xt::xtensor<int, 1>& x0,
-    const xt::xtensor<int, 1>& x1,
+inline array_type::tensor<int, 2> path(
+    const array_type::tensor<int, 1>& x0,
+    const array_type::tensor<int, 1>& x1,
     path_mode mode = path_mode::Bresenham);
 
 /**
@@ -97,7 +97,7 @@ Dummy image with circles. The positions and radii of the circles are randomly ge
 \param periodic Switch to assume image periodic.
 \return The dummy image.
 */
-inline xt::xarray<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
+inline array_type::array<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
 
 /**
 Dummy image with circles.
@@ -108,11 +108,11 @@ Dummy image with circles.
 \param periodic Switch to assume image periodic.
 \return The dummy image.
 */
-inline xt::xarray<int> dummy_circles(
+inline array_type::array<int> dummy_circles(
     const std::vector<size_t>& shape,
-    const xt::xtensor<int, 1>& row,
-    const xt::xtensor<int, 1>& col,
-    const xt::xtensor<int, 1>& r,
+    const array_type::tensor<int, 1>& row,
+    const array_type::tensor<int, 1>& col,
+    const array_type::tensor<int, 1>& r,
     bool periodic = true);
 
 /**
@@ -131,15 +131,18 @@ template <
         std::is_integral<typename T::value_type>::value &&
             std::is_integral<typename S::value_type>::value,
         int> = 0>
-inline T
-dilate(const T& f, const S& kernel, const xt::xtensor<size_t, 1>& iterations, bool periodic = true);
+inline T dilate(
+    const T& f,
+    const S& kernel,
+    const array_type::tensor<size_t, 1>& iterations,
+    bool periodic = true);
 
 /**
 Dilate image. Select "kernel::nearest" as kernel.
 See above for parameters.
 */
 template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int> = 0>
-inline T dilate(const T& f, const xt::xtensor<size_t, 1>& iterations, bool periodic = true);
+inline T dilate(const T& f, const array_type::tensor<size_t, 1>& iterations, bool periodic = true);
 
 /**
 Dilate image. Fixed number of iterations for all labels.
@@ -191,41 +194,41 @@ public:
     Return labels (1..n).
     \return 'Image'.
     */
-    xt::xarray<int> labels() const;
+    array_type::array<int> labels() const;
 
     /**
     Return label only in the center of gravity (1..n).
     \return 'Image'.
     */
-    xt::xarray<int> centers() const;
+    array_type::array<int> centers() const;
 
     /**
     Return positions of the centers of gravity (in the original rank, or as 3-d).
     \return List of positions.
     */
-    xt::xtensor<double, 2> center_positions(bool as3d = false) const;
+    array_type::tensor<double, 2> center_positions(bool as3d = false) const;
 
     /**
     Return size per cluster
     \return List.
     */
-    xt::xtensor<size_t, 1> sizes() const;
+    array_type::tensor<size_t, 1> sizes() const;
 
 private:
     void compute();
 
     template <class T>
-    xt::xtensor<double, 2> average_position(const T& lab) const;
+    array_type::tensor<double, 2> average_position(const T& lab) const;
 
-    xt::xtensor<double, 2> average_position_periodic() const;
+    array_type::tensor<double, 2> average_position_periodic() const;
 
     static const size_t MAX_DIM = 3;
     std::vector<size_t> m_shape; // shape of the input image
     std::vector<std::vector<size_t>> m_pad;
-    xt::xtensor<int, 3> m_kernel;
+    array_type::tensor<int, 3> m_kernel;
     bool m_periodic;
-    xt::xtensor<int, 3> m_l; // labels (>= 1, 0 = background), 3-d
-    xt::xtensor<int, 3> m_l_np; // labels before applying periodicity
+    array_type::tensor<int, 3> m_l; // labels (>= 1, 0 = background), 3-d
+    array_type::tensor<int, 3> m_l_np; // labels before applying periodicity
 };
 
 /**
@@ -234,7 +237,7 @@ Compute clusters. Wraps GooseEYE::Clusters::labels().
 \param periodic Interpret image as periodic.
 */
 template <class T>
-xt::xarray<int> clusters(const T& f, bool periodic = true);
+array_type::array<int> clusters(const T& f, bool periodic = true);
 
 /**
 Find map to relabel from "src" to "dest".
@@ -242,7 +245,7 @@ Find map to relabel from "src" to "dest".
 \param dest Image.
 */
 template <class T, class S>
-xt::xtensor<size_t, 1> relabel_map(const T& src, const S& dest);
+array_type::tensor<size_t, 1> relabel_map(const T& src, const S& dest);
 
 /**
 Convert positions to an image.
@@ -261,7 +264,7 @@ Get the position of the center of each label.
 \return The position of the center of each label.
 */
 template <class T>
-xt::xtensor<double, 2> center_of_mass(const T& labels, bool periodic = true);
+array_type::tensor<double, 2> center_of_mass(const T& labels, bool periodic = true);
 
 /**
 Compute ensemble averaged statistics, by repetitively calling the member-function of a certain
@@ -292,37 +295,37 @@ public:
     Get ensemble average.
     \return The average along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> result() const;
+    array_type::array<double> result() const;
 
     /**
     Get ensemble variance.
     \return The variance along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> variance() const;
+    array_type::array<double> variance() const;
 
     /**
     Get raw-data: ensemble sum of the first moment: x_1 + x_2 + ...
     \return The sum along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> data_first() const;
+    array_type::array<double> data_first() const;
 
     /**
     Get raw-data: ensemble sum of the second moment: x_1^2 + x_2^2 + ...
     \return The sum along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> data_second() const;
+    array_type::array<double> data_second() const;
 
     /**
     Get raw-data: normalisation (number of measurements per pixel).
     \return The norm along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> norm() const;
+    array_type::array<double> norm() const;
 
     /**
     Get the relative distance of each pixel in the 'region-of-interest' to its center.
     \return The distances along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> distance() const;
+    array_type::array<double> distance() const;
 
     /**
     Get the relative distance of each pixel in the 'region-of-interest' to its center,
@@ -330,7 +333,7 @@ public:
     \param axis Select axis.
     \return The distances along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> distance(size_t axis) const;
+    array_type::array<double> distance(size_t axis) const;
 
     /**
     Get the relative distance of each pixel in the 'region-of-interest' to its center.
@@ -338,7 +341,7 @@ public:
     \param h The physical dimensions of one pixel (in each direction).
     \return The distances along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> distance(const std::vector<double>& h) const;
+    array_type::array<double> distance(const std::vector<double>& h) const;
 
     /**
     Get the relative distance of each pixel in the 'region-of-interest' to its center,
@@ -348,7 +351,7 @@ public:
     \param axis Select axis.
     \return The distances along the 'region-of-interest' set at construction.
     */
-    xt::xarray<double> distance(const std::vector<double>& h, size_t axis) const;
+    array_type::array<double> distance(const std::vector<double>& h, size_t axis) const;
 
     /**
     Add realization to arithmetic mean.
@@ -486,11 +489,11 @@ private:
 
     // Raw (not normalized) result, and normalization:
     // - sum of the first moment: x_1 + x_2 + ...
-    xt::xtensor<double, 3> m_first;
+    array_type::tensor<double, 3> m_first;
     // - sum of the second moment: x_1^2 + x_2^2 + ...
-    xt::xtensor<double, 3> m_second;
+    array_type::tensor<double, 3> m_second;
     // - number of measurements per pixel
-    xt::xtensor<double, 3> m_norm;
+    array_type::tensor<double, 3> m_norm;
 
     // Shape of the region-of-interest, as specified.
     std::vector<size_t> m_shape_orig;

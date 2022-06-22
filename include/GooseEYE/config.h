@@ -10,9 +10,7 @@
 /**
 \cond
 */
-
 #define _USE_MATH_DEFINES
-
 /**
 \endcond
 */
@@ -56,28 +54,27 @@
     }
 
 #define SIGN(a) ((a < 0) ? -1 : a > 0 ? 1 : 0)
-
 /**
 \endcond
 */
 
 /**
- *  All assertions are implementation as::
- *
- *      GOOSEEYE_ASSERT(...)
- *
- *  They can be enabled by::
- *
- *      #define GOOSEEYE_ENABLE_ASSERT
- *
- *  (before including GooseEYE).
- *  The advantage is that:
- *
- *  -   File and line-number are displayed if the assertion fails.
- *  -   GooseEYE's assertions can be enabled/disabled independently from those of other libraries.
- *
- *  \throw std::runtime_error
- */
+All assertions are implemented as:
+
+    GOOSEEYE_ASSERT(...)
+
+They can be enabled by:
+
+    #define GOOSEEYE_ENABLE_ASSERT
+
+(before including GooseEYE).
+The advantage is that:
+
+-   File and line-number are displayed if the assertion fails.
+-   GooseEYE's assertions can be enabled/disabled independently from those of other libraries.
+
+\throw std::runtime_error
+*/
 #ifdef GOOSEEYE_ENABLE_ASSERT
 #define GOOSEEYE_ASSERT(expr) GOOSEEYE_ASSERT_IMPL(expr, __FILE__, __LINE__, __FUNCTION__)
 #else
@@ -85,40 +82,47 @@
 #endif
 
 /**
- *  All warnings are implemented as::
- *
- *      GOOSEEYE_WARNING(...)
- *
- *  They can be disabled by::
- *
- *      #define GOOSEEYE_DISABLE_WARNING
- */
-#ifdef GOOSEEYE_DISABLE_WARNING
-#define GOOSEEYE_WARNING(message)
-#else
-#define GOOSEEYE_WARNING(message) GOOSEEYE_WARNING_IMPL(message, __FILE__, __LINE__, __FUNCTION__)
-#endif
-
-/**
- *  All warnings specific to the Python API are implemented as::
- *
- *      GOOSEEYE_WARNING_PYTHON(...)
- *
- *  They can be enabled by::
- *
- *      #define GOOSEEYE_ENABLE_WARNING_PYTHON
- */
-#ifdef GOOSEEYE_ENABLE_WARNING_PYTHON
-#define GOOSEEYE_WARNING_PYTHON(message) \
-    GOOSEEYE_WARNING_IMPL(message, __FILE__, __LINE__, __FUNCTION__)
-#else
-#define GOOSEEYE_WARNING_PYTHON(message)
-#endif
-
-/**
- *  Toolbox to compute statistics.
- */
+Toolbox to compute statistics.
+*/
 namespace GooseEYE {
-}
+
+/**
+Container type.
+*/
+namespace array_type {
+
+#ifdef GOOSEEYE_USE_XTENSOR_PYTHON
+
+/**
+Fixed (static) rank array.
+*/
+template <typename T, size_t N>
+using tensor = xt::pytensor<T, N>;
+
+/**
+Dynamic rank array.
+*/
+template <typename T>
+using array = xt::pyarray<T>;
+
+#else
+
+/**
+Fixed (static) rank array.
+*/
+template <typename T, size_t N>
+using tensor = xt::xtensor<T, N>;
+
+/**
+Dynamic rank array.
+*/
+template <typename T>
+using array = xt::xarray<T>;
+
+#endif
+
+} // namespace array_type
+
+} // namespace GooseEYE
 
 #endif

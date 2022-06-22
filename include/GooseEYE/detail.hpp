@@ -37,9 +37,10 @@ See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=a
 @arg axes : Axes along the input array.
 @ret Axes along the 3d-equivalent-array.
 */
-inline xt::xtensor<size_t, 1> atleast_3d_axes(size_t rank, const xt::xtensor<size_t, 1>& axes)
+inline array_type::tensor<size_t, 1>
+atleast_3d_axes(size_t rank, const array_type::tensor<size_t, 1>& axes)
 {
-    xt::xtensor<size_t, 1> ret = xt::empty_like(axes);
+    array_type::tensor<size_t, 1> ret = xt::empty_like(axes);
     for (size_t i = 0; i < axes.size(); ++i) {
         ret(i) = atleast_3d_axis(rank, axes(i));
     }
@@ -53,7 +54,7 @@ See: https://xtensor.readthedocs.io/en/latest/api/xmanipulation.html?highlight=a
 @arg rank : Rank of the input array.
 @ret Axes along the 3d-equivalent-array.
 */
-inline xt::xtensor<size_t, 1> atleast_3d_axes(size_t rank)
+inline array_type::tensor<size_t, 1> atleast_3d_axes(size_t rank)
 {
     return atleast_3d_axes(rank, xt::arange<size_t>(rank));
 }
@@ -135,7 +136,7 @@ See: https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
 namespace path {
 
 template <class T>
-inline xt::xtensor<int, 2> bresenham(const T& xa, const T& xb)
+inline array_type::tensor<int, 2> bresenham(const T& xa, const T& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;
@@ -216,7 +217,7 @@ Compute pixel-path.
 namespace path {
 
 template <class T>
-inline xt::xtensor<int, 2> actual(const T& xa, const T& xb)
+inline array_type::tensor<int, 2> actual(const T& xa, const T& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;
@@ -316,7 +317,7 @@ Compute pixel-path.
 namespace path {
 
 template <class T>
-inline xt::xtensor<int, 2> full(const T& xa, const T& xb)
+inline array_type::tensor<int, 2> full(const T& xa, const T& xb)
 {
     int ndim = static_cast<int>(xa.size());
     std::vector<int> ret;

@@ -23,9 +23,9 @@ inline Ensemble::Ensemble(const std::vector<size_t>& roi, bool periodic, bool va
     m_pad = detail::pad_width(m_shape);
 }
 
-inline xt::xarray<double> Ensemble::result() const
+inline array_type::array<double> Ensemble::result() const
 {
-    xt::xarray<double> ret = m_first / xt::where(m_norm <= 0, 1.0, m_norm);
+    array_type::array<double> ret = m_first / xt::where(m_norm <= 0, 1.0, m_norm);
 
     if (m_stat == Type::heightheight) {
         ret = xt::pow(ret, 0.5);
@@ -34,10 +34,11 @@ inline xt::xarray<double> Ensemble::result() const
     return ret.reshape(m_shape_orig);
 }
 
-inline xt::xarray<double> Ensemble::variance() const
+inline array_type::array<double> Ensemble::variance() const
 {
-    xt::xtensor<double, 3> norm = xt::where(m_norm <= 0, 1.0, m_norm);
-    xt::xarray<double> ret = (m_second / norm - xt::pow(m_first / norm, 2.0)) * norm / (norm - 1);
+    array_type::tensor<double, 3> norm = xt::where(m_norm <= 0, 1.0, m_norm);
+    array_type::array<double> ret =
+        (m_second / norm - xt::pow(m_first / norm, 2.0)) * norm / (norm - 1);
 
     if (m_stat == Type::heightheight) {
         ret = xt::pow(ret, 0.5);
@@ -49,32 +50,32 @@ inline xt::xarray<double> Ensemble::variance() const
     return ret.reshape(m_shape_orig);
 }
 
-inline xt::xarray<double> Ensemble::data_first() const
+inline array_type::array<double> Ensemble::data_first() const
 {
-    xt::xarray<double> ret = m_first;
+    array_type::array<double> ret = m_first;
     return ret.reshape(m_shape_orig);
 }
 
-inline xt::xarray<double> Ensemble::data_second() const
+inline array_type::array<double> Ensemble::data_second() const
 {
-    xt::xarray<double> ret = m_second;
+    array_type::array<double> ret = m_second;
     return ret.reshape(m_shape_orig);
 }
 
-inline xt::xarray<double> Ensemble::norm() const
+inline array_type::array<double> Ensemble::norm() const
 {
-    xt::xarray<double> ret = m_norm;
+    array_type::array<double> ret = m_norm;
     return ret.reshape(m_shape_orig);
 }
 
-inline xt::xarray<double> Ensemble::distance(size_t axis) const
+inline array_type::array<double> Ensemble::distance(size_t axis) const
 {
     GOOSEEYE_ASSERT(axis < m_shape_orig.size());
     axis = detail::atleast_3d_axis(m_shape_orig.size(), axis);
 
-    xt::xtensor<double, 3> dist = xt::empty<double>(m_shape);
+    array_type::tensor<double, 3> dist = xt::empty<double>(m_shape);
 
-    xt::xarray<double> D = xt::linspace<double>(
+    array_type::array<double> D = xt::linspace<double>(
         -1.0 * static_cast<double>(m_pad[axis][0]),
         static_cast<double>(m_pad[axis][1]),
         m_shape[axis]);
@@ -95,13 +96,13 @@ inline xt::xarray<double> Ensemble::distance(size_t axis) const
         }
     }
 
-    xt::xarray<double> ret = std::move(dist);
+    array_type::array<double> ret = std::move(dist);
     return ret.reshape(m_shape_orig);
 }
 
-inline xt::xarray<double> Ensemble::distance() const
+inline array_type::array<double> Ensemble::distance() const
 {
-    xt::xarray<double> ret = xt::zeros<double>(m_shape_orig);
+    array_type::array<double> ret = xt::zeros<double>(m_shape_orig);
 
     for (size_t i = 0; i < m_shape_orig.size(); ++i) {
         ret += xt::pow(this->distance(i), 2.0);
@@ -110,11 +111,11 @@ inline xt::xarray<double> Ensemble::distance() const
     return xt::pow(ret, 0.5);
 }
 
-inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h) const
+inline array_type::array<double> Ensemble::distance(const std::vector<double>& h) const
 {
     GOOSEEYE_ASSERT(m_shape_orig.size() == h.size());
 
-    xt::xarray<double> ret = xt::zeros<double>(m_shape_orig);
+    array_type::array<double> ret = xt::zeros<double>(m_shape_orig);
 
     for (size_t i = 0; i < m_shape_orig.size(); ++i) {
         ret += xt::pow(this->distance(i) * h[i], 2.0);
@@ -123,7 +124,7 @@ inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h) const
     return xt::pow(ret, 0.5);
 }
 
-inline xt::xarray<double> Ensemble::distance(const std::vector<double>& h, size_t axis) const
+inline array_type::array<double> Ensemble::distance(const std::vector<double>& h, size_t axis) const
 {
     GOOSEEYE_ASSERT(m_shape_orig.size() == h.size());
     return this->distance(axis) * h[axis];

@@ -43,7 +43,7 @@ inline T pos2img(const T& img, const U& pos, const V& labels)
 // For periodic algorithm, see:
 // https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
 template <class T>
-inline xt::xtensor<double, 2> center_of_mass(const T& labels, bool periodic)
+inline array_type::tensor<double, 2> center_of_mass(const T& labels, bool periodic)
 {
     static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
 
@@ -54,11 +54,12 @@ inline xt::xtensor<double, 2> center_of_mass(const T& labels, bool periodic)
     size_t N = static_cast<size_t>(xt::amax(labels)(0)) + 1ul;
     size_t rank = labels.dimension();
     auto axes = detail::atleast_3d_axes(rank);
-    xt::xtensor<double, 1> shape = xt::adapt(labels.shape());
-    xt::xtensor<double, 2> ret = xt::zeros<double>({N, rank});
+    array_type::tensor<double, 1> shape = xt::adapt(labels.shape());
+    array_type::tensor<double, 2> ret = xt::zeros<double>({N, rank});
 
     for (size_t l = 0; l < N; ++l) {
-        xt::xtensor<double, 2> positions = xt::from_indices(xt::argwhere(xt::equal(labels, l)));
+        array_type::tensor<double, 2> positions =
+            xt::from_indices(xt::argwhere(xt::equal(labels, l)));
         if (positions.size() == 0) {
             continue;
         }
@@ -115,8 +116,8 @@ inline Clusters::Clusters(const T& f, const S& kernel, bool periodic) : m_period
     }
 
     // rename labels to lowest possible label starting from 1
-    xt::xtensor<int, 1> labels = xt::unique(m_l);
-    xt::xtensor<int, 1> renum = xt::empty<int>({m_l.size()});
+    array_type::tensor<int, 1> labels = xt::unique(m_l);
+    array_type::tensor<int, 1> renum = xt::empty<int>({m_l.size()});
     xt::view(renum, xt::keep(labels)) = xt::arange<int>(static_cast<int>(labels.size()));
     for (auto& i : m_l) {
         i = renum(i);
@@ -141,7 +142,7 @@ inline void Clusters::compute()
     // N.B. By default the algorithm simply loops over the image, consequently it will miss that
     // clusters may touch further down in the image, labelling one cluster with several labels.
     // Using "renum" these touching clusters will glued and assigned one single label.
-    xt::xtensor<int, 1> renum = xt::arange<int>(static_cast<int>(m_l.size()));
+    array_type::tensor<int, 1> renum = xt::arange<int>(static_cast<int>(m_l.size()));
 
     for (size_t h = m_pad[0][0]; h < m_l.shape(0) - m_pad[0][1]; ++h) {
         for (size_t i = m_pad[1][0]; i < m_l.shape(1) - m_pad[1][1]; ++i) {
@@ -173,7 +174,7 @@ inline void Clusters::compute()
                 }
                 // - get the labels to be merged
                 //  (discard 0 and 1 by settings them to "l" in this copy)
-                xt::xarray<int> merge = xt::where(xt::less_equal(Li, 1), l, Li);
+                array_type::array<int> merge = xt::where(xt::less_equal(Li, 1), l, Li);
                 merge = xt::unique(merge);
                 // - merge labels (apply merge to other labels in cluster)
                 int linkto = xt::amin(xt::view(renum, xt::keep(merge)))[0];
@@ -198,14 +199,14 @@ inline void Clusters::compute()
 }
 
 template <class T>
-inline xt::xtensor<double, 2> Clusters::average_position(const T& lab) const
+inline array_type::tensor<double, 2> Clusters::average_position(const T& lab) const
 {
     // number of labels
     size_t N = xt::amax(lab)() + 1;
 
     // allocate average position
-    xt::xtensor<double, 2> x = xt::zeros<double>({N, size_t(3)});
-    xt::xtensor<double, 1> n = xt::zeros<double>({N});
+    array_type::tensor<double, 2> x = xt::zeros<double>({N, size_t(3)});
+    array_type::tensor<double, 1> n = xt::zeros<double>({N});
 
     for (size_t h = 0; h < lab.shape(0); ++h) {
         for (size_t i = 0; i < lab.shape(1); ++i) {
@@ -235,7 +236,7 @@ inline xt::xtensor<double, 2> Clusters::average_position(const T& lab) const
     return x;
 }
 
-inline xt::xtensor<double, 2> Clusters::average_position_periodic() const
+inline array_type::tensor<double, 2> Clusters::average_position_periodic() const
 {
     // get relabelling "m_l_np" -> "m_l"
     auto relabel = relabel_map(m_l_np, m_l);
@@ -247,7 +248,7 @@ inline xt::xtensor<double, 2> Clusters::average_position_periodic() const
     auto mid = detail::half_shape(m_shape);
 
     // initialise shift to apply
-    xt::xtensor<double, 2> shift = xt::zeros<double>({x_np.shape(0), size_t(3)});
+    array_type::tensor<double, 2> shift = xt::zeros<double>({x_np.shape(0), size_t(3)});
 
     // check to apply shift
     for (size_t i = 0; i < shift.shape(0); ++i) {
@@ -262,8 +263,8 @@ inline xt::xtensor<double, 2> Clusters::average_position_periodic() const
     size_t N = xt::amax(m_l)() + 1;
 
     // allocate average position
-    xt::xtensor<double, 2> x = xt::zeros<double>({N, size_t(3)});
-    xt::xtensor<double, 1> n = xt::zeros<double>({N});
+    array_type::tensor<double, 2> x = xt::zeros<double>({N, size_t(3)});
+    array_type::tensor<double, 1> n = xt::zeros<double>({N});
 
     for (size_t h = 0; h < m_l.shape(0); ++h) {
         for (size_t i = 0; i < m_l.shape(1); ++i) {
@@ -294,9 +295,9 @@ inline xt::xtensor<double, 2> Clusters::average_position_periodic() const
     return x;
 }
 
-inline xt::xtensor<double, 2> Clusters::center_positions(bool as3d) const
+inline array_type::tensor<double, 2> Clusters::center_positions(bool as3d) const
 {
-    xt::xtensor<double, 2> x;
+    array_type::tensor<double, 2> x;
 
     if (m_periodic) {
         x = this->average_position_periodic();
@@ -309,14 +310,14 @@ inline xt::xtensor<double, 2> Clusters::center_positions(bool as3d) const
         return x;
     }
 
-    xt::xtensor<size_t, 1> axes = detail::atleast_3d_axes(m_shape.size());
+    array_type::tensor<size_t, 1> axes = detail::atleast_3d_axes(m_shape.size());
     return xt::view(x, xt::all(), xt::keep(axes));
 }
 
-inline xt::xarray<int> Clusters::centers() const
+inline array_type::array<int> Clusters::centers() const
 {
-    xt::xtensor<size_t, 2> x = xt::floor(this->center_positions(true));
-    xt::xarray<int> c = xt::zeros<int>(m_l.shape());
+    array_type::tensor<size_t, 2> x = xt::floor(this->center_positions(true));
+    array_type::array<int> c = xt::zeros<int>(m_l.shape());
 
     for (int l = 1; l < static_cast<int>(x.shape(0)); ++l) {
         c(x(l, 0), x(l, 1), x(l, 2)) = l;
@@ -326,14 +327,14 @@ inline xt::xarray<int> Clusters::centers() const
     return c;
 }
 
-inline xt::xarray<int> Clusters::labels() const
+inline array_type::array<int> Clusters::labels() const
 {
     return xt::adapt(m_l.data(), m_shape);
 }
 
-inline xt::xtensor<size_t, 1> Clusters::sizes() const
+inline array_type::tensor<size_t, 1> Clusters::sizes() const
 {
-    xt::xtensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(m_l)() + size_t(1)});
+    array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(m_l)() + size_t(1)});
 
     for (size_t h = 0; h < m_l.shape(0); ++h) {
         for (size_t i = 0; i < m_l.shape(1); ++i) {
@@ -347,17 +348,18 @@ inline xt::xtensor<size_t, 1> Clusters::sizes() const
 }
 
 template <class T>
-inline xt::xarray<int> clusters(const T& f, bool periodic)
+inline array_type::array<int> clusters(const T& f, bool periodic)
 {
     return Clusters(f, kernel::nearest(f.dimension()), periodic).labels();
 }
 
 template <class T, class S>
-inline xt::xtensor<size_t, 1> relabel_map(const T& src, const S& dest)
+inline array_type::tensor<size_t, 1> relabel_map(const T& src, const S& dest)
 {
     GOOSEEYE_ASSERT(xt::has_shape(src, dest.shape()));
 
-    xt::xtensor<size_t, 1> ret = xt::zeros<size_t>({static_cast<size_t>(xt::amax(src)() + 1)});
+    array_type::tensor<size_t, 1> ret =
+        xt::zeros<size_t>({static_cast<size_t>(xt::amax(src)() + 1)});
     auto A = xt::atleast_3d(src);
     auto B = xt::atleast_3d(dest);
 

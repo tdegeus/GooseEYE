@@ -11,8 +11,8 @@
 
 namespace GooseEYE {
 
-inline xt::xtensor<int, 2>
-path(const xt::xtensor<int, 1>& x0, const xt::xtensor<int, 1>& x1, path_mode mode)
+inline array_type::tensor<int, 2>
+path(const array_type::tensor<int, 1>& x0, const array_type::tensor<int, 1>& x1, path_mode mode)
 {
     if (mode == path_mode::Bresenham) {
         return detail::path::bresenham(x0, x1);

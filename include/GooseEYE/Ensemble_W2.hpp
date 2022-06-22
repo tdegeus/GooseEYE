@@ -39,10 +39,10 @@ inline void Ensemble::W2(const T& f, const T& g, const M& gmask)
     }
 
     // apply padding
-    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<double, 3> G = xt::pad(xt::atleast_3d(g), m_pad, pad_mode);
-    xt::xtensor<double, 3> Gmask =
+    array_type::tensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<double, 3> G = xt::pad(xt::atleast_3d(g), m_pad, pad_mode);
+    array_type::tensor<double, 3> Gmask =
         xt::pad(xt::atleast_3d(gmask), m_pad, xt::pad_mode::constant, mask_value);
 
     // compute correlation
@@ -75,7 +75,7 @@ inline void Ensemble::W2(const T& f, const T& g, const M& gmask)
 template <class T>
 inline void Ensemble::W2(const T& f, const T& g)
 {
-    xt::xarray<int> mask = xt::zeros<int>(f.shape());
+    array_type::array<int> mask = xt::zeros<int>(f.shape());
     W2(f, g, mask);
 }
 
