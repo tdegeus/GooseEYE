@@ -1,6 +1,5 @@
-#define CATCH_CONFIG_MAIN
 #include <GooseEYE/GooseEYE.h>
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("GooseFEM::Clusters", "clusters.hpp")
 {
