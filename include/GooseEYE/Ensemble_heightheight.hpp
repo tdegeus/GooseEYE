@@ -37,10 +37,10 @@ inline void Ensemble::heightheight(const T& f, const M& fmask)
     }
 
     // apply padding
-    xt::xtensor<double, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<mask_type, 3> Fmask =
+    array_type::tensor<double, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<mask_type, 3> Fmask =
         xt::pad(xt::atleast_3d(fmask), m_pad, xt::pad_mode::constant, mask_value);
-    xt::xtensor<double, 3> Fmaskd =
+    array_type::tensor<double, 3> Fmaskd =
         xt::pad(xt::atleast_3d(fmask), m_pad, xt::pad_mode::constant, mask_value);
 
     // compute correlation
@@ -79,7 +79,7 @@ inline void Ensemble::heightheight(const T& f, const M& fmask)
 template <class T>
 inline void Ensemble::heightheight(const T& f)
 {
-    xt::xarray<int> mask = xt::zeros<int>(f.shape());
+    array_type::array<int> mask = xt::zeros<int>(f.shape());
     heightheight(f, mask);
 }
 

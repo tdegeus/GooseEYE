@@ -33,12 +33,12 @@ inline void Ensemble::L(const T& f, path_mode mode)
     }
 
     // apply padding & convert to quasi-3d
-    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
 
     // ROI-shaped array used to extract a pixel stamp:
     // a set of end-points over which to loop and check the statics
     // - initialize to 1
-    xt::xtensor<int, 3> r = xt::ones<int>(m_shape);
+    array_type::tensor<int, 3> r = xt::ones<int>(m_shape);
     // - determine interior pixels (account for quasi-3D images)
     auto ix = m_shape[0] > 1 ? xt::range(1, m_shape[0] - 1) : xt::range(0, m_shape[0]);
     auto iy = m_shape[1] > 1 ? xt::range(1, m_shape[1] - 1) : xt::range(0, m_shape[1]);
@@ -47,7 +47,7 @@ inline void Ensemble::L(const T& f, path_mode mode)
     xt::view(r, ix, iy, iz) = 0;
 
     // get stamp, from the matrix "r"
-    xt::xtensor<int, 2> stamp = xt::from_indices(xt::argwhere(r));
+    array_type::tensor<int, 2> stamp = xt::from_indices(xt::argwhere(r));
     for (size_t i = 0; i < MAX_DIM; ++i) {
         xt::view(stamp, xt::all(), xt::keep(i)) -= m_pad[i][0];
     }
@@ -57,7 +57,7 @@ inline void Ensemble::L(const T& f, path_mode mode)
     for (size_t istamp = 0; istamp < stamp.shape(0); ++istamp) {
 
         // pixel path between the center of the ROI and the current stamp point
-        xt::xtensor<int, 2> path =
+        array_type::tensor<int, 2> path =
             GooseEYE::path({0, 0, 0}, {stamp(istamp, 0), stamp(istamp, 1), stamp(istamp, 2)}, mode);
 
         // compute correlation along this path, for the entire image

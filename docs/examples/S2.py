@@ -84,10 +84,10 @@ if __name__ == "__main__":
         cbar.set_ticklabels(["0", r"$\varphi$"])
 
         ax = axes[2]
-        ax.plot([-50, 50], [phi ** 2.0, phi ** 2.0], color="k", linestyle="--", linewidth=1)
+        ax.plot([-50, 50], [phi**2.0, phi**2.0], color="k", linestyle="--", linewidth=1)
         ax.plot(np.arange(-50, 51), S2[50, :], color="b")
         ax.xaxis.set_ticks([-50, 0, +50])
-        ax.yaxis.set_ticks([0, phi ** 2.0, phi])
+        ax.yaxis.set_ticks([0, phi**2.0, phi])
         ax.yaxis.set_ticklabels([0, r"$\varphi^2$", r"$\varphi$"])
         ax.set_xlim([-50, +50])
         ax.set_ylim([0, phi])

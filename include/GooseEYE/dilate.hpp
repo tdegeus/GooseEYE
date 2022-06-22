@@ -93,7 +93,7 @@ template <
             std::is_integral<typename S::value_type>::value,
         int>>
 inline T
-dilate(const T& f, const S& kernel, const xt::xtensor<size_t, 1>& iterations, bool periodic)
+dilate(const T& f, const S& kernel, const array_type::tensor<size_t, 1>& iterations, bool periodic)
 {
     using value_type = typename T::value_type;
     GOOSEEYE_ASSERT(f.dimension() <= 3);
@@ -109,10 +109,10 @@ dilate(const T& f, const S& kernel, const xt::xtensor<size_t, 1>& iterations, bo
     }
 
     auto shape = f.shape();
-    xt::xtensor<typename S::value_type, 3> K = xt::atleast_3d(kernel);
+    array_type::tensor<typename S::value_type, 3> K = xt::atleast_3d(kernel);
     auto Pad = detail::pad_width(K);
-    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), Pad, pad_mode, pad_value);
-    xt::xtensor<value_type, 3> G = F; // keep copy to check which labels were added in the iteration
+    array_type::tensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), Pad, pad_mode, pad_value);
+    array_type::tensor<value_type, 3> G = F; // copy to list added labels added in the iteration
 
     for (size_t iter = 0; iter < xt::amax(iterations)(0); ++iter) {
 
@@ -169,11 +169,13 @@ dilate(const T& f, const S& kernel, const xt::xtensor<size_t, 1>& iterations, bo
         xt::range(Pad[1][0], F.shape(1) - Pad[1][1]),
         xt::range(Pad[2][0], F.shape(2) - Pad[2][1]));
 
-    return xt::adapt(F.data(), shape);
+    T ret = f;
+    std::copy(F.cbegin(), F.cend(), ret.begin());
+    return ret;
 }
 
 template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
-inline T dilate(const T& f, const xt::xtensor<size_t, 1>& iterations, bool periodic)
+inline T dilate(const T& f, const array_type::tensor<size_t, 1>& iterations, bool periodic)
 {
     return dilate(f, kernel::nearest(f.dimension()), iterations, periodic);
 }
@@ -181,7 +183,7 @@ inline T dilate(const T& f, const xt::xtensor<size_t, 1>& iterations, bool perio
 template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::value, int>>
 inline T dilate(const T& f, size_t iterations, bool periodic)
 {
-    xt::xtensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
+    array_type::tensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
     return dilate(f, kernel::nearest(f.dimension()), iter, periodic);
 }
 
@@ -194,7 +196,7 @@ template <
         int>>
 inline T dilate(const T& f, const S& kernel, size_t iterations, bool periodic)
 {
-    xt::xtensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
+    array_type::tensor<size_t, 1> iter = iterations * xt::ones<size_t>({xt::amax(f)(0) + 1ul});
     return dilate(f, kernel, iter, periodic);
 }
 

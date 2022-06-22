@@ -41,16 +41,17 @@ Ensemble::W2c(const C& clusters, const C& centers, const T& f, const M& fmask, p
     }
 
     // apply padding
-    xt::xtensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
-    xt::xtensor<mask_type, 3> Fmask = xt::pad(xt::atleast_3d(fmask), m_pad, pad_mode);
-    xt::xtensor<cluster_type, 3> Clusters = xt::pad(xt::atleast_3d(clusters), m_pad, pad_mode);
-    xt::xtensor<cluster_type, 3> Centers = xt::pad(xt::atleast_3d(centers), m_pad, pad_mode);
+    array_type::tensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<double, 3> Fd = xt::pad(xt::atleast_3d(f), m_pad, pad_mode);
+    array_type::tensor<mask_type, 3> Fmask = xt::pad(xt::atleast_3d(fmask), m_pad, pad_mode);
+    array_type::tensor<cluster_type, 3> Clusters =
+        xt::pad(xt::atleast_3d(clusters), m_pad, pad_mode);
+    array_type::tensor<cluster_type, 3> Centers = xt::pad(xt::atleast_3d(centers), m_pad, pad_mode);
 
     // ROI-shaped array used to extract a pixel stamp:
     // a set of end-points over which to loop and check the statics
     // - initialize to 1
-    xt::xtensor<int, 3> r = xt::ones<int>(m_shape);
+    array_type::tensor<int, 3> r = xt::ones<int>(m_shape);
     // - determine interior pixels (account for quasi-3D images)
     auto ix = m_shape[0] > 1 ? xt::range(1, m_shape[0] - 1) : xt::range(0, m_shape[0]);
     auto iy = m_shape[1] > 1 ? xt::range(1, m_shape[1] - 1) : xt::range(0, m_shape[1]);
@@ -59,7 +60,7 @@ Ensemble::W2c(const C& clusters, const C& centers, const T& f, const M& fmask, p
     xt::view(r, ix, iy, iz) = 0;
 
     // get stamp, from the matrix "r"
-    xt::xtensor<int, 2> stamp = xt::from_indices(xt::argwhere(r));
+    array_type::tensor<int, 2> stamp = xt::from_indices(xt::argwhere(r));
     for (size_t i = 0; i < MAX_DIM; ++i) {
         xt::view(stamp, xt::all(), xt::keep(i)) -= m_pad[i][0];
     }
@@ -69,7 +70,7 @@ Ensemble::W2c(const C& clusters, const C& centers, const T& f, const M& fmask, p
     for (size_t istamp = 0; istamp < stamp.shape(0); ++istamp) {
 
         // pixel path between the center of the ROI and the current stamp point
-        xt::xtensor<int, 2> path =
+        array_type::tensor<int, 2> path =
             GooseEYE::path({0, 0, 0}, {stamp(istamp, 0), stamp(istamp, 1), stamp(istamp, 2)}, mode);
 
         for (size_t h = m_pad[0][0]; h < F.shape(0) - m_pad[0][1]; ++h) {
@@ -121,7 +122,7 @@ Ensemble::W2c(const C& clusters, const C& centers, const T& f, const M& fmask, p
 template <class C, class T>
 inline void Ensemble::W2c(const C& clusters, const C& centers, const T& f, path_mode mode)
 {
-    xt::xarray<int> mask = xt::zeros<int>(f.shape());
+    array_type::array<int> mask = xt::zeros<int>(f.shape());
     W2c(clusters, centers, f, mask, mode);
 }
 

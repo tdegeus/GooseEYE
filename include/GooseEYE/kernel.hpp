@@ -12,13 +12,13 @@
 namespace GooseEYE {
 namespace kernel {
 
-inline xt::xarray<int> nearest(size_t ndim)
+inline array_type::array<int> nearest(size_t ndim)
 {
     GOOSEEYE_ASSERT(ndim > 0 && ndim <= 3);
 
     std::vector<size_t> shape(ndim, 3);
 
-    xt::xarray<int> kern = xt::zeros<int>(shape);
+    array_type::array<int> kern = xt::zeros<int>(shape);
 
     if (ndim == 1) {
         xt::view(kern, xt::all()) = 1;

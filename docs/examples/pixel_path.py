@@ -90,7 +90,7 @@ if __name__ == "__main__":
             ax.yaxis.set_ticks([])
             ax.set_xlabel(r"$\Delta x$")
             ax.set_ylabel(r"$\Delta y$")
-            ax.set_title(fr"``{mode:s}''")
+            ax.set_title(rf"``{mode:s}''")
             ax.axis("off")
 
         plt.savefig("pixel_path.svg")

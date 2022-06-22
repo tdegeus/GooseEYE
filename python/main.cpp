@@ -1,7 +1,7 @@
-/*
-
-(c - GPLv3) T.W.J. de Geus (Tom) | tom@geus.me | www.geus.me | github.com/tdegeus/GooseEYE
-
+/**
+\file
+\copyright Copyright 2017. Tom de Geus. All rights reserved.
+\license This project is released under the GPLv3 License.
 */
 
 #include <pybind11/pybind11.h>
@@ -11,6 +11,7 @@
 #include <xtensor-python/pyarray.hpp>
 #include <xtensor-python/pytensor.hpp>
 
+#define GOOSEEYE_USE_XTENSOR_PYTHON
 #include <GooseEYE/GooseEYE.h>
 
 namespace py = pybind11;
@@ -34,7 +35,7 @@ PYBIND11_MODULE(_GooseEYE, m)
     random.def(
         "random",
         [](const std::vector<size_t>& shape) {
-            xt::xarray<double> result = GooseEYE::random::random(shape);
+            xt::pyarray<double> result = GooseEYE::random::random(shape);
             return result;
         },
         py::arg("shape"));
@@ -42,7 +43,7 @@ PYBIND11_MODULE(_GooseEYE, m)
     random.def(
         "normal",
         [](const std::vector<size_t>& shape, double mean, double std_dev) {
-            xt::xarray<double> result = GooseEYE::random::normal(shape, mean, std_dev);
+            xt::pyarray<double> result = GooseEYE::random::normal(shape, mean, std_dev);
             return result;
         },
         py::arg("shape"),
@@ -72,9 +73,9 @@ PYBIND11_MODULE(_GooseEYE, m)
         "dummy_circles",
         py::overload_cast<
             const std::vector<size_t>&,
-            const xt::xtensor<int, 1>&,
-            const xt::xtensor<int, 1>&,
-            const xt::xtensor<int, 1>&,
+            const xt::pytensor<int, 1>&,
+            const xt::pytensor<int, 1>&,
+            const xt::pytensor<int, 1>&,
             bool>(&GooseEYE::dummy_circles),
         py::arg("shape"),
         py::arg("row"),
@@ -85,10 +86,10 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "dilate",
         py::overload_cast<
-            const xt::xarray<int>&,
-            const xt::xarray<int>&,
-            const xt::xtensor<size_t, 1>&,
-            bool>(&GooseEYE::dilate<xt::xarray<int>, xt::xarray<int>>),
+            const xt::pyarray<int>&,
+            const xt::pyarray<int>&,
+            const xt::pytensor<size_t, 1>&,
+            bool>(&GooseEYE::dilate<xt::pyarray<int>, xt::pyarray<int>>),
         py::arg("f"),
         py::arg("kernel"),
         py::arg("iterations"),
@@ -96,16 +97,16 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.def(
         "dilate",
-        py::overload_cast<const xt::xarray<int>&, const xt::xtensor<size_t, 1>&, bool>(
-            &GooseEYE::dilate<xt::xarray<int>>),
+        py::overload_cast<const xt::pyarray<int>&, const xt::pytensor<size_t, 1>&, bool>(
+            &GooseEYE::dilate<xt::pyarray<int>>),
         py::arg("f"),
         py::arg("iterations"),
         py::arg("periodic") = true);
 
     m.def(
         "dilate",
-        py::overload_cast<const xt::xarray<int>&, const xt::xarray<int>&, size_t, bool>(
-            &GooseEYE::dilate<xt::xarray<int>, xt::xarray<int>>),
+        py::overload_cast<const xt::pyarray<int>&, const xt::pyarray<int>&, size_t, bool>(
+            &GooseEYE::dilate<xt::pyarray<int>, xt::pyarray<int>>),
         py::arg("f"),
         py::arg("kernel"),
         py::arg("iterations") = 1,
@@ -113,7 +114,7 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.def(
         "dilate",
-        py::overload_cast<const xt::xarray<int>&, size_t, bool>(&GooseEYE::dilate<xt::xarray<int>>),
+        py::overload_cast<const xt::pyarray<int>&, size_t, bool>(&GooseEYE::dilate<xt::pyarray<int>>),
         py::arg("f"),
         py::arg("iterations") = 1,
         py::arg("periodic") = true);
@@ -121,13 +122,13 @@ PYBIND11_MODULE(_GooseEYE, m)
     py::class_<GooseEYE::Clusters>(m, "Clusters")
 
         .def(
-            py::init<const xt::xarray<int>&, bool>(),
+            py::init<const xt::pyarray<int>&, bool>(),
             "Clusters",
             py::arg("f"),
             py::arg("periodic") = true)
 
         .def(
-            py::init<const xt::xarray<int>&, const xt::xarray<int>&, bool>(),
+            py::init<const xt::pyarray<int>&, const xt::pyarray<int>&, bool>(),
             "Clusters",
             py::arg("f"),
             py::arg("kernel"),
@@ -144,18 +145,18 @@ PYBIND11_MODULE(_GooseEYE, m)
         .def("__repr__", [](const GooseEYE::Clusters&) { return "<GooseEYE.Clusters>"; });
 
     m.def(
-        "clusters", &GooseEYE::clusters<xt::xarray<int>>, py::arg("f"), py::arg("periodic") = true);
+        "clusters", &GooseEYE::clusters<xt::pyarray<int>>, py::arg("f"), py::arg("periodic") = true);
 
     m.def(
         "pos2img",
-        &GooseEYE::pos2img<xt::xarray<size_t>, xt::xtensor<double, 2>, xt::xtensor<size_t, 1>>,
+        &GooseEYE::pos2img<xt::pyarray<size_t>, xt::pytensor<double, 2>, xt::pytensor<size_t, 1>>,
         py::arg("img"),
         py::arg("positions"),
         py::arg("labels"));
 
     m.def(
         "center_of_mass",
-        &GooseEYE::center_of_mass<xt::xarray<size_t>>,
+        &GooseEYE::center_of_mass<xt::pyarray<size_t>>,
         py::arg("labels"),
         py::arg("periodic") = true);
 
@@ -200,14 +201,14 @@ PYBIND11_MODULE(_GooseEYE, m)
 
         .def(
             "mean",
-            py::overload_cast<const xt::xarray<double>&>(
-                &GooseEYE::Ensemble::mean<xt::xarray<double>>),
+            py::overload_cast<const xt::pyarray<double>&>(
+                &GooseEYE::Ensemble::mean<xt::pyarray<double>>),
             py::arg("f"))
 
         .def(
             "mean",
-            py::overload_cast<const xt::xarray<double>&, const xt::xarray<int>&>(
-                &GooseEYE::Ensemble::mean<xt::xarray<double>, xt::xarray<int>>),
+            py::overload_cast<const xt::pyarray<double>&, const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::mean<xt::pyarray<double>, xt::pyarray<int>>),
             py::arg("f"),
             py::arg("fmask"))
 
@@ -215,26 +216,26 @@ PYBIND11_MODULE(_GooseEYE, m)
 
         .def(
             "S2",
-            py::overload_cast<const xt::xarray<int>&, const xt::xarray<int>&>(
-                &GooseEYE::Ensemble::S2<xt::xarray<int>>),
+            py::overload_cast<const xt::pyarray<int>&, const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::S2<xt::pyarray<int>>),
             py::arg("f"),
             py::arg("g"))
 
         .def(
             "S2",
-            py::overload_cast<const xt::xarray<double>&, const xt::xarray<double>&>(
-                &GooseEYE::Ensemble::S2<xt::xarray<double>>),
+            py::overload_cast<const xt::pyarray<double>&, const xt::pyarray<double>&>(
+                &GooseEYE::Ensemble::S2<xt::pyarray<double>>),
             py::arg("f"),
             py::arg("g"))
 
         .def(
             "S2",
             py::overload_cast<
-                const xt::xarray<double>&,
-                const xt::xarray<double>&,
-                const xt::xarray<int>&,
-                const xt::xarray<int>&>(
-                &GooseEYE::Ensemble::S2<xt::xarray<double>, xt::xarray<int>>),
+                const xt::pyarray<double>&,
+                const xt::pyarray<double>&,
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::S2<xt::pyarray<double>, xt::pyarray<int>>),
             py::arg("f"),
             py::arg("g"),
             py::arg("fmask"),
@@ -244,14 +245,14 @@ PYBIND11_MODULE(_GooseEYE, m)
 
         .def(
             "heightheight",
-            py::overload_cast<const xt::xarray<double>&>(
-                &GooseEYE::Ensemble::heightheight<xt::xarray<double>>),
+            py::overload_cast<const xt::pyarray<double>&>(
+                &GooseEYE::Ensemble::heightheight<xt::pyarray<double>>),
             py::arg("f"))
 
         .def(
             "heightheight",
-            py::overload_cast<const xt::xarray<double>&, const xt::xarray<int>&>(
-                &GooseEYE::Ensemble::heightheight<xt::xarray<double>, xt::xarray<int>>),
+            py::overload_cast<const xt::pyarray<double>&, const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::heightheight<xt::pyarray<double>, xt::pyarray<int>>),
             py::arg("f"),
             py::arg("fmask"))
 
@@ -259,18 +260,18 @@ PYBIND11_MODULE(_GooseEYE, m)
 
         .def(
             "C2",
-            py::overload_cast<const xt::xarray<int>&, const xt::xarray<int>&>(
-                &GooseEYE::Ensemble::C2<xt::xarray<int>>),
+            py::overload_cast<const xt::pyarray<int>&, const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::C2<xt::pyarray<int>>),
             py::arg("f"),
             py::arg("g"))
 
         .def(
             "C2",
             py::overload_cast<
-                const xt::xarray<int>&,
-                const xt::xarray<int>&,
-                const xt::xarray<int>&,
-                const xt::xarray<int>&>(&GooseEYE::Ensemble::C2<xt::xarray<int>, xt::xarray<int>>),
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&>(&GooseEYE::Ensemble::C2<xt::pyarray<int>, xt::pyarray<int>>),
             py::arg("f"),
             py::arg("g"),
             py::arg("fmask"),
@@ -280,25 +281,25 @@ PYBIND11_MODULE(_GooseEYE, m)
 
         .def(
             "W2",
-            py::overload_cast<const xt::xarray<int>&, const xt::xarray<int>&>(
-                &GooseEYE::Ensemble::W2<xt::xarray<int>>),
+            py::overload_cast<const xt::pyarray<int>&, const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::W2<xt::pyarray<int>>),
             py::arg("w"),
             py::arg("f"))
 
         .def(
             "W2",
-            py::overload_cast<const xt::xarray<double>&, const xt::xarray<double>&>(
-                &GooseEYE::Ensemble::W2<xt::xarray<double>>),
+            py::overload_cast<const xt::pyarray<double>&, const xt::pyarray<double>&>(
+                &GooseEYE::Ensemble::W2<xt::pyarray<double>>),
             py::arg("w"),
             py::arg("f"))
 
         .def(
             "W2",
             py::overload_cast<
-                const xt::xarray<double>&,
-                const xt::xarray<double>&,
-                const xt::xarray<int>&>(
-                &GooseEYE::Ensemble::W2<xt::xarray<double>, xt::xarray<int>>),
+                const xt::pyarray<double>&,
+                const xt::pyarray<double>&,
+                const xt::pyarray<int>&>(
+                &GooseEYE::Ensemble::W2<xt::pyarray<double>, xt::pyarray<int>>),
             py::arg("w"),
             py::arg("f"),
             py::arg("fmask"))
@@ -308,10 +309,10 @@ PYBIND11_MODULE(_GooseEYE, m)
         .def(
             "W2c",
             py::overload_cast<
-                const xt::xarray<int>&,
-                const xt::xarray<int>&,
-                const xt::xarray<int>&,
-                GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::xarray<int>, xt::xarray<int>>),
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&,
+                GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::pyarray<int>, xt::pyarray<int>>),
             py::arg("clusters"),
             py::arg("centers"),
             py::arg("f"),
@@ -320,10 +321,10 @@ PYBIND11_MODULE(_GooseEYE, m)
         .def(
             "W2c",
             py::overload_cast<
-                const xt::xarray<int>&,
-                const xt::xarray<int>&,
-                const xt::xarray<double>&,
-                GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::xarray<int>, xt::xarray<double>>),
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&,
+                const xt::pyarray<double>&,
+                GooseEYE::path_mode>(&GooseEYE::Ensemble::W2c<xt::pyarray<int>, xt::pyarray<double>>),
             py::arg("clusters"),
             py::arg("centers"),
             py::arg("f"),
@@ -332,12 +333,12 @@ PYBIND11_MODULE(_GooseEYE, m)
         .def(
             "W2c",
             py::overload_cast<
-                const xt::xarray<int>&,
-                const xt::xarray<int>&,
-                const xt::xarray<double>&,
-                const xt::xarray<int>&,
+                const xt::pyarray<int>&,
+                const xt::pyarray<int>&,
+                const xt::pyarray<double>&,
+                const xt::pyarray<int>&,
                 GooseEYE::path_mode>(
-                &GooseEYE::Ensemble::W2c<xt::xarray<int>, xt::xarray<double>, xt::xarray<int>>),
+                &GooseEYE::Ensemble::W2c<xt::pyarray<int>, xt::pyarray<double>, xt::pyarray<int>>),
             py::arg("clusters"),
             py::arg("centers"),
             py::arg("f"),
@@ -348,7 +349,7 @@ PYBIND11_MODULE(_GooseEYE, m)
 
         .def(
             "L",
-            &GooseEYE::Ensemble::L<xt::xarray<int>>,
+            &GooseEYE::Ensemble::L<xt::pyarray<int>>,
             py::arg("f"),
             py::arg("mode") = GooseEYE::path_mode::Bresenham)
 
@@ -387,8 +388,8 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "S2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& f,
-           const xt::xarray<int>& g,
+           const xt::pyarray<int>& f,
+           const xt::pyarray<int>& g,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.S2(f, g);
@@ -402,8 +403,8 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "S2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<double>& f,
-           const xt::xarray<double>& g,
+           const xt::pyarray<double>& f,
+           const xt::pyarray<double>& g,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.S2(f, g);
@@ -417,10 +418,10 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "S2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<double>& f,
-           const xt::xarray<double>& g,
-           const xt::xarray<int>& fmask,
-           const xt::xarray<int>& gmask,
+           const xt::pyarray<double>& f,
+           const xt::pyarray<double>& g,
+           const xt::pyarray<int>& fmask,
+           const xt::pyarray<int>& gmask,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.S2(f, g, fmask, gmask);
@@ -438,8 +439,8 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "C2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& f,
-           const xt::xarray<int>& g,
+           const xt::pyarray<int>& f,
+           const xt::pyarray<int>& g,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.C2(f, g);
@@ -453,10 +454,10 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "C2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& f,
-           const xt::xarray<int>& g,
-           const xt::xarray<int>& fmask,
-           const xt::xarray<int>& gmask,
+           const xt::pyarray<int>& f,
+           const xt::pyarray<int>& g,
+           const xt::pyarray<int>& fmask,
+           const xt::pyarray<int>& gmask,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.C2(f, g, fmask, gmask);
@@ -474,8 +475,8 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "W2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& w,
-           const xt::xarray<int>& f,
+           const xt::pyarray<int>& w,
+           const xt::pyarray<int>& f,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.W2(w, f);
@@ -489,8 +490,8 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "W2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<double>& w,
-           const xt::xarray<double>& f,
+           const xt::pyarray<double>& w,
+           const xt::pyarray<double>& f,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.W2(w, f);
@@ -504,9 +505,9 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "W2",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<double>& w,
-           const xt::xarray<double>& f,
-           const xt::xarray<int>& fmask,
+           const xt::pyarray<double>& w,
+           const xt::pyarray<double>& f,
+           const xt::pyarray<int>& fmask,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.W2(w, f, fmask);
@@ -523,9 +524,9 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "W2c",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& clusters,
-           const xt::xarray<int>& centers,
-           const xt::xarray<int>& f,
+           const xt::pyarray<int>& clusters,
+           const xt::pyarray<int>& centers,
+           const xt::pyarray<int>& f,
            GooseEYE::path_mode mode,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
@@ -542,9 +543,9 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "W2c",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& clusters,
-           const xt::xarray<int>& centers,
-           const xt::xarray<double>& f,
+           const xt::pyarray<int>& clusters,
+           const xt::pyarray<int>& centers,
+           const xt::pyarray<double>& f,
            GooseEYE::path_mode mode,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
@@ -561,10 +562,10 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "W2c",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& clusters,
-           const xt::xarray<int>& centers,
-           const xt::xarray<double>& f,
-           const xt::xarray<int>& fmask,
+           const xt::pyarray<int>& clusters,
+           const xt::pyarray<int>& centers,
+           const xt::pyarray<double>& f,
+           const xt::pyarray<int>& fmask,
            GooseEYE::path_mode mode,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
@@ -583,7 +584,7 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.def(
         "heightheight",
-        [](const std::vector<size_t>& roi, const xt::xarray<double>& f, bool periodic) {
+        [](const std::vector<size_t>& roi, const xt::pyarray<double>& f, bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.heightheight(f);
             return ensemble.result();
@@ -595,8 +596,8 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "heightheight",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<double>& f,
-           const xt::xarray<int>& fmask,
+           const xt::pyarray<double>& f,
+           const xt::pyarray<int>& fmask,
            bool periodic) {
             GooseEYE::Ensemble ensemble(roi, periodic);
             ensemble.heightheight(f, fmask);
@@ -610,7 +611,7 @@ PYBIND11_MODULE(_GooseEYE, m)
     m.def(
         "L",
         [](const std::vector<size_t>& roi,
-           const xt::xarray<int>& f,
+           const xt::pyarray<int>& f,
            bool periodic,
            GooseEYE::path_mode mode) {
             GooseEYE::Ensemble ensemble(roi, periodic);
