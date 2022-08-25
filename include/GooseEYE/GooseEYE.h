@@ -450,15 +450,17 @@ public:
 
     /**
     Add realization to height-height correlation.
+    The height-height correlation, at position \f$ \Delta i \f$, is defined as:
+    \f$ \frac{1}{N} \left( \sum_{i=1}^{N} (f_i - f_{i + \Delta i})^2 \right)^{1/2} \f$
+
     \param f The image.
     */
     template <class T>
     void heightheight(const T& f);
 
     /**
-    Add realization to height-height correlation.
-    \param f The image.
-    \param fmask Mask certain pixels of f (binary, 1: masked, 0: not masked).
+    \copydoc heightheight(const T& f)
+    \param fmask Mask certain pixels of `f` (binary, 1: masked, 0: not masked).
     */
     template <class T, class M>
     void heightheight(const T& f, const M& fmask);
