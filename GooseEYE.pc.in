@@ -3,5 +3,5 @@ includedir=${prefix}/include
 
 Name: @PROJECT_NAME@
 Description: Geometric statistics in C++.
-Version: @GOOSEEYE_VERSION@
+Version: @PROJECT_VERSION@
 Cflags: -I${includedir}
