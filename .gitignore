@@ -1,5 +1,6 @@
 _skbuild
 _cmake_test_compile
+_version.py
 
 # custom variables
 .qmake*
