@@ -3,7 +3,7 @@ copyright = "2017-2022, Tom de Geus"
 author = "Tom de Geus"
 
 extensions = [
-    "sphinx.ext.imgmath",
+    "sphinx.ext.mathjax",
     "sphinx.ext.todo",
 ]
 
