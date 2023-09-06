@@ -24,14 +24,13 @@ class Structure(enstat.static):
     @property
     def qnorm(self):
         """
-        Frequency (norm) of the structure factor.
+        Norm of the frequency of the structure factor.
         """
         if self.first.ndim == 1:
             n = self.first.shape[0]
-            if n % 2 == 0:
-                b = int(n / 2)
-            else:
-                b = int((n - 1) / 2) + 1
+            b = n // 2
+            if n % 2 != 0:
+                b += 1
             return np.abs(np.fft.fftfreq(n)[:b])
 
         # if self.first.ndim == 2:
@@ -45,26 +44,28 @@ class Structure(enstat.static):
         raise NotImplementedError
 
     def mean_norm(self):
-        """ """
+        """
+        Mean of the structure factor, for the norm of the frequency.
+        The output is the same shape as of :py:attr:`qnorm`.
+        """
         if self.norm is None:
             return None
 
         if self.first.ndim == 1:
             n = self.first.shape[0]
-            if n % 2 == 0:
-                b = int(n / 2)
-                first = np.hstack((self.first[0], self.first[1:b] + np.flip(self.first[b + 1 :])))
-            else:
-                b = int((n - 1) / 2) + 1
-                first = np.hstack((self.first[0], self.first[1:b] + np.flip(self.first[b:])))
+            b = n // 2
+            if n % 2 != 0:
+                b += 1
             norm = self.norm[0]
             assert np.all(np.equal(norm, self.norm))
-            return first / norm
+            ret = 2 * self.first[:b] / norm
+            ret[0] /= 2
+            return ret
 
         raise NotImplementedError
 
     def add_sample(self, data: ArrayLike):
-        r"""
+        """
         Add a sample.
         :param data: The sample.
         """
@@ -76,6 +77,10 @@ class Structure(enstat.static):
                 if data.ndim == 1:
                     n = data.shape[0]
                     self.first[-int(n / 2)] = np.NaN
+                elif data.ndim == 2:
+                    n, m = data.shape
+                    self.first[-int(n / 2), :] = np.NaN
+                    self.first[:, -int(m / 2)] = np.NaN
 
         datum = np.empty_like(data)
 
