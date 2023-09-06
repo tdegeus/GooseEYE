@@ -18,7 +18,7 @@ class Test_structure(unittest.TestCase):
             structure += u
             usum += np.sum((u - np.mean(u)) ** 2)
 
-        self.assertAlmostEqual(np.sum(2 * structure.first[1:u.size // 2]) / usum, 1, places=3)
+        self.assertAlmostEqual(np.sum(2 * structure.first[1 : u.size // 2]) / usum, 1, places=3)
 
     def test_norm_odd(self):
         usum = 0

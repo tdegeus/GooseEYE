@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
         q = structure.qnorm[1:]
         s = structure.mean_norm()[1:]
-        scaling = 1/(q**2)
+        scaling = 1 / (q**2)
         scaling *= s[1] / scaling[1]
 
         ax.plot(q, s, marker=".")

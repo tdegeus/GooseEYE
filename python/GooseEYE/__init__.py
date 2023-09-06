@@ -12,6 +12,7 @@ class Structure(enstat.static):
         The shape of the sample.
         Warning: This is not the same shape the (mean) structure factor.
     """
+
     def __init__(
         self,
         compute_variance: bool = True,
@@ -44,9 +45,7 @@ class Structure(enstat.static):
         raise NotImplementedError
 
     def mean_norm(self):
-        """
-
-        """
+        """ """
         if self.norm is None:
             return None
 
@@ -54,7 +53,7 @@ class Structure(enstat.static):
             n = self.first.shape[0]
             if n % 2 == 0:
                 b = int(n / 2)
-                first = np.hstack((self.first[0], self.first[1:b] + np.flip(self.first[b + 1:])))
+                first = np.hstack((self.first[0], self.first[1:b] + np.flip(self.first[b + 1 :])))
             else:
                 b = int((n - 1) / 2) + 1
                 first = np.hstack((self.first[0], self.first[1:b] + np.flip(self.first[b:])))
@@ -63,7 +62,6 @@ class Structure(enstat.static):
             return first / norm
 
         raise NotImplementedError
-
 
     def add_sample(self, data: ArrayLike):
         r"""
@@ -77,7 +75,7 @@ class Structure(enstat.static):
             if even:
                 if data.ndim == 1:
                     n = data.shape[0]
-                    self.first[-int(n/2)] = np.NaN
+                    self.first[-int(n / 2)] = np.NaN
 
         datum = np.empty_like(data)
 
@@ -88,7 +86,7 @@ class Structure(enstat.static):
             if n % 2 == 0:
                 b = int(n / 2)
                 datum[1:b] = np.real(hat[1:b] * np.flip(hat[b + 1 :]))
-                datum[b + 1:] = np.flip(datum[1:b])
+                datum[b + 1 :] = np.flip(datum[1:b])
             else:
                 b = int((n - 1) / 2) + 1
                 datum[1:b] = np.real(hat[1:b] * np.flip(hat[b:]))
