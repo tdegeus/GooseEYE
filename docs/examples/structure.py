@@ -16,7 +16,7 @@ import numpy as np
 
 structure = GooseEYE.Structure()
 
-for i in range(2000):
+for _ in range(2000):
     u = np.hstack((0, np.cumsum(np.random.randn(2001))))  # random walk
     u = u - u * np.arange(u.size) / u.size  # periodic random walk
     structure += u
@@ -61,9 +61,9 @@ if __name__ == "__main__":
         ax.set_xlabel(r"$q$")
         ax.set_ylabel(r"$S(q)$")
 
-        q = structure.q[1:]
-        s = structure.mean()[1:]
-        scaling = 1 / (q**2)
+        q = structure.qnorm[1:]
+        s = structure.mean_norm()[1:]
+        scaling = 1/(q**2)
         scaling *= s[1] / scaling[1]
 
         ax.plot(q, s, marker=".")

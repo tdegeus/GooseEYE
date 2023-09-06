@@ -12,72 +12,58 @@ class Structure(enstat.static):
         The shape of the sample.
         Warning: This is not the same shape the (mean) structure factor.
     """
-
     def __init__(
         self,
         compute_variance: bool = True,
         shape: tuple[int] = None,
         dtype: DTypeLike = np.float64,
     ):
-        self.sample_shape = shape
-        self.q = None
-        super().__init__(compute_variance=compute_variance, shape=None, dtype=dtype)
+        super().__init__(compute_variance=compute_variance, shape=shape, dtype=dtype)
 
-    def _get_q(self):
-        assert self.sample_shape is not None
+    @property
+    def qnorm(self):
+        """
+        Frequency (norm) of the structure factor.
+        """
+        if self.first.ndim == 1:
+            n = self.first.shape[0]
+            if n % 2 == 0:
+                b = int(n / 2)
+            else:
+                b = int((n - 1) / 2) + 1
+            return np.abs(np.fft.fftfreq(n)[:b])
 
-        for s in self.sample_shape:
-            if s % 2 != 0:
-                raise NotImplementedError
-
-        if len(self.sample_shape) == 1:
-            return np.fft.fftfreq(self.sample_shape[0])[: int(self.sample_shape[0] / 2)]
+        # if self.first.ndim == 2:
+        #     qm, qn = np.meshgrid(
+        #         np.fft.fftfreq(self.first.shape[0]),
+        #         np.fft.fftfreq(self.first.shape[1]),
+        #         indexing="ij",
+        #     )
+        #     return np.sqrt(qm**2 + qn**2)
 
         raise NotImplementedError
 
-    def _allocate(self, shape, dtype):
-        if self.sample_shape is not None:
-            assert np.all(np.equal(shape, self.sample_shape))
-        else:
-            self.sample_shape = shape
-
-        self.q = self._get_q()
-        super()._allocate([self.q.size], dtype)
-
-    def _check_dimensions(self):
-        assert np.allclose(self.q, self._get_q())
-        return super()._check_dimensions()
-
-    def __iter__(self):
-        super().__iter__()
-        yield "q", self.q
-        yield "sample_shape", self.sample_shape
-
-    @classmethod
-    def restore(
-        cls,
-        first: ArrayLike = None,
-        second: ArrayLike = None,
-        norm: ArrayLike = None,
-        q: ArrayLike = None,
-        sample_shape: tuple[int] = None,
-    ):
+    def mean_norm(self):
         """
-        Restore previous data.
 
-        :param first: Continued computation: Sum of the first moment.
-        :param second: Continued computation: Sum of the second moment.
-        :param norm: Continued computation: Number of samples (integer).
-        :param q: (Norm of) the frequency.
-        :param sample_shape: Shape of the sample.
         """
-        ret = cls(compute_variance=second is not None)
-        ret.first = first
-        ret.second = second
-        ret.norm = norm
-        ret.q = q
-        ret.sample_shape = sample_shape
-        return ret._check_dimensions()
+        if self.norm is None:
+            return None
+
+        if self.first.ndim == 1:
+            n = self.first.shape[0]
+            if n % 2 == 0:
+                b = int(n / 2)
+                first = np.hstack((self.first[0], self.first[1:b] + np.flip(self.first[b + 1:])))
+            else:
+                b = int((n - 1) / 2) + 1
+                first = np.hstack((self.first[0], self.first[1:b] + np.flip(self.first[b:])))
+            norm = self.norm[0]
+            assert np.all(np.equal(norm, self.norm))
+            return first / norm
+
+        raise NotImplementedError
+
 
     def add_sample(self, data: ArrayLike):
         r"""
@@ -86,14 +72,28 @@ class Structure(enstat.static):
         """
         if self.first is None:
             self._allocate(data.shape, data.dtype)
+            even = data.shape[0] % 2 == 0
+            assert np.all(np.equal([i % 2 == 0 for i in data.shape], data.shape[0] % 2 == 0))
+            if even:
+                if data.ndim == 1:
+                    n = data.shape[0]
+                    self.first[-int(n/2)] = np.NaN
 
-        assert np.all(np.equal(data.shape, self.sample_shape))
-        datum = np.empty_like(self.first)
+        datum = np.empty_like(data)
 
-        if len(self.sample_shape) == 1:
+        if data.ndim == 1:
+            n = data.shape[0]
             hat = np.fft.fft(data)
-            b = int(data.size / 2)
             datum[0] = 2 * np.real(hat[0] ** 2)
-            datum[1:] = 2 * np.real(hat[1:b] * np.flip(hat[b + 1 :]))
+            if n % 2 == 0:
+                b = int(n / 2)
+                datum[1:b] = np.real(hat[1:b] * np.flip(hat[b + 1 :]))
+                datum[b + 1:] = np.flip(datum[1:b])
+            else:
+                b = int((n - 1) / 2) + 1
+                datum[1:b] = np.real(hat[1:b] * np.flip(hat[b:]))
+                datum[b:] = np.flip(datum[1:b])
+        else:
+            raise NotImplementedError
 
         super().add_sample(datum / hat.size)
