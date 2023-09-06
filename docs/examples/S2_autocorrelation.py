@@ -31,7 +31,7 @@ S2 = GooseEYE.S2((101, 101), img, img)
 noise = 0.1 * (2.0 * GooseEYE.random.random(img.shape) - 1.0)
 
 # grey-scale image
-Igr = np.array(img, copy=True).astype(np.float)
+Igr = np.array(img, copy=True).astype(float)
 Igr = (Igr + 0.1) / 1.2 + noise
 
 # 2-point correlation ('auto-correlation')

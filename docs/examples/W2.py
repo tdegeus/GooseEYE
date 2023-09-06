@@ -49,7 +49,7 @@ WI = GooseEYE.W2((101, 101), W, img, fmask=W)
 # ------------------------------
 
 # convert to gray-scale image and introduce noise
-Igr = np.array(img, copy=True).astype(np.float)
+Igr = np.array(img, copy=True).astype(float)
 Igr += 0.1 * (2.0 * GooseEYE.random.random(Igr.shape) - 1.0) + 0.1
 Igr /= 1.2
 
@@ -57,7 +57,7 @@ Igr /= 1.2
 Iav = np.mean(Igr)
 
 # weighted correlation
-WIgr = GooseEYE.W2((101, 101), W.astype(np.float), Igr, fmask=W)
+WIgr = GooseEYE.W2((101, 101), W.astype(float), Igr, fmask=W)
 # </snippet>
 
 if __name__ == "__main__":
