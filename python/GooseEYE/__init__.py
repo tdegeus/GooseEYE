@@ -1,13 +1,16 @@
-from ._GooseEYE import *  # noqa: F401, F403
-
 import enstat
 import numpy as np
 from numpy.typing import ArrayLike
 from numpy.typing import DTypeLike
 
+from ._GooseEYE import *  # noqa: F401, F403
+
+
 class Structure(enstat.static):
     """
-    :shape: The shape of the sample. Warning: This is not the same shape the (mean) structure factor.
+    :shape:
+        The shape of the sample.
+        Warning: This is not the same shape the (mean) structure factor.
     """
 
     def __init__(
@@ -28,7 +31,7 @@ class Structure(enstat.static):
                 raise NotImplementedError
 
         if len(self.sample_shape) == 1:
-            return np.fft.fftfreq(self.sample_shape[0])[:int(self.sample_shape[0] / 2)]
+            return np.fft.fftfreq(self.sample_shape[0])[: int(self.sample_shape[0] / 2)]
 
         raise NotImplementedError
 
@@ -90,9 +93,7 @@ class Structure(enstat.static):
         if len(self.sample_shape) == 1:
             hat = np.fft.fft(data)
             b = int(data.size / 2)
-            datum[0] = 2 * np.real(hat[0]**2)
+            datum[0] = 2 * np.real(hat[0] ** 2)
             datum[1:] = 2 * np.real(hat[1:b] * np.flip(hat[b + 1 :]))
 
         super().add_sample(datum / hat.size)
-
-
