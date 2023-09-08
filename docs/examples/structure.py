@@ -58,11 +58,12 @@ if __name__ == "__main__":
         ax.set_xscale("log")
         ax.set_yscale("log")
 
-        ax.set_xlabel(r"$q$")
-        ax.set_ylabel(r"$S(q)$")
+        ax.set_xlabel(r"$|q|$")
+        ax.set_ylabel(r"$S(|q|)$")
 
-        q = structure.qnorm[1:]
-        s = structure.mean_norm()[1:]
+        q = structure.qnorm
+        s = structure.mean()[1:q.size]
+        q = q[1:]
         scaling = 1 / (q**2)
         scaling *= s[1] / scaling[1]
 

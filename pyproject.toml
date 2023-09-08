@@ -6,6 +6,7 @@ requires = [
   "cmake>=3.18",
   "setuptools_scm[toml]>=3.4",
   "ninja",
+  "enstat>=0.9.7",
   "numpy"
 ]
 
