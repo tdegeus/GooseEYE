@@ -120,7 +120,8 @@ class Structure(enstat.static):
 
     def _allocate(self, shape, dtype):
         """
-        Allocate ``first``, ``second``, and ``norm``, and set the relevant entries to ``np.NaN``.
+        Allocate ``first``, ``second``, and ``norm``.
+        Set the relevant entries to ``np.NaN`` (in the case of even samples).
         """
         super()._allocate(shape, dtype)
         dim = len(shape)
