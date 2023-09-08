@@ -52,13 +52,11 @@ WIc = GooseEYE.W2c((101, 101), clusters, centers, img, fmask=W)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("W2c.h5", "w") as data:
@@ -70,7 +68,6 @@ if __name__ == "__main__":
             data["WIc"] = WIc
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("W2c.h5", "r") as data:
@@ -82,7 +79,6 @@ if __name__ == "__main__":
             assert np.allclose(data["WIc"][...], WIc)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm

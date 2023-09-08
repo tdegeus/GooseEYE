@@ -80,7 +80,6 @@ T = np.empty(alpha.shape)
 S = np.empty(alpha.shape)
 
 for i, a in enumerate(alpha):
-
     T[i], S[i] = threshold_otsu(Ia * (1.0 - a) + Ib * a, bins=100)
 
 W = alpha[np.argmax(S)]

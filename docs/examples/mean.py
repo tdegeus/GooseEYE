@@ -26,13 +26,11 @@ assert np.isclose(ensemble.result()[0], np.mean(random_data))
 assert np.isclose(ensemble.variance()[0], np.var(random_data), rtol=1e-4)
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("mean.h5", "w") as data:
@@ -40,7 +38,6 @@ if __name__ == "__main__":
             data["variance"] = ensemble.variance()
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("mean.h5", "r") as data:
@@ -48,5 +45,4 @@ if __name__ == "__main__":
             assert np.isclose(data["variance"][...], ensemble.variance())
 
     if args["--plot"]:
-
         pass

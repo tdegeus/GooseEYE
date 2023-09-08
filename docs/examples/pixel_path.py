@@ -22,7 +22,6 @@ modes = {
 images = {}
 
 for mode in modes:
-
     # calculate a few pixel paths
     paths = (
         GooseEYE.path([0, 0], [9, 2], mode=modes[mode]),
@@ -42,13 +41,11 @@ for mode in modes:
     images[mode] = img
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("pixel_path.h5", "w") as data:
@@ -56,7 +53,6 @@ if __name__ == "__main__":
                 data[f"/{mode:s}/img"] = images[mode]
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("pixel_path.h5", "r") as data:
@@ -64,7 +60,6 @@ if __name__ == "__main__":
                 assert np.all(np.equal(data[mode]["img"][...], images[mode]))
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
 
         try:

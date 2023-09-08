@@ -43,13 +43,11 @@ Isq_av = np.mean(Igr**2.0)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("S2_autocorrelation.h5", "w") as data:
@@ -59,7 +57,6 @@ if __name__ == "__main__":
             data["S2gr"] = S2gr
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("S2_autocorrelation.h5", "r") as data:
@@ -69,7 +66,6 @@ if __name__ == "__main__":
             assert np.allclose(data["S2gr"][...], S2gr)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
