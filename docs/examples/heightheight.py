@@ -27,13 +27,11 @@ dx = GooseEYE.distance(roi=[200], h=[h], dim=0)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("heightheight.h5", "w") as data:
@@ -44,7 +42,6 @@ if __name__ == "__main__":
             data["dx"] = dx
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("heightheight.h5", "r") as data:
@@ -55,7 +52,6 @@ if __name__ == "__main__":
             assert np.allclose(data["dx"][...], dx)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
 
         try:

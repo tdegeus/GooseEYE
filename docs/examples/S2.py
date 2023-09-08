@@ -23,13 +23,11 @@ S2 = GooseEYE.S2((101, 101), img, img)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("S2.h5", "w") as data:
@@ -37,7 +35,6 @@ if __name__ == "__main__":
             data["S2"] = S2
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("S2.h5", "r") as data:
@@ -45,7 +42,6 @@ if __name__ == "__main__":
             assert np.allclose(data["S2"][...], S2)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm

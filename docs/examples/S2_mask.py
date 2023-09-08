@@ -35,13 +35,11 @@ S2mask = GooseEYE.S2((101, 101), Ierr, Ierr, fmask=mask, gmask=mask)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("S2_mask.h5", "w") as data:
@@ -53,7 +51,6 @@ if __name__ == "__main__":
             data["S2mask"] = S2mask
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("S2_mask.h5", "r") as data:
@@ -65,7 +62,6 @@ if __name__ == "__main__":
             assert np.allclose(data["S2mask"][...], S2mask)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm

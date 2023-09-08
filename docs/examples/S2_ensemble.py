@@ -24,27 +24,23 @@ S2 = ensemble.result()
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("S2_ensemble.h5", "w") as data:
             data["S2"] = S2
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("S2_ensemble.h5", "r") as data:
             assert np.allclose(data["S2"][...], S2)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 

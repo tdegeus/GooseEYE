@@ -31,13 +31,11 @@ CD = GooseEYE.dilate(C)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("clusters_dilate.h5", "w") as data:
@@ -46,7 +44,6 @@ if __name__ == "__main__":
             data["CD"] = CD
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("clusters_dilate.h5", "r") as data:
@@ -55,7 +52,6 @@ if __name__ == "__main__":
             assert np.all(np.equal(data["CD"][...], CD))
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm

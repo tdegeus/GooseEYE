@@ -61,13 +61,11 @@ WIgr = GooseEYE.W2((101, 101), W.astype(float), Igr, fmask=W)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("W2.h5", "w") as data:
@@ -78,7 +76,6 @@ if __name__ == "__main__":
             data["WIgr"] = WIgr
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("W2.h5", "r") as data:
@@ -89,7 +86,6 @@ if __name__ == "__main__":
             assert np.allclose(data["WIgr"][...], WIgr)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm

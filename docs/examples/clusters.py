@@ -25,13 +25,11 @@ clusters_periodic = GooseEYE.clusters(img, periodic=True)
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("clusters.h5", "w") as data:
@@ -40,7 +38,6 @@ if __name__ == "__main__":
             data["clusters_periodic"] = clusters_periodic
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("clusters.h5", "r") as data:
@@ -49,7 +46,6 @@ if __name__ == "__main__":
             assert np.all(np.equal(data["clusters_periodic"][...], clusters_periodic))
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
