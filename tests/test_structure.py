@@ -97,7 +97,6 @@ class Test_structure_1d(unittest.TestCase):
         self.assertEqual(structure.q(1).shape, (nrow, ncol))
 
     def test_even_nan_1d(self):
-
         n = 6
         structure = eye.Structure(shape=[n])
         self.assertTrue(np.isnan(structure.first[n // 2]))
@@ -111,7 +110,6 @@ class Test_structure_1d(unittest.TestCase):
         self.assertTrue(not np.any(np.isnan(structure.first)))
 
     def test_even_nan_2d(self):
-
         nrow = 6
         ncol = 8
         structure = eye.Structure(shape=[nrow, ncol])

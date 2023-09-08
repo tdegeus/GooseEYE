@@ -23,13 +23,11 @@ for _ in range(2000):
 # </snippet>
 
 if __name__ == "__main__":
-
     import docopt
 
     args = docopt.docopt(__doc__)
 
     if args["--save"]:
-
         import h5py
 
         with h5py.File("structure.h5", "w") as data:
@@ -37,7 +35,6 @@ if __name__ == "__main__":
                 data[key] = value
 
     if args["--check"]:
-
         import h5py
 
         with h5py.File("structure.h5", "r") as data:
@@ -45,7 +42,6 @@ if __name__ == "__main__":
                 np.allclose(data[key], value)
 
     if args["--plot"]:
-
         import matplotlib.pyplot as plt
 
         try:
