@@ -69,7 +69,7 @@ jobs:
       run: python setup.py install --build-type Release -vv
 
     - name: Run Python tests
-      if: runner.os == 'macOS'
+      if: runner.os == 'Linux'
       working-directory: docs/examples
       run: |
         python S2.py --check
@@ -89,6 +89,6 @@ jobs:
         python pixel_path.py --check
 
     - name: Build doxygen-docs (error on warning)
-      if: runner.os == 'macOS'
+      if: runner.os == 'Linux'
       working-directory: build
       run: make docs
