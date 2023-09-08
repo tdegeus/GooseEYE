@@ -119,6 +119,9 @@ class Structure(enstat.static):
         super().__init__(compute_variance=compute_variance, shape=shape, dtype=dtype)
 
     def _allocate(self, shape, dtype):
+        """
+        Allocate ``first``, ``second``, and ``norm``, and set the relevant entries to ``np.NaN``.
+        """
         super()._allocate(shape, dtype)
         dim = len(shape)
         assert dim in [1, 2]
@@ -129,11 +132,15 @@ class Structure(enstat.static):
 
         if dim == 1:
             n = shape[0]
-            self.first[n // 2] = np.NaN
+            for data in [self.first, self.second]:
+                if data is not None:
+                    data[n // 2] = np.NaN
         elif dim == 2:
             nrow, ncol = shape
-            self.first[nrow // 2, :] = np.NaN
-            self.first[:, ncol // 2] = np.NaN
+            for data in [self.first, self.second]:
+                if data is not None:
+                    data[nrow // 2, :] = np.NaN
+                    data[:, ncol // 2] = np.NaN
 
         return self
 

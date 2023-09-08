@@ -115,18 +115,22 @@ class Test_structure_1d(unittest.TestCase):
         nrow = 6
         ncol = 8
         structure = eye.Structure(shape=[nrow, ncol])
-        self.assertTrue(np.all(np.isnan(structure.first[nrow // 2, :])))
-        self.assertTrue(np.all(np.isnan(structure.first[:, ncol // 2])))
+        for data in [structure.first, structure.second]:
+            self.assertTrue(np.all(np.isnan(data[nrow // 2, :])))
+            self.assertTrue(np.all(np.isnan(data[:, ncol // 2])))
         structure += np.zeros([nrow, ncol], dtype=float)
-        self.assertTrue(np.all(np.isnan(structure.first[nrow // 2, :])))
-        self.assertTrue(np.all(np.isnan(structure.first[:, ncol // 2])))
+        for data in [structure.first, structure.second]:
+            self.assertTrue(np.all(np.isnan(data[nrow // 2, :])))
+            self.assertTrue(np.all(np.isnan(data[:, ncol // 2])))
 
         nrow = 7
         ncol = 9
         structure = eye.Structure(shape=[nrow, ncol])
-        self.assertTrue(not np.any(np.isnan(structure.first)))
+        for data in [structure.first, structure.second]:
+            self.assertTrue(not np.any(np.isnan(data)))
         structure += np.zeros([nrow, ncol], dtype=float)
-        self.assertTrue(not np.any(np.isnan(structure.first)))
+        for data in [structure.first, structure.second]:
+            self.assertTrue(not np.any(np.isnan(data)))
 
     def test_norm_even(self):
         usum = 0
