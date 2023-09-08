@@ -153,22 +153,22 @@ class Test_structure_1d(unittest.TestCase):
         self.assertAlmostEqual(np.sum(structure.first[1:]) / usum, 1, places=5)
 
     def test_random_walk(self):
-        structure = eye.Structure()
+        for size in [2001, 2002]:
+            structure = eye.Structure()
+            for _ in range(2000):
+                u = np.hstack((0, np.cumsum(np.random.randn(size))))  # random walk
+                u = u - u * np.arange(u.size) / u.size  # periodic random walk
+                structure += u
 
-        for _ in range(2000):
-            u = np.hstack((0, np.cumsum(np.random.randn(2001))))  # random walk
-            u = u - u * np.arange(u.size) / u.size  # periodic random walk
-            structure += u
-
-        q = structure.qnorm
-        s = structure.mean()[1 : q.size]
-        q = q[1:]
-        scaling = 1 / (q**2)
-        scaling *= s[1] / scaling[1]
-        keep = np.logical_and(q > 1e-3, q < 1e-1)
-        error = np.sqrt(np.mean((s[keep] / scaling[keep]) ** 2))
-        self.assertLess(error, 1.1)
-        self.assertGreater(error, 0.9)
+            q = structure.qnorm
+            s = structure.mean()[1 : q.size]
+            q = q[1:]
+            scaling = 1 / (q**2)
+            scaling *= s[1] / scaling[1]
+            keep = np.logical_and(q > 1e-3, q < 1e-1)
+            error = np.sqrt(np.mean((s[keep] / scaling[keep]) ** 2))
+            self.assertLess(error, 1.1)
+            self.assertGreater(error, 0.9)
 
 
 if __name__ == "__main__":

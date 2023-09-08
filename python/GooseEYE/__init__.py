@@ -80,6 +80,12 @@ class Structure(enstat.static):
         if n % 2 == 0:
             s[e] = np.NaN
 
+    .. note::
+
+        This class stores **all** frequencies.
+        As a consequence, their are a number of duplicate entries in the raw data.
+        See below for suggested plotting without these duplicates.
+
     Suggested plotting
     ------------------
 
