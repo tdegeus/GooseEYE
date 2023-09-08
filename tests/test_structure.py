@@ -19,7 +19,7 @@ class Test_structure_1d(unittest.TestCase):
             self.assertTrue(np.allclose(q[:e], np.arange(e)))
             self.assertTrue(np.allclose(np.flip(q[s:]), -np.arange(1, e)))
 
-    def test_stragy_1d(self):
+    def test_stragy_2d(self):
         """
         Implementation strategy (not a test of the implementation).
         """
@@ -75,7 +75,7 @@ class Test_structure_1d(unittest.TestCase):
         qnorm = np.zeros([qrow.size, qcol.size])
         for i in range(qrow.size):
             for j in range(qcol.size):
-                qnorm[i, j] = np.sqrt(qrow[i]**2 + qcol[j]**2)
+                qnorm[i, j] = np.sqrt(qrow[i] ** 2 + qcol[j] ** 2)
         self.assertTrue(np.allclose(structure.qnorm, qnorm))
 
         nrow = 7
@@ -86,7 +86,7 @@ class Test_structure_1d(unittest.TestCase):
         qnorm = np.zeros([qrow.size, qcol.size])
         for i in range(qrow.size):
             for j in range(qcol.size):
-                qnorm[i, j] = np.sqrt(qrow[i]**2 + qcol[j]**2)
+                qnorm[i, j] = np.sqrt(qrow[i] ** 2 + qcol[j] ** 2)
         self.assertTrue(np.allclose(structure.qnorm, qnorm))
 
     def test_even_nan_1d(self):
@@ -154,7 +154,7 @@ class Test_structure_1d(unittest.TestCase):
             structure += u
 
         q = structure.qnorm
-        s = structure.mean()[1:q.size]
+        s = structure.mean()[1 : q.size]
         q = q[1:]
         scaling = 1 / (q**2)
         scaling *= s[1] / scaling[1]
@@ -162,6 +162,7 @@ class Test_structure_1d(unittest.TestCase):
         error = np.sqrt(np.mean((s[keep] / scaling[keep]) ** 2))
         self.assertLess(error, 1.1)
         self.assertGreater(error, 0.9)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

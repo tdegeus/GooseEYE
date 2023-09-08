@@ -7,7 +7,7 @@ from ._GooseEYE import *  # noqa: F401, F403
 
 
 class Structure(enstat.static):
-    """
+    r"""
     Compute the ensemble average structure factor:
 
     .. math::
@@ -144,15 +144,16 @@ class Structure(enstat.static):
             return np.fft.fftfreq(self.first.shape[0])
 
         elif self.first.ndim == 2:
+            nrow, ncol = self.first.shape
+            qrow, qcol = np.meshgrid(np.fft.fftfreq(nrow), np.fft.fftfreq(ncol), indexing="ij")
             if axis == 0:
-                return np.fft.fftfreq(self.first.shape[0])
+                return qrow
             elif axis == 1:
-                return np.fft.fftfreq(self.first.shape[1])
+                return qcol
             else:
                 raise ValueError(f"Invalid axis: {axis}")
 
         raise NotImplementedError
-
 
     @property
     def qnorm(self):
@@ -194,16 +195,16 @@ class Structure(enstat.static):
         Add a sample.
         :param data: The sample.
         """
-        datum = np.empty_like(data)
+        ret = np.empty_like(data)
 
         if data.ndim == 1:
             hat = np.fft.fft(data)
             n = data.shape[0]
             e = n // 2 if n % 2 == 0 else n // 2 + 1
             s = e + 1 if n % 2 == 0 else e
-            datum[0] = np.real(hat[0] * hat[0])
-            datum[1:e] = np.real(hat[1:e] * np.flip(hat[s:]))
-            datum[s:] = np.flip(datum[1:e])
+            ret[0] = np.real(hat[0] * hat[0])
+            ret[1:e] = np.real(hat[1:e] * np.flip(hat[s:]))
+            ret[s:] = np.flip(ret[1:e])
 
         elif data.ndim == 2:
             hat = np.fft.fft2(data)
@@ -212,15 +213,15 @@ class Structure(enstat.static):
             ecol = ncol // 2 if ncol % 2 == 0 else ncol // 2 + 1
             srow = erow + 1 if nrow % 2 == 0 else erow
             scol = ecol + 1 if ncol % 2 == 0 else ecol
-            datum[0, 0] = np.real(hat[0, 0] * hat[0, 0])
-            datum[0, 1:ecol] = np.real(hat[0, 1:ecol] * np.flip(hat[0, scol:]))
-            datum[1:erow, 0] = np.real(hat[1:erow, 0] * np.flip(hat[srow:, 0]))
-            datum[1:erow, 1:ecol] = np.real(hat[1:erow, 1:ecol] * np.flip(hat[srow:, scol:]))
-            datum[srow:, scol:] = np.flip(datum[1:erow, 1:ecol])
-            datum[1:erow, scol:] = np.real(hat[1:erow, 1:ecol] * np.flip(hat[1:erow, scol:], axis=1))
-            datum[srow:, 1:ecol] = np.real(hat[1:erow, 1:ecol] * np.flip(hat[srow:, 1:ecol], axis=0))
+            ret[0, 0] = np.real(hat[0, 0] * hat[0, 0])
+            ret[0, 1:ecol] = np.real(hat[0, 1:ecol] * np.flip(hat[0, scol:]))
+            ret[1:erow, 0] = np.real(hat[1:erow, 0] * np.flip(hat[srow:, 0]))
+            ret[1:erow, 1:ecol] = np.real(hat[1:erow, 1:ecol] * np.flip(hat[srow:, scol:]))
+            ret[srow:, scol:] = np.flip(ret[1:erow, 1:ecol])
+            ret[1:erow, scol:] = np.real(hat[1:erow, 1:ecol] * np.flip(hat[1:erow, scol:], axis=1))
+            ret[srow:, 1:ecol] = np.real(hat[1:erow, 1:ecol] * np.flip(hat[srow:, 1:ecol], axis=0))
 
         else:
             raise NotImplementedError
 
-        super().add_sample(datum / hat.size)
+        super().add_sample(ret / hat.size)

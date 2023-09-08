@@ -62,7 +62,7 @@ if __name__ == "__main__":
         ax.set_ylabel(r"$S(|q|)$")
 
         q = structure.qnorm
-        s = structure.mean()[1:q.size]
+        s = structure.mean()[1 : q.size]
         q = q[1:]
         scaling = 1 / (q**2)
         scaling *= s[1] / scaling[1]
