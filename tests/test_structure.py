@@ -89,6 +89,13 @@ class Test_structure_1d(unittest.TestCase):
                 qnorm[i, j] = np.sqrt(qrow[i] ** 2 + qcol[j] ** 2)
         self.assertTrue(np.allclose(structure.qnorm, qnorm))
 
+    def test_q(self):
+        nrow = 6
+        ncol = 8
+        structure = eye.Structure(shape=[nrow, ncol])
+        self.assertEqual(structure.q(0).shape, (nrow, ncol))
+        self.assertEqual(structure.q(1).shape, (nrow, ncol))
+
     def test_even_nan_1d(self):
 
         n = 6

@@ -23,7 +23,7 @@ class Structure(enstat.static):
 
         \vec{q} = \sum_{i = 1}^d q_i \vec{e}_i
 
-    The frequencies in each direction are organised as follows
+    The frequencies along a direction ``i`` are organised as follows
     (see `docs <https://numpy.org/doc/stable/reference/generated/numpy.fft.fftfreq.html>`_):
 
     .. code-block:: python
