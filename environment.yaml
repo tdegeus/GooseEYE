@@ -16,3 +16,4 @@ dependencies:
 - xsimd
 - xtensor
 - xtensor-python
+- enstat >=0.9.7

@@ -87,6 +87,7 @@ jobs:
         python heightheight.py --check
         python mean.py --check
         python pixel_path.py --check
+        python structure.py --check
 
     - name: Build doxygen-docs (error on warning)
       if: runner.os == 'macOS'
