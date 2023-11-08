@@ -1,19 +1,19 @@
 /**
-\file
-\copyright Copyright 2017. Tom de Geus. All rights reserved.
-\license This project is released under the GPLv3 License.
-*/
+ * @file
+ * @copyright Copyright 2017. Tom de Geus. All rights reserved.
+ * @license This project is released under the GPLv3 License.
+ */
 
 #ifndef GOOSEEYE_INCLUDE_H
 #define GOOSEEYE_INCLUDE_H
 
 /**
-\cond
-*/
+ * @cond
+ */
 #define _USE_MATH_DEFINES
 /**
-\endcond
-*/
+ * @endcond
+ */
 
 #include <algorithm>
 #include <assert.h>
@@ -37,8 +37,8 @@
 #include <xtensor/xview.hpp>
 
 /**
-\cond
-*/
+ * @cond
+ */
 #define Q(x) #x
 #define QUOTE(x) Q(x)
 
@@ -55,26 +55,26 @@
 
 #define SIGN(a) ((a < 0) ? -1 : a > 0 ? 1 : 0)
 /**
-\endcond
-*/
+ * @endcond
+ */
 
 /**
-All assertions are implemented as:
-
-    GOOSEEYE_ASSERT(...)
-
-They can be enabled by:
-
-    #define GOOSEEYE_ENABLE_ASSERT
-
-(before including GooseEYE).
-The advantage is that:
-
--   File and line-number are displayed if the assertion fails.
--   GooseEYE's assertions can be enabled/disabled independently from those of other libraries.
-
-\throw std::runtime_error
-*/
+ * All assertions are implemented as:
+ *
+ *     GOOSEEYE_ASSERT(...)
+ *
+ * They can be enabled by:
+ *
+ *     #define GOOSEEYE_ENABLE_ASSERT
+ *
+ * (before including GooseEYE).
+ * The advantage is that:
+ *
+ * -   File and line-number are displayed if the assertion fails.
+ * -   GooseEYE's assertions can be enabled/disabled independently from those of other libraries.
+ *
+ * \throw std::runtime_error
+ */
 #ifdef GOOSEEYE_ENABLE_ASSERT
 #define GOOSEEYE_ASSERT(expr) GOOSEEYE_ASSERT_IMPL(expr, __FILE__, __LINE__, __FUNCTION__)
 #else
@@ -82,40 +82,40 @@ The advantage is that:
 #endif
 
 /**
-Toolbox to compute statistics.
-*/
+ * Toolbox to compute statistics.
+ */
 namespace GooseEYE {
 
 /**
-Container type.
-*/
+ * Container type.
+ */
 namespace array_type {
 
 #ifdef GOOSEEYE_USE_XTENSOR_PYTHON
 
 /**
-Fixed (static) rank array.
-*/
+ * Fixed (static) rank array.
+ */
 template <typename T, size_t N>
 using tensor = xt::pytensor<T, N>;
 
 /**
-Dynamic rank array.
-*/
+ * Dynamic rank array.
+ */
 template <typename T>
 using array = xt::pyarray<T>;
 
 #else
 
 /**
-Fixed (static) rank array.
-*/
+ * Fixed (static) rank array.
+ */
 template <typename T, size_t N>
 using tensor = xt::xtensor<T, N>;
 
 /**
-Dynamic rank array.
-*/
+ * Dynamic rank array.
+ */
 template <typename T>
 using array = xt::xarray<T>;
 
