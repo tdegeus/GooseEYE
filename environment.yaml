@@ -5,6 +5,7 @@ dependencies:
 - cmake
 - docopt
 - doxygen
+- enstat >=0.9.7
 - h5py
 - highfive
 - ninja
@@ -16,4 +17,3 @@ dependencies:
 - xsimd
 - xtensor
 - xtensor-python
-- enstat >=0.9.7

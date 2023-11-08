@@ -1,8 +1,8 @@
 /**
-\file
-\copyright Copyright 2017. Tom de Geus. All rights reserved.
-\license This project is released under the GPLv3 License.
-*/
+ * @file
+ * @copyright Copyright 2017. Tom de Geus. All rights reserved.
+ * @license This project is released under the GPLv3 License.
+ */
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
