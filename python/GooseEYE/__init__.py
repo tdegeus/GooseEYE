@@ -99,6 +99,17 @@ class Structure(enstat.static):
             s = structure.mean()[:q.size]
             ax.plot(q[1:], s[1:], marker=".")
 
+        Or to apply a common correction:
+
+        .. code-block:: python
+
+            q = 2 * np.sin(np.pi * data.qnorm)
+            s = structure.mean()[:q.size]
+            ax.plot(q[1:], s[1:], marker=".")
+
+            ax.set_xlabel(r"$2 \sin(q / 2)$")
+            ax.set_ylabel(r"$\langle \hat{u}(q) \hat{u}(-q) \rangle$")
+
     *   In two dimensions:
 
         .. code-block:: python
