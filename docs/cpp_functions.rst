@@ -123,7 +123,6 @@ Get clusters.
 .. seealso::
 
   * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
-  * :download:`clusters.hpp <../include/GooseEYE/clusters.hpp>`
   * :ref:`Example <theory_clusters>`.
 
 Generate shape
