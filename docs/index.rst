@@ -21,7 +21,6 @@ GooseEYE can be used from C++ or as a Python module. Please consider the theory 
    :maxdepth: 1
 
    tricks/segmentation/readme.rst
-   changelog.rst
 
 .. toctree::
    :caption: C++ INTERFACE
