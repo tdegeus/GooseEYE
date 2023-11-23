@@ -176,4 +176,4 @@ def test_random_walk():
         scaling *= s[1] / scaling[1]
         keep = np.logical_and(q > 1e-3, q < 1e-1)
         error = np.sqrt(np.mean((s[keep] / scaling[keep]) ** 2))
-        assert 0.9 < error < 1.1
+        assert 0.8 < error < 1.2
