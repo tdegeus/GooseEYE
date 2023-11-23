@@ -152,6 +152,12 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("periodic") = true);
 
     m.def(
+        "relabel_map",
+        &GooseEYE::relabel_map<xt::pyarray<int>, xt::pyarray<int>>,
+        py::arg("a"),
+        py::arg("b"));
+
+    m.def(
         "pos2img",
         &GooseEYE::pos2img<xt::pyarray<size_t>, xt::pytensor<double, 2>, xt::pytensor<size_t, 1>>,
         py::arg("img"),
