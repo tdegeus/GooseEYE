@@ -199,7 +199,9 @@ public:
      */
     template <class T>
     Clusters(const T& f, bool periodic = true)
-        : Clusters(f, kernel::nearest(f.dimension()), periodic){};
+        : Clusters(f, kernel::nearest(f.dimension()), periodic)
+    {
+    }
 
     /**
      * Constructor.
