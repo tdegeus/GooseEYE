@@ -165,26 +165,20 @@ template <class T, std::enable_if_t<std::is_integral<typename T::value_type>::va
 inline T dilate(const T& f, size_t iterations = 1, bool periodic = true);
 
 /**
- * Find map to relabel from "src" to "dest".
- * @param src Image.
- * @param dest Image.
+ * Find map to relabel from `a` to `b`.
+ * @param a Image.
+ * @param b Image.
+ * @return List of length `max(a) + 1` with per label in `a` the corresponding label in `b`.
  */
 template <class T, class S>
-array_type::tensor<size_t, 1> relabel_map(const T& src, const S& dest)
+array_type::tensor<size_t, 1> relabel_map(const T& a, const S& b)
 {
-    GOOSEEYE_ASSERT(xt::has_shape(src, dest.shape()));
+    GOOSEEYE_ASSERT(xt::has_shape(a, b.shape()));
 
-    array_type::tensor<size_t, 1> ret =
-        xt::zeros<size_t>({static_cast<size_t>(xt::amax(src)() + 1)});
-    auto A = xt::atleast_3d(src);
-    auto B = xt::atleast_3d(dest);
+    array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({static_cast<size_t>(xt::amax(a)() + 1)});
 
-    for (size_t h = 0; h < A.shape(0); ++h) {
-        for (size_t i = 0; i < A.shape(1); ++i) {
-            for (size_t j = 0; j < A.shape(2); ++j) {
-                ret(A(h, i, j)) = B(h, i, j);
-            }
-        }
+    for (size_t i = 0; i < a.size(); ++i) {
+        ret(a.flat(i)) = b.flat(i);
     }
 
     return ret;
