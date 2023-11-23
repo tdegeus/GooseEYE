@@ -108,7 +108,6 @@ dilate(const T& f, const S& kernel, const array_type::tensor<size_t, 1>& iterati
         pad_mode = xt::pad_mode::periodic;
     }
 
-    auto shape = f.shape();
     array_type::tensor<typename S::value_type, 3> K = xt::atleast_3d(kernel);
     auto Pad = detail::pad_width(K);
     array_type::tensor<value_type, 3> F = xt::pad(xt::atleast_3d(f), Pad, pad_mode, pad_value);
