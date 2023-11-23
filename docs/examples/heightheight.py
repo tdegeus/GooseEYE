@@ -1,15 +1,3 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 # <snippet>
 import GooseEYE
 import numpy as np
@@ -27,31 +15,38 @@ dx = GooseEYE.distance(roi=[200], h=[h], dim=0)
 # </snippet>
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("heightheight.h5", "w") as data:
-            data["y1"] = y1
-            data["y2"] = y2
-            data["hh1"] = hh1
-            data["hh2"] = hh2
-            data["dx"] = dx
+        with h5py.File(root / "heightheight.h5", "w") as file:
+            file["y1"] = y1
+            file["y2"] = y2
+            file["hh1"] = hh1
+            file["hh2"] = hh2
+            file["dx"] = dx
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("heightheight.h5", "r") as data:
-            assert np.allclose(data["y1"][...], y1)
-            assert np.allclose(data["y2"][...], y2)
-            assert np.allclose(data["hh1"][...], hh1)
-            assert np.allclose(data["hh2"][...], hh2)
-            assert np.allclose(data["dx"][...], dx)
+        with h5py.File(root / "heightheight.h5") as file:
+            assert np.allclose(file["y1"][...], y1)
+            assert np.allclose(file["y2"][...], y2)
+            assert np.allclose(file["hh1"][...], hh1)
+            assert np.allclose(file["hh2"][...], hh2)
+            assert np.allclose(file["dx"][...], dx)
 
-    if args["--plot"]:
+    if args.plot:
         import matplotlib.pyplot as plt
 
         try:
@@ -75,5 +70,5 @@ if __name__ == "__main__":
         ax.set_ylabel(r"$|| z(x) - z(x + \Delta x) ||$")
         ax.legend()
 
-        plt.savefig("heightheight.svg")
-        plt.close()
+        fig.savefig(root / "heightheight.svg")
+        plt.close(fig)

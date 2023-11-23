@@ -1,5 +1,6 @@
 #include <GooseEYE/GooseEYE.h>
 #include <highfive/H5Easy.hpp>
+#include <prrng.h>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
 #define MYASSERT_IMPL(expr, file, line) \
@@ -11,7 +12,8 @@
 
 int main()
 {
-    xt::xarray<double> random_data = GooseEYE::random::random({40, 40, 40});
+    prrng::pcg32 rng(0);
+    auto random_data = rng.random({40, 40, 40});
 
     GooseEYE::Ensemble ensemble({1}, true, true);
 

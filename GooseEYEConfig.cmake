@@ -27,6 +27,7 @@ endif()
 
 # Find dependencies
 
+find_dependency(prrng)
 find_dependency(xtensor)
 
 # Define support target "GooseEYE::compiler_warnings"

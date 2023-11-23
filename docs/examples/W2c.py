@@ -1,18 +1,7 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 # <snippet>
 import GooseEYE
 import numpy as np
+import prrng
 
 # square grid of circles
 N = 15
@@ -25,9 +14,10 @@ col = col.reshape(-1)
 r = float(M) / float(N) / 4.0 * np.ones(N * N)
 
 # random perturbation
-row += GooseEYE.random.normal([N * N], 0.0, float(M) / float(N))
-col += GooseEYE.random.normal([N * N], 0.0, float(M) / float(N))
-r *= GooseEYE.random.random([N * N]) * 2.0 + 0.1
+rng = prrng.pcg32(0)
+row += rng.normal([N * N], 0.0, float(M) / float(N))
+col += rng.normal([N * N], 0.0, float(M) / float(N))
+r *= rng.random([N * N]) * 2.0 + 0.1
 
 # generate image, extract 'volume-fraction' for plotting
 img = GooseEYE.dummy_circles((M, M), np.round(row), np.round(col), np.round(r))
@@ -52,33 +42,40 @@ WIc = GooseEYE.W2c((101, 101), clusters, centers, img, fmask=W)
 # </snippet>
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("W2c.h5", "w") as data:
-            data["I"] = img
-            data["clusters"] = clusters
-            data["centers"] = centers
-            data["W"] = W
-            data["WI"] = WI
-            data["WIc"] = WIc
+        with h5py.File(root / "W2c.h5", "w") as file:
+            file["I"] = img
+            file["clusters"] = clusters
+            file["centers"] = centers
+            file["W"] = W
+            file["WI"] = WI
+            file["WIc"] = WIc
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("W2c.h5", "r") as data:
-            assert np.all(np.equal(data["I"][...], img))
-            assert np.all(np.equal(data["clusters"][...], clusters))
-            assert np.all(np.equal(data["centers"][...], centers))
-            assert np.all(np.equal(data["W"][...], W))
-            assert np.allclose(data["WI"][...], WI)
-            assert np.allclose(data["WIc"][...], WIc)
+        with h5py.File(root / "W2c.h5") as file:
+            assert np.all(np.equal(file["I"][...], img))
+            assert np.all(np.equal(file["clusters"][...], clusters))
+            assert np.all(np.equal(file["centers"][...], centers))
+            assert np.all(np.equal(file["W"][...], W))
+            assert np.allclose(file["WI"][...], WI)
+            assert np.allclose(file["WIc"][...], WIc)
 
-    if args["--plot"]:
+    if args.plot:
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
@@ -155,4 +152,5 @@ if __name__ == "__main__":
         cbar.set_ticks([-phi, 0, +phi])
         cbar.set_ticklabels([r"$-\varphi$", "0", r"$+\varphi$"])
 
-        plt.savefig("W2c.svg")
+        fig.savefig(root / "W2c.svg")
+        plt.close(fig)

@@ -28,49 +28,6 @@ inline array_type::array<int> nearest(size_t ndim);
 } // namespace kernel
 
 /**
- * Random number generator.
- */
-namespace random {
-
-/**
- * Set the random seed.
- * @param seed Random seed: e.g. `static_cast<size_t>(std::time(0))`
- */
-inline void seed(size_t seed = 0);
-
-/**
- * Return random numbers.
- * @param shape Shape of the output array.
- */
-auto random(const std::vector<size_t>& shape);
-
-/**
- * Return random numbers.
- * @param shape Shape of the output array.
- */
-template <class T>
-auto random(const T& shape);
-
-/**
- * Return random numbers.
- * @param shape Shape of the output array.
- * @param mean The mean of the distribution.
- * @param std_dev The standard deviation of the distribution.
- */
-auto normal(const std::vector<size_t>& shape, double mean = 0, double std_dev = 1);
-
-/**
- * Return random numbers.
- * @param shape Shape of the output array.
- * @param mean The mean of the distribution.
- * @param std_dev The standard deviation of the distribution.
- */
-template <class T>
-auto normal(const T& shape, double mean = 0, double std_dev = 1);
-
-} // namespace random
-
-/**
  * Different methods to compute a pixel-path.
  */
 enum class path_mode {
@@ -95,9 +52,11 @@ inline array_type::tensor<int, 2> path(
  * Dummy image with circles. The positions and radii of the circles are randomly generated.
  * @param shape Shape of the output image.
  * @param periodic Switch to assume image periodic.
+ * @param seed Seed for the random number generator.
  * @return The dummy image.
  */
-inline array_type::array<int> dummy_circles(const std::vector<size_t>& shape, bool periodic = true);
+inline array_type::array<int>
+dummy_circles(const std::vector<size_t>& shape, bool periodic = true, uint64_t seed = 0);
 
 /**
  * Dummy image with circles.
@@ -1035,6 +994,5 @@ L(const std::vector<size_t>& roi,
 #include "dilate.hpp"
 #include "dummy_circles.hpp"
 #include "kernel.hpp"
-#include "random.hpp"
 
 #endif

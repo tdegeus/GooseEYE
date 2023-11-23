@@ -10,9 +10,11 @@ dependencies:
 - highfive
 - ninja
 - numpy
+- prrng
 - pybind11
 - pytest
 - python
+- python-prrng
 - scikit-build
 - setuptools_scm
 - xsimd

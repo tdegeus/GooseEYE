@@ -2,7 +2,6 @@ import faulthandler
 
 import GooseEYE as eye
 import numpy as np
-import pytest
 
 faulthandler.enable()
 
@@ -17,6 +16,7 @@ def test_stragy_1d():
         s = e + 1 if n % 2 == 0 else e
         assert np.allclose(q[:e], np.arange(e))
         assert np.allclose(np.flip(q[s:]), -np.arange(1, e))
+
 
 def test_stragy_2d():
     """
@@ -54,6 +54,7 @@ def test_stragy_2d():
         assert np.allclose(qc[1:erow, 1:ecol], -np.flip(qc[1:erow, scol:], axis=1))
         assert np.allclose(qc[1:erow, 1:ecol], np.flip(qc[srow:, 1:ecol], axis=0))
 
+
 def test_qnorm_1d():
     n = 6
     structure = eye.Structure(shape=[n])
@@ -64,6 +65,7 @@ def test_qnorm_1d():
     structure = eye.Structure(shape=[n])
     qnorm = structure.qnorm * n
     assert np.allclose(qnorm, np.array([0, 1, 2, 3]))
+
 
 def test_qnorm_2d():
     nrow = 6
@@ -88,12 +90,14 @@ def test_qnorm_2d():
             qnorm[i, j] = np.sqrt(qrow[i] ** 2 + qcol[j] ** 2)
     assert np.allclose(structure.qnorm, qnorm)
 
+
 def test_q():
     nrow = 6
     ncol = 8
     structure = eye.Structure(shape=[nrow, ncol])
     assert structure.q(0).shape == (nrow, ncol)
     assert structure.q(1).shape == (nrow, ncol)
+
 
 def test_even_nan_1d():
     n = 6
@@ -107,6 +111,7 @@ def test_even_nan_1d():
     assert not np.any(np.isnan(structure.first))
     structure += np.zeros([n], dtype=float)
     assert not np.any(np.isnan(structure.first))
+
 
 def test_even_nan_2d():
     nrow = 6
@@ -129,6 +134,7 @@ def test_even_nan_2d():
     for data in [structure.first, structure.second]:
         assert not np.any(np.isnan(data))
 
+
 def test_norm_even():
     usum = 0
     structure = eye.Structure()
@@ -141,6 +147,7 @@ def test_norm_even():
 
     assert np.isclose(np.sum(2 * structure.first[1 : u.size // 2]) / usum, 1, atol=1e-2)
 
+
 def test_norm_odd():
     usum = 0
     structure = eye.Structure()
@@ -152,6 +159,7 @@ def test_norm_odd():
         usum += np.sum((u - np.mean(u)) ** 2)
 
     assert np.isclose(np.sum(structure.first[1:]) / usum, 1, atol=1e-2)
+
 
 def test_random_walk():
     for size in [2001, 2002]:
@@ -169,5 +177,3 @@ def test_random_walk():
         keep = np.logical_and(q > 1e-3, q < 1e-1)
         error = np.sqrt(np.mean((s[keep] / scaling[keep]) ** 2))
         assert 0.9 < error < 1.1
-
-

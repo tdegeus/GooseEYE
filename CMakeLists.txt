@@ -43,6 +43,7 @@ endif()
 # Set target
 # ==========
 
+find_package(prrng REQUIRED)
 find_package(xtensor REQUIRED)
 
 add_library(${PROJECT_NAME} INTERFACE)
@@ -52,6 +53,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
+target_link_libraries(${PROJECT_NAME} INTERFACE prrng)
 target_link_libraries(${PROJECT_NAME} INTERFACE xtensor)
 
 target_compile_definitions(${PROJECT_NAME} INTERFACE

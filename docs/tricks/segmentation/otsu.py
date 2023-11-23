@@ -1,3 +1,5 @@
+import pathlib
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -195,5 +197,6 @@ ax.imshow(np.where(img < threshold, 0, 1), interpolation="nearest", clim=(0, 1),
 # Save results
 # ------------
 
-plt.savefig("otsu.svg")
+root = pathlib.Path(__file__).parent
+fig.savefig(root / "otsu.svg")
 plt.show()

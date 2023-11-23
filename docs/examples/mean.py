@@ -1,21 +1,9 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 import GooseEYE
 import numpy as np
+import prrng
 
-np.random.seed(0)
-
-random_data = GooseEYE.random.random((40, 40, 40))
+rng = prrng.pcg32(0)
+random_data = rng.random((40, 40, 40))
 
 ensemble = GooseEYE.Ensemble([1], True, True)
 
@@ -26,23 +14,30 @@ assert np.isclose(ensemble.result()[0], np.mean(random_data))
 assert np.isclose(ensemble.variance()[0], np.var(random_data), rtol=1e-4)
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("mean.h5", "w") as data:
-            data["mean"] = ensemble.result()
-            data["variance"] = ensemble.variance()
+        with h5py.File(root / "mean.h5", "w") as file:
+            file["mean"] = ensemble.result()
+            file["variance"] = ensemble.variance()
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("mean.h5", "r") as data:
-            assert np.isclose(data["mean"][...], ensemble.result())
-            assert np.isclose(data["variance"][...], ensemble.variance())
+        with h5py.File(root / "mean.h5") as file:
+            assert np.isclose(file["mean"][...], ensemble.result())
+            assert np.isclose(file["variance"][...], ensemble.variance())
 
-    if args["--plot"]:
+    if args.plot:
         pass

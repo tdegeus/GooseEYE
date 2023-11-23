@@ -1,15 +1,3 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 # <snippet>
 import GooseEYE
 import numpy as np
@@ -24,23 +12,30 @@ S2 = ensemble.result()
 # </snippet>
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("S2_ensemble.h5", "w") as data:
-            data["S2"] = S2
+        with h5py.File(root / "S2_ensemble.h5", "w") as file:
+            file["S2"] = S2
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("S2_ensemble.h5", "r") as data:
-            assert np.allclose(data["S2"][...], S2)
+        with h5py.File(root / "S2_ensemble.h5") as file:
+            assert np.allclose(file["S2"][...], S2)
 
-    if args["--plot"]:
+    if args.plot:
         import matplotlib.pyplot as plt
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -64,4 +59,5 @@ if __name__ == "__main__":
         cbar.set_ticks([0, phi])
         cbar.set_ticklabels(["0", r"$\varphi$"])
 
-        plt.savefig("S2_ensemble.svg")
+        fig.savefig(root / "S2_ensemble.svg")
+        plt.close(fig)

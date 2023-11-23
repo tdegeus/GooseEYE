@@ -1,5 +1,6 @@
 #include <GooseEYE/GooseEYE.h>
 #include <highfive/H5Easy.hpp>
+#include <prrng.h>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
 #define MYASSERT_IMPL(expr, file, line) \
@@ -24,7 +25,8 @@ int main()
     // ------------------------
 
     // noise
-    auto noise = 0.1 * (2.0 * GooseEYE::random::random(I.shape()) - 1.0);
+    prrng::pcg32 rng(0);
+    auto noise = 0.1 * (2.0 * rng.random(I.shape()) - 1.0);
 
     // convert to grey-scale image and introduce noise
     xt::xarray<double> Igr = I;
