@@ -1,5 +1,6 @@
 #include <GooseEYE/GooseEYE.h>
 #include <catch2/catch_all.hpp>
+#include <prrng.h>
 
 TEST_CASE("Results from previous versions", "GooseEYE.h")
 {
@@ -403,7 +404,8 @@ TEST_CASE("Results from previous versions", "GooseEYE.h")
 
     SECTION("mean")
     {
-        xt::xarray<double> random_data = GooseEYE::random::random({40, 40, 40});
+        prrng::pcg32 rng(0);
+        xt::xarray<double> random_data = rng.random({40, 40, 40});
 
         GooseEYE::Ensemble ensemble({1}, true, true);
 
@@ -412,8 +414,8 @@ TEST_CASE("Results from previous versions", "GooseEYE.h")
             ensemble.mean(slice);
         }
 
-        REQUIRE(xt::allclose(ensemble.result(), xt::xtensor<double, 1>{0.498849}, 1e-4));
-        REQUIRE(xt::allclose(ensemble.variance(), xt::xtensor<double, 1>{0.083382}, 1e-4));
+        REQUIRE(xt::allclose(ensemble.result(), xt::xtensor<double, 1>{0.500321}, 1e-4));
+        REQUIRE(xt::allclose(ensemble.variance(), xt::xtensor<double, 1>{0.083357}, 1e-4));
     }
 
     SECTION("clusters")

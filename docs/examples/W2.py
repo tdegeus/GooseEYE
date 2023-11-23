@@ -1,18 +1,7 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 # <snippet>
 import GooseEYE
 import numpy as np
+import prrng
 
 # image + "damage" + correlation
 # ------------------------------
@@ -28,9 +17,10 @@ col = col.reshape(-1)
 r = float(M) / float(N) / 4.0 * np.ones(N * N)
 
 # random perturbation
-row += GooseEYE.random.normal([N * N], 0.0, float(M) / float(N))
-col += GooseEYE.random.normal([N * N], 0.0, float(M) / float(N))
-r *= GooseEYE.random.random([N * N]) * 2.0 + 0.1
+rng = prrng.pcg32(0)
+row += rng.normal(shape=[N * N], mu=0, sigma=M / N)
+col += rng.normal(shape=[N * N], mu=0, sigma=M / N)
+r *= rng.normal(shape=[N * N], mu=0, sigma=2) + 0.1
 
 # generate image, extract 'volume-fraction' for plotting
 img = GooseEYE.dummy_circles((M, M), np.round(row), np.round(col), np.round(r))
@@ -50,7 +40,7 @@ WI = GooseEYE.W2((101, 101), W, img, fmask=W)
 
 # convert to gray-scale image and introduce noise
 Igr = np.array(img, copy=True).astype(float)
-Igr += 0.1 * (2.0 * GooseEYE.random.random(Igr.shape) - 1.0) + 0.1
+Igr += 0.1 * (2.0 * rng.random(Igr.shape) - 1.0) + 0.1
 Igr /= 1.2
 
 # mean intensity (for bounds)
@@ -61,31 +51,38 @@ WIgr = GooseEYE.W2((101, 101), W.astype(float), Igr, fmask=W)
 # </snippet>
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("W2.h5", "w") as data:
-            data["I"] = img
-            data["Igr"] = Igr
-            data["W"] = W
-            data["WI"] = WI
-            data["WIgr"] = WIgr
+        with h5py.File(root / "W2.h5", "w") as file:
+            file["I"] = img
+            file["Igr"] = Igr
+            file["W"] = W
+            file["WI"] = WI
+            file["WIgr"] = WIgr
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("W2.h5", "r") as data:
-            assert np.all(np.equal(data["I"][...], img))
-            assert np.all(np.equal(data["W"][...], W))
-            assert np.allclose(data["Igr"][...], Igr)
-            assert np.allclose(data["WI"][...], WI)
-            assert np.allclose(data["WIgr"][...], WIgr)
+        with h5py.File(root / "W2.h5") as file:
+            assert np.all(np.equal(file["I"][...], img))
+            assert np.all(np.equal(file["W"][...], W))
+            assert np.allclose(file["Igr"][...], Igr)
+            assert np.allclose(file["WI"][...], WI)
+            assert np.allclose(file["WIgr"][...], WIgr)
 
-    if args["--plot"]:
+    if args.plot:
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
@@ -182,4 +179,5 @@ if __name__ == "__main__":
             [r"$-\langle \mathcal{I} \rangle$", "0", r"$+\langle \mathcal{I} \rangle$"]
         )
 
-        plt.savefig("W2.svg")
+        fig.savefig(root / "W2.svg")
+        plt.close(fig)

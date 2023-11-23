@@ -1,15 +1,3 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 # <snippet>
 import GooseEYE
 import numpy as np
@@ -25,27 +13,34 @@ clusters_periodic = GooseEYE.clusters(img, periodic=True)
 # </snippet>
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("clusters.h5", "w") as data:
-            data["I"] = img
-            data["clusters"] = clusters
-            data["clusters_periodic"] = clusters_periodic
+        with h5py.File(root / "clusters.h5", "w") as file:
+            file["I"] = img
+            file["clusters"] = clusters
+            file["clusters_periodic"] = clusters_periodic
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("clusters.h5", "r") as data:
-            assert np.all(np.equal(data["I"][...], img))
-            assert np.all(np.equal(data["clusters"][...], clusters))
-            assert np.all(np.equal(data["clusters_periodic"][...], clusters_periodic))
+        with h5py.File(root / "clusters.h5") as file:
+            assert np.all(np.equal(file["I"][...], img))
+            assert np.all(np.equal(file["clusters"][...], clusters))
+            assert np.all(np.equal(file["clusters_periodic"][...], clusters_periodic))
 
-    if args["--plot"]:
+    if args.plot:
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
@@ -106,4 +101,5 @@ if __name__ == "__main__":
         cbar = plt.colorbar(im, cax=cax)
         cbar.set_ticks([])
 
-        plt.savefig("clusters.svg")
+        fig.savefig(root / "clusters.svg")
+        plt.close(fig)

@@ -8,6 +8,7 @@
 #define GOOSEEYE_DUMMY_CIRCLES_HPP
 
 #include "config.h"
+#include <prrng.h>
 
 namespace GooseEYE {
 
@@ -55,9 +56,11 @@ inline array_type::array<int> dummy_circles(
     return out;
 }
 
-inline array_type::array<int> dummy_circles(const std::vector<size_t>& shape, bool periodic)
+inline array_type::array<int>
+dummy_circles(const std::vector<size_t>& shape, bool periodic, uint64_t seed = 0)
 {
     GOOSEEYE_ASSERT(shape.size() == 2);
+    prrng::pcg32 rng(seed);
 
     // set default: number of circles in both directions and (constant) radius
     size_t N = (size_t)(0.05 * (double)shape[0]);
@@ -83,9 +86,9 @@ inline array_type::array<int> dummy_circles(const std::vector<size_t>& shape, bo
 
     // randomly perturb circles (move in any direction, enlarge/shrink)
     for (size_t i = 0; i < N * M; i++) {
-        row(i) += (int)(((double)(std::rand() % 2) - 0.5) * 2.0) * std::rand() % dN;
-        col(i) += (int)(((double)(std::rand() % 2) - 0.5) * 2.0) * std::rand() % dM;
-        r(i) = (int)(((double)(std::rand() % 100) / 100.0 * 2.0 + 0.1) * (double)(r(i)));
+        row(i) += rng.randint(2 * dN) - dN;
+        col(i) += rng.randint(2 * dM) - dM;
+        r(i) = (double)r(i) * 2.0 * rng.random();
     }
 
     // convert to image

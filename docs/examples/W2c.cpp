@@ -1,5 +1,6 @@
 #include <GooseEYE/GooseEYE.h>
 #include <highfive/H5Easy.hpp>
+#include <prrng.h>
 
 #define MYASSERT(expr) MYASSERT_IMPL(expr, __FILE__, __LINE__)
 #define MYASSERT_IMPL(expr, file, line) \
@@ -24,9 +25,10 @@ int main()
     xt::xtensor<double, 1> r = (double)(M) / (double)(N) / 4.0 * xt::ones<double>({N * N});
 
     // random perturbation
-    rowmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
-    colmat += GooseEYE::random::normal({N * N}, 0.0, (double)(M) / (double)(N));
-    xt::xtensor<double, 1> dr = GooseEYE::random::random({N * N}) * 2.0 + 0.1;
+    prrng::pcg32 rng(0);
+    rowmat += rng.normal({N * N}, 0.0, (double)(M) / (double)(N));
+    colmat += rng.normal({N * N}, 0.0, (double)(M) / (double)(N));
+    auto dr = rng.random({N * N}) * 2.0 + 0.1;
     r = r * dr;
 
     // generate image

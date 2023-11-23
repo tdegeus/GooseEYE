@@ -1,15 +1,3 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 # <snippet>
 import GooseEYE
 import numpy as np
@@ -23,25 +11,32 @@ S2 = GooseEYE.S2((101, 101), img, img)
 # </snippet>
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("S2.h5", "w") as data:
-            data["I"] = img
-            data["S2"] = S2
+        with h5py.File(root / "S2.h5", "w") as file:
+            file["I"] = img
+            file["S2"] = S2
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("S2.h5", "r") as data:
-            assert np.all(np.equal(data["I"][...], img))
-            assert np.allclose(data["S2"][...], S2)
+        with h5py.File(root / "S2.h5") as file:
+            assert np.all(np.equal(file["I"][...], img))
+            assert np.allclose(file["S2"][...], S2)
 
-    if args["--plot"]:
+    if args.plot:
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
@@ -90,4 +85,5 @@ if __name__ == "__main__":
         ax.set_xlabel(r"$\Delta x$")
         ax.set_ylabel(r"$S_2$")
 
-        plt.savefig("S2.svg")
+        fig.savefig(root / "S2.svg")
+        plt.close(fig)

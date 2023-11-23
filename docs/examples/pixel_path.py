@@ -1,15 +1,3 @@
-r"""
-    Plot and/or check.
-
-Usage:
-    script [options]
-
-Options:
-    -s, --save      Save output for later check.
-    -c, --check     Check against earlier results.
-    -p, --plot      Plot.
-    -h, --help      Show this help.
-"""
 import GooseEYE
 import numpy as np
 
@@ -41,25 +29,32 @@ for mode in modes:
     images[mode] = img
 
 if __name__ == "__main__":
-    import docopt
+    import argparse
+    import pathlib
 
-    args = docopt.docopt(__doc__)
+    root = pathlib.Path(__file__).parent
 
-    if args["--save"]:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--check", action="store_true")
+    parser.add_argument("--plot", action="store_true")
+    args = parser.parse_args()
+
+    if args.save:
         import h5py
 
-        with h5py.File("pixel_path.h5", "w") as data:
+        with h5py.File(root / "pixel_path.h5", "w") as file:
             for mode in modes:
-                data[f"/{mode:s}/img"] = images[mode]
+                file[f"/{mode:s}/img"] = images[mode]
 
-    if args["--check"]:
+    if args.check:
         import h5py
 
-        with h5py.File("pixel_path.h5", "r") as data:
+        with h5py.File(root / "pixel_path.h5") as file:
             for mode in modes:
-                assert np.all(np.equal(data[mode]["img"][...], images[mode]))
+                assert np.all(np.equal(file[mode]["img"][...], images[mode]))
 
-    if args["--plot"]:
+    if args.plot:
         import matplotlib.pyplot as plt
 
         try:
@@ -88,4 +83,5 @@ if __name__ == "__main__":
             ax.set_title(rf"``{mode:s}''")
             ax.axis("off")
 
-        plt.savefig("pixel_path.svg")
+        fig.savefig(root / "pixel_path.svg")
+        plt.close(fig)
