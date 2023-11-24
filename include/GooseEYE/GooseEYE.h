@@ -298,6 +298,13 @@ inline L labels_rename(const L& labels, const A& rename)
         map.emplace(rename(i, 0), rename(i, 1));
     }
 
+#ifdef GOOSEEYE_ENABLE_ASSERT
+    auto l = xt::unique(labels);
+    for (size_t i = 0; i < l.size(); ++i) {
+        GOOSEEYE_ASSERT(map.count(l(i)) > 0, std::out_of_range);
+    }
+#endif
+
     L ret = xt::empty_like(labels);
     for (size_t i = 0; i < labels.size(); ++i) {
         ret.flat(i) = map[labels.flat(i)];
@@ -315,7 +322,12 @@ inline L labels_rename(const L& labels, const A& rename)
 template <class L, class A>
 inline L labels_reorder(const L& labels, const A& order)
 {
-    GOOSEEYE_ASSERT(xt::all(xt::equal(xt::unique(labels), xt::unique(order))), std::out_of_range);
+#ifdef GOOSEEYE_ENABLE_ASSERT
+    auto a = xt::unique(labels);
+    auto b = xt::unique(order);
+    GOOSEEYE_ASSERT(a.size() == b.size(), std::out_of_range);
+    GOOSEEYE_ASSERT(xt::all(xt::equal(a, b)), std::out_of_range);
+#endif
 
     auto maxlab = *std::max_element(order.begin(), order.end());
     std::vector<typename A::value_type> renum(maxlab + 1);
@@ -393,9 +405,6 @@ private:
      * @note
      *      -   The maximum label is `maxlab = prod(shape) + 1`.
      *      -   `m_renum` is allocated to `arange(maxlab)`.
-     *      -   ClusterLabeller::prune assumes that active labels correspond to
-     *          `m_renum[active] = arange(maxlab)[active]`.
-     *          For example, if active labels are `[0, 2, 5]` then `m_renum = [0 . 2 . . 5 . . .]`.
      */
     std::vector<ptrdiff_t> m_renum;
 
@@ -440,38 +449,6 @@ public:
             m_dx = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
         }
         m_connected.resize(m_dx.shape(0));
-    }
-
-    /**
-     * @brief Current number of labels (including the background).
-     * @note
-     *      If ClusterLabeller::prune has been called (or no clusters where merged),
-     *      `segmenter.nlabels == max(segmenter.labels) + 1 == unique(segmenter.labels).size`.
-     *      Otherwise this is just an upper bound.
-     * @return unsigned integer.
-     */
-    size_t nlabels()
-    {
-        return m_new_label;
-    }
-
-    /**
-     * @brief Prune: renumber labels to lowest possible label, see also ClusterLabeller::nlabels.
-     * @note This might change all labels.
-     */
-    void prune()
-    {
-        ptrdiff_t n = static_cast<ptrdiff_t>(m_new_label);
-        m_new_label = 1;
-        m_renum[0] = 0;
-        for (ptrdiff_t i = 1; i < n; ++i) {
-            if (m_renum[i] == i) {
-                m_renum[i] = m_new_label;
-                ++m_new_label;
-            }
-        }
-        this->private_renumber(m_renum);
-        std::iota(m_renum.begin(), m_renum.begin() + n, 0);
     }
 
     /**
@@ -615,20 +592,57 @@ private:
 public:
     /**
      * @brief Add image. Previous labels are not overwritten.
+     * @param img Image (can be incremental only).
      */
     template <class T>
     void add_image(const T& img)
     {
+        GOOSEEYE_ASSERT(xt::has_shape(img, m_shape), std::out_of_range);
+
         for (size_t idx = 0; idx < m_label.size(); ++idx) {
             if (img.flat(idx) == 0) {
                 continue;
             }
-            if (m_label.flat(idx) > 0) {
+            if (m_label.flat(idx) != 0) {
                 continue;
             }
             this->label_impl(idx);
         }
         this->apply_merge();
+    }
+
+    /**
+     * @brief Add sequence of points.
+     * @param begin Iterator to first point.
+     * @param end Iterator to last point.
+     */
+    template <class T>
+    void add_points(const T& begin, const T& end)
+    {
+#ifdef GOOSEEYE_ENABLE_ASSERT
+        size_t n = m_label.size();
+        GOOSEEYE_ASSERT(
+            !std::any_of(begin, end, [n](size_t i) { return i < 0 || i >= n; }), std::out_of_range);
+#endif
+
+        for (auto it = begin; it != end; ++it) {
+            if (m_label.flat(*it) != 0) {
+                continue;
+            }
+            this->label_impl(*it);
+        }
+        this->apply_merge();
+    }
+
+    /**
+     * @brief Add sequence of points.
+     * @param idx List of points.
+     */
+    template <class T>
+    void add_points(const T& idx)
+    {
+        GOOSEEYE_ASSERT(idx.dimension() == 1, std::out_of_range);
+        return this->add_points(idx.begin(), idx.end());
     }
 
     /**

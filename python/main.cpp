@@ -36,14 +36,18 @@ void allocate_ClusterLabeller(py::module& mod)
     cls.def_property_readonly("shape", &Class::shape, "Shape of system.");
     cls.def_property_readonly("size", &Class::shape, "Size of system.");
     cls.def_property_readonly("labels", &Class::labels, "Cluster of each block.");
-    cls.def_property_readonly("nlabels", &Class::nlabels, "Current number of labels.");
-    cls.def("prune", &Class::prune, "Prune: renumber to smallest index.");
     cls.def("reset", &Class::reset, "Reset labels to zero.");
     cls.def(
         "add_image",
         &Class::template add_image<xt::pytensor<int, Dim>>,
         "Add image",
         py::arg("img"));
+
+    cls.def(
+        "add_points",
+        static_cast<void (Class::*)(const xt::pytensor<size_t, 1>&)>(&Class::add_points),
+        "Add points",
+        py::arg("idx"));
 }
 
 PYBIND11_MODULE(_GooseEYE, m)
