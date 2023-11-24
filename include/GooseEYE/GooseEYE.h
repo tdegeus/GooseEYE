@@ -506,74 +506,6 @@ private:
         }
     }
 
-public:
-    /**
-     * @brief Apply renumbering.
-     * @param new_label
-     *      List of new labels for each label (in use).
-     *      For each current label `i`, the new label is `new_label[i]`.
-     *
-     * @note
-     *      -   `new_label.size >= segmenter.nlabels`
-     *      -   Internal assumption: `max(new_label) < segmenter.size + 1`.
-     */
-    void change_labels(const array_type::tensor<size_t, 1>& new_label)
-    {
-        GOOSEEYE_ASSERT(new_label.size() >= this->nlabels(), std::out_of_range);
-        GOOSEEYE_ASSERT(
-            *std::max_element(new_label.begin(), new_label.end()) < this->size() + 1,
-            std::out_of_range);
-
-        this->private_renumber(new_label);
-        m_new_label = xt::amax(m_label)() + 1;
-        std::fill(m_renum.begin(), m_renum.begin() + m_new_label, 0);
-
-        for (size_t i = 0; i < new_label.size(); ++i) {
-            m_renum[new_label[i]] = new_label[i];
-        }
-    }
-
-    /**
-     * @brief Reorder the labels.
-     * @param labels List new order of labels (`unique(segmenter.labels)` in desired order).
-     */
-    void reorder(const array_type::tensor<ptrdiff_t, 1>& labels)
-    {
-        auto maxlab = *std::max_element(labels.begin(), labels.end());
-
-#ifdef GOOSEEYE_ENABLE_ASSERT
-        GOOSEEYE_ASSERT(maxlab < m_new_label, std::out_of_range);
-
-        std::vector<bool> label_in_use(m_new_label, false);
-        for (size_t i = 0; i < m_label.size(); ++i) {
-            label_in_use[m_label.flat(i)] = true;
-        }
-
-        std::vector<bool> label_in_order(m_new_label, false);
-        for (size_t i = 0; i < labels.size(); ++i) {
-            label_in_order[labels[i]] = true;
-        }
-
-        for (ptrdiff_t i = 0; i < m_new_label; ++i) {
-            if (label_in_use[i]) {
-                GOOSEEYE_ASSERT(label_in_order[i], std::out_of_range);
-            }
-        }
-#endif
-
-        decltype(m_renum) tmp(m_new_label);
-
-        for (size_t i = 0; i < labels.size(); ++i) {
-            tmp[labels[i]] = i;
-            m_renum[labels[i]] = i;
-        }
-
-        this->private_renumber(tmp);
-        m_new_label = xt::amax(m_label)() + 1;
-        std::iota(m_renum.begin(), m_renum.begin() + m_new_label, 0);
-    }
-
-private:
     /**
      * @brief Link `b` to `head[a]`.
      * @details
@@ -620,7 +552,6 @@ private:
         return target;
     }
 
-private:
     void apply_merge()
     {
         if (m_nmerge == 0) {

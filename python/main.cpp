@@ -39,8 +39,6 @@ void allocate_ClusterLabeller(py::module& mod)
     cls.def_property_readonly("nlabels", &Class::nlabels, "Current number of labels.");
     cls.def("prune", &Class::prune, "Prune: renumber to smallest index.");
     cls.def("reset", &Class::reset, "Reset labels to zero.");
-    cls.def("change_labels", &Class::change_labels, "Change label.", py::arg("new_label"));
-    cls.def("reorder", &Class::reorder, "Specify new order of labels.", py::arg("labels"));
     cls.def(
         "add_image",
         &Class::template add_image<xt::pytensor<int, Dim>>,
