@@ -8,6 +8,20 @@ from numpy.typing import DTypeLike
 from ._GooseEYE import *  # noqa: F401, F403
 
 
+def ClusterLabeller(shape, periodic=True):
+    """
+    Allocate a cluster labeller.
+    :param shape: The shape of the image.
+    :param periodic: Whether the image is periodic.
+    :return: A cluster labeller.
+    """
+    if len(shape) == 1 and periodic:
+        return ClusterLabeller1p(shape)
+    if len(shape) == 2 and periodic:
+        return ClusterLabeller2p(shape)
+    raise NotImplementedError
+
+
 class Structure(enstat.static):
     r"""
     Compute the ensemble average structure factor:

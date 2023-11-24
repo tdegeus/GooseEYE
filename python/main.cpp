@@ -29,7 +29,7 @@ template <class Class>
 void allocate_ClusterLabeller(py::module& mod)
 {
     const size_t Dim = Class::Dim;
-    std::string name = "ClusterLabeller" + std::to_string(Dim);
+    std::string name = "ClusterLabeller" + std::to_string(Dim) + "p";
     py::class_<Class> cls(mod, name.c_str());
     cls.def(py::init<const std::template array<size_t, Dim>&>(), name.c_str(), py::arg("shape"));
     cls.def("__repr__", &Class::repr);

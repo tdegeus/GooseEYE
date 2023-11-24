@@ -84,7 +84,7 @@ def test_simple():
         labels = eye.clusters(np.where(test > 0, 1, 0), periodic=True)
         assert np.all(np.equal(labels, eye.labels_rename(test, eye.labels_map(test, labels))))
 
-    segmenter = eye.ClusterLabeller2(shape=(4, 4))
+    segmenter = eye.ClusterLabeller(shape=(4, 4))
     for test in tests:
         segmenter.reset()
         for i in test:
@@ -312,7 +312,7 @@ def test_bug_a():
 
     n = len(idx)
     for steps in range(1, n):
-        segmenter = eye.ClusterLabeller2(shape=shape)
+        segmenter = eye.ClusterLabeller(shape=shape)
         start = 0
         for i in range(n // steps + 1):
             step = min((i + 1) * steps, n)
