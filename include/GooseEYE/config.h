@@ -4,8 +4,8 @@
  * @license This project is released under the GPLv3 License.
  */
 
-#ifndef GOOSEEYE_INCLUDE_H
-#define GOOSEEYE_INCLUDE_H
+#ifndef GOOSEEYE_CONFIG_H
+#define GOOSEEYE_CONFIG_H
 
 /**
  * @cond
@@ -18,9 +18,11 @@
 #include <algorithm>
 #include <assert.h>
 #include <cstdlib>
+#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <math.h>
 #include <memory>
 #include <numeric>
@@ -46,9 +48,9 @@
     std::cout << std::string(file) + ":" + std::to_string(line) + " (" + std::string(function) + \
                      ")" + ": " message ") \n\t";
 
-#define GOOSEEYE_ASSERT_IMPL(expr, file, line, function) \
+#define GOOSEEYE_ASSERT_IMPL(expr, assertion, file, line, function) \
     if (!(expr)) { \
-        throw std::runtime_error( \
+        throw assertion( \
             std::string(file) + ":" + std::to_string(line) + " (" + std::string(function) + ")" + \
             ": assertion failed (" #expr ") \n\t"); \
     }
@@ -76,9 +78,10 @@
  * \throw std::runtime_error
  */
 #ifdef GOOSEEYE_ENABLE_ASSERT
-#define GOOSEEYE_ASSERT(expr) GOOSEEYE_ASSERT_IMPL(expr, __FILE__, __LINE__, __FUNCTION__)
+#define GOOSEEYE_ASSERT(expr, assertion) \
+    GOOSEEYE_ASSERT_IMPL(expr, assertion, __FILE__, __LINE__, __FUNCTION__)
 #else
-#define GOOSEEYE_ASSERT(expr)
+#define GOOSEEYE_ASSERT(expr, assertion)
 #endif
 
 /**

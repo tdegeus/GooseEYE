@@ -251,7 +251,10 @@ def test_main():
     assert np.all(np.equal(eye.dummy_circles([30, 30], [0, 15], [0, 15], [10, 5]), img))
 
     assert np.all(np.equal(eye.clusters(img, periodic=False), labels))
-    assert np.all(np.equal(eye.clusters(img, periodic=True), labels_periodic))
+
+    test = eye.clusters(img, periodic=True)
+    remap = eye.relabel_map(labels_periodic, test)
+    assert np.all(np.equal(remap[labels_periodic], test))
 
     assert np.all(np.equal(eye.dilate(labels, iterations=1, periodic=False), labels_dilate))
     assert np.all(

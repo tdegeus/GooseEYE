@@ -12,10 +12,41 @@
 #include <xtensor-python/pytensor.hpp>
 
 #define GOOSEEYE_USE_XTENSOR_PYTHON
-#define GOOSEEYE_ENABLE_WARNING_PYTHON
 #include <GooseEYE/GooseEYE.h>
 
 namespace py = pybind11;
+
+template <size_t First, size_t Last, typename Lambda>
+inline void static_for(Lambda const& f)
+{
+    if constexpr (First < Last) {
+        f(std::integral_constant<size_t, First>{});
+        static_for<First + 1, Last>(f);
+    }
+}
+
+template <class Class>
+void allocate_ClusterLabeller(py::module& mod)
+{
+    const size_t Dim = Class::Dim;
+    std::string name = "ClusterLabeller" + std::to_string(Dim);
+    py::class_<Class> cls(mod, name.c_str());
+    cls.def(py::init<const std::template array<size_t, Dim>&>(), name.c_str(), py::arg("shape"));
+    cls.def("__repr__", &Class::repr);
+    cls.def_property_readonly("shape", &Class::shape, "Shape of system.");
+    cls.def_property_readonly("size", &Class::shape, "Size of system.");
+    cls.def_property_readonly("labels", &Class::labels, "Cluster of each block.");
+    cls.def_property_readonly("nlabels", &Class::nlabels, "Current number of labels.");
+    cls.def("prune", &Class::prune, "Prune: renumber to smallest index.");
+    cls.def("reset", &Class::reset, "Reset labels to zero.");
+    cls.def("change_labels", &Class::change_labels, "Change label.", py::arg("new_label"));
+    cls.def("reorder", &Class::reorder, "Specify new order of labels.", py::arg("labels"));
+    cls.def(
+        "add_image",
+        &Class::template add_image<xt::pytensor<int, Dim>>,
+        "Add image",
+        py::arg("img"));
+}
 
 PYBIND11_MODULE(_GooseEYE, m)
 {
@@ -100,6 +131,8 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("iterations") = 1,
         py::arg("periodic") = true);
 
+    static_for<1, 3>([&](auto i) { allocate_ClusterLabeller<GooseEYE::ClusterLabeller<i>>(m); });
+
     py::class_<GooseEYE::Clusters>(m, "Clusters")
 
         .def(
@@ -131,7 +164,21 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("f"),
         py::arg("periodic") = true);
 
-    m.def("labels_sizes", &GooseEYE::labels_sizes<xt::pyarray<int>>, py::arg("f"));
+    m.def("labels_map", &GooseEYE::labels_map<xt::pyarray<int>>, py::arg("a"), py::arg("b"));
+
+    m.def(
+        "labels_rename",
+        &GooseEYE::labels_rename<xt::pyarray<int>, xt::xtensor<int, 2>>,
+        py::arg("labels"),
+        py::arg("rename"));
+
+    m.def(
+        "labels_reorder",
+        &GooseEYE::labels_reorder<xt::pyarray<int>, xt::xtensor<int, 1>>,
+        py::arg("labels"),
+        py::arg("order"));
+
+    m.def("labels_sizes", &GooseEYE::labels_sizes<xt::pyarray<int>>, py::arg("labels"));
 
     m.def(
         "relabel_map",

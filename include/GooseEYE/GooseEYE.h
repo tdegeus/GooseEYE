@@ -14,6 +14,41 @@
 
 namespace GooseEYE {
 
+namespace detail {
+
+/**
+ * @brief Get identifier of the namespace.
+ */
+inline std::string get_namespace()
+{
+    std::string ret = "GooseEYE";
+#ifdef GOOSEEYE_USE_XTENSOR_PYTHON
+    return ret + ".";
+#else
+    return ret + "::";
+#endif
+}
+
+/**
+ * @brief Convert shape to string.
+ * @param shape Shape.
+ */
+template <class T>
+inline std::string shape_to_string(const T& shape)
+{
+    std::string ret = "[";
+    for (size_t i = 0; i < shape.size(); ++i) {
+        ret += std::to_string(shape[i]);
+        if (i < shape.size() - 1) {
+            ret += ", ";
+        }
+    }
+    ret += "]";
+    return ret;
+}
+
+} // namespace detail
+
 /**
  * Collect kernels.
  */
@@ -65,9 +100,9 @@ inline array_type::array<int> dummy_circles(
     const array_type::tensor<int, 1>& r,
     bool periodic = true)
 {
-    GOOSEEYE_ASSERT(row.shape() == col.shape());
-    GOOSEEYE_ASSERT(row.shape() == r.shape());
-    GOOSEEYE_ASSERT(shape.size() == 2);
+    GOOSEEYE_ASSERT(row.shape() == col.shape(), std::out_of_range);
+    GOOSEEYE_ASSERT(row.shape() == r.shape(), std::out_of_range);
+    GOOSEEYE_ASSERT(shape.size() == 2, std::out_of_range);
 
     array_type::array<int> out = xt::zeros<int>(shape);
 
@@ -112,7 +147,7 @@ inline array_type::array<int> dummy_circles(
 inline array_type::array<int>
 dummy_circles(const std::vector<size_t>& shape, bool periodic = true, uint64_t seed = 0)
 {
-    GOOSEEYE_ASSERT(shape.size() == 2);
+    GOOSEEYE_ASSERT(shape.size() == 2, std::out_of_range);
     prrng::pcg32 rng(seed);
 
     // set default: number of circles in both directions and (constant) radius
@@ -206,7 +241,7 @@ inline T dilate(const T& f, size_t iterations = 1, bool periodic = true);
 template <class T, class S>
 array_type::tensor<size_t, 1> relabel_map(const T& a, const S& b)
 {
-    GOOSEEYE_ASSERT(xt::has_shape(a, b.shape()));
+    GOOSEEYE_ASSERT(xt::has_shape(a, b.shape()), std::out_of_range);
 
     array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({static_cast<size_t>(xt::amax(a)() + 1)});
 
@@ -218,21 +253,492 @@ array_type::tensor<size_t, 1> relabel_map(const T& a, const S& b)
 }
 
 /**
- * @brief Size per label.
- * @param f Image with labels (0..n).
- * @return List of size n + 1 with the size per label.
+ * @brief Get a map to relabel from `a` to `b`.
+ * @param a Image with labels.
+ * @param b Image with labels.
+ * @return Array with each row the pair (old_label, new_label).
  */
 template <class T>
-array_type::tensor<size_t, 1> labels_sizes(const T& f)
+inline array_type::tensor<typename T::value_type, 2> labels_map(const T& a, const T& b)
 {
-    array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(f)() + size_t(1)});
+    using value_type = typename T::value_type;
+    std::map<value_type, value_type> map;
 
-    for (size_t i = 0; i < f.size(); ++i) {
-        ret(f.flat(i))++;
+    for (size_t i = 0; i < a.size(); ++i) {
+        map.try_emplace(a.flat(i), b.flat(i));
+    }
+
+    size_t i = 0;
+    array_type::tensor<typename T::value_type, 2> ret =
+        xt::empty<typename T::value_type>(std::array<size_t, 2>{map.size(), 2});
+
+    for (auto const& [key, val] : map) {
+        ret(i, 0) = key;
+        ret(i, 1) = val;
+        ++i;
     }
 
     return ret;
 }
+
+/**
+ * @brief Rename labels.
+ * @param labels Image with labels.
+ * @param rename Array with each row the pair (old_label, new_label).
+ * @return Image with reordered labels.
+ */
+template <class L, class A>
+inline L labels_rename(const L& labels, const A& rename)
+{
+    GOOSEEYE_ASSERT(rename.dimension() == 2, std::out_of_range);
+    GOOSEEYE_ASSERT(rename.shape(1) == 2, std::out_of_range);
+    using value_type = typename A::value_type;
+    std::map<value_type, value_type> map;
+    for (size_t i = 0; i < rename.shape(0); ++i) {
+        map.emplace(rename(i, 0), rename(i, 1));
+    }
+
+    L ret = xt::empty_like(labels);
+    for (size_t i = 0; i < labels.size(); ++i) {
+        ret.flat(i) = map[labels.flat(i)];
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Reorder labels.
+ * @param labels Image with labels.
+ * @param order List of new order of labels (`unique(labels)` in desired order).
+ * @return Image with reordered labels.
+ */
+template <class L, class A>
+inline L labels_reorder(const L& labels, const A& order)
+{
+    GOOSEEYE_ASSERT(xt::all(xt::equal(xt::unique(labels), xt::unique(order))), std::out_of_range);
+
+    auto maxlab = *std::max_element(order.begin(), order.end());
+    std::vector<typename A::value_type> renum(maxlab + 1);
+
+    for (size_t i = 0; i < order.size(); ++i) {
+        renum[order[i]] = i;
+    }
+
+    L ret = xt::empty_like(labels);
+    for (size_t i = 0; i < labels.size(); ++i) {
+        ret.flat(i) = renum[labels.flat(i)];
+    }
+
+    return ret;
+}
+
+/**
+ * @brief Size per label.
+ * @param labels Image with labels (0..n).
+ * @return List of size n + 1 with the size per label.
+ */
+template <class T>
+array_type::tensor<size_t, 1> labels_sizes(const T& labels)
+{
+    array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(labels)() + size_t(1)});
+
+    for (size_t i = 0; i < labels.size(); ++i) {
+        ret(labels.flat(i))++;
+    }
+
+    return ret;
+}
+
+namespace detail {
+
+/**
+ * @brief Unravel index.
+ * @param idx Flat index to unravel.
+ * @param strides Strides.
+ * @param indices Output: array indices.
+ */
+inline void unravel_index(
+    ptrdiff_t idx,
+    const std::array<ptrdiff_t, 2>& strides,
+    std::array<ptrdiff_t, 2>& indices)
+{
+    indices[0] = idx / strides[0];
+    indices[1] = idx % strides[0];
+}
+
+} // namespace detail
+
+/**
+ * @brief Label clusters.
+ * @tparam Dimension The rank (a.k.a. `dimension`) of the image.
+ *
+ * @todo `0` is the background label.
+ */
+template <size_t Dimension>
+class ClusterLabeller {
+public:
+    static constexpr size_t Dim = Dimension; ///< Dimensionality of the system.
+
+private:
+    std::array<size_t, Dim> m_shape; ///< Shape of the system.
+    array_type::tensor<ptrdiff_t, Dim> m_dx; ///< Kernel (in distances along each dimension).
+    array_type::tensor<ptrdiff_t, Dim> m_label; ///< Per block, the label (`0` for background).
+    ptrdiff_t m_new_label = 1; ///< The next label number to assign.
+    size_t m_nmerge = 0; ///< Number of times that clusters have been merged.
+    std::array<ptrdiff_t, Dim> m_index;
+    std::array<ptrdiff_t, Dim> m_strides;
+
+    /**
+     * @brief Memory used for relabeling.
+     * @note
+     *      -   The maximum label is `maxlab = prod(shape) + 1`.
+     *      -   `m_renum` is allocated to `arange(maxlab)`.
+     *      -   ClusterLabeller::prune assumes that active labels correspond to
+     *          `m_renum[active] = arange(maxlab)[active]`.
+     *          For example, if active labels are `[0, 2, 5]` then `m_renum = [0 . 2 . . 5 . . .]`.
+     */
+    std::vector<ptrdiff_t> m_renum;
+
+    /**
+     * @brief Linked list of labels connected to a certain label.
+     * @warning Each label can only be connected to one other label.
+     * @note To get the labels connected to label `i`:
+     *
+     *      labels = []
+     *      while m_next[i] != -1:
+     *          labels.append(m_next[i])
+     *          i = m_next[i]
+     */
+    std::vector<ptrdiff_t> m_next;
+    std::vector<ptrdiff_t> m_connected; ///< List of labels connected to the current block.
+
+public:
+    /**
+     * @param shape @copydoc ClusterLabeller::m_shape
+     * @todo Allow different kernels. Current: `[1 1 1]` in 1d, `[[0 1 0], [1 1 1], [0 1 0]]` in 2d.
+     */
+    template <class T>
+    ClusterLabeller(const T& shape)
+    {
+        std::copy(shape.begin(), shape.end(), m_shape.begin());
+        m_label = xt::empty<ptrdiff_t>(m_shape);
+        m_renum.resize(m_label.size() + 1);
+        m_next.resize(m_label.size() + 1);
+        this->reset();
+
+        for (size_t i = 0; i < Dim; ++i) {
+            m_shape[i] = static_cast<ptrdiff_t>(m_shape[i]);
+            m_strides[i] = static_cast<ptrdiff_t>(m_label.strides()[i]);
+        }
+
+        if constexpr (Dim == 1) {
+            // kernel = {1, 1, 1}
+            m_dx = {-1, 1};
+        }
+        else if constexpr (Dim == 2) {
+            // kernel = {{0, 1, 0}, {1, 1, 1}, {0, 1, 0}};
+            m_dx = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
+        }
+        m_connected.resize(m_dx.shape(0));
+    }
+
+    /**
+     * @brief Current number of labels (including the background).
+     * @note
+     *      If ClusterLabeller::prune has been called (or no clusters where merged),
+     *      `segmenter.nlabels == max(segmenter.labels) + 1 == unique(segmenter.labels).size`.
+     *      Otherwise this is just an upper bound.
+     * @return unsigned integer.
+     */
+    size_t nlabels()
+    {
+        return m_new_label;
+    }
+
+    /**
+     * @brief Prune: renumber labels to lowest possible label, see also ClusterLabeller::nlabels.
+     * @note This might change all labels.
+     */
+    void prune()
+    {
+        ptrdiff_t n = static_cast<ptrdiff_t>(m_new_label);
+        m_new_label = 1;
+        m_renum[0] = 0;
+        for (ptrdiff_t i = 1; i < n; ++i) {
+            if (m_renum[i] == i) {
+                m_renum[i] = m_new_label;
+                ++m_new_label;
+            }
+        }
+        this->private_renumber(m_renum);
+        std::iota(m_renum.begin(), m_renum.begin() + n, 0);
+    }
+
+    /**
+     * @brief Reset labels to zero.
+     */
+    void reset()
+    {
+        std::fill(m_label.begin(), m_label.end(), 0);
+        m_new_label = 1;
+        this->clean_next();
+        std::iota(m_renum.begin(), m_renum.end(), 0);
+    }
+
+private:
+    /**
+     * @brief Clean linked list.
+     */
+    void clean_next()
+    {
+        std::fill(m_next.begin(), m_next.end(), -1);
+    }
+
+    /**
+     * @brief Apply renumbering without assertions.
+     * @param renum List of new label for each label in used.
+     */
+    template <class T>
+    void private_renumber(const T& renum)
+    {
+        for (size_t i = 0; i < m_label.size(); ++i) {
+            m_label.flat(i) = renum[m_label.flat(i)];
+        }
+    }
+
+public:
+    /**
+     * @brief Apply renumbering.
+     * @param new_label
+     *      List of new labels for each label (in use).
+     *      For each current label `i`, the new label is `new_label[i]`.
+     *
+     * @note
+     *      -   `new_label.size >= segmenter.nlabels`
+     *      -   Internal assumption: `max(new_label) < segmenter.size + 1`.
+     */
+    void change_labels(const array_type::tensor<size_t, 1>& new_label)
+    {
+        GOOSEEYE_ASSERT(new_label.size() >= this->nlabels(), std::out_of_range);
+        GOOSEEYE_ASSERT(
+            *std::max_element(new_label.begin(), new_label.end()) < this->size() + 1,
+            std::out_of_range);
+
+        this->private_renumber(new_label);
+        m_new_label = xt::amax(m_label)() + 1;
+        std::fill(m_renum.begin(), m_renum.begin() + m_new_label, 0);
+
+        for (size_t i = 0; i < new_label.size(); ++i) {
+            m_renum[new_label[i]] = new_label[i];
+        }
+    }
+
+    /**
+     * @brief Reorder the labels.
+     * @param labels List new order of labels (`unique(segmenter.labels)` in desired order).
+     */
+    void reorder(const array_type::tensor<ptrdiff_t, 1>& labels)
+    {
+        auto maxlab = *std::max_element(labels.begin(), labels.end());
+
+#ifdef GOOSEEYE_ENABLE_ASSERT
+        GOOSEEYE_ASSERT(maxlab < m_new_label, std::out_of_range);
+
+        std::vector<bool> label_in_use(m_new_label, false);
+        for (size_t i = 0; i < m_label.size(); ++i) {
+            label_in_use[m_label.flat(i)] = true;
+        }
+
+        std::vector<bool> label_in_order(m_new_label, false);
+        for (size_t i = 0; i < labels.size(); ++i) {
+            label_in_order[labels[i]] = true;
+        }
+
+        for (ptrdiff_t i = 0; i < m_new_label; ++i) {
+            if (label_in_use[i]) {
+                GOOSEEYE_ASSERT(label_in_order[i], std::out_of_range);
+            }
+        }
+#endif
+
+        decltype(m_renum) tmp(m_new_label);
+
+        for (size_t i = 0; i < labels.size(); ++i) {
+            tmp[labels[i]] = i;
+            m_renum[labels[i]] = i;
+        }
+
+        this->private_renumber(tmp);
+        m_new_label = xt::amax(m_label)() + 1;
+        std::iota(m_renum.begin(), m_renum.begin() + m_new_label, 0);
+    }
+
+private:
+    /**
+     * @brief Link `b` to `head[a]`.
+     * @details
+     *      -   `head[list(b)] = head[a]`
+     *      -   `list(head[a]).append(list(b))`
+     * @param a Target label.
+     * @param b Label to merge into `a`.
+     */
+    void merge_detail(ptrdiff_t a, ptrdiff_t b)
+    {
+        // -> head[list(b)] = head[a]
+        ptrdiff_t i = m_renum[b];
+        ptrdiff_t target = m_renum[a];
+        m_renum[b] = target;
+        while (true) {
+            i = m_next[i];
+            if (i == -1) {
+                break;
+            }
+            m_renum[i] = target;
+        }
+        // -> list(head[a]).append(list(b))
+        while (m_next[a] != -1) {
+            a = m_next[a];
+        }
+        m_next[a] = b;
+    }
+
+    /**
+     * @brief Mark list of labels as merged.
+     * @note Link all labels to the lowest label in the list.
+     * @warning `m_labels` is not updated.
+     * @param labels List of labels to merge.
+     * @param nlabels Number of labels in the list.
+     */
+    ptrdiff_t merge(ptrdiff_t* labels, size_t nlabels)
+    {
+        std::sort(labels, labels + nlabels);
+        nlabels = std::unique(labels, labels + nlabels) - labels;
+        ptrdiff_t target = labels[0];
+        for (size_t i = 1; i < nlabels; ++i) {
+            this->merge_detail(target, labels[i]);
+        }
+        return target;
+    }
+
+private:
+    void apply_merge()
+    {
+        if (m_nmerge == 0) {
+            return;
+        }
+
+        this->private_renumber(m_renum);
+        this->clean_next();
+        m_nmerge = 0;
+    }
+
+    void label_impl(size_t idx)
+    {
+        ptrdiff_t compare;
+        size_t nconnected = 0;
+
+        for (size_t j = 0; j < m_dx.shape(0); ++j) {
+            if constexpr (Dim == 1) {
+                ptrdiff_t nn = m_shape[0];
+                ptrdiff_t ii = (nn + idx + m_dx(j)) % nn; // index corrected for periodicity
+                compare = ii;
+            }
+            else if constexpr (Dim == 2) {
+                detail::unravel_index(idx, m_strides, m_index);
+                ptrdiff_t nn = m_shape[0];
+                ptrdiff_t mm = m_shape[1];
+                ptrdiff_t ii = (nn + m_index[0] + m_dx(j, 0)) % nn;
+                ptrdiff_t jj = (mm + m_index[1] + m_dx(j, 1)) % mm;
+                compare = ii * mm + jj;
+            }
+            if (m_label.flat(compare) != 0) {
+                m_connected[nconnected] = m_renum[m_label.flat(compare)];
+                nconnected++;
+            }
+        }
+
+        if (nconnected == 0) {
+            m_label.flat(idx) = m_new_label;
+            m_new_label += 1;
+            return;
+        }
+
+        if (nconnected == 1) {
+            m_label.flat(idx) = m_connected[0];
+            return;
+        }
+
+        // mark all labels in the list for merging
+        // `m_label` is not yet updated to avoid looping over all blocks too frequently
+        // the new label can be read by `m_renum[lab]` (as done above)
+        m_label.flat(idx) = this->merge(&m_connected[0], nconnected);
+        m_nmerge++;
+
+        // every so often: apply the renumbering to `m_label`
+        // the linked labels in `m_next` can be released
+        if (m_nmerge > 100) {
+            this->apply_merge();
+        }
+    }
+
+public:
+    /**
+     * @brief Add image. Previous labels are not overwritten.
+     */
+    template <class T>
+    void add_image(const T& img)
+    {
+        for (size_t idx = 0; idx < m_label.size(); ++idx) {
+            if (img.flat(idx) == 0) {
+                continue;
+            }
+            if (m_label.flat(idx) > 0) {
+                continue;
+            }
+            this->label_impl(idx);
+        }
+        this->apply_merge();
+    }
+
+    /**
+     * @brief Basic class info.
+     * @return std::string
+     */
+    std::string repr() const
+    {
+        return detail::get_namespace() + "ClusterLabeller" + std::to_string(Dim) + " " +
+               detail::shape_to_string(m_shape);
+    }
+
+    /**
+     * @brief Shape of ClusterLabeller::s and ClusterLabeller::labels.
+     * @return Shape
+     */
+    const auto& shape() const
+    {
+        return m_label.shape();
+    }
+
+    /**
+     * @brief Size of ClusterLabeller::s and ClusterLabeller::labels (`== prod(shape)`).
+     * @return Size
+     */
+    auto size() const
+    {
+        return m_label.size();
+    }
+
+    // todo: allow resetting a cluster map ?
+
+    /**
+     * @brief @copydoc ClusterLabeller::m_label
+     * @return array of signed integers.
+     */
+    const auto& labels() const
+    {
+        return m_label;
+    }
+};
 
 /**
  * Compute clusters and obtain certain characteristic about them.
@@ -266,9 +772,9 @@ public:
         static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
         static_assert(std::is_integral<typename S::value_type>::value, "Integral kernel required.");
 
-        GOOSEEYE_ASSERT(xt::all(xt::equal(f, 0) || xt::equal(f, 1)));
-        GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
-        GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
+        GOOSEEYE_ASSERT(xt::all(xt::equal(f, 0) || xt::equal(f, 1)), std::out_of_range);
+        GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)), std::out_of_range);
+        GOOSEEYE_ASSERT(f.dimension() == kernel.dimension(), std::out_of_range);
 
         m_shape = detail::shape(f);
         m_kernel = xt::atleast_3d(kernel);
@@ -543,6 +1049,18 @@ private:
 template <class T>
 array_type::array<int> clusters(const T& f, bool periodic = true)
 {
+    if (periodic) {
+        if (f.dimension() == 1) {
+            ClusterLabeller<1> c(f.shape());
+            c.add_image(f);
+            return c.labels();
+        }
+        if (f.dimension() == 2) {
+            ClusterLabeller<2> c(f.shape());
+            c.add_image(f);
+            return c.labels();
+        }
+    }
     return Clusters(f, kernel::nearest(f.dimension()), periodic).labels();
 }
 
@@ -556,11 +1074,11 @@ array_type::array<int> clusters(const T& f, bool periodic = true)
 template <typename T, typename U, typename V>
 inline T pos2img(const T& img, const U& positions, const V& labels)
 {
-    GOOSEEYE_ASSERT(img.dimension() > 0);
-    GOOSEEYE_ASSERT(img.dimension() <= 3);
-    GOOSEEYE_ASSERT(img.dimension() == positions.shape(1));
-    GOOSEEYE_ASSERT(positions.shape(0) == labels.size());
-    GOOSEEYE_ASSERT(labels.dimension() == 1);
+    GOOSEEYE_ASSERT(img.dimension() > 0, std::out_of_range);
+    GOOSEEYE_ASSERT(img.dimension() <= 3, std::out_of_range);
+    GOOSEEYE_ASSERT(img.dimension() == positions.shape(1), std::out_of_range);
+    GOOSEEYE_ASSERT(positions.shape(0) == labels.size(), std::out_of_range);
+    GOOSEEYE_ASSERT(labels.dimension() == 1, std::out_of_range);
 
     using value_type = typename T::value_type;
     T res = img;
@@ -599,8 +1117,8 @@ array_type::tensor<double, 2> center_of_mass(const T& labels, bool periodic = tr
 {
     static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
 
-    GOOSEEYE_ASSERT(labels.dimension() > 0);
-    GOOSEEYE_ASSERT(xt::all(labels >= 0));
+    GOOSEEYE_ASSERT(labels.dimension() > 0, std::out_of_range);
+    GOOSEEYE_ASSERT(xt::all(labels >= 0), std::out_of_range);
 
     double pi = xt::numeric_constants<double>::PI;
     size_t N = static_cast<size_t>(xt::amax(labels)(0)) + 1ul;

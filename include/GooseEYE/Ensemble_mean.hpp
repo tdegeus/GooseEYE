@@ -14,8 +14,8 @@ namespace GooseEYE {
 template <class T>
 void Ensemble::mean(const T& f)
 {
-    GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1));
-    GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
+    GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1), std::out_of_range);
+    GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset, std::out_of_range);
 
     m_stat = Type::mean;
 
@@ -29,10 +29,10 @@ void Ensemble::mean(const T& f, const M& fmask)
 {
     static_assert(std::is_integral<typename M::value_type>::value, "Integral mask required.");
 
-    GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()));
-    GOOSEEYE_ASSERT(xt::all(xt::equal(fmask, 0) || xt::equal(fmask, 1)));
-    GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1));
-    GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset);
+    GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()), std::out_of_range);
+    GOOSEEYE_ASSERT(xt::all(xt::equal(fmask, 0) || xt::equal(fmask, 1)), std::out_of_range);
+    GOOSEEYE_ASSERT(m_shape == std::vector<size_t>(MAX_DIM, 1), std::out_of_range);
+    GOOSEEYE_ASSERT(m_stat == Type::mean || m_stat == Type::Unset, std::out_of_range);
 
     m_stat = Type::mean;
 

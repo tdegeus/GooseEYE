@@ -14,7 +14,7 @@ namespace kernel {
 
 inline array_type::array<int> nearest(size_t ndim)
 {
-    GOOSEEYE_ASSERT(ndim > 0 && ndim <= 3);
+    GOOSEEYE_ASSERT(ndim > 0 && ndim <= 3, std::out_of_range);
 
     std::vector<size_t> shape(ndim, 3);
 

@@ -20,13 +20,13 @@ inline void Ensemble::C2(const T& f, const T& g, const M& fmask, const M& gmask)
     static_assert(std::is_integral<value_type>::value, "Integral image required.");
     static_assert(std::is_integral<mask_type>::value, "Integral mask required.");
 
-    GOOSEEYE_ASSERT(xt::has_shape(f, g.shape()));
-    GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()));
-    GOOSEEYE_ASSERT(xt::has_shape(f, gmask.shape()));
-    GOOSEEYE_ASSERT(f.dimension() == m_shape_orig.size());
-    GOOSEEYE_ASSERT(xt::all(xt::equal(fmask, 0) || xt::equal(fmask, 1)));
-    GOOSEEYE_ASSERT(xt::all(xt::equal(gmask, 0) || xt::equal(gmask, 1)));
-    GOOSEEYE_ASSERT(m_stat == Type::C2 || m_stat == Type::Unset);
+    GOOSEEYE_ASSERT(xt::has_shape(f, g.shape()), std::out_of_range);
+    GOOSEEYE_ASSERT(xt::has_shape(f, fmask.shape()), std::out_of_range);
+    GOOSEEYE_ASSERT(xt::has_shape(f, gmask.shape()), std::out_of_range);
+    GOOSEEYE_ASSERT(f.dimension() == m_shape_orig.size(), std::out_of_range);
+    GOOSEEYE_ASSERT(xt::all(xt::equal(fmask, 0) || xt::equal(fmask, 1)), std::out_of_range);
+    GOOSEEYE_ASSERT(xt::all(xt::equal(gmask, 0) || xt::equal(gmask, 1)), std::out_of_range);
+    GOOSEEYE_ASSERT(m_stat == Type::C2 || m_stat == Type::Unset, std::out_of_range);
 
     // lock statistic
     m_stat = Type::C2;
