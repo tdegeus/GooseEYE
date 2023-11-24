@@ -401,7 +401,7 @@ inline void unravel_index(
  * @brief (Incrementally) Label clusters (0 as background, 1..n as labels).
  * @tparam Dimension The rank (a.k.a. `dimension`) of the image.
  */
-template <size_t Dimension>
+template <size_t Dimension, bool Periodic = true>
 class ClusterLabeller {
 public:
     static constexpr size_t Dim = Dimension; ///< Dimensionality of the system.
@@ -444,6 +444,9 @@ public:
     template <class T>
     ClusterLabeller(const T& shape)
     {
+        static_assert(Dim == 1 || Dim == 2, "WIP: 1d and 2d supported.");
+        static_assert(Periodic, "WIP: only periodic supported.");
+
         std::copy(shape.begin(), shape.end(), m_shape.begin());
         m_label = xt::empty<ptrdiff_t>(m_shape);
         m_renum.resize(m_label.size() + 1);
