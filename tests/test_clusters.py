@@ -121,10 +121,12 @@ def test_labels_rename():
 
 def test_labels_sizes():
     labels = np.array([[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 2, 0], [0, 0, 0, 0]])
-    sizes = []
-    for i in range(np.max(labels) + 1):
-        sizes.append(np.sum(labels == i))
-    assert list(eye.labels_sizes(labels)) == sizes
+    assert np.all(
+        np.equal(
+            eye.labels_sizes(labels),
+            [[i, s] for i, s in zip(*np.unique(labels, return_counts=True))],
+        )
+    )
 
 
 # def test_change_label_b():

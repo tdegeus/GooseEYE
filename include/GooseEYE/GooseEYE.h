@@ -239,8 +239,9 @@ inline T dilate(const T& f, size_t iterations = 1, bool periodic = true);
  * @return List of length `max(a) + 1` with per label in `a` the corresponding label in `b`.
  */
 template <class T, class S>
-array_type::tensor<size_t, 1> relabel_map(const T& a, const S& b)
+[[deprecated]] array_type::tensor<size_t, 1> relabel_map(const T& a, const S& b)
 {
+    GOOSEEYE_WARNING_PYTHON("relabel_map is deprecated, use labels_map instead (new API) instead");
     GOOSEEYE_ASSERT(xt::has_shape(a, b.shape()), std::out_of_range);
 
     array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({static_cast<size_t>(xt::amax(a)() + 1)});
@@ -350,12 +351,28 @@ inline L labels_reorder(const L& labels, const A& order)
  * @return List of size n + 1 with the size per label.
  */
 template <class T>
-array_type::tensor<size_t, 1> labels_sizes(const T& labels)
+array_type::tensor<typename T::value_type, 2> labels_sizes(const T& labels)
 {
-    array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(labels)() + size_t(1)});
+    using value_type = typename T::value_type;
+    std::map<value_type, value_type> map;
 
     for (size_t i = 0; i < labels.size(); ++i) {
-        ret(labels.flat(i))++;
+        if (map.count(labels.flat(i)) == 0) {
+            map.emplace(labels.flat(i), 1);
+        }
+        else {
+            map[labels.flat(i)]++;
+        }
+    }
+
+    size_t i = 0;
+    array_type::tensor<value_type, 2> ret =
+        xt::empty<value_type>(std::array<size_t, 2>{map.size(), 2});
+
+    for (auto const& [key, val] : map) {
+        ret(i, 0) = key;
+        ret(i, 1) = val;
+        ++i;
     }
 
     return ret;
@@ -800,8 +817,18 @@ public:
      */
     [[deprecated]] array_type::tensor<size_t, 1> sizes() const
     {
-        GOOSEEYE_WARNING_PYTHON("Clusters.sizes() is deprecated, use labels_sizes() instead");
-        return labels_sizes(m_l);
+        GOOSEEYE_WARNING_PYTHON("Clusters.sizes() is deprecated, use labels_sizes() (new API)");
+        array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(m_l)() + size_t(1)});
+
+        for (size_t h = 0; h < m_l.shape(0); ++h) {
+            for (size_t i = 0; i < m_l.shape(1); ++i) {
+                for (size_t j = 0; j < m_l.shape(2); ++j) {
+                    ret(m_l(h, i, j))++;
+                }
+            }
+        }
+
+        return ret;
     }
 
 private:
