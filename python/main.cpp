@@ -36,6 +36,7 @@ void allocate_ClusterLabeller(py::module& mod)
     cls.def_property_readonly("shape", &Class::shape, "Shape of system.");
     cls.def_property_readonly("size", &Class::shape, "Size of system.");
     cls.def_property_readonly("labels", &Class::labels, "Cluster of each block.");
+    cls.def("prune", &Class::prune, "Prune: renumber to smallest index.");
     cls.def("reset", &Class::reset, "Reset labels to zero.");
     cls.def(
         "add_image",

@@ -91,6 +91,33 @@ def test_simple():
             segmenter.add_image(np.where(i > 0, 1, 0))
             assert np.all(np.equal(segmenter.labels, i))
 
+def test_simple2():
+    img = np.array([
+        [1, 0, 0, 1, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [1, 0, 0, 1, 1],
+        [0, 0, 0, 0, 0],
+    ])
+    labels = np.array([
+        [1, 0, 0, 1, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [2, 0, 0, 2, 2],
+        [0, 0, 0, 0, 0],
+    ])
+    assert np.all(np.equal(eye.clusters(img), labels))
+
+def test_simple3():
+    labels = np.array([
+        [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 1, 0, 0, 1, 1, 1, 0, 2, 0],
+        [0, 1, 1, 1, 0, 1, 1, 0, 2, 2],
+        [0, 1, 1, 1, 1, 1, 1, 0, 0, 2],
+        [0, 1, 1, 1, 0, 1, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ])
+    assert np.all(np.equal(eye.clusters(np.where(labels > 0, 1, 0)), labels))
 
 def test_labels_reorder():
     labels = np.array([[1, 0, 2, 0], [0, 0, 0, 0], [3, 0, 4, 0], [0, 0, 0, 0]])

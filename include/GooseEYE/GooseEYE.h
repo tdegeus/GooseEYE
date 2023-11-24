@@ -447,16 +447,15 @@ public:
         static_assert(Dim == 1 || Dim == 2, "WIP: 1d and 2d supported.");
         static_assert(Periodic, "WIP: only periodic supported.");
 
-        std::copy(shape.begin(), shape.end(), m_shape.begin());
-        m_label = xt::empty<ptrdiff_t>(m_shape);
+        m_label = xt::empty<ptrdiff_t>(shape);
         m_renum.resize(m_label.size() + 1);
         m_next.resize(m_label.size() + 1);
-        this->reset();
-
         for (size_t i = 0; i < Dim; ++i) {
-            m_shape[i] = static_cast<ptrdiff_t>(m_shape[i]);
+            m_shape[i] = static_cast<ptrdiff_t>(shape[i]);
             m_strides[i] = static_cast<ptrdiff_t>(m_label.strides()[i]);
         }
+        GOOSEEYE_ASSERT(m_strides.back() == 1, std::out_of_range);
+        this->reset();
 
         if constexpr (Dim == 1) {
             // kernel = {1, 1, 1}
@@ -475,9 +474,28 @@ public:
     void reset()
     {
         std::fill(m_label.begin(), m_label.end(), 0);
+        std::iota(m_renum.begin(), m_renum.end(), 0);
         m_new_label = 1;
         this->clean_next();
-        std::iota(m_renum.begin(), m_renum.end(), 0);
+    }
+
+    /**
+     * @brief Prune: renumber labels to lowest possible label, see also AvalancheSegmenter::nlabels.
+     * @note This might change all labels.
+     */
+    void prune()
+    {
+        ptrdiff_t n = static_cast<ptrdiff_t>(m_new_label);
+        m_new_label = 1;
+        m_renum[0] = 0;
+        for (ptrdiff_t i = 1; i < n; ++i) {
+            if (m_renum[i] == i) {
+                m_renum[i] = m_new_label;
+                ++m_new_label;
+            }
+        }
+        this->private_renumber(m_renum);
+        std::iota(m_renum.begin(), m_renum.begin() + n, 0);
     }
 
 private:
@@ -615,9 +633,9 @@ public:
     template <class T>
     void add_image(const T& img)
     {
-        GOOSEEYE_ASSERT(xt::has_shape(img, m_shape), std::out_of_range);
+        GOOSEEYE_ASSERT(xt::has_shape(img, m_label.shape()), std::out_of_range);
 
-        for (size_t idx = 0; idx < m_label.size(); ++idx) {
+        for (size_t idx = 0; idx < img.size(); ++idx) {
             if (img.flat(idx) == 0) {
                 continue;
             }
@@ -1026,11 +1044,13 @@ array_type::array<int> clusters(const T& f, bool periodic = true)
         if (f.dimension() == 1) {
             ClusterLabeller<1> c(f.shape());
             c.add_image(f);
+            c.prune();
             return c.labels();
         }
         if (f.dimension() == 2) {
             ClusterLabeller<2> c(f.shape());
             c.add_image(f);
+            c.prune();
             return c.labels();
         }
     }
