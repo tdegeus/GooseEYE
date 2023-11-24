@@ -398,10 +398,8 @@ inline void unravel_index(
 } // namespace detail
 
 /**
- * @brief Label clusters.
+ * @brief (Incrementally) Label clusters (0 as background, 1..n as labels).
  * @tparam Dimension The rank (a.k.a. `dimension`) of the image.
- *
- * @todo `0` is the background label.
  */
 template <size_t Dimension>
 class ClusterLabeller {
@@ -414,8 +412,8 @@ private:
     array_type::tensor<ptrdiff_t, Dim> m_label; ///< Per block, the label (`0` for background).
     ptrdiff_t m_new_label = 1; ///< The next label number to assign.
     size_t m_nmerge = 0; ///< Number of times that clusters have been merged.
-    std::array<ptrdiff_t, Dim> m_index;
-    std::array<ptrdiff_t, Dim> m_strides;
+    std::array<ptrdiff_t, Dim> m_index; ///< Array index (reused).
+    std::array<ptrdiff_t, Dim> m_strides; ///< Strides of the array.
 
     /**
      * @brief Memory used for relabeling.
