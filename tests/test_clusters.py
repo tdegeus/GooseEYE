@@ -286,3 +286,11 @@ def test_simple():
 #             self.assertAlmostEqual(segmenter.t, t[step - 1])
 #             self.assertTrue(np.all(segmenter.s == sizes[step - 1]))
 #             self.assertTrue(np.all(segmenter.labels == labels[step - 1]))
+
+
+def test_labels_sizes():
+    labels = np.array([[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 2, 0], [0, 0, 0, 0]])
+    sizes = []
+    for i in range(np.max(labels) + 1):
+        sizes.append(np.sum(labels == i))
+    assert list(eye.labels_sizes(labels)) == sizes

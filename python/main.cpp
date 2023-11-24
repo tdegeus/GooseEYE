@@ -12,6 +12,7 @@
 #include <xtensor-python/pytensor.hpp>
 
 #define GOOSEEYE_USE_XTENSOR_PYTHON
+#define GOOSEEYE_ENABLE_WARNING_PYTHON
 #include <GooseEYE/GooseEYE.h>
 
 namespace py = pybind11;
@@ -129,6 +130,8 @@ PYBIND11_MODULE(_GooseEYE, m)
         &GooseEYE::clusters<xt::pyarray<int>>,
         py::arg("f"),
         py::arg("periodic") = true);
+
+    m.def("labels_sizes", &GooseEYE::labels_sizes<xt::pyarray<int>>, py::arg("f"));
 
     m.def(
         "relabel_map",

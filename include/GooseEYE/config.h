@@ -82,6 +82,22 @@
 #endif
 
 /**
+ * Warnings specific to the Python API are implemented as:
+ *
+ *      GOOSEEYE_WARNING_PYTHON(...)
+ *
+ * They can be enabled by:
+ *
+ *      #define GOOSEEYE_ENABLE_WARNING_PYTHON
+ */
+#ifdef GOOSEEYE_ENABLE_WARNING_PYTHON
+#define GOOSEEYE_WARNING_PYTHON(message) \
+    GOOSEEYE_WARNING_IMPL(message, __FILE__, __LINE__, __FUNCTION__)
+#else
+#define GOOSEEYE_WARNING_PYTHON(message)
+#endif
+
+/**
  * Toolbox to compute statistics.
  */
 namespace GooseEYE {

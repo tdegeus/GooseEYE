@@ -218,6 +218,23 @@ array_type::tensor<size_t, 1> relabel_map(const T& a, const S& b)
 }
 
 /**
+ * @brief Size per label.
+ * @param f Image with labels (0..n).
+ * @return List of size n + 1 with the size per label.
+ */
+template <class T>
+array_type::tensor<size_t, 1> labels_sizes(const T& f)
+{
+    array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(f)() + size_t(1)});
+
+    for (size_t i = 0; i < f.size(); ++i) {
+        ret(f.flat(i))++;
+    }
+
+    return ret;
+}
+
+/**
  * Compute clusters and obtain certain characteristic about them.
  */
 class Clusters {
@@ -330,19 +347,10 @@ public:
      * Return size per cluster
      * @return List.
      */
-    array_type::tensor<size_t, 1> sizes() const
+    [[deprecated]] array_type::tensor<size_t, 1> sizes() const
     {
-        array_type::tensor<size_t, 1> ret = xt::zeros<size_t>({xt::amax(m_l)() + size_t(1)});
-
-        for (size_t h = 0; h < m_l.shape(0); ++h) {
-            for (size_t i = 0; i < m_l.shape(1); ++i) {
-                for (size_t j = 0; j < m_l.shape(2); ++j) {
-                    ret(m_l(h, i, j))++;
-                }
-            }
-        }
-
-        return ret;
+        GOOSEEYE_WARNING_PYTHON("Clusters.sizes() is deprecated, use labels_sizes() instead");
+        return labels_sizes(m_l);
     }
 
 private:
@@ -527,9 +535,10 @@ private:
 };
 
 /**
- * Compute clusters. Wraps GooseEYE::Clusters::labels().
+ * @brief Compute clusters.
  * @param f Image.
  * @param periodic Interpret image as periodic.
+ * @return 'Image' with labels (1..n) for labels, 0 for background.
  */
 template <class T>
 array_type::array<int> clusters(const T& f, bool periodic = true)
