@@ -381,21 +381,6 @@ array_type::tensor<typename T::value_type, 2> labels_sizes(const T& labels)
 namespace detail {
 
 /**
- * @brief Unravel index.
- * @param idx Flat index to unravel.
- * @param strides Strides.
- * @param indices Output: array indices.
- */
-inline void unravel_index(
-    ptrdiff_t idx,
-    const std::array<ptrdiff_t, 2>& strides,
-    std::array<ptrdiff_t, 2>& indices)
-{
-    indices[0] = idx / strides[0];
-    indices[1] = idx % strides[0];
-}
-
-/**
  * @brief Convert kernel to array of distances and remove zero distance.
  * @param kernel Kernel.
  * @return Array of distances.
@@ -450,7 +435,6 @@ private:
     array_type::tensor<ptrdiff_t, Dim> m_label; ///< Per block, the label (`0` for background).
     ptrdiff_t m_new_label = 1; ///< The next label number to assign.
     size_t m_nmerge = 0; ///< Number of times that clusters have been merged.
-    std::array<ptrdiff_t, Dim> m_index; ///< Array index (reused).
     std::array<ptrdiff_t, Dim> m_strides; ///< Strides of the array.
 
     /**
@@ -647,15 +631,13 @@ private:
                 compare = idx + m_dx(j);
             }
             else if constexpr (Dim == 2 && Periodic) {
-                detail::unravel_index(idx, m_strides, m_index);
-                ptrdiff_t ii = (m_shape[0] + m_index[0] + m_dx(j, 0)) % m_shape[0];
-                ptrdiff_t jj = (m_shape[1] + m_index[1] + m_dx(j, 1)) % m_shape[1];
+                ptrdiff_t ii = (m_shape[0] + (idx / m_strides[0]) + m_dx(j, 0)) % m_shape[0];
+                ptrdiff_t jj = (m_shape[1] + (idx % m_strides[0]) + m_dx(j, 1)) % m_shape[1];
                 compare = ii * m_shape[1] + jj;
             }
             else if constexpr (Dim == 2 && !Periodic) {
-                detail::unravel_index(idx, m_strides, m_index);
-                ptrdiff_t ii = m_index[0] + m_dx(j, 0);
-                ptrdiff_t jj = m_index[1] + m_dx(j, 1);
+                ptrdiff_t ii = (idx / m_strides[0]) + m_dx(j, 0);
+                ptrdiff_t jj = (idx % m_strides[0]) + m_dx(j, 1);
                 if (ii < 0 || ii >= m_shape[0] || jj < 0 || jj >= m_shape[1]) {
                     continue;
                 }
@@ -684,12 +666,6 @@ private:
         // the new label can be read by `m_renum[lab]` (as done above)
         m_label.flat(idx) = this->merge(&m_connected[0], nconnected);
         m_nmerge++;
-
-        // every so often: apply the renumbering to `m_label`
-        // the linked labels in `m_next` can be released
-        if (m_nmerge > 100) {
-            this->apply_merge();
-        }
     }
 
 public:

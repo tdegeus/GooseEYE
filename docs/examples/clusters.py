@@ -41,7 +41,7 @@ if __name__ == "__main__":
             assert np.all(np.equal(file["clusters"][...], clusters))
             assert np.all(np.equal(file["clusters_periodic"][...], clusters_periodic))
 
-    if args.plot:
+    if args.plot or args.show:
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
