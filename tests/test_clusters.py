@@ -3,6 +3,7 @@ import faulthandler
 import GooseEYE as eye
 import numpy as np
 import pytest
+import scipy.ndimage
 
 faulthandler.enable()
 
@@ -41,7 +42,7 @@ def test_labels_map():
     assert np.all(np.equal(eye.labels_map(a, b), lmap))
 
 
-def test_simple():
+def test_clusters_simple():
     tests = [
         [
             np.array([[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
@@ -92,7 +93,7 @@ def test_simple():
             assert np.all(np.equal(segmenter.labels, i))
 
 
-def test_simple2():
+def test_clusters_simple2():
     img = np.array(
         [
             [1, 0, 0, 1, 1],
@@ -114,7 +115,7 @@ def test_simple2():
     assert np.all(np.equal(eye.clusters(img), labels))
 
 
-def test_simple3():
+def test_clusters_simple3():
     labels = np.array(
         [
             [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -126,6 +127,16 @@ def test_simple3():
         ]
     )
     assert np.all(np.equal(eye.clusters(np.where(labels > 0, 1, 0)), labels))
+
+
+def test_clusters_scipy():
+    img = eye.dummy_circles((500, 500), periodic=False)
+    clusters = eye.clusters(img, periodic=False)
+    scp, num = scipy.ndimage.label(img)
+    assert np.unique(clusters).size == num + 1
+    lmap = eye.labels_map(scp, clusters)
+    scp = eye.labels_rename(scp, lmap)
+    assert np.all(np.equal(scp, clusters))
 
 
 def test_labels_reorder():

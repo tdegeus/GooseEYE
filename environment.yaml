@@ -3,7 +3,6 @@ channels:
 dependencies:
 - catch2
 - cmake
-- docopt
 - doxygen
 - enstat >=0.9.7
 - h5py
@@ -16,6 +15,7 @@ dependencies:
 - python
 - python-prrng
 - scikit-build
+- scipy
 - setuptools_scm
 - xsimd
 - xtensor
