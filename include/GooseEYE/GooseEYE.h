@@ -734,12 +734,12 @@ public:
         size_t n = m_label.size();
         if constexpr (std::is_signed_v<typename T::value_type>) {
             GOOSEEYE_ASSERT(
-                !std::any_of(begin, end, [n](size_t i) { return i >= n; }), std::out_of_range);
+                !std::any_of(begin, end, [n](size_t i) { return i < 0 || i >= n; }),
+                std::out_of_range);
         }
         else {
             GOOSEEYE_ASSERT(
-                !std::any_of(begin, end, [n](size_t i) { return i < 0 || i >= n; }),
-                std::out_of_range);
+                !std::any_of(begin, end, [n](size_t i) { return i >= n; }), std::out_of_range);
         }
 #endif
 
