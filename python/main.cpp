@@ -29,9 +29,18 @@ template <class Class>
 void allocate_ClusterLabeller(py::module& mod)
 {
     const size_t Dim = Class::Dim;
-    std::string name = "ClusterLabeller" + std::to_string(Dim) + "p";
+    std::string name = "ClusterLabeller" + std::to_string(Dim);
+    if (Class::Periodic) {
+        name += "p";
+    }
     py::class_<Class> cls(mod, name.c_str());
     cls.def(py::init<const std::template array<size_t, Dim>&>(), name.c_str(), py::arg("shape"));
+    cls.def(
+        py::init<const std::template array<size_t, Dim>&, const xt::template pytensor<int, Dim>&>(),
+        name.c_str(),
+        py::arg("shape"),
+        py::arg("kernel"));
+
     cls.def("__repr__", &Class::repr);
     cls.def_property_readonly("shape", &Class::shape, "Shape of system.");
     cls.def_property_readonly("size", &Class::shape, "Size of system.");
@@ -134,7 +143,10 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("iterations") = 1,
         py::arg("periodic") = true);
 
-    static_for<1, 3>([&](auto i) { allocate_ClusterLabeller<GooseEYE::ClusterLabeller<i>>(m); });
+    static_for<1, 3>(
+        [&](auto i) { allocate_ClusterLabeller<GooseEYE::ClusterLabeller<i, true>>(m); });
+    static_for<1, 3>(
+        [&](auto i) { allocate_ClusterLabeller<GooseEYE::ClusterLabeller<i, false>>(m); });
 
     py::class_<GooseEYE::Clusters>(m, "Clusters")
 

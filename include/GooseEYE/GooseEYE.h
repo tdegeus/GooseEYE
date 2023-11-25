@@ -395,16 +395,54 @@ inline void unravel_index(
     indices[1] = idx % strides[0];
 }
 
+/**
+ * @brief Convert kernel to array of distances and remove zero distance.
+ * @param kernel Kernel.
+ * @return Array of distances.
+ */
+template <size_t Dim, class T>
+inline array_type::tensor<ptrdiff_t, Dim> kernel_to_dx(T kernel)
+{
+#ifdef GOOSEEYE_ENABLE_ASSERT
+    for (size_t i = 0; i < Dim; ++i) {
+        GOOSEEYE_ASSERT(kernel.shape(i) % 2 == 1, std::out_of_range);
+    }
+#endif
+
+    std::array<size_t, Dim> mid;
+    for (size_t i = 0; i < Dim; ++i) {
+        mid[i] = (kernel.shape(i) - 1) / 2;
+    }
+    size_t idx = 0;
+    for (size_t i = 0; i < Dim; ++i) {
+        idx += mid[i] * kernel.strides()[i];
+    }
+    GOOSEEYE_ASSERT(kernel.flat(idx) == 1, std::out_of_range);
+    kernel.flat(idx) = 0;
+
+    if constexpr (Dim == 1) {
+        return xt::flatten_indices(xt::argwhere(kernel)) - mid[0];
+    }
+
+    auto ret = xt::from_indices(xt::argwhere(kernel));
+    for (size_t i = 0; i < Dim; ++i) {
+        xt::view(ret, xt::all(), i) -= mid[i];
+    }
+    return ret;
+}
+
 } // namespace detail
 
 /**
  * @brief (Incrementally) Label clusters (0 as background, 1..n as labels).
  * @tparam Dimension The rank (a.k.a. `dimension`) of the image.
+ * @note The default kernel is `GooseEYE::kernel::nearest()`.
  */
-template <size_t Dimension, bool Periodic = true>
+template <size_t Dimension, bool Periodicity = true>
 class ClusterLabeller {
 public:
     static constexpr size_t Dim = Dimension; ///< Dimensionality of the system.
+    static constexpr bool Periodic = Periodicity; ///< Periodicity of the system.
 
 private:
     std::array<size_t, Dim> m_shape; ///< Shape of the system.
@@ -439,14 +477,37 @@ private:
 public:
     /**
      * @param shape @copydoc ClusterLabeller::m_shape
-     * @todo Allow different kernels. Current: `[1 1 1]` in 1d, `[[0 1 0], [1 1 1], [0 1 0]]` in 2d.
      */
     template <class T>
     ClusterLabeller(const T& shape)
     {
-        static_assert(Dim == 1 || Dim == 2, "WIP: 1d and 2d supported.");
-        static_assert(Periodic, "WIP: only periodic supported.");
+        if constexpr (Dim == 1) {
+            // kernel = {1, 1, 1}
+            m_dx = {-1, 1};
+        }
+        else if constexpr (Dim == 2) {
+            // kernel = {{0, 1, 0}, {1, 1, 1}, {0, 1, 0}};
+            m_dx = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
+        }
+        this->init(shape);
+    }
 
+    /**
+     * @param shape @copydoc ClusterLabeller::m_shape
+     * @param kernel Kernel (e.g. GooseEYE::kernel::nearest()).
+     */
+    template <class T, class K>
+    ClusterLabeller(const T& shape, const K& kernel)
+    {
+        m_dx = detail::kernel_to_dx<Dim>(kernel);
+        this->init(shape);
+    }
+
+private:
+    template <class T>
+    void init(const T& shape)
+    {
+        static_assert(Dim == 1 || Dim == 2, "WIP: 1d and 2d supported.");
         m_label = xt::empty<ptrdiff_t>(shape);
         m_renum.resize(m_label.size() + 1);
         m_next.resize(m_label.size() + 1);
@@ -456,18 +517,10 @@ public:
         }
         GOOSEEYE_ASSERT(m_strides.back() == 1, std::out_of_range);
         this->reset();
-
-        if constexpr (Dim == 1) {
-            // kernel = {1, 1, 1}
-            m_dx = {-1, 1};
-        }
-        else if constexpr (Dim == 2) {
-            // kernel = {{0, 1, 0}, {1, 1, 1}, {0, 1, 0}};
-            m_dx = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
-        }
         m_connected.resize(m_dx.shape(0));
     }
 
+public:
     /**
      * @brief Reset labels to zero.
      */
@@ -578,16 +631,26 @@ private:
 
     void label_impl(size_t idx)
     {
+        static_assert(Dim == 1 || Dim == 2, "WIP: 1d and 2d supported.");
+
         ptrdiff_t compare;
         size_t nconnected = 0;
 
         for (size_t j = 0; j < m_dx.shape(0); ++j) {
-            if constexpr (Dim == 1) {
+            if constexpr (Dim == 1 && Periodic) {
                 ptrdiff_t nn = m_shape[0];
                 ptrdiff_t ii = (nn + idx + m_dx(j)) % nn; // index corrected for periodicity
                 compare = ii;
             }
-            else if constexpr (Dim == 2) {
+            else if constexpr (Dim == 1 && !Periodic) {
+                ptrdiff_t nn = m_shape[0];
+                ptrdiff_t ii = idx + m_dx(j);
+                if (ii < 0 || ii >= nn) {
+                    continue;
+                }
+                compare = ii;
+            }
+            else if constexpr (Dim == 2 && Periodic) {
                 detail::unravel_index(idx, m_strides, m_index);
                 ptrdiff_t nn = m_shape[0];
                 ptrdiff_t mm = m_shape[1];
@@ -595,6 +658,18 @@ private:
                 ptrdiff_t jj = (mm + m_index[1] + m_dx(j, 1)) % mm;
                 compare = ii * mm + jj;
             }
+            else if constexpr (Dim == 2 && !Periodic) {
+                detail::unravel_index(idx, m_strides, m_index);
+                ptrdiff_t nn = m_shape[0];
+                ptrdiff_t mm = m_shape[1];
+                ptrdiff_t ii = m_index[0] + m_dx(j, 0);
+                ptrdiff_t jj = m_index[1] + m_dx(j, 1);
+                if (ii < 0 || ii >= nn || jj < 0 || jj >= mm) {
+                    continue;
+                }
+                compare = ii * mm + jj;
+            }
+
             if (m_label.flat(compare) != 0) {
                 m_connected[nconnected] = m_renum[m_label.flat(compare)];
                 nconnected++;
@@ -1031,6 +1106,26 @@ private:
     array_type::tensor<int, 3> m_l_np; // labels before applying periodicity
 };
 
+namespace detail {
+
+template <size_t Dimension, bool Periodicity>
+class ClusterLabellerOverload : public ClusterLabeller<Dimension, Periodicity> {
+public:
+    template <class T>
+    ClusterLabellerOverload(const T& img) : ClusterLabeller<Dimension, Periodicity>(img.shape())
+    {
+        this->add_image(img);
+        this->prune();
+    }
+
+    auto get() const
+    {
+        return this->labels();
+    }
+};
+
+} // namespace detail
+
 /**
  * @brief Compute clusters.
  * @param f Image.
@@ -1040,20 +1135,21 @@ private:
 template <class T>
 array_type::array<int> clusters(const T& f, bool periodic = true)
 {
-    if (periodic) {
-        if (f.dimension() == 1) {
-            ClusterLabeller<1> c(f.shape());
-            c.add_image(f);
-            c.prune();
-            return c.labels();
-        }
-        if (f.dimension() == 2) {
-            ClusterLabeller<2> c(f.shape());
-            c.add_image(f);
-            c.prune();
-            return c.labels();
-        }
+    auto n = f.dimension();
+    if (n == 1 && periodic) {
+        return detail::ClusterLabellerOverload<1, true>(f).get();
     }
+    if (n == 1 && !periodic) {
+        return detail::ClusterLabellerOverload<1, false>(f).get();
+    }
+    if (n == 2 && periodic) {
+        return detail::ClusterLabellerOverload<2, true>(f).get();
+    }
+    if (n == 2 && !periodic) {
+        return detail::ClusterLabellerOverload<2, false>(f).get();
+    }
+
+    GOOSEEYE_WARNING("WIP: updated 3d implementation needs to be completed. Please file a PR.");
     return Clusters(f, kernel::nearest(f.dimension()), periodic).labels();
 }
 

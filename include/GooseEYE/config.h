@@ -85,6 +85,21 @@
 #endif
 
 /**
+ * Warnings are implemented as:
+ *
+ *      GOOSEEYE_WARNING(...)
+ *
+ * They can be disables by:
+ *
+ *      #define GOOSEEYE_DISABLE_WARNING
+ */
+#ifndef GOOSEEYE_DISABLE_WARNING
+#define GOOSEEYE_WARNING(message) GOOSEEYE_WARNING_IMPL(message, __FILE__, __LINE__, __FUNCTION__)
+#else
+#define GOOSEEYE_WARNING(message)
+#endif
+
+/**
  * Warnings specific to the Python API are implemented as:
  *
  *      GOOSEEYE_WARNING_PYTHON(...)

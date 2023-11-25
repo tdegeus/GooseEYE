@@ -8,17 +8,21 @@ from numpy.typing import DTypeLike
 from ._GooseEYE import *  # noqa: F401, F403
 
 
-def ClusterLabeller(shape, periodic=True):
+def ClusterLabeller(shape, periodic=True, **kwargs):
     """
     Allocate a cluster labeller.
     :param shape: The shape of the image.
     :param periodic: Whether the image is periodic.
     :return: A cluster labeller.
     """
-    if len(shape) == 1 and periodic:
-        return ClusterLabeller1p(shape)
-    if len(shape) == 2 and periodic:
-        return ClusterLabeller2p(shape)
+    if len(shape) == 1:
+        if periodic:
+            return ClusterLabeller1p(shape, **kwargs)
+        return ClusterLabeller1(shape, **kwargs)
+    if len(shape) == 2:
+        if periodic:
+            return ClusterLabeller2p(shape, **kwargs)
+        return ClusterLabeller2(shape, **kwargs)
     raise NotImplementedError
 
 
