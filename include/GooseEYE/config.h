@@ -27,6 +27,7 @@
 #include <memory>
 #include <numeric>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <xtensor/xadapt.hpp>
