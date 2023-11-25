@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("--save", action="store_true")
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--plot", action="store_true")
+    parser.add_argument("--show", action="store_true")
     args = parser.parse_args()
 
     if args.save:
@@ -44,6 +45,7 @@ if __name__ == "__main__":
         import matplotlib.pyplot as plt
         import matplotlib as mpl
         import matplotlib.cm as cm
+        import prrng
         from mpl_toolkits.axes_grid1 import make_axes_locatable
 
         # color-scheme: modify such that the background is white
@@ -52,12 +54,30 @@ if __name__ == "__main__":
         cmap[0, :3] = 1.0
         cmap = mpl.colors.ListedColormap(cmap)
 
+        # reshuffle for better visualisation
+        assert np.all(np.diff(np.unique(clusters)) == 1)
+        assert np.all(np.diff(np.unique(clusters_periodic)) == 1)
+        assert np.unique(clusters).size >= np.unique(clusters_periodic).size
+        rng = prrng.pcg32()
+        lab = np.unique(clusters)
+        lab = lab[lab != 0]
+        new = np.copy(lab).astype(np.int64)
+        rng.shuffle(new)
+        rename = np.array(([0] + list(lab), [0] + list(new))).T
+        clusters = GooseEYE.labels_rename(clusters, rename)
+        lmap = GooseEYE.labels_map(clusters_periodic, clusters)
+        unq, unq_idx, unq_cnt = np.unique(lmap[:, 1], return_inverse=True, return_counts=True)
+        assert np.all(np.in1d(np.unique(clusters_periodic), lmap[:, 0]))
+        assert np.all(np.equal(np.sort(lmap[:, 0]), np.unique(lmap[:, 0])))
+        assert np.all(np.equal(np.sort(lmap[:, 1]), np.unique(lmap[:, 1])))
+        clusters_periodic = GooseEYE.labels_rename(clusters_periodic, lmap)
+
         try:
             plt.style.use(["goose", "goose-latex"])
         except OSError:
             pass
 
-        fig, axes = plt.subplots(figsize=(18, 6), nrows=1, ncols=3)
+        fig, axes = plt.subplots(figsize=(8 * 4, 6), nrows=1, ncols=4)
 
         ax = axes[0]
         im = ax.imshow(img, clim=(0, 1), cmap=mpl.colors.ListedColormap(cm.gray([0, 255])))
@@ -82,13 +102,9 @@ if __name__ == "__main__":
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$y$")
         ax.set_title(r"clusters")
-        div = make_axes_locatable(ax)
-        cax = div.append_axes("right", size="5%", pad=0.1)
-        cbar = plt.colorbar(im, cax=cax)
-        cbar.set_ticks([])
 
         ax = axes[2]
-        im = ax.imshow(clusters_periodic, clim=(0, np.max(clusters) + 1), cmap=cmap)
+        im = ax.imshow(clusters_periodic, clim=(0, np.max(clusters_periodic) + 1), cmap=cmap)
         ax.xaxis.set_ticks([0, 500])
         ax.yaxis.set_ticks([0, 500])
         ax.set_xlim([0, 500])
@@ -96,10 +112,23 @@ if __name__ == "__main__":
         ax.set_xlabel(r"$x$")
         ax.set_ylabel(r"$y$")
         ax.set_title(r"clusters (periodic)")
-        div = make_axes_locatable(ax)
-        cax = div.append_axes("right", size="5%", pad=0.1)
-        cbar = plt.colorbar(im, cax=cax)
-        cbar.set_ticks([])
 
-        fig.savefig(root / "clusters.svg")
+        ax = axes[3]
+        im = ax.imshow(
+            np.where(clusters_periodic != clusters, clusters_periodic, 0),
+            clim=(0, np.max(clusters_periodic) + 1),
+            cmap=cmap,
+        )
+        ax.xaxis.set_ticks([0, 500])
+        ax.yaxis.set_ticks([0, 500])
+        ax.set_xlim([0, 500])
+        ax.set_ylim([0, 500])
+        ax.set_xlabel(r"$x$")
+        ax.set_ylabel(r"$y$")
+        ax.set_title(r"difference")
+
+        if args.show:
+            plt.show()
+        else:
+            fig.savefig(root / "clusters.svg")
         plt.close(fig)

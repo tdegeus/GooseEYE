@@ -14,7 +14,7 @@ namespace GooseEYE {
 inline Ensemble::Ensemble(const std::vector<size_t>& roi, bool periodic, bool variance)
     : m_periodic(periodic), m_variance(variance), m_shape_orig(roi)
 {
-    GOOSEEYE_ASSERT(m_shape_orig.size() <= MAX_DIM);
+    GOOSEEYE_ASSERT(m_shape_orig.size() <= MAX_DIM, std::out_of_range);
 
     m_first = xt::atleast_3d(xt::zeros<double>(m_shape_orig));
     m_second = zeros_like(m_first);
@@ -70,7 +70,7 @@ inline array_type::array<double> Ensemble::norm() const
 
 inline array_type::array<double> Ensemble::distance(size_t axis) const
 {
-    GOOSEEYE_ASSERT(axis < m_shape_orig.size());
+    GOOSEEYE_ASSERT(axis < m_shape_orig.size(), std::out_of_range);
     axis = detail::atleast_3d_axis(m_shape_orig.size(), axis);
 
     array_type::tensor<double, 3> dist = xt::empty<double>(m_shape);
@@ -113,7 +113,7 @@ inline array_type::array<double> Ensemble::distance() const
 
 inline array_type::array<double> Ensemble::distance(const std::vector<double>& h) const
 {
-    GOOSEEYE_ASSERT(m_shape_orig.size() == h.size());
+    GOOSEEYE_ASSERT(m_shape_orig.size() == h.size(), std::out_of_range);
 
     array_type::array<double> ret = xt::zeros<double>(m_shape_orig);
 
@@ -126,7 +126,7 @@ inline array_type::array<double> Ensemble::distance(const std::vector<double>& h
 
 inline array_type::array<double> Ensemble::distance(const std::vector<double>& h, size_t axis) const
 {
-    GOOSEEYE_ASSERT(m_shape_orig.size() == h.size());
+    GOOSEEYE_ASSERT(m_shape_orig.size() == h.size(), std::out_of_range);
     return this->distance(axis) * h[axis];
 }
 

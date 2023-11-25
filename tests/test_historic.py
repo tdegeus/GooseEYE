@@ -156,3 +156,6 @@ def test_pixel_path():
         [[0, 0], [-1, 0], [-1, 1], [-2, 1], [-3, 1], [-3, 2], [-4, 2], [-5, 2], [-5, 3], [-6, 3]]
     )
     assert np.all(np.equal(eye.path([0, 0], [-6, 3], eye.path_mode.full), path))
+
+    for mode in [eye.path_mode.Bresenham, eye.path_mode.full, eye.path_mode.actual]:
+        assert np.all(np.equal(eye.path([0, 0], [0, 2], mode), [[0, 0], [0, 1], [0, 2]]))

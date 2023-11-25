@@ -18,8 +18,8 @@ inline void Ensemble::L(const T& f, path_mode mode)
 
     static_assert(std::is_integral<value_type>::value, "Integral image required.");
 
-    GOOSEEYE_ASSERT(f.dimension() == m_shape_orig.size());
-    GOOSEEYE_ASSERT(m_stat == Type::L || m_stat == Type::Unset);
+    GOOSEEYE_ASSERT(f.dimension() == m_shape_orig.size(), std::out_of_range);
+    GOOSEEYE_ASSERT(m_stat == Type::L || m_stat == Type::Unset, std::out_of_range);
 
     // lock statistics
     m_stat = Type::L;

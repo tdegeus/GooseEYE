@@ -96,10 +96,10 @@ inline T
 dilate(const T& f, const S& kernel, const array_type::tensor<size_t, 1>& iterations, bool periodic)
 {
     using value_type = typename T::value_type;
-    GOOSEEYE_ASSERT(f.dimension() <= 3);
-    GOOSEEYE_ASSERT(f.dimension() == kernel.dimension());
-    GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)));
-    GOOSEEYE_ASSERT(static_cast<size_t>(xt::amax(f)()) <= iterations.size() + 1);
+    GOOSEEYE_ASSERT(f.dimension() <= 3, std::out_of_range);
+    GOOSEEYE_ASSERT(f.dimension() == kernel.dimension(), std::out_of_range);
+    GOOSEEYE_ASSERT(xt::all(xt::equal(kernel, 0) || xt::equal(kernel, 1)), std::out_of_range);
+    GOOSEEYE_ASSERT(static_cast<size_t>(xt::amax(f)()) <= iterations.size() + 1, std::out_of_range);
 
     xt::pad_mode pad_mode = xt::pad_mode::constant;
     int pad_value = 0;
