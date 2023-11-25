@@ -166,6 +166,17 @@ def test_labels_rename():
         eye.labels_rename(labels, [[0, 0], [3, 2]])
 
 
+def test_labels_rename2():
+    segmenter = eye.ClusterLabeller(shape=(4, 4))
+    segmenter.add_points([0, 2, 8, 10])
+    lab = segmenter.labels
+    assert np.all(np.equal(lab, np.array([[1, 0, 2, 0], [0, 0, 0, 0], [3, 0, 4, 0], [0, 0, 0, 0]])))
+
+    rename = [[0, 0], [1, 6], [2, 1], [3, 2], [4, 3]]
+    lab = eye.labels_rename(lab, rename)
+    assert np.all(np.equal(lab, np.array([[6, 0, 1, 0], [0, 0, 0, 0], [2, 0, 3, 0], [0, 0, 0, 0]])))
+
+
 def test_labels_sizes():
     labels = np.array([[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 2, 0], [0, 0, 0, 0]])
     assert np.all(
@@ -176,112 +187,14 @@ def test_labels_sizes():
     )
 
 
-# def test_change_label_b():
-#     idx = [0, 2, 8, 10]
-#     t = np.arange(len(idx)) + 1
-#     c = eye.allocate_AvalancheSegmenter(shape=(4, 4), idx=idx, t=t)
-#     c.advance(len(idx))
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 0, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[1, 0, 2, 0], [0, 0, 0, 0], [3, 0, 4, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 5)
-
-#     c.change_labels([0, 6, 1, 2, 3])
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 0, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[6, 0, 1, 0], [0, 0, 0, 0], [2, 0, 3, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 7)
-
-#     with self.assertRaises(IndexError):
-#         c.change_labels([0, 1, 2, 3, 4])
-
-#     with self.assertRaises(IndexError):
-#         c.reorder([0, 7, 1, 3, 2])
-
-#     with self.assertRaises(IndexError):
-#         c.reorder([0, 5, 1, 3, 2])
-
-#     with self.assertRaises(IndexError):
-#         c.reorder([0, 6, 3, 2])
-
-#     c.reorder([0, 6, 1, 3, 2])
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 0, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[1, 0, 2, 0], [0, 0, 0, 0], [4, 0, 3, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 5)
-
-#     c.prune()
-#     c.prune()
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 0, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[1, 0, 2, 0], [0, 0, 0, 0], [4, 0, 3, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 5)
-
-# def test_change_label_c():
-#     idx = [0, 2, 8, 10]
-#     t = np.arange(len(idx)) + 1
-#     c = eye.allocate_AvalancheSegmenter(shape=(4, 4), idx=idx, t=t)
-#     c.advance(len(idx))
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 0, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[1, 0, 2, 0], [0, 0, 0, 0], [3, 0, 4, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 5)
-
-#     c.change_labels([0, 6, 1, 2, 3])
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 0, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[6, 0, 1, 0], [0, 0, 0, 0], [2, 0, 3, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 7)
-
-#     c.prune()
-#     c.prune()
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 0, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[4, 0, 1, 0], [0, 0, 0, 0], [2, 0, 3, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 5)
-
-# def test_prune():
-#     idx = [0, 2, 8, 10, 1]
-#     t = np.arange(len(idx)) + 1
-#     c = eye.allocate_AvalancheSegmenter(shape=(4, 4), idx=idx, t=t)
-#     c.advance(len(idx))
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 1, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[1, 1, 1, 0], [0, 0, 0, 0], [3, 0, 4, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 5)
-
-#     c.prune()
-#     self.assertTrue(
-#         np.all(c.s == np.array([[1, 1, 1, 0], [0, 0, 0, 0], [1, 0, 1, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertTrue(
-#         np.all(c.labels == np.array([[1, 1, 1, 0], [0, 0, 0, 0], [2, 0, 3, 0], [0, 0, 0, 0]]))
-#     )
-#     self.assertEqual(c.nlabels, 4)
+def test_prune():
+    segmenter = eye.ClusterLabeller(shape=(4, 4))
+    segmenter.add_points([0, 2, 8, 10, 1])
+    lab = segmenter.labels
+    assert np.all(np.equal(lab, np.array([[1, 1, 1, 0], [0, 0, 0, 0], [3, 0, 4, 0], [0, 0, 0, 0]])))
+    segmenter.prune()
+    lab = segmenter.labels
+    assert np.all(np.equal(lab, np.array([[1, 1, 1, 0], [0, 0, 0, 0], [2, 0, 3, 0], [0, 0, 0, 0]])))
 
 
 def test_bug_a():
