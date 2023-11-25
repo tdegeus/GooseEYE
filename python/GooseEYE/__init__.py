@@ -23,7 +23,7 @@ def ClusterLabeller(shape, periodic=True, **kwargs):
         if periodic:
             return ClusterLabeller2p(shape, **kwargs)
         return ClusterLabeller2(shape, **kwargs)
-    raise NotImplementedError
+    raise NotImplementedError("3d extension needed, please open a PR")
 
 
 class Structure(enstat.static):

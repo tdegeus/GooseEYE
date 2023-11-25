@@ -799,7 +799,7 @@ public:
 /**
  * Compute clusters and obtain certain characteristic about them.
  */
-class Clusters {
+class [[deprecated]] Clusters {
 public:
     Clusters() = default;
 
@@ -825,6 +825,9 @@ public:
     template <class T, class S>
     Clusters(const T& f, const S& kernel, bool periodic = true) : m_periodic(periodic)
     {
+        GOOSEEYE_WARNING_PYTHON("Clusters is deprecated, use ClusterLabeller (new API) instead "
+                                "(please open a PR for missing functions)");
+
         static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
         static_assert(std::is_integral<typename S::value_type>::value, "Integral kernel required.");
 
