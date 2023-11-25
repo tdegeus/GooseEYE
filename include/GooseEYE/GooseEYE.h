@@ -732,7 +732,7 @@ public:
     {
 #ifdef GOOSEEYE_ENABLE_ASSERT
         size_t n = m_label.size();
-        if constexpr (std::is_signed_v<T::value_type>) {
+        if constexpr (std::is_signed_v<typename T::value_type>) {
             GOOSEEYE_ASSERT(
                 !std::any_of(begin, end, [n](size_t i) { return i >= n; }), std::out_of_range);
         }
