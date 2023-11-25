@@ -457,6 +457,7 @@ private:
      */
     std::vector<ptrdiff_t> m_next;
     std::vector<ptrdiff_t> m_connected; ///< List of labels connected to the current block.
+    std::vector<ptrdiff_t> m_mergetable; ///< ??
 
 public:
     /**
@@ -493,6 +494,7 @@ private:
     {
         static_assert(Dim == 1 || Dim == 2, "WIP: 1d and 2d supported.");
         m_label = xt::empty<ptrdiff_t>(shape);
+        m_mergetable.resize(m_label.size() + 1);
         m_renum.resize(m_label.size() + 1);
         m_next.resize(m_label.size() + 1);
         for (size_t i = 0; i < Dim; ++i) {
@@ -613,6 +615,46 @@ private:
         m_nmerge = 0;
     }
 
+    /**
+     * https://github.com/scipy/scipy/blob/v1.11.4/scipy/ndimage/src/_ni_label.pyx
+     */
+    ptrdiff_t mark_for_merge(ptrdiff_t a, ptrdiff_t b)
+    {
+        ptrdiff_t orig_a = a;
+        ptrdiff_t orig_b = b;
+        ptrdiff_t minlabel;
+
+        // find smallest root for each of a and b
+        while (a != m_mergetable[a]) {
+            a = m_mergetable[a];
+        }
+        while (b != m_mergetable[b]) {
+            b = m_mergetable[b];
+        }
+
+        if (a < b) {
+            minlabel = a;
+        }
+        else {
+            minlabel = b;
+        }
+
+        // merge roots
+        m_mergetable[a] = m_mergetable[b] = minlabel;
+
+        // merge every step to minlabel
+        a = orig_a;
+        b = orig_b;
+        while (a != minlabel) {
+            a, m_mergetable[a] = m_mergetable[a], minlabel;
+        }
+        while (b != minlabel) {
+            b, m_mergetable[b] = m_mergetable[b], minlabel;
+        }
+
+        return minlabel;
+    }
+
     void label_impl(size_t idx)
     {
         static_assert(Dim == 1 || Dim == 2, "WIP: 1d and 2d supported.");
@@ -652,6 +694,7 @@ private:
 
         if (nconnected == 0) {
             m_label.flat(idx) = m_new_label;
+            m_mergetable[m_new_label] = m_new_label;
             m_new_label += 1;
             return;
         }
