@@ -315,6 +315,53 @@ inline L labels_rename(const L& labels, const A& rename)
 }
 
 /**
+ * @brief Prune labels: renumber labels to lowest possible label starting from 1.
+ * Note that the background 0 is always 0.
+ *
+ * @param labels Image with labels.
+ * @return Image with reordered labels.
+ */
+template <class T>
+inline T labels_prune(const T& labels)
+{
+    using value_type = typename T::value_type;
+    auto unq = xt::unique(labels);
+    bool background = xt::any(xt::equal(unq, 0));
+
+    std::array<size_t, 2> shape = {unq.size(), 2};
+    array_type::tensor<value_type, 2> rename = xt::empty<value_type>(shape);
+
+    if (background) {
+        rename(0, 0) = 0;
+        rename(0, 1) = 0;
+        if (unq(0) == 0) {
+            for (size_t i = 1; i < unq.size(); ++i) {
+                rename(i, 0) = unq(i);
+                rename(i, 1) = i;
+            }
+        }
+        else {
+            size_t row = 1;
+            for (size_t i = 0; i < unq.size(); ++i) {
+                if (unq(i) == 0) {
+                    continue;
+                }
+                rename(row, 0) = unq(i);
+                rename(row, 1) = row;
+                row++;
+            }
+        }
+    }
+    else {
+        for (size_t i = 0; i < unq.size(); ++i) {
+            rename(i, 0) = unq(i);
+            rename(i, 1) = i + 1;
+        }
+    }
+    return labels_rename(labels, rename);
+}
+
+/**
  * @brief Reorder labels.
  * @param labels Image with labels.
  * @param order List of new order of labels (`unique(labels)` in desired order).
