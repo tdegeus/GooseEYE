@@ -316,7 +316,7 @@ inline L labels_rename(const L& labels, const A& rename)
 
 /**
  * @brief Prune labels: renumber labels to lowest possible label starting from 1.
- * Note that the background 0 is always 0.
+ * Note that the background 0 is always kept 0.
  *
  * @param labels Image with labels.
  * @return Image with reordered labels.
