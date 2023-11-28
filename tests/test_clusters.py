@@ -13,6 +13,24 @@ def test_init():
     assert np.all(eye.clusters(s) == s)
 
 
+def test_labels_prune():
+    a = np.array([[-2, -2, 0, 0], [0, 0, 8, 8], [3, 3, 0, 0], [0, 0, 6, 6]])
+    b = np.array([[1, 1, 0, 0], [0, 0, 4, 4], [2, 2, 0, 0], [0, 0, 3, 3]])
+    assert np.all(np.equal(eye.labels_prune(a), b))
+
+    a = np.array([[-2, -2, 9, 9], [9, 9, 8, 8], [3, 3, 9, 9], [9, 9, 6, 6]])
+    b = np.array([[1, 1, 5, 5], [5, 5, 4, 4], [2, 2, 5, 5], [5, 5, 3, 3]])
+    assert np.all(np.equal(eye.labels_prune(a), b))
+
+    a = np.array([[1, 1, 0, 0], [0, 0, 8, 8], [3, 3, 0, 0], [0, 0, 6, 6]])
+    b = np.array([[1, 1, 0, 0], [0, 0, 4, 4], [2, 2, 0, 0], [0, 0, 3, 3]])
+    assert np.all(np.equal(eye.labels_prune(a), b))
+
+    a = np.array([[1, 1, 9, 9], [9, 9, 8, 8], [3, 3, 9, 9], [9, 9, 6, 6]])
+    b = np.array([[1, 1, 5, 5], [5, 5, 4, 4], [2, 2, 5, 5], [5, 5, 3, 3]])
+    assert np.all(np.equal(eye.labels_prune(a), b))
+
+
 def test_labels_map():
     a = np.array([[1, 1, 0, 0], [0, 0, 3, 3], [2, 2, 0, 0], [0, 0, 4, 4]])
     b = np.array([[-3, -3, 0, 0], [0, 0, 1, 1], [5, 5, 0, 0], [0, 0, 7, 7]])

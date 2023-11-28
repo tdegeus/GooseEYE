@@ -187,6 +187,8 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("labels"),
         py::arg("rename"));
 
+    m.def("labels_prune", &GooseEYE::labels_prune<xt::pyarray<int>>, py::arg("labels"));
+
     m.def(
         "labels_reorder",
         &GooseEYE::labels_reorder<xt::pyarray<int>, xt::xtensor<int, 1>>,
