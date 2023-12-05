@@ -143,9 +143,9 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("iterations") = 1,
         py::arg("periodic") = true);
 
-    static_for<1, 3>(
+    static_for<1, 4>(
         [&](auto i) { allocate_ClusterLabeller<GooseEYE::ClusterLabeller<i, true>>(m); });
-    static_for<1, 3>(
+    static_for<1, 4>(
         [&](auto i) { allocate_ClusterLabeller<GooseEYE::ClusterLabeller<i, false>>(m); });
 
     py::class_<GooseEYE::Clusters>(m, "Clusters")

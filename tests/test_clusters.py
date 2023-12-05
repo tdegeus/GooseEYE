@@ -147,6 +147,17 @@ def test_clusters_simple3():
     assert np.all(np.equal(eye.clusters(np.where(labels > 0, 1, 0)), labels))
 
 
+def test_clusters_one():
+    """
+    Test that having a shape[i] == 1 does not break the code.
+    """
+    labels = np.array([[1, 1, 0, 2, 2, 2, 0, 3, 3, 3, 0, 1]])
+    assert np.all(np.equal(eye.clusters(np.where(labels > 0, 1, 0)), labels))
+
+    labels = labels.reshape(-1, 1)
+    assert np.all(np.equal(eye.clusters(np.where(labels > 0, 1, 0)), labels))
+
+
 def test_clusters_scipy():
     img = eye.dummy_circles((500, 500), periodic=False)
     clusters = eye.clusters(img, periodic=False)
