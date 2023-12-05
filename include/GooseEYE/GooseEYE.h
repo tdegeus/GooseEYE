@@ -827,6 +827,20 @@ public:
         this->apply_merge();
     }
 
+private:
+    template <class T>
+    bool legal_points(const T& begin, const T& end)
+    {
+        size_t n = m_label.size();
+        if constexpr (std::is_signed_v<typename T::value_type>) {
+            return !std::any_of(begin, end, [n](size_t i) { return i < 0 || i >= n; });
+        }
+        else {
+            return !std::any_of(begin, end, [n](size_t i) { return i >= n; });
+        }
+    }
+
+public:
     /**
      * @brief Add sequence of points.
      * @param begin Iterator to first point.
@@ -835,19 +849,7 @@ public:
     template <class T>
     void add_points(const T& begin, const T& end)
     {
-#ifdef GOOSEEYE_ENABLE_ASSERT
-        size_t n = m_label.size();
-        if constexpr (std::is_signed_v<typename T::value_type>) {
-            GOOSEEYE_ASSERT(
-                !std::any_of(begin, end, [n](size_t i) { return i < 0 || i >= n; }),
-                std::out_of_range);
-        }
-        else {
-            GOOSEEYE_ASSERT(
-                !std::any_of(begin, end, [n](size_t i) { return i >= n; }), std::out_of_range);
-        }
-#endif
-
+        GOOSEEYE_ASSERT(this->legal_points(begin, end), std::out_of_range);
         for (auto it = begin; it != end; ++it) {
             if (m_label.flat(*it) != 0) {
                 continue;
