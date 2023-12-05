@@ -41,20 +41,30 @@ int main()
     W = xt::where(xt::equal(I, 1), 0, W);
 
     // compute individual damage clusters and their centers
-    GooseEYE::Clusters Clusters(W);
-    auto clusters = Clusters.labels();
-    auto centers = Clusters.centers();
+    auto labels = GooseEYE::clusters(W);
+    auto names = xt::unique(labels);
+    auto cpos = GooseEYE::labels_centers(labels, names);
+    auto centers = xt::zeros_like(labels);
+    int m = static_cast<int>(labels.shape(0));
+    int n = static_cast<int>(labels.shape(1));
+    for (size_t i = 0; i < names.size(); ++i) {
+        auto row = (int)round(cpos(i, 0));
+        auto col = (int)round(cpos(i, 1));
+        row = row < 0 ? 0 : (row >= m ? m - 1 : row);
+        col = col < 0 ? 0 : (col >= n ? n - 1 : col);
+        centers(row, col) = names(i);
+    }
 
     // weighted correlation
     auto WI = GooseEYE::W2({101, 101}, W, I, W);
 
     // collapsed weighted correlation
-    auto WIc = GooseEYE::W2c({101, 101}, clusters, centers, I, W);
+    auto WIc = GooseEYE::W2c({101, 101}, labels, centers, I, W);
 
     // check against previous versions
     H5Easy::File data("W2c.h5", H5Easy::File::ReadOnly);
     MYASSERT(xt::all(xt::equal(I, H5Easy::load<decltype(I)>(data, "I"))));
-    MYASSERT(xt::all(xt::equal(clusters, H5Easy::load<decltype(clusters)>(data, "clusters"))));
+    MYASSERT(xt::all(xt::equal(labels, H5Easy::load<decltype(labels)>(data, "labels"))));
     MYASSERT(xt::all(xt::equal(centers, H5Easy::load<decltype(centers)>(data, "centers"))));
     MYASSERT(xt::all(xt::equal(W, H5Easy::load<decltype(W)>(data, "W"))));
     MYASSERT(xt::allclose(WI, H5Easy::load<decltype(WI)>(data, "WI")));

@@ -21,7 +21,7 @@ int main()
     I(15, 16) = 1;
 
     // clusters
-    auto C = GooseEYE::Clusters(I).labels();
+    auto C = GooseEYE::clusters(I);
 
     // dilate
     auto CD = GooseEYE::dilate(C);

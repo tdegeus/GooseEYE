@@ -24,7 +24,8 @@ for mode in modes:
     # plot the paths
     img = np.zeros((19, 19), dtype="int")
     for i, path in enumerate(paths):
-        img = GooseEYE.pos2img(img, path + 9, (i + 1) * np.ones(path.shape[0]))
+        index = np.ravel_multi_index(9 + path.T, img.shape)
+        img.flat[index] = (i + 1) * np.ones(path.shape[0])
 
     images[mode] = img
 
