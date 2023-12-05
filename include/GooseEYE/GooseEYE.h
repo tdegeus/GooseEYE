@@ -655,6 +655,18 @@ private:
     }
 
     /**
+     * @brief Sorted unique list.
+     * @param labels List of labels.
+     * @param nlabels Size of the list.
+     * @return Size of the unique list.
+     */
+    size_t unique(ptrdiff_t* labels, size_t nlabels)
+    {
+        std::sort(labels, labels + nlabels);
+        return std::unique(labels, labels + nlabels) - labels;
+    }
+
+    /**
      * @brief Mark list of labels as merged.
      * @note Link all labels to the lowest label in the list.
      * @warning `m_labels` is not updated.
@@ -663,8 +675,6 @@ private:
      */
     ptrdiff_t merge(ptrdiff_t* labels, size_t nlabels)
     {
-        std::sort(labels, labels + nlabels);
-        nlabels = std::unique(labels, labels + nlabels) - labels;
         ptrdiff_t target = labels[0];
         for (size_t i = 1; i < nlabels; ++i) {
             this->merge_detail(target, labels[i]);
@@ -793,6 +803,12 @@ private:
             return;
         }
 
+        if (nconnected == 1) {
+            m_label.flat(idx) = m_connected[0];
+            return;
+        }
+
+        nconnected = this->unique(&m_connected[0], nconnected);
         if (nconnected == 1) {
             m_label.flat(idx) = m_connected[0];
             return;
