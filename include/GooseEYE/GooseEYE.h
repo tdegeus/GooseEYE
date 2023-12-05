@@ -1351,7 +1351,7 @@ inline array_type::tensor<double, 1> center(
 }
 
 /**
- * @copydoc GooseEye::center()
+ * @copydoc GooseEYE::center()
  * @param weights Weight for each position.
  */
 inline array_type::tensor<double, 1> center_of_mass(
