@@ -1417,7 +1417,7 @@ public:
  * @return Coordinates of the center (in array coordinates), in order of the unique (sorted) labels.
  */
 template <class T, class N>
-array_type::tensor<double, 2> labels_centers(const T& labels, const N& names, bool periodic = true)
+inline array_type::tensor<double, 2> labels_centers(const T& labels, const N& names, bool periodic = true)
 {
     static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
     GOOSEEYE_ASSERT(labels.dimension() > 0, std::out_of_range);
@@ -1440,11 +1440,11 @@ array_type::tensor<double, 2> labels_centers(const T& labels, const N& names, bo
 }
 
 /**
- * @copydoc GooseEye::labels_centers()
+ * @copydoc GooseEYE::labels_centers()
  * @param weights Weight for each pixel.
  */
 template <class T, class W, class N>
-array_type::tensor<double, 2>
+inline array_type::tensor<double, 2>
 labels_centers_of_mass(const T& labels, const W& weights, const N& names, bool periodic = true)
 {
     static_assert(std::is_integral<typename T::value_type>::value, "Integral labels required.");
