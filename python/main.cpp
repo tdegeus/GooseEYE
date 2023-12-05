@@ -58,6 +58,12 @@ void allocate_ClusterLabeller(py::module& mod)
         static_cast<void (Class::*)(const xt::pytensor<size_t, 1>&)>(&Class::add_points),
         "Add points",
         py::arg("idx"));
+
+    cls.def(
+        "add_sequence",
+        &Class::template add_sequence<xt::pytensor<size_t, 1>>,
+        "Add points",
+        py::arg("idx"));
 }
 
 PYBIND11_MODULE(_GooseEYE, m)
