@@ -115,7 +115,7 @@ The relative distance of each pixel of the ROI.
   * :download:`GooseEYE.hpp <../include/GooseEYE/GooseEYE.hpp>`
   * :ref:`Example <theory_heightheight>`.
 
-GooseEYE::Clusters
+GooseEYE::clusters
 ------------------
 
 Get clusters.

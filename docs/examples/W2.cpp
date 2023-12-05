@@ -31,7 +31,7 @@ int main()
     prrng::pcg32 rng(0);
     rowmat += rng.normal({N * N}, 0.0, (double)(M) / (double)(N));
     colmat += rng.normal({N * N}, 0.0, (double)(M) / (double)(N));
-    auto dr = rng.random({N * N}) * 2.0 + 0.1;
+    auto dr = rng.normal({N * N}, 0.0, 2.0) + 0.1;
     r = r * dr;
 
     // generate image

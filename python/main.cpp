@@ -154,31 +154,6 @@ PYBIND11_MODULE(_GooseEYE, m)
     static_for<1, 4>(
         [&](auto i) { allocate_ClusterLabeller<GooseEYE::ClusterLabeller<i, false>>(m); });
 
-    py::class_<GooseEYE::Clusters>(m, "Clusters")
-
-        .def(
-            py::init<const xt::pyarray<int>&, bool>(),
-            "Clusters",
-            py::arg("f"),
-            py::arg("periodic") = true)
-
-        .def(
-            py::init<const xt::pyarray<int>&, const xt::pyarray<int>&, bool>(),
-            "Clusters",
-            py::arg("f"),
-            py::arg("kernel"),
-            py::arg("periodic") = true)
-
-        .def("labels", &GooseEYE::Clusters::labels)
-
-        .def("centers", &GooseEYE::Clusters::centers)
-
-        .def("center_positions", &GooseEYE::Clusters::center_positions, py::arg("as3d") = false)
-
-        .def("sizes", &GooseEYE::Clusters::sizes)
-
-        .def("__repr__", [](const GooseEYE::Clusters&) { return "<GooseEYE.Clusters>"; });
-
     m.def(
         "clusters",
         &GooseEYE::clusters<xt::pyarray<ptrdiff_t>>,
@@ -213,19 +188,6 @@ PYBIND11_MODULE(_GooseEYE, m)
             &GooseEYE::labels_sizes<xt::pyarray<ptrdiff_t>, xt::pytensor<ptrdiff_t, 1>>),
         py::arg("labels"),
         py::arg("names"));
-
-    m.def(
-        "relabel_map",
-        &GooseEYE::relabel_map<xt::pyarray<int>, xt::pyarray<int>>,
-        py::arg("a"),
-        py::arg("b"));
-
-    m.def(
-        "pos2img",
-        &GooseEYE::pos2img<xt::pyarray<size_t>, xt::pytensor<double, 2>, xt::pytensor<size_t, 1>>,
-        py::arg("img"),
-        py::arg("positions"),
-        py::arg("labels"));
 
     m.def(
         "center",

@@ -262,5 +262,10 @@ def test_main():
         np.equal(eye.dilate(labels_periodic, iterations=1, periodic=True), labels_periodic_dilate)
     )
 
-    assert np.all(np.equal(eye.Clusters(img, periodic=False).centers(), centers))
-    assert np.all(np.equal(eye.Clusters(img, periodic=True).centers(), centers_periodic))
+    names = np.unique(labels)[1:]
+    c = eye.labels_centers(labels, names)
+    assert np.all(np.equal(np.argwhere(centers), np.floor(c + 0.01)))
+
+    names = np.unique(labels_periodic)[1:]
+    c = eye.labels_centers(labels_periodic, names)
+    assert np.all(np.equal(np.argwhere(centers_periodic), np.floor(c + 0.01)))

@@ -30,15 +30,21 @@ W = GooseEYE.dummy_circles((M, M), np.round(row), np.round(col), np.round(r))
 W[img == 1] = 0
 
 # compute individual damage clusters and their centers
-Clusters = GooseEYE.Clusters(W)
-clusters = Clusters.labels()
-centers = Clusters.centers()
+labels = GooseEYE.clusters(W)
+names = np.unique(labels)[1:]
+cpos = GooseEYE.labels_centers(labels, names)
+cpos = np.rint(cpos).astype(int)
+cpos[:, 0] = np.clip(cpos[:, 0], 0, labels.shape[0] - 1)
+cpos[:, 1] = np.clip(cpos[:, 1], 0, labels.shape[1] - 1)
+index = np.ravel_multi_index(cpos.T, labels.shape)
+centers = np.zeros_like(labels)
+centers.flat[index] = names
 
 # weighted correlation
 WI = GooseEYE.W2((101, 101), W, img, fmask=W)
 
 # collapsed weighted correlation
-WIc = GooseEYE.W2c((101, 101), clusters, centers, img, fmask=W)
+WIc = GooseEYE.W2c((101, 101), labels, centers, img, fmask=W)
 # </snippet>
 
 if __name__ == "__main__":
@@ -58,7 +64,7 @@ if __name__ == "__main__":
 
         with h5py.File(root / "W2c.h5", "w") as file:
             file["I"] = img
-            file["clusters"] = clusters
+            file["labels"] = labels
             file["centers"] = centers
             file["W"] = W
             file["WI"] = WI
@@ -69,7 +75,7 @@ if __name__ == "__main__":
 
         with h5py.File(root / "W2c.h5") as file:
             assert np.all(np.equal(file["I"][...], img))
-            assert np.all(np.equal(file["clusters"][...], clusters))
+            assert np.all(np.equal(file["labels"][...], labels))
             assert np.all(np.equal(file["centers"][...], centers))
             assert np.all(np.equal(file["W"][...], W))
             assert np.allclose(file["WI"][...], WI)
@@ -90,7 +96,7 @@ if __name__ == "__main__":
             np.array([[0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 1.0]], dtype="float64")
         )
 
-        fig, axes = plt.subplots(figsize=(18, 6), nrows=1, ncols=3)
+        fig, axes = plt.subplots(figsize=(20, 6), nrows=1, ncols=3, constrained_layout=True)
 
         # ---
 
@@ -152,5 +158,5 @@ if __name__ == "__main__":
         cbar.set_ticks([-phi, 0, +phi])
         cbar.set_ticklabels([r"$-\varphi$", "0", r"$+\varphi$"])
 
-        fig.savefig(root / "W2c.svg")
+        fig.savefig(root / "W2c.svg", bbox_inches="tight")
         plt.close(fig)

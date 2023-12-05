@@ -12,7 +12,7 @@ img[19, 18] = True
 img[19, 20] = True
 
 # clusters
-C = GooseEYE.Clusters(img).labels()
+C = GooseEYE.clusters(img)
 
 # dilate
 CD = GooseEYE.dilate(C)

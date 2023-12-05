@@ -15,14 +15,14 @@ int main()
     auto I = GooseEYE::dummy_circles({500, 500}, true);
 
     // clusters
-    GooseEYE::Clusters clusters(I, false);
-    auto labels = clusters.labels();
-    auto centers = clusters.center_positions();
+    auto labels = GooseEYE::clusters(I, false);
+    auto names = xt::unique(labels);
+    auto centers = GooseEYE::labels_centers(labels, names, false);
 
     // clusters, if the image is periodic
-    GooseEYE::Clusters clusters_periodic(I, true);
-    auto labels_periodic = clusters_periodic.labels();
-    auto centers_periodic = clusters_periodic.center_positions();
+    auto labels_periodic = GooseEYE::clusters(I, true);
+    auto names_periodic = xt::unique(labels_periodic);
+    auto centers_periodic = GooseEYE::labels_centers(labels_periodic, names_periodic, true);
 
     // check against previous versions
     H5Easy::File data("clusters_centers.h5", H5Easy::File::ReadOnly);
