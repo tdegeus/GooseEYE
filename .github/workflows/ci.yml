@@ -44,7 +44,6 @@ jobs:
         init-shell: bash
         cache-downloads: true
         create-args: >-
-          ${{ runner.os == 'Windows' && 'ninja' || '' }}
           ${{ runner.os == 'Windows' && 'clang_win-64' || '' }}
 
     - name: Export version of this library
