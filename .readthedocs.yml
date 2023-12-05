@@ -1,0 +1,17 @@
+version: 2
+
+sphinx:
+  configuration: docs/conf.py
+
+build:
+  os: ubuntu-22.04
+  tools:
+    python: mambaforge-22.9
+
+conda:
+  environment: environment.yaml
+
+python:
+  install:
+  - method: pip
+    path: .
