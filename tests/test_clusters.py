@@ -216,6 +216,129 @@ def test_labels_sizes():
     )
 
 
+def test_labels_centers():
+    labels = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    centers = np.array(
+        [
+            [2.0, 2.0],  # background (0)
+            [2.0, 2.0],  # label (1)
+        ]
+    )
+    assert np.allclose(eye.labels_centers(labels, [0, 1], periodic=False), centers)
+
+
+def test_labels_centers2():
+    labels = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    centers = np.array(
+        [
+            [4.5, 4.5],  # background (0)
+            [2.0, 2.0],  # label (1)
+        ]
+    )
+
+    for i in range(labels.shape[0]):
+        for j in range(labels.shape[1]):
+            assert np.allclose(eye.labels_centers(labels, [0, 1], periodic=True), centers)
+            labels = np.roll(labels, 1, 1)
+            y = centers[:, 1] + 1
+            centers[:, 1] = np.where(y > labels.shape[1], y - labels.shape[1], y)
+
+        labels = np.roll(labels, 1, 0)
+        x = centers[:, 0] + 1
+        centers[:, 0] = np.where(x > labels.shape[0], x - labels.shape[0], x)
+
+
+def test_labels_centers3():
+    labels = np.array(
+        [
+            [2, 3, 3, 3, 2],
+            [0, 0, 1, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0],
+            [2, 4, 4, 4, 2],
+        ]
+    )
+
+    c = np.array(
+        [
+            [0, 0, 3, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 4, 0, 2],
+        ]
+    )
+
+    centers = np.array(
+        [
+            [2.0, 4.5],
+            [2.0, 2.0],
+            [4.5, 4.5],
+            [0.0, 2.0],
+            [4.0, 2.0],
+        ]
+    )
+
+    res_centers = eye.labels_centers(labels, [0, 1, 2, 3, 4])
+    assert np.allclose(res_centers, centers)
+
+    centers_flat = np.ravel_multi_index(np.floor(centers).astype(int).T, c.shape)
+    assert np.all(np.equal(np.sort(np.flatnonzero(c)), np.sort(centers_flat[1:])))
+
+
+def test_labels_centers_weights():
+    labels = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    weights = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 2, 0, 0],
+            [0, 2, 9, 2, 0],
+            [0, 0, 2, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    centers = np.array([[2.0, 2.0]])
+
+    for i in range(labels.shape[0]):
+        for j in range(labels.shape[1]):
+            ret = eye.labels_centers_of_mass(labels, weights, [1], periodic=True)
+            assert np.allclose(ret, centers)
+
+            labels = np.roll(labels, 1, 1)
+            weights = np.roll(weights, 1, 1)
+            y = centers[:, 1] + 1
+            centers[:, 1] = np.where(y > labels.shape[1], y - labels.shape[1], y)
+
+        labels = np.roll(labels, 1, 0)
+        weights = np.roll(weights, 1, 0)
+        x = centers[:, 0] + 1
+        centers[:, 0] = np.where(x > labels.shape[0], x - labels.shape[0], x)
+
+
 def test_prune():
     segmenter = eye.ClusterLabeller(shape=(4, 4))
     segmenter.add_points([0, 2, 8, 10, 1])
