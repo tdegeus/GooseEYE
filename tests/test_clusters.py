@@ -13,6 +13,79 @@ def test_init():
     assert np.all(eye.clusters(s) == s)
 
 
+def test_clusters_sequence():
+    """
+    Get sequence of clusters.
+    """
+    split = [0]
+    idx = []
+    labels = np.zeros([5, 5], dtype=int)
+
+    patch = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [1, 1, 0, 0, 0],
+        ]
+    )
+    idx += np.argwhere(patch.ravel() > 0).ravel().tolist()
+    split.append(len(idx))
+    labels += patch
+
+    patch = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 2, 2, 0, 0],
+            [0, 2, 2, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    idx += np.argwhere(patch.ravel() > 0).ravel().tolist()
+    split.append(len(idx))
+    labels += patch
+
+    patch = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 3],
+            [0, 0, 0, 0, 3],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    idx += np.argwhere(patch.ravel() > 0).ravel().tolist()
+    split.append(len(idx))
+    labels += patch
+
+    segmenter = eye.ClusterLabeller(shape=labels.shape)
+    ret = segmenter.add_sequence(idx)
+    assert np.all(np.equal(segmenter.labels, labels))
+    assert np.all(np.equal(ret, split))
+
+    patch = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 4, 0],
+            [0, 0, 0, 4, 0],
+            [0, 0, 0, 4, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    idx += np.argwhere(patch.ravel() > 0).ravel().tolist()
+    split.append(len(idx))
+    labels += patch
+    labels = np.where(labels == 3, 2, labels)
+    labels = np.where(labels == 4, 2, labels)
+
+    segmenter = eye.ClusterLabeller(shape=labels.shape)
+    ret = segmenter.add_sequence(idx)
+    assert np.all(np.equal(segmenter.labels, labels))
+    assert np.all(np.equal(ret, split))
+
+
 def test_labels_prune():
     a = np.array([[-2, -2, 0, 0], [0, 0, 8, 8], [3, 3, 0, 0], [0, 0, 6, 6]])
     b = np.array([[1, 1, 0, 0], [0, 0, 4, 4], [2, 2, 0, 0], [0, 0, 3, 3]])

@@ -887,6 +887,53 @@ public:
     }
 
     /**
+     * @brief
+     *      Add a sequence of points.
+     *      Mark index every time a new cluster is started or a cluster is merged.
+     *
+     * @param idx List of points.
+     * @return List of indices.
+     */
+    template <class T>
+    std::vector<size_t> add_sequence(const T& idx)
+    {
+        GOOSEEYE_ASSERT(idx.dimension() == 1, std::out_of_range);
+        GOOSEEYE_ASSERT(idx.size() >= 1, std::out_of_range);
+        GOOSEEYE_ASSERT(this->legal_points(idx.begin(), idx.end()), std::out_of_range);
+        std::vector<size_t> ret;
+        size_t i = 0;
+        while (true) {
+            auto nl = m_new_label;
+            auto nm = m_nmerge;
+            auto lab = m_label.flat(idx(i));
+
+            for (; i < idx.size(); ++i) {
+                auto l = m_label.flat(idx(i));
+                if (l != lab && l != 0) {
+                    ret.push_back(i);
+                    break;
+                }
+                if (l != 0) {
+                    continue;
+                }
+                this->label_impl(idx(i));
+                if (m_new_label != nl || m_nmerge != nm) {
+                    ret.push_back(i);
+                    break;
+                }
+            }
+
+            if (i == idx.size()) {
+                break;
+            }
+        }
+
+        this->apply_merge();
+        ret.push_back(idx.size());
+        return ret;
+    }
+
+    /**
      * @brief Basic class info.
      * @return std::string
      */
