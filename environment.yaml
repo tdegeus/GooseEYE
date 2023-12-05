@@ -5,6 +5,7 @@ dependencies:
 - cmake
 - doxygen
 - enstat >=0.9.7
+- furo
 - h5py
 - highfive
 - ninja
