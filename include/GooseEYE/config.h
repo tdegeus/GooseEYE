@@ -62,6 +62,12 @@
  */
 
 /**
+ * @brief Assertions that are always enabled.
+ */
+#define GOOSEEYE_REQUIRE(expr, assertion) \
+    GOOSEEYE_ASSERT_IMPL(expr, assertion, __FILE__, __LINE__, __FUNCTION__)
+
+/**
  * All assertions are implemented as:
  *
  *     GOOSEEYE_ASSERT(...)
