@@ -211,9 +211,36 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("labels"));
 
     m.def(
+        "center",
+        &GooseEYE::center,
+        py::arg("shape"),
+        py::arg("positions"),
+        py::arg("periodic") = true);
+
+    m.def(
         "center_of_mass",
-        &GooseEYE::center_of_mass<xt::pyarray<size_t>>,
+        &GooseEYE::center_of_mass,
+        py::arg("shape"),
+        py::arg("positions"),
+        py::arg("weights"),
+        py::arg("periodic") = true);
+
+    m.def(
+        "labels_centers",
+        &GooseEYE::labels_centers<xt::pyarray<ptrdiff_t>, xt::pytensor<ptrdiff_t, 1>>,
         py::arg("labels"),
+        py::arg("names"),
+        py::arg("periodic") = true);
+
+    m.def(
+        "labels_centers_of_mass",
+        &GooseEYE::labels_centers_of_mass<
+            xt::pyarray<ptrdiff_t>,
+            xt::pyarray<double>,
+            xt::pytensor<ptrdiff_t, 1>>,
+        py::arg("labels"),
+        py::arg("weights"),
+        py::arg("names"),
         py::arg("periodic") = true);
 
     py::class_<GooseEYE::Ensemble>(m, "Ensemble")
