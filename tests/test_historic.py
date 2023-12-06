@@ -4,6 +4,7 @@ import prrng
 
 
 def test_clusters():
+    img = eye.dummy_circles([30, 30], [0, 15], [0, 15], [10, 5])
     centers = np.array(
         [
             [0.0, 0.0],
@@ -15,13 +16,20 @@ def test_clusters():
         ]
     )
     centers_periodic = np.array([[0.0, 0.0], [0.0, 0.0], [15.0, 15.0]])
+    centers_img = {1: [3, 3], 2: [3, 25], 3: [15, 15], 4: [25, 3], 5: [25, 25]}
+    centers_img_periodic = {1: [0, 0], 2: [15, 15]}
     sizes = [598, 73, 63, 49, 63, 54]
     sizes_periodic = [598, 253, 49]
-    img = eye.dummy_circles([30, 30], [0, 15], [0, 15], [10, 5])
     assert np.allclose(eye.Clusters(img, periodic=False).sizes(), sizes)
     assert np.allclose(eye.Clusters(img, periodic=True).sizes(), sizes_periodic)
     assert np.allclose(eye.Clusters(img, periodic=False).center_positions(), centers)
     assert np.allclose(eye.Clusters(img, periodic=True).center_positions(), centers_periodic)
+
+    for cpos, periodic in zip([centers_img, centers_img_periodic], [False, True]):
+        cim = np.zeros(img.shape, dtype=int)
+        for name, (row, col) in cpos.items():
+            cim[row, col] = name
+        assert np.allclose(eye.Clusters(img, periodic=periodic).centers(), cim)
 
 
 def test_C2():
