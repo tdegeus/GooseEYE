@@ -181,23 +181,23 @@ PYBIND11_MODULE(_GooseEYE, m)
 
     m.def(
         "clusters",
-        &GooseEYE::clusters<xt::pyarray<int>>,
+        &GooseEYE::clusters<xt::pyarray<ptrdiff_t>>,
         py::arg("f"),
         py::arg("periodic") = true);
 
-    m.def("labels_map", &GooseEYE::labels_map<xt::pyarray<int>>, py::arg("a"), py::arg("b"));
+    m.def("labels_map", &GooseEYE::labels_map<xt::pyarray<ptrdiff_t>>, py::arg("a"), py::arg("b"));
 
     m.def(
         "labels_rename",
-        &GooseEYE::labels_rename<xt::pyarray<int>, xt::xtensor<int, 2>>,
+        &GooseEYE::labels_rename<xt::pyarray<ptrdiff_t>, xt::xtensor<ptrdiff_t, 2>>,
         py::arg("labels"),
         py::arg("rename"));
 
-    m.def("labels_prune", &GooseEYE::labels_prune<xt::pyarray<int>>, py::arg("labels"));
+    m.def("labels_prune", &GooseEYE::labels_prune<xt::pyarray<ptrdiff_t>>, py::arg("labels"));
 
     m.def(
         "labels_reorder",
-        &GooseEYE::labels_reorder<xt::pyarray<int>, xt::xtensor<int, 1>>,
+        &GooseEYE::labels_reorder<xt::pyarray<ptrdiff_t>, xt::xtensor<ptrdiff_t, 1>>,
         py::arg("labels"),
         py::arg("order"));
 

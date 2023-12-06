@@ -395,7 +395,7 @@ inline L labels_reorder(const L& labels, const A& order)
 namespace detail {
 
 template <class T>
-auto labels_sizes_impl(const T& labels)
+inline auto labels_sizes_impl(const T& labels)
 {
     using value_type = typename T::value_type;
     std::map<value_type, value_type> map;
@@ -1343,7 +1343,7 @@ public:
  * @return 'Image' with labels (1..n) for labels, 0 for background.
  */
 template <class T>
-array_type::array<int> clusters(const T& f, bool periodic = true)
+inline array_type::array<int> clusters(const T& f, bool periodic = true)
 {
     GOOSEEYE_ASSERT(f.layout() == xt::layout_type::row_major, std::runtime_error);
 
