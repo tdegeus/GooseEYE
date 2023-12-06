@@ -154,7 +154,6 @@ Example
 ^^^^^^^
 
 | :download:`W2c.py <examples/W2c.py>`
-| :download:`W2c.cpp <examples/W2c.cpp>`
 
 .. image:: examples/W2c.svg
     :width: 700px
@@ -173,9 +172,3 @@ Python
     :language: python
     :start-after: <snippet>
     :end-before: </snippet>
-
-C++
-^^^
-
-.. literalinclude:: examples/W2c.cpp
-    :language: cpp
