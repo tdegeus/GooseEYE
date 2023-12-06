@@ -201,7 +201,18 @@ PYBIND11_MODULE(_GooseEYE, m)
         py::arg("labels"),
         py::arg("order"));
 
-    m.def("labels_sizes", &GooseEYE::labels_sizes<xt::pyarray<int>>, py::arg("labels"));
+    m.def(
+        "labels_sizes",
+        py::overload_cast<const xt::pyarray<ptrdiff_t>&>(
+            &GooseEYE::labels_sizes<xt::pyarray<ptrdiff_t>>),
+        py::arg("labels"));
+
+    m.def(
+        "labels_sizes",
+        py::overload_cast<const xt::pyarray<ptrdiff_t>&, const xt::pytensor<ptrdiff_t, 1>&>(
+            &GooseEYE::labels_sizes<xt::pyarray<ptrdiff_t>, xt::pytensor<ptrdiff_t, 1>>),
+        py::arg("labels"),
+        py::arg("names"));
 
     m.def(
         "relabel_map",

@@ -392,13 +392,10 @@ inline L labels_reorder(const L& labels, const A& order)
     return ret;
 }
 
-/**
- * @brief Size per label.
- * @param labels Image with labels (0..n).
- * @return List of size n + 1 with the size per label.
- */
+namespace detail {
+
 template <class T>
-array_type::tensor<typename T::value_type, 2> labels_sizes(const T& labels)
+auto labels_sizes_impl(const T& labels)
 {
     using value_type = typename T::value_type;
     std::map<value_type, value_type> map;
@@ -412,9 +409,24 @@ array_type::tensor<typename T::value_type, 2> labels_sizes(const T& labels)
         }
     }
 
+    return map;
+}
+
+} // namespace detail
+
+/**
+ * @brief Size per label.
+ * @param labels Image with labels.
+ * @return List of size n + 1 with the size per label.
+ */
+template <class T>
+inline array_type::tensor<typename T::value_type, 2> labels_sizes(const T& labels)
+{
+    using value_type = typename T::value_type;
+    auto map = detail::labels_sizes_impl(labels);
+    std::array<size_t, 2> shape = {map.size(), 2};
+    array_type::tensor<value_type, 2> ret = xt::empty<value_type>(shape);
     size_t i = 0;
-    array_type::tensor<value_type, 2> ret =
-        xt::empty<value_type>(std::array<size_t, 2>{map.size(), 2});
 
     for (auto const& [key, val] : map) {
         ret(i, 0) = key;
@@ -422,6 +434,24 @@ array_type::tensor<typename T::value_type, 2> labels_sizes(const T& labels)
         ++i;
     }
 
+    return ret;
+}
+
+/**
+ * @brief Size per label.
+ * @param labels Image with labels.
+ * @param names List of 'names' to extract.
+ * @return Size of each label in names.
+ */
+template <class T, class N>
+inline array_type::tensor<typename T::value_type, 1> labels_sizes(const T& labels, const N& names)
+{
+    using value_type = typename T::value_type;
+    auto map = detail::labels_sizes_impl(labels);
+    array_type::tensor<value_type, 1> ret = xt::zeros<value_type>({names.size()});
+    for (size_t i = 0; i < names.size(); ++i) {
+        ret(i) = map[names(i)];
+    }
     return ret;
 }
 
