@@ -60,9 +60,6 @@ The paths can be computed using different algorithms, illustrated below:
 Example
 -------
 
-| :download:`L.py <examples/L.py>`
-| :download:`L.cpp <examples/L.cpp>`
-
 .. image:: examples/L.svg
     :width: 700px
 
@@ -72,16 +69,20 @@ Example
     the average can be extended to that of an
     :ref:`ensemble <theory_S2_ensemble>` of images.
 
-Python
-^^^^^^
+.. tabs::
 
-.. literalinclude:: examples/L.py
-    :language: python
-    :start-after: <snippet>
-    :end-before: </snippet>
+   .. tab:: Python
 
-C++
-^^^
+        :download:`L.py <examples/L.py>`
 
-.. literalinclude:: examples/L.cpp
-    :language: cpp
+        .. literalinclude:: examples/L.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>
+
+   .. tab:: C++
+
+        :download:`L.cpp <examples/L.cpp>`
+
+        .. literalinclude:: examples/L.cpp
+            :language: cpp

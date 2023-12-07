@@ -4,83 +4,84 @@ Obtain clusters
 ===============
 
 .. raw:: html
-   :file: examples/clusters_algorithm.html
+    :file: examples/clusters_algorithm.html
 
 Calculate clusters
 ------------------
 
 Extract clusters ('islands' of connected pixels with the same value).
 
-| :download:`clusters.py <examples/clusters.py>`
-| :download:`clusters.cpp <examples/clusters.cpp>`
-
 .. image:: examples/clusters.svg
-  :width: 700px
+    :width: 700px
 
-Python
-^^^^^^
+.. tabs::
 
-.. literalinclude:: examples/clusters.py
-   :language: python
-   :start-after: <snippet>
-   :end-before: </snippet>
+    .. tab:: Python
 
-C++
-^^^
+        :download:`clusters.py <examples/clusters.py>`
 
-.. literalinclude:: examples/clusters.cpp
-   :language: cpp
+        .. literalinclude:: examples/clusters.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>
+
+    .. tab:: C++
+
+        :download:`clusters.cpp <examples/clusters.cpp>`
+
+        .. literalinclude:: examples/clusters.cpp
+            :language: cpp
 
 Calculate clusters and centers
 ------------------------------
 
-| :download:`clusters_centers.py <examples/clusters_centers.py>`
-| :download:`clusters_centers.cpp <examples/clusters_centers.cpp>`
-
 .. image:: examples/clusters_centers.svg
-  :width: 700px
+    :width: 700px
 
-Python
-^^^^^^
+.. tabs::
 
-.. literalinclude:: examples/clusters_centers.py
-   :language: python
-   :start-after: <snippet>
-   :end-before: </snippet>
+    .. tab:: Python
 
-C++
-^^^
+        :download:`clusters_centers.py <examples/clusters_centers.py>`
 
-.. literalinclude:: examples/clusters_centers.cpp
-   :language: cpp
+        .. literalinclude:: examples/clusters_centers.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>
+
+    .. tab:: C++
+
+        :download:`clusters_centers.cpp <examples/clusters_centers.cpp>`
+
+        .. literalinclude:: examples/clusters_centers.cpp
+            :language: cpp
 
 Dilate clusters (differently)
 -----------------------------
 
-| :download:`clusters_dilate.py <examples/clusters_dilate.py>`
-| :download:`clusters_dilate.cpp <examples/clusters_dilate.cpp>`
-
 .. image:: examples/clusters_dilate.svg
-  :width: 700px
+    :width: 700px
 
-Python
-^^^^^^
+.. tabs::
 
-:download:`clusters_dilate.py <examples/clusters_dilate.py>`
+    .. tab:: Python
 
-.. literalinclude:: examples/clusters_dilate.py
-   :language: python
-   :start-after: <snippet>
-   :end-before: </snippet>
+        :download:`clusters_dilate.py <examples/clusters_dilate.py>`
 
-.. note::
+        .. literalinclude:: examples/clusters_dilate.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>
 
-    There is an additional example to show the effect of periodicity:
-    :download:`clusters_dilate_periodic.py <examples/clusters_dilate_periodic.py>`
-    :download:`clusters_dilate_periodic.svg <examples/clusters_dilate_periodic.svg>`
+        .. note::
 
-C++
-^^^
+            There is an additional example to show the effect of periodicity:
+            :download:`clusters_dilate_periodic.py <examples/clusters_dilate_periodic.py>`
+            :download:`clusters_dilate_periodic.svg <examples/clusters_dilate_periodic.svg>`
 
-.. literalinclude:: examples/clusters_dilate.cpp
-   :language: cpp
+    .. tab:: C++
+
+        :download:`clusters_dilate.cpp <examples/clusters_dilate.cpp>`
+
+        .. literalinclude:: examples/clusters_dilate.cpp
+            :language: cpp

@@ -19,6 +19,7 @@ dependencies:
 - scikit-build
 - scipy
 - setuptools_scm
+- sphinx-tabs
 - xsimd
 - xtensor
 - xtensor-python

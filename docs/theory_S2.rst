@@ -68,9 +68,6 @@ the 2-point probability :math:`S_2` in two dimensions,
 and a cross-section of this result in the middle of the region-of-interest
 along the horizontal axis.
 
-| :download:`S2.py <examples/S2.py>`
-| :download:`S2.cpp <examples/S2.cpp>`
-
 .. image:: examples/S2.svg
     :width: 700px
 
@@ -87,19 +84,23 @@ along the horizontal axis.
     If this assumption is not reasonable be sure to specify the
     ``periodic`` option (that defaults True).
 
-Python
-^^^^^^
+.. tabs::
 
-.. literalinclude:: examples/S2.py
-    :language: python
-    :start-after: <snippet>
-    :end-before: </snippet>
+    .. tab:: Python
 
-C++
-^^^
+        :download:`S2.py <examples/S2.py>`
 
-.. literalinclude:: examples/S2.cpp
-    :language: cpp
+        .. literalinclude:: examples/S2.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>
+
+    .. tab:: C++
+
+        :download:`S2.cpp <examples/S2.cpp>`
+
+        .. literalinclude:: examples/S2.cpp
+            :language: cpp
 
 .. _theory_S2_masked:
 
@@ -137,19 +138,19 @@ and then adds the result per image to it. Consider the following example.
     relative small measurements. See
     `Wikipedia <https://en.wikipedia.org/wiki/Ensemble_average_(statistical_mechanics)>`__.
 
-Python
-^^^^^^
+.. tabs::
 
-.. literalinclude:: examples/S2_ensemble.py
-    :language: python
-    :start-after: <snippet>
-    :end-before: </snippet>
+    .. tab:: Python
 
-C++
-^^^
+        .. literalinclude:: examples/S2_ensemble.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>
 
-.. literalinclude:: examples/S2_ensemble.cpp
-    :language: cpp
+    .. tab:: C++
+
+        .. literalinclude:: examples/S2_ensemble.cpp
+            :language: cpp
 
 Auto-correlation
 ----------------

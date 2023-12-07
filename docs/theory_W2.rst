@@ -80,9 +80,6 @@ all pixels for which :math:`\mathcal{M}(\vec{x}_i) = 0` are considered as normal
 Example
 -------
 
-| :download:`W2.py <examples/W2.py>`
-| :download:`W2.cpp <examples/W2.cpp>`
-
 .. image:: examples/W2.svg
     :width: 700px
 
@@ -93,19 +90,23 @@ Example
     Similarly, the average can be extended to that of an
     :ref:`ensemble <theory_S2_ensemble>` of images.
 
-Python
-^^^^^^
+.. tabs::
 
-.. literalinclude:: examples/W2.py
-    :language: python
-    :start-after: <snippet>
-    :end-before: </snippet>
+    .. tab:: Python
 
-C++
-^^^
+        :download:`W2.py <examples/W2.py>`
 
-.. literalinclude:: examples/W2.cpp
-    :language: cpp
+        .. literalinclude:: examples/W2.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>
+
+    .. tab:: C++
+
+        :download:`W2.cpp <examples/W2.cpp>`
+
+        .. literalinclude:: examples/W2.cpp
+            :language: cpp
 
 Collapse to single point
 ------------------------
@@ -153,8 +154,6 @@ Similarly to the above, a mask may be introduced as follows:
 Example
 ^^^^^^^
 
-| :download:`W2c.py <examples/W2c.py>`
-
 .. image:: examples/W2c.svg
     :width: 700px
 
@@ -165,10 +164,13 @@ Example
     Similarly, the average can be extended to that of an :ref:`ensemble <theory_S2_ensemble>`
     of images.
 
-Python
-^^^^^^
+.. tabs::
 
-.. literalinclude:: examples/W2c.py
-    :language: python
-    :start-after: <snippet>
-    :end-before: </snippet>
+   .. tab:: Python
+
+        :download:`W2c.py <examples/W2c.py>`
+
+        .. literalinclude:: examples/W2c.py
+            :language: python
+            :start-after: <snippet>
+            :end-before: </snippet>

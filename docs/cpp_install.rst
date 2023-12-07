@@ -51,14 +51,14 @@ concerning optimisation.
     There are additional targets available to expedite your ``CMakeLists.txt``:
 
     *   ``GooseEYE::assert``:
-         enable GooseEYE assertions by defining ``GOOSEEYE_ENABLE_ASSERT``.
+        enable GooseEYE assertions by defining ``GOOSEEYE_ENABLE_ASSERT``.
 
     *   ``GooseEYE::debug``:
-         enable GooseEYE assertions by defining ``GOOSEEYE_ENABLE_ASSERT`` and
-         xtensor assertions by defining ``XTENSOR_ENABLE_ASSERT`` (slow).
+        enable GooseEYE assertions by defining ``GOOSEEYE_ENABLE_ASSERT`` and
+        xtensor assertions by defining ``XTENSOR_ENABLE_ASSERT`` (slow).
 
     *   ``GooseEYE::compiler_warnings``:
-         enable compiler warnings (generic).
+        enable compiler warnings (generic).
 
 By hand
 ^^^^^^^

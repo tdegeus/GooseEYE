@@ -5,6 +5,7 @@ author = "Tom de Geus"
 extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
+    "sphinx_tabs.tabs",
 ]
 
 templates_path = ["_templates"]
