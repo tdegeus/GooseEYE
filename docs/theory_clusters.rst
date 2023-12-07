@@ -3,6 +3,9 @@
 Obtain clusters
 ===============
 
+.. raw:: html
+   :file: examples/clusters_algorithm.html
+
 Calculate clusters
 ------------------
 
