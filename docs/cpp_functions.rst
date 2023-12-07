@@ -124,17 +124,3 @@ Get clusters.
 
   * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
   * :ref:`Example <theory_clusters>`.
-
-Generate shape
-==============
-
-GooseEYE::dummy_circles
------------------------
-
-Create a dummy binary images of circles.
-
-.. seealso::
-
-  * :download:`GooseEYE.h <../include/GooseEYE/GooseEYE.h>`
-  * :download:`dummy_circles.hpp <../include/GooseEYE/dummy_circles.hpp>`
-  * :ref:`Example <theory_S2>`.
