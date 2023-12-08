@@ -1,9 +1,12 @@
+##########
+ GooseEYE
+##########
 
-********
-GooseEYE
-********
-
-GooseEYE can be used from C++ or as a Python module. Please consider the theory and examples below that describe briefly the different measurements and their interpretation, accompanied by a C++ and a Python example. Since this is a research code, the code itself is the best reference.
+GooseEYE can be used from C++ or as a Python module. Please consider the
+theory and examples below that describe briefly the different
+measurements and their interpretation, accompanied by a C++ and a Python
+example. Since this is a research code, the code itself is the best
+reference.
 
 .. toctree::
    :caption: THEORY & EXAMPLES
@@ -37,9 +40,10 @@ GooseEYE can be used from C++ or as a Python module. Please consider the theory 
    python_install.rst
    python_usage.rst
 
-Indices and tables
-==================
+********************
+ Indices and tables
+********************
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+-  :ref:`genindex`
+-  :ref:`modindex`
+-  :ref:`search`
