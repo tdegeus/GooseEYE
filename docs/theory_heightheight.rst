@@ -1,5 +1,28 @@
 .. _theory_heightheight:
 
+******************
+Height correlation
+******************
+
+Structure factor
+================
+
+The structure factor is defined as:
+
+.. math::
+
+    S(\vec{q}) = \langle \hat{u}(\vec{q}) \hat{u}(\vec{q}) \rangle
+
+where :math:`\vec{q}` is the angular frequency.
+
+.. image:: examples/structure.svg
+    :width: 700px
+    :class: only-light
+
+.. image:: examples/structure-dark.svg
+    :width: 700px
+    :class: only-dark
+
 Height-height correlation
 =========================
 

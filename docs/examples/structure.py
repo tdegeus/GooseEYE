@@ -22,6 +22,8 @@ if __name__ == "__main__":
     parser.add_argument("--save", action="store_true")
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--plot", action="store_true")
+    parser.add_argument("--dark", action="store_true", help="use dark theme to plot")
+    parser.add_argument("--show", action="store_true", help="show plot instead of saving it")
     args = parser.parse_args()
 
     if args.save:
@@ -42,7 +44,10 @@ if __name__ == "__main__":
         import matplotlib.pyplot as plt
 
         try:
-            plt.style.use(["goose", "goose-latex"])
+            styles = ["goose", "goose-latex"]
+            if args.dark:
+                styles += ["dark_background"]
+            plt.style.use(styles)
         except OSError:
             pass
 
@@ -51,17 +56,26 @@ if __name__ == "__main__":
         ax.set_xscale("log")
         ax.set_yscale("log")
 
-        ax.set_xlabel(r"$|q|$")
+        ax.set_xlabel(r"$2 \sin(|q| / 2)$")
         ax.set_ylabel(r"$S(|q|)$")
 
         q = structure.qnorm
         s = structure.mean()[1 : q.size]
         q = q[1:]
+        q *= 2 * np.pi
+        q = 2 * np.sin(q * 0.5)
         scaling = 1 / (q**2)
         scaling *= s[1] / scaling[1]
 
         ax.plot(q, s, marker=".")
         ax.plot(q, scaling, ls="--")
 
-        fig.savefig(root / "structure.svg")
+        if args.show:
+            plt.show()
+        else:
+            if args.dark:
+                plt.savefig(root / "structure-dark.svg")
+            else:
+                fig.savefig(root / "structure.svg")
+
         plt.close(fig)
