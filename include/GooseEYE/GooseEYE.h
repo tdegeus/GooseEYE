@@ -1038,14 +1038,24 @@ inline array_type::array<int> clusters(const T& f, bool periodic = true)
 /**
  * @brief Return the geometric center of a list of positions.
  *
+ * @note
+ *      The positions are organised as one column per dimension.
+ *      For example, in 2d, the positions are organised as
+ *      `positions = np.hstack((rows.reshape(-1, 1), cols.reshape(-1, 1)))`.
+ *      You can also use `positions = np.argwhere(condition)`.
+ *      This means that the following two calls are equivalent:
+ *
+ *          >>> centers(shape=labels.shape, positions=np.argwhere(labels == 1), periodic=True)
+ *          >>> labels_centers(labels=labels, names=[1], periodic=True)[0, :]
+ *
  * @details
  *      For periodic algorithm, see:
  *      https://en.wikipedia.org/wiki/Center_of_mass#Systems_with_periodic_boundary_conditions
  *
- * @param shape Shape of the array.
- * @param positions List of positions (in array coordinates).
+ * @param shape Shape of the box to which the coordinates below (needed to apply periodicity).
+ * @param positions List of positions (in array coordinates, e.g. `[rows, columns]`).
  * @param periodic Switch to assume array periodic.
- * @return Coordinates of the center (in array coordinates).
+ * @return Coordinates of the center (in array coordinates, e.g. `[center_row, center_col]`).
  */
 inline array_type::tensor<double, 1> center(
     const array_type::tensor<double, 1>& shape,
@@ -1131,6 +1141,8 @@ public:
 
 /**
  * @brief Get the position of the center of each label.
+ *
+ * @note To compute the center of a single label, you can also use GooseEYE::center().
  *
  * @param labels An image with labels.
  * @param names List of labels to compute the center for.
