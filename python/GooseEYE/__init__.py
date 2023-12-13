@@ -8,7 +8,7 @@ from numpy.typing import DTypeLike
 from ._GooseEYE import *  # noqa: F401, F403
 
 
-def ClusterLabeller(shape, periodic=True, **kwargs):
+def ClusterLabeller(shape, periodic: bool = True, **kwargs):
     """
     Allocate a cluster labeller.
 
