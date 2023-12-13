@@ -11,6 +11,7 @@ from ._GooseEYE import *  # noqa: F401, F403
 def ClusterLabeller(shape, periodic=True, **kwargs):
     """
     Allocate a cluster labeller.
+
     :param shape: The shape of the image.
     :param periodic: Whether the image is periodic.
     :return: A cluster labeller.

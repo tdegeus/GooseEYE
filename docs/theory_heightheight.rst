@@ -1,5 +1,36 @@
 .. _theory_heightheight:
 
+******************
+Height correlation
+******************
+
+Structure factor
+================
+
+The structure factor is defined as:
+
+.. math::
+
+    S(\vec{q}) = \langle \hat{u}(\vec{q}) \hat{u}(\vec{q}) \rangle
+
+where :math:`\vec{q}` is the angular frequency.
+It can be used to compute the roughness exponent :math:`\zeta`:
+
+.. math::
+
+    S(|q|) \sim |q|^{-(d + 2 \zeta)}
+
+where :math:`d` is the dimension of the image.
+An example is shown below.
+
+.. image:: examples/structure.svg
+    :width: 700px
+    :class: only-light
+
+.. image:: examples/structure-dark.svg
+    :width: 700px
+    :class: only-dark
+
 Height-height correlation
 =========================
 
