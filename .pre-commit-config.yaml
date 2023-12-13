@@ -51,6 +51,10 @@ repos:
   hooks:
   - id: clang-format
     args: [-i]
+- repo: https://github.com/dzhu/rstfmt
+  rev: v0.0.14
+  hooks:
+  - id: rstfmt
 - repo: https://github.com/tdegeus/conda_envfile
   rev: v0.4.2
   hooks:
