@@ -152,18 +152,20 @@ if(BUILD_PYTHON OR BUILD_ALL)
         find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
     endif()
 
-    add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/docstrings.h"
-    COMMAND Python::Interpreter
-    ARGS
-        -m pybind11_mkdoc
-        --output "${CMAKE_CURRENT_BINARY_DIR}/docstrings.h"
-        -std=c++17
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/GooseEYE/GooseEYE.h"
-    COMMAND_EXPAND_LISTS
-    VERBATIM
-    )
-    set_property(SOURCE python/main.cpp APPEND PROPERTY OBJECT_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/docstrings.h")
+    if (NOT SKBUILD)
+        add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/docstrings.h"
+        COMMAND Python::Interpreter
+        ARGS
+            -m pybind11_mkdoc
+            --output "${CMAKE_CURRENT_BINARY_DIR}/docstrings.h"
+            -std=c++17
+            "${CMAKE_CURRENT_SOURCE_DIR}/include/GooseEYE/GooseEYE.h"
+        COMMAND_EXPAND_LISTS
+        VERBATIM
+        )
+        set_property(SOURCE python/main.cpp APPEND PROPERTY OBJECT_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/docstrings.h")
+    endif()
 
     pybind11_add_module(${PYPROJECT_NAME} python/main.cpp)
 
