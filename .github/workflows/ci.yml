@@ -62,6 +62,13 @@ jobs:
       working-directory: pybind11_mkdoc
       run: python -m pip install . -v
 
+    - name: Configure using CMake
+      run: cmake -Bbuild ${{ matrix.config }}
+
+    - name: Build C++
+      working-directory: build
+      run: cmake --build .
+
     - name: Build and install Python module
       run: python -m pip install . -v --no-build-isolation
 
@@ -88,13 +95,6 @@ jobs:
         python mean.py --check
         python pixel_path.py --check
         python structure.py --check
-
-    - name: Configure using CMake
-      run: cmake -Bbuild ${{ matrix.config }}
-
-    - name: Build C++
-      working-directory: build
-      run: cmake --build .
 
     - name: Run C++ tests
       working-directory: build
