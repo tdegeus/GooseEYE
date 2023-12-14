@@ -51,8 +51,16 @@ jobs:
         LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
         echo "SETUPTOOLS_SCM_PRETEND_VERSION=$LATEST_TAG" >> $GITHUB_ENV
 
-    - name: Get pybind11_mkdoc
-      run: python -m pip install git+git://github.com/pybind/pybind11_mkdoc.git@master
+    - name: Clone pybind11_mkdoc
+      uses: actions/checkout@v3
+      with:
+        path: pybind11_mkdoc
+        repository: pybind/pybind11_mkdoc
+        fetch-depth: 0
+
+    - name: Install pybind11_mkdoc
+      working-directory: pybind11_mkdoc
+      run: python -m pip install . -v
 
     - name: Build and install Python module
       run: python -m pip install . -v --no-build-isolation
